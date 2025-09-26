@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom",
+      "node",
+      "@atlas/vitest-conf"
+    ],
+    "noEmit": true
+  },
+  "include": ["vitest.setup.ts", "src/**/*.test.ts", "src/**/*.test.tsx"]
+}

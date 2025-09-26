@@ -2,24 +2,26 @@
   "name": "atlas",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
     "build": "turbo run build",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "format:pkg": "sort-package-json \"apps/*/package.json\" \"packages/*/package.json\"",
     "test": "turbo run test"
   },
-  "packageManager": "pnpm@10.17.1",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "eslint": "^9.36.0",
     "prettier": "^3.6.2",
+    "sort-package-json": "^3.4.0",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1"
   },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  }
+  "packageManager": "pnpm@10.17.1"
 }
