@@ -18,9 +18,8 @@ This package centralises all testing setup — including Vitest configuration, j
 
  ## Usage
 
- 1. add `@atlas/vitest-conf` as a workspace dependency:
+ 1. add `@atlas/vitest-conf` as a workspace dependency in `apps/my-app/package.json`:
 ```json
-// apps/my-app/package.json
 "devDependencies": {
     "@atlas/vitest-conf": "workspace:*"
 }
@@ -37,9 +36,8 @@ export default defineConfig({
 });
 ```
 
- 3. Include global type definitions:
+ 3. Include global type definitions in `apps/my-app/tsconfig.json`:
 ```json
-// apps/my-app/tsconfig.json:
 {
     "compilerOptions": {
         "types": ["@atlas/vitest-conf/global-types"]
