@@ -23,10 +23,11 @@
       }
     }
   },
-  "runArgs": [
-    "--net=host",
-    "--security-opt=label=disable"
-  ],
+  "features": {
+    // add in eternal history and other bash features
+    "ghcr.io/diamondlightsource/devcontainer-features/bash-config:1": {}
+  },
+  "runArgs": ["--net=host", "--security-opt=label=disable"],
   "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
   "postCreateCommand": "pnpm install"
 }
