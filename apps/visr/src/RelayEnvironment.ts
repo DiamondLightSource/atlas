@@ -6,7 +6,7 @@ import {
   type FetchFunction,
 } from "relay-runtime";
 
-const HTTP_ENDPOINT = "/api/workflows";
+const HTTP_ENDPOINT = "/api/graphql";
 const fetchFn: FetchFunction = async (request, variables) => {
   const resp = await fetch(HTTP_ENDPOINT, {
     method: "POST",
