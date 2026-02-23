@@ -1,0 +1,11 @@
+apiVersion: v2
+name: i15-1
+description: I15-1 UI
+type: application
+version: 0.5.0 # Bumped by CI job
+appVersion: "0.5.0" # Bumped by CI job
+
+dependencies:
+  - name: ui-base
+    repository: "file://../../../helm/"
+    version: 0.1.0

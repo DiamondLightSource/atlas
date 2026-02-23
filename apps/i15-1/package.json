@@ -1,0 +1,32 @@
+{
+  "name": "@atlas/i15-1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@diamondlightsource/sci-react-ui": "^0.2.0",
+    "@mui/icons-material": "^6.5.0",
+    "@mui/material": "<7.0.0"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "typescript": "~5.9.3",
+    "msw": "^2.10.4",
+    "vite": "^7.3.1",
+    "react-router-dom": "^7.7.1",
+    "vite-plugin-relay": "^2.1.0",
+    "@vitejs/plugin-react-swc": "^3.11.0",
+    "vitest": "*"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
+  "packageManager": "pnpm@10.12.3+sha512.467df2c586056165580ad6dfb54ceaad94c5a30f80893ebdec5a44c5aa73c205ae4a5bb9d5ed6bb84ea7c249ece786642bbb49d06a307df218d03da41c317417"
+}

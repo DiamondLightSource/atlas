@@ -1,0 +1,17 @@
+ui-base:
+  name: i15-1
+  host: i15-1.diamond.ac.uk
+
+  image:
+    repository: ghcr.io/diamondlightsource/atlas/i15-1
+    tag: # Updated by CI job with latest release version
+
+  upstreams:
+    - id: blueapi
+      path: /api/
+      rewriteTarget: /
+      target:
+        external:
+          uri: http://i15-1-blueapi.diamond.ac.uk
+
+  identityProvider: prod
