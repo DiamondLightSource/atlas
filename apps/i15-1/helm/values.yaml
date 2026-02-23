@@ -14,4 +14,6 @@ ui-base:
         external:
           uri: http://i15-1-blueapi.diamond.ac.uk
 
-  identityProvider: prod
+  # identityProvider: prod
+  oauth2-proxy:
+    enabled: false
