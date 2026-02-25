@@ -1,17 +1,28 @@
-import { useFragment } from "react-relay";
+import { graphql, useFragment } from "react-relay";
 import { type JSONObject, type Visit } from "../../utils/types";
 import type { JsonSchema, UISchemaElement } from "@jsonforms/core";
-import type { workflowTemplateFragment$key } from "../../graphql/__generated__/workflowTemplateFragment.graphql";
-import { workflowTemplateFragment } from "../../graphql/workflowTemplateFragment";
 import TemplateSubmissionForm from "./TemplateSubmissionForm";
+import type { SubmissionFormFragment$key } from "./__generated__/SubmissionFormFragment.graphql";
+
+export const SubmissionFormFragment = graphql`
+  fragment SubmissionFormFragment on WorkflowTemplate {
+    name
+    maintainer
+    title
+    description
+    arguments
+    uiSchema
+    repository
+  }
+`;
 
 const SubmissionForm = (props: {
-  template: workflowTemplateFragment$key;
+  template: SubmissionFormFragment$key;
   prepopulatedParameters?: JSONObject;
   visit?: Visit;
   onSubmit: (visit: Visit, parameters: object) => void;
 }) => {
-  const data = useFragment(workflowTemplateFragment, props.template);
+  const data = useFragment(SubmissionFormFragment, props.template);
   return (
     <TemplateSubmissionForm
       title={data.title ? data.title : data.name}

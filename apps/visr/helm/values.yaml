@@ -36,4 +36,11 @@ ui-base:
         external:
           uri: https://graph-nightly.diamond.ac.uk
 
+    - id: subscriptions
+      path: /api/graphql/ws
+      rewriteTarget: /graphql/ws
+      target:
+        external:
+          uri: https://graph-nightly.diamond.ac.uk
+
   identityProvider: legacy
