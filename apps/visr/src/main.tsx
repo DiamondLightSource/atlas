@@ -9,16 +9,16 @@ import Spectroscopy from "./routes/Spectroscopy.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import Workflows from "./routes/Workflows.tsx";
+import { RelayEnvironmentProvider } from "react-relay";
+import { getRelayEnvironment } from "./RelayEnvironment.ts";
+
 declare global {
   interface Window {
     global?: typeof globalThis;
   }
 }
-
 window.global ||= window;
-import Workflows from "./routes/Workflows.tsx";
-import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -52,9 +52,13 @@ const router = createBrowserRouter([
   },
 ]);
 
-enableMocking().then(() => {
+(async function start() {
+  await enableMocking();
+
+  const environment = await getRelayEnvironment();
+
   createRoot(document.getElementById("root")!).render(
-    <RelayEnvironmentProvider environment={RelayEnvironment}>
+    <RelayEnvironmentProvider environment={environment}>
       <InstrumentSessionProvider>
         <StrictMode>
           <ThemeProvider theme={DiamondTheme} defaultMode="light">
@@ -64,4 +68,4 @@ enableMocking().then(() => {
       </InstrumentSessionProvider>
     </RelayEnvironmentProvider>,
   );
-});
+})();

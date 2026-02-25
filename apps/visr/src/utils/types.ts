@@ -92,3 +92,12 @@ export type JSONValue =
 export interface JSONObject {
   [key: string]: JSONValue;
 }
+
+export interface SubmissionData {
+  submissionResult:
+    | SubmissionSuccessMessage
+    | SubmissionGraphQLErrorMessage
+    | SubmissionNetworkErrorMessage;
+  visit: Visit;
+  workflowName?: string;
+}

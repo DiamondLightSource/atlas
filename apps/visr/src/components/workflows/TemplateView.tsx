@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useLazyLoadQuery } from "react-relay/hooks";
 import { graphql } from "relay-runtime";
-import type {
-  JSONObject,
-  SubmissionGraphQLErrorMessage,
-  SubmissionNetworkErrorMessage,
-  SubmissionSuccessMessage,
-} from "../../utils/types";
+import type { JSONObject, SubmissionData } from "../../utils/types";
 import { type Visit, visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionForm from "./SubmissionForm";
 import type { TemplateViewQuery as TemplateViewQueryType } from "./__generated__/TemplateViewQuery.graphql";
@@ -18,7 +13,7 @@ import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 const templateViewQuery = graphql`
   query TemplateViewQuery($templateName: String!) {
     workflowTemplate(name: $templateName) {
-      ...workflowTemplateFragment
+      ...SubmissionFormFragment
     }
   }
 `;
@@ -35,13 +30,9 @@ export default function TemplateView({
   const data = useLazyLoadQuery<TemplateViewQueryType>(templateViewQuery, {
     templateName,
   });
-  const [submissionResults, setSubmissionResults] = useState<
-    (
-      | SubmissionSuccessMessage
-      | SubmissionNetworkErrorMessage
-      | SubmissionGraphQLErrorMessage
-    )[]
-  >([]);
+  const [submissionResults, setSubmissionResults] = useState<SubmissionData[]>(
+    [],
+  );
 
   const storedVisit = visitTextToVisit(
     localStorage.getItem("instrumentSessionID") ?? "",
@@ -54,8 +45,11 @@ export default function TemplateView({
       const { name: submittedName } = await submit(visit, parameters);
       setSubmissionResults(prev => [
         {
-          type: "success",
-          message: `${visitToText(visit)}/${submittedName}`,
+          submissionResult: {
+            type: "success",
+            message: `${visitToText(visit)}/${submittedName}`,
+          },
+          visit,
         },
         ...prev,
       ]);
@@ -65,16 +59,22 @@ export default function TemplateView({
       if (Array.isArray(err)) {
         setSubmissionResults(prev => [
           {
-            type: "graphQLError",
-            errors: err,
+            submissionResult: {
+              type: "graphQLError",
+              errors: err,
+            },
+            visit,
           },
           ...prev,
         ]);
       } else {
         setSubmissionResults(prev => [
           {
-            type: "networkError",
-            error: err as Error,
+            submissionResult: {
+              type: "networkError",
+              error: err as Error,
+            },
+            visit,
           },
           ...prev,
         ]);
@@ -90,7 +90,7 @@ export default function TemplateView({
         visit={visit ?? storedVisit ?? undefined}
         onSubmit={submitWorkflow}
       />
-      <SubmittedMessagesList submissionResults={submissionResults} />
+      <SubmittedMessagesList submittedData={submissionResults} />
     </Box>
   );
 }

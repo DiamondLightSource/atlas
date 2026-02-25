@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<eb6c85d3e5731fbc36fe9b45f460ecbe>>
+ * @generated SignedSource<<e10c8607833d1c312cb959334703846d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,7 +15,7 @@ export type TemplateViewQuery$variables = {
 };
 export type TemplateViewQuery$data = {
   readonly workflowTemplate: {
-    readonly " $fragmentSpreads": FragmentRefs<"workflowTemplateFragment">;
+    readonly " $fragmentSpreads": FragmentRefs<"SubmissionFormFragment">;
   };
 };
 export type TemplateViewQuery = {
@@ -56,7 +56,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "workflowTemplateFragment"
+            "name": "SubmissionFormFragment"
           }
         ],
         "storageKey": null
@@ -134,16 +134,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9fb9e57ce71efced848172180274ed2a",
+    "cacheID": "f7b70050ad93e97cf69ca8025a53c572",
     "id": null,
     "metadata": {},
     "name": "TemplateViewQuery",
     "operationKind": "query",
-    "text": "query TemplateViewQuery(\n  $templateName: String!\n) {\n  workflowTemplate(name: $templateName) {\n    ...workflowTemplateFragment\n  }\n}\n\nfragment workflowTemplateFragment on WorkflowTemplate {\n  name\n  maintainer\n  title\n  description\n  arguments\n  uiSchema\n  repository\n}\n"
+    "text": "query TemplateViewQuery(\n  $templateName: String!\n) {\n  workflowTemplate(name: $templateName) {\n    ...SubmissionFormFragment\n  }\n}\n\nfragment SubmissionFormFragment on WorkflowTemplate {\n  name\n  maintainer\n  title\n  description\n  arguments\n  uiSchema\n  repository\n}\n"
   }
 };
 })();
 
-(node as any).hash = "907837f3f9cf4408bf964271f9a981d1";
+(node as any).hash = "4c702d8bfd75a5c741f542f85ff6f4a9";
 
 export default node;
