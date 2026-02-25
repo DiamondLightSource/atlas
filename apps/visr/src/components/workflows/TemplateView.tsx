@@ -50,6 +50,7 @@ export default function TemplateView({
             message: `${visitToText(visit)}/${submittedName}`,
           },
           visit,
+          workflowName: submittedName,
         },
         ...prev,
       ]);
