@@ -38,6 +38,7 @@ export interface RenderSubmittedMessagePropsList {
 export const RenderSubmittedMessage: React.FC<
   RenderSubmittedMessagePropsList
 > = ({ result, index, fragmentRef }) => {
+  console.log("Bypassing subscription");
   const data = useFragment(RenderSubmittedMessageFragment, fragmentRef);
   switch (result.type) {
     case "success":

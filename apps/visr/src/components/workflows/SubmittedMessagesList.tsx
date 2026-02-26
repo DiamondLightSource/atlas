@@ -11,6 +11,7 @@ interface SubmittedMessagesListProps {
 const SubmittedMessagesList: React.FC<SubmittedMessagesListProps> = ({
   submittedData,
 }) => {
+  console.log("Submitted messages list", submittedData);
   return (
     <Box
       sx={{

@@ -43,6 +43,7 @@ export const SubscribeAndRender: React.FC<SubscribeAndRenderPropsList> = ({
 }) => {
   const [workflowData, setWorkflowData] =
     useState<SubscribeAndRenderSubscription$data | null>(null);
+  console.log("Using subscribe and render. workflowData", workflowData);
 
   const subscriptionData: GraphQLSubscriptionConfig<SubscribeAndRenderSubscriptionType> =
     useMemo(
@@ -61,7 +62,10 @@ export const SubscribeAndRender: React.FC<SubscribeAndRenderPropsList> = ({
       }),
       [visit, workflowName],
     );
+
   useSubscription(subscriptionData);
+
+  console.log("Using subscription data", subscriptionData);
 
   return (
     <RenderSubmittedMessage

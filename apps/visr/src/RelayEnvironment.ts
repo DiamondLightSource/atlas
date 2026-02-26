@@ -11,7 +11,7 @@ import {
 import { createClient } from "graphql-ws";
 
 const HTTP_ENDPOINT = "/api/graphql";
-const WS_ENDPOINT = "/api/graphql/ws";
+export const WS_ENDPOINT = "/api/graphql/ws";
 
 const fetchFn: FetchFunction = async (request, variables) => {
   const resp = await fetch(HTTP_ENDPOINT, {
