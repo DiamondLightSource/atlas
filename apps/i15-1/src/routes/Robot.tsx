@@ -59,8 +59,7 @@ function Robot() {
             buttonText="Load Sample"
           />
           <RunPlanButton
-            name="plan_name"
-            params={formData}
+            name="robot_unload"
             instrumentSession={instrumentSession}
             buttonText="Unload Sample"
           />
