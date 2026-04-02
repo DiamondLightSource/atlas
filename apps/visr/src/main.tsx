@@ -19,14 +19,14 @@ declare global {
 window.global ||= window;
 import Workflows from "./routes/Workflows.tsx";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment.ts";
+import { getRelayEnvironment } from "./RelayEnvironment.ts";
 import { createApi } from "@atlas/blueapi";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
     const { worker } = await import("./mocks/browser");
-    return worker.start();
+    return await worker.start();
   }
 }
 
@@ -59,8 +59,9 @@ const api = createApi("/api");
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {
+  const environment = getRelayEnvironment();
   createRoot(document.getElementById("root")!).render(
-    <RelayEnvironmentProvider environment={RelayEnvironment}>
+    <RelayEnvironmentProvider environment={environment}>
       <InstrumentSessionProvider>
         <StrictMode>
           <ThemeProvider theme={DiamondTheme} defaultMode="light">

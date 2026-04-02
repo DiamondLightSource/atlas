@@ -3,67 +3,116 @@
     "instrument": {
       "instrumentSessions": [
         {
+          "proposal": {
+            "proposalNumber": 39125,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 1,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 39125,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 2,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 39125,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 3,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 1,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 2,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 3,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 4,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+          "state": "Completed"
         },
         {
+          "proposal": {
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
           "instrumentSessionNumber": 5,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+          "state": "Completed"
         },
         {
-          "instrumentSessionNumber": 6,
           "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
+            "proposalNumber": 40661,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 6,
+          "state": "Completed"
+        },
+        {
+          "proposal": {
+            "proposalNumber": 44191,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 1,
+          "state": "Completed"
+        },
+        {
+          "proposal": {
+            "proposalNumber": 44191,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 2,
+          "state": "In Progress"
+        },
+        {
+          "proposal": {
+            "proposalNumber": 44191,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 3,
+          "state": "Future"
+        },
+        {
+          "proposal": {
+            "proposalNumber": 44191,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 4,
+          "state": "Future"
+        },
+        {
+          "proposal": {
+            "proposalNumber": 44191,
+            "proposalCategory": "CM"
+          },
+          "instrumentSessionNumber": 5,
+          "state": "Future"
         }
       ]
     }

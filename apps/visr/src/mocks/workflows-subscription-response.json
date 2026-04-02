@@ -1,0 +1,201 @@
+[
+  { "t": "2026-01-27T14:38:35Z", "type": "connection_ack" },
+  {
+    "t": "2026-01-27T14:38:35Z",
+    "type": "next",
+    "id": "1",
+    "payload": {
+      "data": {
+        "workflow": {
+          "name": "mockSubmittedName",
+          "visit": {
+            "proposalCode": "cm",
+            "proposalNumber": 40661,
+            "number": 6
+          },
+          "templateRef": "visr-reconstruction",
+          "parameters": {
+            "input-file-path": "/dls/b01-1/data/2025/cm40661-6/b01-1-361.nxs"
+          },
+          "status": null
+        }
+      }
+    }
+  },
+  {
+    "t": "2026-01-27T14:38:36Z",
+    "type": "next",
+    "id": "1",
+    "payload": {
+      "data": {
+        "workflow": {
+          "name": "mockSubmittedName",
+          "visit": {
+            "proposalCode": "cm",
+            "proposalNumber": 40661,
+            "number": 6
+          },
+          "templateRef": "visr-reconstruction",
+          "parameters": {
+            "input-file-path": "/dls/b01-1/data/2025/cm40661-6/b01-1-361.nxs"
+          },
+          "status": {
+            "__typename": "WorkflowRunningStatus",
+            "startTime": "2026-01-27T14:38:35+00:00",
+            "message": null,
+            "tasks": [
+              {
+                "message": null,
+                "id": "visr-reconstruction-ws7fl",
+                "name": "visr-reconstruction-ws7fl",
+                "status": "PENDING",
+                "depends": [],
+                "dependencies": [],
+                "stepType": "Pod",
+                "artifacts": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "t": "2026-01-27T14:38:46Z",
+    "type": "next",
+    "id": "1",
+    "payload": {
+      "data": {
+        "workflow": {
+          "name": "mockSubmittedName",
+          "visit": {
+            "proposalCode": "cm",
+            "proposalNumber": 40661,
+            "number": 6
+          },
+          "templateRef": "visr-reconstruction",
+          "parameters": {
+            "input-file-path": "/dls/b01-1/data/2025/cm40661-6/b01-1-361.nxs"
+          },
+          "status": {
+            "__typename": "WorkflowRunningStatus",
+            "startTime": "2026-01-27T14:38:35+00:00",
+            "message": null,
+            "tasks": [
+              {
+                "message": null,
+                "id": "visr-reconstruction-ws7fl",
+                "name": "visr-reconstruction-ws7fl",
+                "status": "RUNNING",
+                "depends": [],
+                "dependencies": [],
+                "stepType": "Pod",
+                "artifacts": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "t": "2026-01-27T14:38:56Z",
+    "type": "next",
+    "id": "1",
+    "payload": {
+      "data": {
+        "workflow": {
+          "name": "mockSubmittedName",
+          "visit": {
+            "proposalCode": "cm",
+            "proposalNumber": 40661,
+            "number": 6
+          },
+          "templateRef": "visr-reconstruction",
+          "parameters": {
+            "input-file-path": "/dls/b01-1/data/2025/cm40661-6/b01-1-361.nxs"
+          },
+          "status": {
+            "__typename": "WorkflowSucceededStatus",
+            "startTime": "2026-01-27T14:38:35+00:00",
+            "endTime": "2026-01-27T14:38:56+00:00",
+            "message": null,
+            "tasks": [
+              {
+                "message": null,
+                "id": "visr-reconstruction-ws7fl",
+                "name": "visr-reconstruction-ws7fl",
+                "status": "SUCCEEDED",
+                "depends": [],
+                "dependencies": [],
+                "stepType": "Pod",
+                "artifacts": [
+                  {
+                    "name": "visr-reconstructed-image.png",
+                    "url": "https://sci-nas-s3.diamond.ac.uk/k8s-workflows-test/visr-reconstruction-ws7fl/visr-reconstruction-ws7fl/visr-reconstructed-image.png",
+                    "mimeType": "image/png"
+                  },
+                  {
+                    "name": "main.log",
+                    "url": "https://sci-nas-s3.diamond.ac.uk/k8s-workflows-test/visr-reconstruction-ws7fl/visr-reconstruction-ws7fl/main.log",
+                    "mimeType": "text/plain"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "t": "2026-01-27T14:38:57Z",
+    "type": "next",
+    "id": "1",
+    "payload": {
+      "data": {
+        "workflow": {
+          "name": "mockSubmittedName",
+          "visit": {
+            "proposalCode": "cm",
+            "proposalNumber": 40661,
+            "number": 6
+          },
+          "templateRef": "visr-reconstruction",
+          "parameters": {
+            "input-file-path": "/dls/b01-1/data/2025/cm40661-6/b01-1-361.nxs"
+          },
+          "status": {
+            "__typename": "WorkflowSucceededStatus",
+            "startTime": "2026-01-27T14:38:35+00:00",
+            "endTime": "2026-01-27T14:38:56+00:00",
+            "message": null,
+            "tasks": [
+              {
+                "message": null,
+                "id": "visr-reconstruction-ws7fl",
+                "name": "visr-reconstruction-ws7fl",
+                "status": "SUCCEEDED",
+                "depends": [],
+                "dependencies": [],
+                "stepType": "Pod",
+                "artifacts": [
+                  {
+                    "name": "visr-reconstructed-image.png",
+                    "url": "https://sci-nas-s3.diamond.ac.uk/k8s-workflows-test/visr-reconstruction-ws7fl/visr-reconstruction-ws7fl/visr-reconstructed-image.png",
+                    "mimeType": "image/png"
+                  },
+                  {
+                    "name": "main.log",
+                    "url": "https://sci-nas-s3.diamond.ac.uk/k8s-workflows-test/visr-reconstruction-ws7fl/visr-reconstruction-ws7fl/main.log",
+                    "mimeType": "text/plain"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+]

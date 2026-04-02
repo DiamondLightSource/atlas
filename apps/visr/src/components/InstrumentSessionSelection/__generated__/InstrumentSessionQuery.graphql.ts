@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bd1bc2c804b6142383c22bcdbb18504a>>
+ * @generated SignedSource<<44623b1875ca9e075b68b6222a7fb543>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -20,6 +20,7 @@ export type InstrumentSessionQuery$data = {
         readonly proposalCategory: string | null | undefined;
         readonly proposalNumber: number;
       } | null | undefined;
+      readonly state: string | null | undefined;
     }>;
   } | null | undefined;
 };
@@ -64,6 +65,13 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "instrumentSessionNumber",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "state",
             "storageKey": null
           },
           {
@@ -116,16 +124,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "625bde94466c698bcacfb6d41e195cbe",
+    "cacheID": "0fd5a212ca97751f6ddc9c1cdd801979",
     "id": null,
     "metadata": {},
     "name": "InstrumentSessionQuery",
     "operationKind": "query",
-    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrument(instrumentName: $instrumentName) {\n    instrumentSessions {\n      instrumentSessionNumber\n      proposal {\n        proposalCategory\n        proposalNumber\n      }\n    }\n  }\n}\n"
+    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrument(instrumentName: $instrumentName) {\n    instrumentSessions {\n      instrumentSessionNumber\n      state\n      proposal {\n        proposalCategory\n        proposalNumber\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3cb865e4a1f45b6db5b70c2cb201f4e7";
+(node as any).hash = "5de2b65b410c0ad26c8721ba04010220";
 
 export default node;
