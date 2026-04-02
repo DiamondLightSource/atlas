@@ -17,6 +17,7 @@
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",
+    "@babel/runtime": "^7.28.4",
     "@diamondlightsource/davidia": "^1.0.3",
     "@diamondlightsource/sci-react-ui": "^0.2.0",
     "@emotion/react": "^11.14.0",
@@ -32,6 +33,7 @@
     "@react-three/fiber": "^8.16.8",
     "@tanstack/react-query": "^5.90.21",
     "ndarray": "^1.0.19",
+    "graphql-ws": "^6.0.6",
     "react-error-boundary": "^6.0.0",
     "react-router-dom": "^7.7.1",
     "three": "^0.164.1"
@@ -45,6 +47,7 @@
     "@types/react-relay": "^18.2.1",
     "@types/relay-runtime": "^19.0.2",
     "@types/three": "^0.164.0",
+    "@vitejs/plugin-react": "^5.1.2",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "ajv": "^8.17.1",
     "babel-plugin-relay": "^20.1.1",
