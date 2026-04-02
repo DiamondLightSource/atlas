@@ -37,4 +37,4 @@ ui-base:
           uri: https://graph-nightly.diamond.ac.uk
       passHostHeader: false
 
-  identityProvider: legacy
+  identityProvider: prod

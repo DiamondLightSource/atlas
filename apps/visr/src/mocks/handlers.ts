@@ -1,16 +1,26 @@
-import { http, HttpResponse, graphql } from "msw";
+import { http, HttpResponse, graphql, ws } from "msw";
 import workflowsResponse from "./workflows-response.json";
+import instrumentSessionResponse from "./instrumentSessions-response.json";
 import plansResponse from "./plans-response.json";
 import { mapData } from "./mock_data";
 import type { ScanEventMessage } from "../hooks/scanEvents";
+import workflowsSubscriptionResponse from "./workflows-subscription-response.json";
+import { WS_ENDPOINT } from "../RelayEnvironment";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 
 export const handlers = [
-  // Query handler
+  // Workflows template query handler
   graphql.query("TemplateViewQuery", async () => {
     return HttpResponse.json({
       data: workflowsResponse.data,
+    });
+  }),
+
+  // Instrument session query handler
+  graphql.query("InstrumentSessionQuery", async () => {
+    return HttpResponse.json({
+      data: instrumentSessionResponse.data,
     });
   }),
 
@@ -103,4 +113,69 @@ export const handlers = [
       },
     });
   }),
+
+  ...createGraphQlSubscriptionHandlers(),
 ];
+
+type WorkflowsSubscriptionMessage = {
+  t?: string;
+  type: string;
+  id?: string;
+  payload?: unknown;
+};
+
+export function createGraphQlSubscriptionHandlers() {
+  const link = ws.link(WS_ENDPOINT);
+
+  return [
+    link.addEventListener("connection", ({ client }) => {
+      let ackSent = false;
+      client.addEventListener("message", event => {
+        const text =
+          typeof event.data === "string" ? event.data : String(event.data);
+        let msg;
+        try {
+          msg = JSON.parse(text);
+        } catch {
+          return;
+        }
+
+        if (msg.type === "connection_init") {
+          if (!ackSent) {
+            ackSent = true;
+            client.send(JSON.stringify({ type: "connection_ack" }));
+          }
+          return;
+        }
+
+        if (msg.type === "ping") {
+          client.send(JSON.stringify({ type: "pong", payload: msg.payload }));
+          return;
+        }
+
+        if (msg.type === "subscribe") {
+          const subId = msg.id ?? "1";
+
+          for (const frame of workflowsSubscriptionResponse as WorkflowsSubscriptionMessage[]) {
+            const out = { ...frame, id: subId };
+            client.send(JSON.stringify(out));
+          }
+
+          if (
+            !(
+              workflowsSubscriptionResponse as WorkflowsSubscriptionMessage[]
+            ).some(m => m.type === "complete")
+          ) {
+            client.send(JSON.stringify({ type: "complete", id: subId }));
+          }
+
+          return;
+        }
+
+        if (msg.type === "complete") {
+          return;
+        }
+      });
+    }),
+  ];
+}

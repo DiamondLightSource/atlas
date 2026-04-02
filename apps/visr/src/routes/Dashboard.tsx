@@ -4,7 +4,7 @@ import FeedIcon from "@mui/icons-material/Feed";
 import AddchartIcon from "@mui/icons-material/Addchart";
 import { Link } from "react-router-dom";
 import InstrumentSessionView from "../components/InstrumentSessionSelection/InstrumentSessionView";
-// import GetInstrumentSessions from "../components/InstrumentSessionSelection/InstrumentSession";
+import GetInstrumentSessions from "../components/InstrumentSessionSelection/InstrumentSession";
 
 function Dashboard() {
   return (
@@ -52,16 +52,7 @@ function Dashboard() {
               <Typography sx={{ mt: "4px" }}>Workflows</Typography>
             </Button>
           </Stack>
-          {/* <InstrumentSessionView sessionsList={GetInstrumentSessions()} /> */}
-          <InstrumentSessionView
-            sessionsList={[
-              "cm44191-1",
-              "cm44191-2",
-              "cm44191-3",
-              "cm44191-4",
-              "cm44191-5",
-            ]}
-          />
+          <InstrumentSessionView sessionsList={GetInstrumentSessions()} />
         </Stack>
       </Container>
     </>
