@@ -1191,6 +1191,10 @@ input StringOperatorInput {
   """
   eq: String = null
 
+"""
+Conditions used to filter results based on the value of a String field
+"""
+input StringOperatorInput {
   """
   Will filter to items where the `String` field is not equal to the provided value
   """

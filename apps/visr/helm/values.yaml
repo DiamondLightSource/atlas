@@ -35,7 +35,7 @@ ui-base:
       rewriteTarget: /graphql
       target:
         external:
-          uri: https://graph-nightly.diamond.ac.uk/graphqp
+          uri: https://graph-nightly.diamond.ac.uk/graphql
       passHostHeader: false
 
   identityProvider: prod
