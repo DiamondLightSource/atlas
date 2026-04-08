@@ -2,6 +2,15 @@ ui-base:
   name: visr
   host: visr.diamond.ac.uk
 
+  oauth2-proxy:
+    extraArgs:
+      skip-provider-button: "true"
+      standard-logging: "true"
+      request-logging: "true"
+      auth-logging: "true"
+      show-debug-on-error: "true"
+      skip-auth-route: "^/api/graphql/ws(?:\\?.*)?$"
+
   image:
     repository: ghcr.io/diamondlightsource/atlas/visr
     tag: # Updated by CI job with latest release version
@@ -31,10 +40,10 @@ ui-base:
 
     - id: supergraph
       path: /api/graphql
-      rewriteTarget: /
+      rewriteTarget: /graphql
       target:
         external:
-          uri: https://graph-nightly.diamond.ac.uk/graphql
+          uri: https://graph-nightly.diamond.ac.uk/
       passHostHeader: false
 
   identityProvider: prod
