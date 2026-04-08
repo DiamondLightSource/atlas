@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4f6547654b801b006d483c984e5808e1>>
+ * @generated SignedSource<<1bf0edfd66484b0fb05d16638676a62b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -47,40 +47,28 @@ v2 = {
 },
 v3 = [
   {
-    "alias": null,
-    "args": [
-      {
-        "kind": "Variable",
-        "name": "name",
-        "variableName": "templateName"
-      },
-      {
-        "kind": "Variable",
-        "name": "parameters",
-        "variableName": "parameters"
-      },
-      {
-        "kind": "Variable",
-        "name": "visit",
-        "variableName": "visit"
-      }
-    ],
-    "concreteType": "Workflow",
-    "kind": "LinkedField",
-    "name": "submitWorkflowTemplate",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "name",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
+    "kind": "Variable",
+    "name": "name",
+    "variableName": "templateName"
+  },
+  {
+    "kind": "Variable",
+    "name": "parameters",
+    "variableName": "parameters"
+  },
+  {
+    "kind": "Variable",
+    "name": "visit",
+    "variableName": "visit"
   }
-];
+],
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -91,7 +79,20 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "submitWorkflowTemplateMutation",
-    "selections": (v3/*: any*/),
+    "selections": [
+      {
+        "alias": null,
+        "args": (v3/*: any*/),
+        "concreteType": "Workflow",
+        "kind": "LinkedField",
+        "name": "submitWorkflowTemplate",
+        "plural": false,
+        "selections": [
+          (v4/*: any*/)
+        ],
+        "storageKey": null
+      }
+    ],
     "type": "Mutation",
     "abstractKey": null
   },
@@ -104,15 +105,35 @@ return {
     ],
     "kind": "Operation",
     "name": "submitWorkflowTemplateMutation",
-    "selections": (v3/*: any*/)
+    "selections": [
+      {
+        "alias": null,
+        "args": (v3/*: any*/),
+        "concreteType": "Workflow",
+        "kind": "LinkedField",
+        "name": "submitWorkflowTemplate",
+        "plural": false,
+        "selections": [
+          (v4/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          }
+        ],
+        "storageKey": null
+      }
+    ]
   },
   "params": {
-    "cacheID": "7d09d16bd3f1a6868e61ed6912292072",
+    "cacheID": "4c13758cbc0d34e6d9a014c9f36e641a",
     "id": null,
     "metadata": {},
     "name": "submitWorkflowTemplateMutation",
     "operationKind": "mutation",
-    "text": "mutation submitWorkflowTemplateMutation(\n  $templateName: String!\n  $visit: VisitInput!\n  $parameters: JSON!\n) {\n  submitWorkflowTemplate(name: $templateName, visit: $visit, parameters: $parameters) {\n    name\n  }\n}\n"
+    "text": "mutation submitWorkflowTemplateMutation(\n  $templateName: String!\n  $visit: VisitInput!\n  $parameters: JSON!\n) {\n  submitWorkflowTemplate(name: $templateName, visit: $visit, parameters: $parameters) {\n    name\n    id\n  }\n}\n"
   }
 };
 })();
