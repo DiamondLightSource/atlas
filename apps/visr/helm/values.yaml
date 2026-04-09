@@ -40,6 +40,7 @@ ui-base:
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
+      passHostHeader: false
 
     - id: subscriptions
       path: /api/graphql/ws
@@ -47,5 +48,6 @@ ui-base:
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
+      passHostHeader: false
 
   identityProvider: prod
