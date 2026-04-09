@@ -47,6 +47,7 @@ export function getRelayEnvironment(): Environment {
     const fetchFn: FetchFunction = async (request, variables) => {
       const resp = await fetch(HTTP_ENDPOINT, {
         method: "POST",
+        credentials: "include",
         headers: {
           Accept:
             "application/graphql-response+json; charset=utf-8, application/json; charset=utf-8",
@@ -63,6 +64,9 @@ export function getRelayEnvironment(): Environment {
 
     const wsClient = createClient({
       url: WS_ENDPOINT,
+      shouldRetry: () => true,
+      connectionParams: undefined,
+      webSocketImpl: WebSocket,
     });
 
     const subscribeFn: SubscribeFunction = (operation, variables) => {
