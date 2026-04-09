@@ -42,4 +42,14 @@ ui-base:
           uri: https://graph-nightly.diamond.ac.uk
       passHostHeader: false
 
+    - id: websockets
+      path: /api/graphql/ws
+      rewriteTarget: /graphql
+      target:
+        external:
+          uri: https://graph-nightly.diamond.ac.uk
+      proxyWebSockets: true
+      passHostHeader: false
+      flushInterval: "1s"
+
   identityProvider: prod
