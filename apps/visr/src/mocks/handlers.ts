@@ -30,6 +30,7 @@ export const handlers = [
       data: {
         submitWorkflowTemplate: {
           name: "mockSubmittedName",
+          id: "mockSubmittedId",
         },
       },
     });
