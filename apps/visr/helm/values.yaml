@@ -2,10 +2,6 @@ ui-base:
   name: visr
   host: visr.diamond.ac.uk
 
-  oauth2-proxy:
-    extraArgs:
-      skip-auth-route: "^/api/graphql/ws(?:\\?.*)?$"
-
   image:
     repository: ghcr.io/diamondlightsource/atlas/visr
     tag: # Updated by CI job with latest release version
