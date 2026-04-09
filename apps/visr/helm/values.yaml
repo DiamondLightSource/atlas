@@ -2,6 +2,10 @@ ui-base:
   name: visr
   host: visr.diamond.ac.uk
 
+  oauth2-proxy:
+    extraArgs:
+      skip-auth-route: "^/api/graphql/ws(?:\\?.*)?$"
+
   image:
     repository: ghcr.io/diamondlightsource/atlas/visr
     tag: # Updated by CI job with latest release version
@@ -40,16 +44,12 @@ ui-base:
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
-      passHostHeader: false
 
-    - id: websockets
+    - id: subscriptions
       path: /api/graphql/ws
-      rewriteTarget: /graphql
+      rewriteTarget: /graphql/ws
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
-      proxyWebSockets: true
-      passHostHeader: false
-      flushInterval: "1s"
 
   identityProvider: prod
