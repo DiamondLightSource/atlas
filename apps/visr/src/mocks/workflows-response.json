@@ -1,7 +1,7 @@
 {
   "data": {
     "workflowTemplate": {
-      "name": "visr",
+      "name": "visr-reconstruction",
       "maintainer": "visr-group",
       "title": "visr",
       "description": "Data processing for the Visible Light Spectroscopy beamline (ViSR).\n",
