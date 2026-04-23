@@ -39,7 +39,7 @@ ui-base:
 
     - id: subscriptions
       path: /api/graphql/ws
-      rewriteTarget: /graphql/ws
+      rewriteTarget: /graphql
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
