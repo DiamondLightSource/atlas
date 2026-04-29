@@ -44,9 +44,6 @@ jobs:
             cp "$file" "pr-coverage/$project.json"
           done
 
-      - name: Capture PR ref
-        run: echo "PR_REF=${{ github.head_ref }}" >> $GITHUB_ENV
-
         # --- baseline coverage ---
       - name: Checkout target branch
         run: git checkout origin/${{ github.base_ref }}
