@@ -30,12 +30,41 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Identify affected projects
+        id: affected
+        run: |
+          # the filter means 'projects changed since origin/main (or target branch), inc dependents'
+          pnpm turbo run coverage \
+            --filter=...[origin/${{ github.base_ref }}] \
+            --dry=json > turbodry.json
+
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('turbodry.json'));
+
+            const projects = [...new Set(data.tasks.map(task => task.package))];
+
+            console.log('Affected projects:', projects);
+
+            fs.writeFileSync('affected.txt', projects.join('\n'))
+          "
+
+          if [ ! -s affected.txt ]; then
+            echo "No affected projects"
+            echo "has_affected=false" >> $GITHUB_ENV
+          else
+            echo "has_affected=true" >> $GITHUB_ENV
+          fi
+
         # --- PR coverage (affected only) ---
       - name: Run PR coverage
-        # the filter means 'projects changed since origin/main (or target branch), inc dependents'
-        run: pnpm turbo run coverage --filter=...[origin/${{ github.base_ref }}] --force --no-daemon
+        if: env.has_affected == 'true'
+        run: |
+          FILTERS=$(awk '{print "--filter="$0}' affected.txt | xargs)
+          pnpm turbo run coverage $FILTERS --force --no-daemon
 
       - name: Save PR coverage
+        if: env.has_affected == 'true'
         run: |
           mkdir pr-coverage
           find apps packages -path "*/coverage/coverage-summary.json" | while read file; do
@@ -46,16 +75,22 @@ jobs:
 
         # --- baseline coverage ---
       - name: Checkout target branch
+        if: env.has_affected == 'true'
         run: git checkout origin/${{ github.base_ref }}
 
       - name: Install dependencies (main)
+        if: env.has_affected == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Run coverage (main affected)
+        if: env.has_affected == 'true'
         # notice both times we --force turbo to ignore cache and execute tasks fresh
-        run: pnpm turbo run coverage --filter=...[origin/${{ github.head_ref }}] --force --no-daemon
+        run: |
+          FILTERS=$(awk '{print "--filter="$0}' affected.txt | xargs)
+          pnpm turbo run coverage $FILTERS --force --no-daemon
 
       - name: Save coverage (main affected)
+        if: env.has_affected == 'true'
         run: |
           mkdir base-coverage
           find apps packages -path "*/coverage/coverage-summary.json" | while read file; do
@@ -66,6 +101,7 @@ jobs:
 
         # --- compare ---
       - name: Compare coverage
+        if: env.has_affected == 'true'
         # the script errors (exit code 1), causing this action to fail,
         # if regression for any app or package is detected
         run: node scripts/compare-coverage.mjs pr-coverage base-coverage
