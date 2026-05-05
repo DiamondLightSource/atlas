@@ -39,10 +39,10 @@ ui-base:
 
     - id: subscriptions
       path: /api/graphql/ws
-      rewriteTarget: /graphql
+      rewriteTarget: /graphql/ws
       target:
         external:
-          uri: https://graph-nightly.diamond.ac.uk
+          uri: wss://graph-nightly.diamond.ac.uk
       passHostHeader: false
 
   identityProvider: prod
