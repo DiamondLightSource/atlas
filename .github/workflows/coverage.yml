@@ -82,16 +82,38 @@ jobs:
         if: env.has_affected == 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Filter out affected packages not in base
+        if: env.has_affected == 'true'
+        run: |
+          pnpm m ls --depth -1 --json > workspace.json
+
+          node -e "
+            const fs = require('fs');
+
+            const affected = fs.readFileSync('affected.txt', 'utf-8').split('\n');
+            const workspace = JSON.parse(fs.readFileSync('workspace.json'));
+            const availableProjects = new Set(workspace.map(project => project.name));
+
+            const filtered = affected.filter(project => availableProjects.has(project));
+
+            console.log('Filtered affected projects:', filtered);
+
+            fs.writeFileSync('affected.filtered.txt', filtered.join('\n'));
+          "
+
+          if [ ! -s affected.filtered.txt ]; then
+            echo "No affected projects"
+            echo "has_affected=false" >> $GITHUB_ENV
+          else
+            echo "has_affected=true" >> $GITHUB_ENV
+          fi
+
       - name: Run coverage (main affected)
         if: env.has_affected == 'true'
         # notice both times we --force turbo to ignore cache and execute tasks fresh
         run: |
-          while read project; do
-            name=$(echo "$project" | sed 's/@atlas\///')
-            if [ -f "apps/$name/package.json" ] || [ -f "packages/$name/package.json" ]; then
-              pnpm turbo run coverage --filter=$project --force --no-daemon
-            fi
-          done < affected.txt
+          FILTERS=$(awk '{print "--filter="$0}' affected.filtered.txt | xargs)
+          pnpm turbo run coverage $FILTERS --force --no-daemon
 
       - name: Save coverage (main affected)
         if: env.has_affected == 'true'
