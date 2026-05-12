@@ -1,11 +1,9 @@
 import { Button, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
 
 import type { WorkerStateRequest } from "@atlas/blueapi";
 import { useSetWorkerState } from "@atlas/blueapi-query";
 
 export function AbortPlanButton() {
-  const theme = useTheme();
   const workerState = useSetWorkerState();
 
   const handleClick = async () => {
