@@ -6,6 +6,7 @@ import RunPlanButton from "../components/RunPlanButton";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
 import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
+import { AbortPlanButton } from "../components/AbortPlanButton";
 
 type RobotSampleFormData = {
   puck: number;
@@ -77,7 +78,7 @@ function Robot() {
           borderColor: theme.palette.primary.main,
         }}
       >
-        <Stack direction={"column"} spacing={3} alignItems={"center"}>
+        <Stack direction={"column"} spacing={4} alignItems={"center"}>
           <Typography component="h1" variant="h5">
             Sample Position
           </Typography>
@@ -99,17 +100,20 @@ function Robot() {
               }}
             />
           </Stack>
-          <RunPlanButton
-            name="robot_load"
-            params={formData}
-            instrumentSession={instrumentSession}
-            buttonText="Load Sample"
-          />
-          <RunPlanButton
-            name="robot_unload"
-            instrumentSession={instrumentSession}
-            buttonText="Unload Sample"
-          />
+          <Stack direction={"row"} spacing={3} alignItems={"center"}>
+            <RunPlanButton
+              name="robot_load"
+              params={formData}
+              instrumentSession={instrumentSession}
+              buttonText="Load Sample"
+            />
+            <RunPlanButton
+              name="robot_unload"
+              instrumentSession={instrumentSession}
+              buttonText="Unload Sample"
+            />
+          </Stack>
+          <AbortPlanButton />
         </Stack>
       </Box>
       <StatusSidebar />
