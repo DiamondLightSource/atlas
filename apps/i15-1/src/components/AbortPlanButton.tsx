@@ -1,4 +1,4 @@
-import { Button, useTheme } from "@mui/material";
+import { Button } from "@mui/material";
 
 import type { WorkerStateRequest } from "@atlas/blueapi";
 import { useSetWorkerState } from "@atlas/blueapi-query";

@@ -23,6 +23,10 @@ export const handlers = [
     return HttpResponse.json("IDLE");
   }),
 
+  http.put("/api/worker/state", () => {
+    return HttpResponse.json("ABORTING");
+  }),
+
   http.get("/oauth2/userinfo", () => {
     return HttpResponse.json({ preferredUsername: "abc123456" });
   }),
