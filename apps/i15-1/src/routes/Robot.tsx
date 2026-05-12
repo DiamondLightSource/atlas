@@ -1,10 +1,11 @@
 import { useInstrumentSession } from "../context/instrumentSession/useInstrumentSession";
-import { Box, Typography, Stack, useTheme, TextField } from "@mui/material";
+import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "../components/NumberInput";
 import RunPlanButton from "../components/RunPlanButton";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
+import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
 
 type RobotSampleFormData = {
   puck: number;
@@ -16,6 +17,7 @@ function StatusSidebar() {
   return (
     <Box sx={{ ml: 5 }}>
       <Stack direction={"column"} spacing={2}>
+        <BlueapiWorkerState />
         <StatusCard
           title="Currently loaded"
           bgColor={theme.palette.info.light}
@@ -59,7 +61,6 @@ function Robot() {
   const theme = useTheme();
   return (
     <Box
-      // component={"section"}
       sx={{
         display: "flex",
         justifyContent: "center",
