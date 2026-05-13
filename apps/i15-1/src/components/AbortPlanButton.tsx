@@ -54,7 +54,7 @@ export function AbortPlanButton() {
         open={openSnackbar}
         autoHideDuration={5000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert onClose={handleSnackbarClose} severity="warning">
           Abort button pressed, will abort current plan ...
