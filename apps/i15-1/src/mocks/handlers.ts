@@ -23,6 +23,19 @@ export const handlers = [
     });
   }),
 
+  http.get<{ task_id: string }>("/api/tasks/:task_id", ({ taskId }) => {
+    const { task_id } = taskId;
+    return HttpResponse.json({
+      task_id: task_id,
+      task: { name: "fake-task", params: {}, metadata: {} },
+      request_id: "00",
+      is_complete: true,
+      is_pending: false,
+      errors: [""],
+      outcome: { outcome: "success", type: "str", result: null },
+    });
+  }),
+
   http.put("/api/worker/state", async ({ request }) => {
     // @ts-ignore
     const { new_state } = await request.json();

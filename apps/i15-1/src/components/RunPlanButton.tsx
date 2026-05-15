@@ -11,8 +11,9 @@ import {
   useGetWorkerState,
   useSetActiveTask,
   useSubmitTask,
+  useTask,
 } from "@atlas/blueapi-query";
-import type { TaskRequest } from "@atlas/blueapi";
+import type { TaskRequest, TaskResponse } from "@atlas/blueapi";
 import { useUserAuth } from "../context/userAuth/useUserAuth";
 
 type RunPlanButtonProps = {
@@ -41,7 +42,9 @@ const RunPlanButton = ({
   const submitTask = useSubmitTask();
   const startTask = useSetActiveTask();
 
-  const submitAndRunTask = async (task: TaskRequest) => {
+  const submitAndRunTask = async (
+    task: TaskRequest,
+  ): Promise<TaskResponse | void> => {
     await submitTask.mutateAsync(task).then((response) => {
       if (response) {
         startTask.mutateAsync(response.task_id);
@@ -57,13 +60,23 @@ const RunPlanButton = ({
       params: params,
       instrument_session: instrumentSession,
     };
-    setLoading(true);
-    await submitAndRunTask(taskRequest);
-    setLoading(false);
+    await submitAndRunTask(taskRequest).then((response) => {
+      if (response) {
+        const { data } = useTask(response.task_id);
+        if (data?.is_complete && data.outcome?.outcome === "success") {
+          setSeverity("success");
+          setMsg("Plan succeeded");
+        } else {
+          setSeverity("error");
+          setMsg(`Plan failed with error ${data?.errors[0]}`); // typing to use data.outcome.message needs fixing
+        }
+      }
+    });
   };
 
   const handleClick = async () => {
     setOpenSnackbar(true);
+    setLoading(true);
     await runOnClick().catch((error) => {
       setSeverity("error");
       setMsg(
@@ -71,6 +84,7 @@ const RunPlanButton = ({
       );
       console.log(`${msg}. Reason: ${error}`);
     });
+    setLoading(false);
   };
 
   const handleSnackbarClose = (
