@@ -3,4 +3,4 @@ export * from "./tasks";
 export * from "./worker";
 export * from "./devices";
 
-export { BlueapiProvider } from "./provider";
+export { BlueapiProvider, useBlueapi } from "./provider";

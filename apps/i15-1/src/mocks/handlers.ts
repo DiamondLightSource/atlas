@@ -23,15 +23,14 @@ export const handlers = [
     });
   }),
 
-  http.get<{ task_id: string }>("/api/tasks/:task_id", ({ taskId }) => {
-    const { task_id } = taskId;
+  http.get("/api/tasks/:task_id", () => {
     return HttpResponse.json({
-      task_id: task_id,
+      task_id: fakeTaskId,
       task: { name: "fake-task", params: {}, metadata: {} },
       request_id: "00",
       is_complete: true,
       is_pending: false,
-      errors: [""],
+      errors: [],
       outcome: { outcome: "success", type: "str", result: null },
     });
   }),

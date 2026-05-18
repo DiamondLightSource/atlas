@@ -8,6 +8,7 @@ import {
 import React, { useState } from "react";
 
 import {
+  useBlueapi,
   useGetWorkerState,
   useSetActiveTask,
   useSubmitTask,
@@ -39,36 +40,38 @@ const RunPlanButton = ({
 
   const user = useUserAuth();
 
+  const workerState = useGetWorkerState();
+  const blueapi = useBlueapi();
+
   const submitTask = useSubmitTask();
   const startTask = useSetActiveTask();
 
   const submitAndRunTask = async (
     task: TaskRequest,
   ): Promise<TaskResponse | void> => {
-    await submitTask.mutateAsync(task).then((response) => {
+    await submitTask.mutateAsync(task).then(async (response) => {
       if (response) {
-        startTask.mutateAsync(response.task_id);
+        await runTask(response.task_id).catch((error) => {
+          throw new Error(error);
+        });
       } else {
         throw new Error("Task couldn't be submitted");
       }
     });
   };
 
-  const runOnClick = async () => {
-    const taskRequest: TaskRequest = {
-      name: name,
-      params: params,
-      instrument_session: instrumentSession,
-    };
-    await submitAndRunTask(taskRequest).then((response) => {
+  const runTask = async (task_id: string) => {
+    await startTask.mutateAsync(task_id).then(async (response) => {
       if (response) {
-        const { data } = useTask(response.task_id);
-        if (data?.is_complete && data.outcome?.outcome === "success") {
-          setSeverity("success");
-          setMsg("Plan succeeded");
-        } else {
-          setSeverity("error");
-          setMsg(`Plan failed with error ${data?.errors[0]}`); // typing to use data.outcome.message needs fixing
+        // TODO This needs to poll not return right away!
+        const data = await blueapi.tasks.get(task_id);
+        if (data.is_complete) {
+          if (data.outcome?.outcome === "success") {
+            setSeverity("success");
+            setMsg("Plan succeeded");
+          } else if (data.outcome?.outcome === "error") {
+            throw new Error(`${data.errors[0]}`);
+          }
         }
       }
     });
@@ -77,12 +80,17 @@ const RunPlanButton = ({
   const handleClick = async () => {
     setOpenSnackbar(true);
     setLoading(true);
-    await runOnClick().catch((error) => {
+    const taskRequest: TaskRequest = {
+      name: name,
+      params: params,
+      instrument_session: instrumentSession,
+    };
+    await submitAndRunTask(taskRequest).catch((error) => {
       setSeverity("error");
       setMsg(
         `Failed to run plan ${name}, see console and blueapi logs for full error.`,
       );
-      console.log(`${msg}. Reason: ${error}`);
+      console.log(`${msg}.\n Reason: ${error}`);
     });
     setLoading(false);
   };
@@ -99,7 +107,6 @@ const RunPlanButton = ({
   };
 
   const isButtonDisabled = () => {
-    const workerState = useGetWorkerState();
     const disable =
       user.person == null ||
       user.person == undefined ||
@@ -120,7 +127,7 @@ const RunPlanButton = ({
       </Button>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={5000}
+        autoHideDuration={10000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
