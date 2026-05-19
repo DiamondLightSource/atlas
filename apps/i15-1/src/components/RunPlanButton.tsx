@@ -46,6 +46,30 @@ const RunPlanButton = ({
   const submitTask = useSubmitTask();
   const startTask = useSetActiveTask();
 
+  const waitForIdle = async (ms: number): Promise<void> => {
+    return new Promise((res) => setTimeout(res, ms));
+  };
+
+  const runTask = async (task_id: string) => {
+    await startTask.mutateAsync(task_id).then(async (response) => {
+      if (response) {
+        const status = workerState.data;
+        while (status !== "IDLE" && status !== "ABORTING") {
+          await waitForIdle(10);
+        }
+        const data = await blueapi.tasks.get(task_id);
+        if (data.is_complete) {
+          if (data.outcome?.outcome === "success") {
+            setSeverity("success");
+            setMsg("Plan succeeded");
+          } else if (data.outcome?.outcome === "error") {
+            throw new Error(`${data.errors[0]}`);
+          }
+        }
+      }
+    });
+  };
+
   const submitAndRunTask = async (
     task: TaskRequest,
   ): Promise<TaskResponse | void> => {
@@ -56,23 +80,6 @@ const RunPlanButton = ({
         });
       } else {
         throw new Error("Task couldn't be submitted");
-      }
-    });
-  };
-
-  const runTask = async (task_id: string) => {
-    await startTask.mutateAsync(task_id).then(async (response) => {
-      if (response) {
-        // TODO This needs to poll not return right away!
-        const data = await blueapi.tasks.get(task_id);
-        if (data.is_complete) {
-          if (data.outcome?.outcome === "success") {
-            setSeverity("success");
-            setMsg("Plan succeeded");
-          } else if (data.outcome?.outcome === "error") {
-            throw new Error(`${data.errors[0]}`);
-          }
-        }
       }
     });
   };
