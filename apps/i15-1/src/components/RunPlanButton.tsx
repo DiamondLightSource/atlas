@@ -53,9 +53,10 @@ const RunPlanButton = ({
   const runTask = async (task_id: string) => {
     await startTask.mutateAsync(task_id).then(async (response) => {
       if (response) {
-        const status = workerState.data;
+        let status = workerState.data;
         while (status !== "IDLE" && status !== "ABORTING") {
           await waitForIdle(10);
+          status = workerState.data;
         }
         const data = await blueapi.tasks.get(task_id);
         if (data.is_complete) {
