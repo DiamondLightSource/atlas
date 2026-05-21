@@ -21,9 +21,17 @@ ui-base:
         external:
           uri: https://workflows.diamond.ac.uk
 
-    - id: data
+    - id: tiled
       path: /api/data/
-      rewriteTarget: /
+      rewriteTarget: /api/v1/
+      target:
+        service:
+          name: b01-1-tiled
+          port: 8000
+
+    - id: dataserver
+      path: /api/data/events
+      rewriteTarget: /events
       target:
         service:
           name: dataserver

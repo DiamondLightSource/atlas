@@ -1,7 +1,7 @@
 import { http, HttpResponse, graphql } from "msw";
 import workflowsResponse from "./workflows-response.json";
 import plansResponse from "./plans-response.json";
-import { mapData } from "./mock_data";
+import { binnedReadback, binnedSetpoint, mapData } from "./mock_data";
 import type { ScanEventMessage } from "../hooks/scanEvents";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
@@ -44,6 +44,18 @@ export const handlers = [
 
   http.put("/api/worker/state", () => {
     return HttpResponse.json("IDLE");
+  }),
+
+  http.get("/api/data/binned/:uuid", ({ request }) => {
+    const url = new URL(request.url);
+    const setPoints = url.searchParams.get("setpoints");
+    let data;
+    if (String(setPoints).toLowerCase() !== "true") {
+      data = binnedSetpoint;
+    } else {
+      data = binnedReadback;
+    }
+    return HttpResponse.json({ values: data });
   }),
 
   http.get("/api/data/map", ({ request }) => {
