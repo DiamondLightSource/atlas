@@ -1,86 +1,14 @@
-import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
-import ndarray from "ndarray";
-import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
+import { ImagePlot } from "@diamondlightsource/davidia";
+import { useSpectroscopyData } from "./useSpectroscopyData";
 import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
-import { useMemo, type ComponentProps } from "react";
+import { useMemo } from "react";
 import { Box } from "@mui/material";
-
-function toNDT(matrix: (number | null)[][], colour: RGBColour): NDT {
-  if (!matrix?.length || !matrix[0]?.length) {
-    return EMPTY_NDT; // skip invalid input
-  }
-  const height = matrix.length;
-  const width = matrix[0].length;
-
-  // Flatten and filter out nulls for normalisation
-  const flat = matrix.flat();
-  const valid = flat.filter((v): v is number => v !== null && !isNaN(v));
-
-  // Avoid crashes when no valid values
-  const min = valid.length ? Math.min(...valid) : 0;
-  const max = valid.length ? Math.max(...valid) : 1;
-  const scale = max > min ? 255 / (max - min) : 1;
-
-  const rgb = new Uint8Array(width * height * 3);
-
-  for (let i = 0; i < flat.length; i++) {
-    const v = flat[i];
-    let scaled = 0;
-    if (v !== null && !isNaN(v)) {
-      scaled = Math.round((v - min) * scale);
-    } // else stays 0 (black)
-
-    switch (colour) {
-      case "red":
-        rgb[i * 3] = scaled;
-        break;
-      case "green":
-        rgb[i * 3 + 1] = scaled;
-        break;
-      case "blue":
-        rgb[i * 3 + 2] = scaled;
-        break;
-      case "gray":
-        rgb[i * 3] = scaled;
-        rgb[i * 3 + 1] = scaled;
-        rgb[i * 3 + 2] = scaled;
-        break;
-    }
-  }
-
-  return ndarray(rgb, [height, width, 3]) as NDT;
-}
-/** Placeholder empty gray dataset */
-const EMPTY_NDT = toNDT([[0]], "gray");
-
-/** Return type of `/api/data/map` */
-interface MapResponse {
-  values: (number | null)[][];
-}
-
-async function fetchMap(
-  filepath: string,
-  datapath: string,
-  colour: RGBColour,
-  snake: boolean,
-) {
-  const url = `/api/data/map?filepath=${encodeURIComponent(filepath)}&datapath=${encodeURIComponent(datapath)}&snake=${encodeURIComponent(snake)}`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(resp.statusText);
-  const mapResponse: MapResponse = await resp.json();
-  return toNDT(mapResponse.values, colour);
-}
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
   { key: "green", label: "Green channel" },
   { key: "blue", label: "Blue channel" },
-  //{ key: "gray", label: "Gray channel" }, // using gray channel to stop typing errors
 ] as const;
-
-type ChannelKey = (typeof CHANNELS)[number]["key"];
-type PlotValues = ComponentProps<typeof ImagePlot>["values"];
-export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 interface SpectroscopyPlotsProps {
   expanded: boolean;
@@ -91,7 +19,7 @@ function SpectroscopyPlots({
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
-  const { data: channels } = useSpectroscopyData(fetchMap);
+  const { data: channels } = useSpectroscopyData();
   const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
   const w = 1;
@@ -107,12 +35,11 @@ function SpectroscopyPlots({
       h: h,
       static: true,
     },
-    // { i: "3", x: !expanded ? 3 : 1, !expanded ? 0 : h, w: w, h: h, static: true },
   ];
 
   const plots = useMemo(
     () =>
-      CHANNELS.map(({ key }, i) => (
+      CHANNELS.map(({ key, label }, i) => (
         <Box
           key={i}
           sx={{
@@ -123,10 +50,14 @@ function SpectroscopyPlots({
           <ImagePlot
             key={i}
             aspect={plotAspectRatio}
-            plotConfig={{ title: key + " channel" }}
+            plotConfig={{
+              title: label,
+              xValues: channels.xValues,
+              yValues: channels.yValues,
+            }}
             customToolbarChildren={null}
-            values={channels[key] ?? EMPTY_NDT}
-            //tightAxes //requires Davidia 1.1.0
+            values={channels[key]}
+            // tightAxes //requires Davidia 1.1.0
           />
         </Box>
       )),
