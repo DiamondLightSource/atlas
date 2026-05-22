@@ -4,7 +4,8 @@ WORKDIR /workspaces
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    vim  less \
+    vim \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm and turbo globally
