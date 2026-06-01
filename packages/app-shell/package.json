@@ -1,0 +1,28 @@
+{
+  "name": "@atlas/app-shell",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.13.1"
+  },
+  "peerDependencies": {
+    "@diamondlightsource/sci-react-ui": "workspace:*",
+    "@mui/material": "workspace:*",
+    "lucide-react": "^1.16.0"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "@diamondlightsource/sci-react-ui": "^0.4.1",
+    "@mui/material": "^6.5.0",
+    "lucide-react": "^1.16.0",
+    "vitest": "*"
+  }
+}
