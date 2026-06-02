@@ -1,11 +1,9 @@
 import { DiamondTheme } from "@diamondlightsource/sci-react-ui";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
-import { Layout } from "./routes/Layout.tsx";
-import Dashboard from "./routes/Dashboard.tsx";
-import Robot from "./routes/Robot.tsx";
+import router from "./router.tsx";
 
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
@@ -16,23 +14,6 @@ async function enableMocking() {
     return worker.start();
   }
 }
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "robot",
-        element: <Robot />,
-      },
-    ],
-  },
-]);
 
 const api = createApi("/api");
 

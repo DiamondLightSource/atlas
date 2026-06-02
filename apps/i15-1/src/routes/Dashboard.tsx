@@ -1,6 +1,4 @@
 import { Container, Typography, Button, Stack } from "@mui/material";
-import { Link } from "react-router-dom";
-import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 
 import InstrumentSessionView from "../components/InstrumentSessionSelection/InstrumentSessionView.tsx";
 
@@ -21,17 +19,6 @@ function Dashboard() {
               "cm12345-5",
             ]}
           />
-          <Stack direction={"row"} spacing={5}>
-            <Button
-              component={Link}
-              to="/Robot"
-              variant="contained"
-              startIcon={<PrecisionManufacturingIcon />}
-              sx={{ width: 150, height: 50 }}
-            >
-              <Typography sx={{ mt: "4px" }}> Robot </Typography>
-            </Button>
-          </Stack>
         </Stack>
       </Container>
     </>
