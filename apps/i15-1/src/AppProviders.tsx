@@ -3,11 +3,12 @@ import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
 import { InstrumentSessionProvider } from "./context/instrumentSession/InstrumentSessionProvider";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { store } from "@diamondlightsource/cs-web-lib";
 import { useLoadPvwsConfig } from "@atlas/pvws-config";
+import { UserAuthProvider } from "./context/userAuth/UserAuthProvider";
 
 type Props = {
   api: Api;
@@ -20,11 +21,13 @@ export function AppProviders({ api, theme, children }: Props) {
   return (
     <ThemeProvider theme={theme}>
       <InstrumentSessionProvider>
-        <Provider store={store(config)}>
-          <QueryClientProvider client={new QueryClient()}>
-            <BlueapiProvider api={api}>{children}</BlueapiProvider>
-          </QueryClientProvider>
-        </Provider>
+        <ReduxProvider store={store(config)}>
+          <UserAuthProvider>
+            <QueryClientProvider client={new QueryClient()}>
+              <BlueapiProvider api={api}>{children}</BlueapiProvider>
+            </QueryClientProvider>
+          </UserAuthProvider>
+        </ReduxProvider>
       </InstrumentSessionProvider>
     </ThemeProvider>
   );
