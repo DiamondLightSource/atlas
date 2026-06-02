@@ -35,14 +35,12 @@ export function SideNav({ navigation, open }: SideNavProps) {
         },
       }}
     >
-      <Toolbar />
+      <Toolbar /> {/* spacer equal to the AppBar's height*/}
       <Box sx={{ overflow: "auto" }}>
         <List
           sx={{
             p: 1,
             flexDirection: "column",
-            gap: 0.5,
-            width: "100%",
           }}
         >
           {navigation.map((group, groupIndex) => (
@@ -70,8 +68,7 @@ function Entry(props: EntryProps) {
     <ListItemIcon
       sx={{
         minWidth: 0,
-        justifyContent: "center",
-        mr: props.open ? 3 : 0,
+        mr: 2,
       }}
     >
       {route.icon}
