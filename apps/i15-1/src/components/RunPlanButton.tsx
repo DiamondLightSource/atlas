@@ -6,7 +6,7 @@ import {
   useSetActiveTask,
   useSubmitTask,
 } from "@atlas/blueapi-query";
-import type { TaskRequest } from "@atlas/blueapi";
+import type { TaskRequest, WorkerState } from "@atlas/blueapi";
 import { useUserAuth } from "../context/userAuth/useUserAuth";
 
 type RunPlanButtonProps = {
@@ -44,12 +44,11 @@ const RunPlanButton = ({
     setLoading(false);
   };
 
-  const isButtonDisabled = () => {
-    const workerState = useGetWorkerState();
+  const workerState = useGetWorkerState();
+
+  const isButtonDisabled = (workerState: WorkerState) => {
     const disable =
-      user.person == null ||
-      user.person == undefined ||
-      workerState.data !== "IDLE";
+      user.person == null || user.person == undefined || workerState !== "IDLE";
     return disable;
   };
 
@@ -59,7 +58,7 @@ const RunPlanButton = ({
       loading={loading}
       sx={{ width: "150px" }}
       onClick={handleClick}
-      disabled={isButtonDisabled()}
+      disabled={workerState.data ? isButtonDisabled(workerState.data) : false}
     >
       {buttonText}
     </Button>

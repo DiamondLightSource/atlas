@@ -1,7 +1,7 @@
 import { http, HttpResponse, ws } from "msw";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
-let workerStatus = { status: "IDLE", duration: 0 };
+const workerStatus = { status: "IDLE", duration: 0 };
 
 const fakePvws = ws.link("wss://pvws.diamond.ac.uk/pvws/pv");
 

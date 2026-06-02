@@ -1,5 +1,5 @@
 import { useInstrumentSession } from "../context/instrumentSession/useInstrumentSession";
-import { Box, Typography, Stack, useTheme, TextField } from "@mui/material";
+import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "../components/NumberInput";
 import RunPlanButton from "../components/RunPlanButton";
