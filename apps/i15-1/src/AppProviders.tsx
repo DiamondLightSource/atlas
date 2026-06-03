@@ -22,11 +22,11 @@ export function AppProviders({ api, theme, children }: Props) {
     <ThemeProvider theme={theme}>
       <InstrumentSessionProvider>
         <ReduxProvider store={store(config)}>
-          <UserAuthProvider>
-            <QueryClientProvider client={new QueryClient()}>
+          <QueryClientProvider client={new QueryClient()}>
+            <UserAuthProvider>
               <BlueapiProvider api={api}>{children}</BlueapiProvider>
-            </QueryClientProvider>
-          </UserAuthProvider>
+            </UserAuthProvider>
+          </QueryClientProvider>
         </ReduxProvider>
       </InstrumentSessionProvider>
     </ThemeProvider>

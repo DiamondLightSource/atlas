@@ -23,7 +23,6 @@ const RunPlanButton = ({
   buttonText = "Run",
 }: RunPlanButtonProps) => {
   const user = useUserAuth();
-
   const submitTask = useSubmitTask();
   const startTask = useSetActiveTask();
   const submitAndRunTask = async (task: TaskRequest) => {
