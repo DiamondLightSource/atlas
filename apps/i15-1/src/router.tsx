@@ -98,4 +98,4 @@ const navigation: SectionGroup[] = [
   },
 ];
 
-export default createRouter({ title: "i15-1", navigation });
+export const router = createRouter({ title: "i15-1", navigation });

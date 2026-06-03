@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
-import router from "./router.tsx";
+import { router } from "./router.tsx";
 
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
