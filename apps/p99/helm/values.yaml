@@ -14,3 +14,10 @@ ui-base:
       target:
         external:
           uri: https://p99-blueapi.diamond.ac.uk/
+
+    - id: workflows
+      path: /api/workflows
+      rewriteTarget: /graphql
+      target:
+        external:
+          uri: https://workflows.diamond.ac.uk
