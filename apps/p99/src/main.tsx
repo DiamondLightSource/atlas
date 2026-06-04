@@ -15,6 +15,7 @@ import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./RelayEnvironment.ts";
 import Plans from "./routes/Plans.tsx";
+import Workflows from "./routes/Workflows.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "plans",
         element: <Plans />,
+      },
+      {
+        path: "workflows",
+        element: <Workflows />,
       },
     ],
   },
