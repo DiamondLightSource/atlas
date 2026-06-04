@@ -1,5 +1,5 @@
 import { render, screen } from "@atlas/vitest-conf";
-import { DevicePanel } from "./DevicePanel";
+import { DevicePanel } from "../../../components/Plans/DevicePanel";
 import type { Device } from "@atlas/blueapi";
 const mockDevicesData: Device[] = [
   { name: "detector-1", protocols: [{ name: "detector", types: [] }] },
