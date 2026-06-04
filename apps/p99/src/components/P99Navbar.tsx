@@ -27,6 +27,12 @@ function P99Navbar() {
             <NavLink to="/" linkComponent={Link}>
               Home
             </NavLink>
+            <NavLink to="plans" linkComponent={Link}>
+              Plans
+            </NavLink>
+            <NavLink to="workflows" linkComponent={Link}>
+              Workflows
+            </NavLink>
           </NavLinks>
         </Box>
       }
