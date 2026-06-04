@@ -6,10 +6,10 @@ import {
 } from "@atlas/blueapi-query";
 import { Alert, Box, Container, Grid2 } from "@mui/material";
 import { useState } from "react";
-import { WorkerStatusBar } from "../components/Plans/WorkerStatusBar";
-import { PlanCard } from "../components/Plans/PlanCard";
+import { WorkerStatusBar } from "../components/plans/WorkerStatusBar";
+import { PlanCard } from "../components/plans/PlanCard";
 import type { Plan } from "@atlas/blueapi";
-import { DevicePanel } from "../components/Plans/DevicePanel";
+import { DevicePanel } from "../components/plans/DevicePanel";
 
 interface FeedbackState {
   type: "success" | "error";
