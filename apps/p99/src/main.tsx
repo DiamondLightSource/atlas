@@ -14,6 +14,7 @@ import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./RelayEnvironment.ts";
+import Plans from "./routes/Plans.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
         index: true,
         element: <Dashboard />,
       },
+      {
+        path: "plans",
+        element: <Plans />,
+      },
     ],
   },
 ]);
@@ -42,12 +47,12 @@ enableMocking().then(() => {
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
         <RelayEnvironmentProvider environment={RelayEnvironment}>
           <QueryClientProvider client={queryClient}>
-          <BlueapiProvider api={api}>
-            <RouterProvider router={router} />
-          </BlueapiProvider>
-        </QueryClientProvider>
+            <BlueapiProvider api={api}>
+              <RouterProvider router={router} />
+            </BlueapiProvider>
+          </QueryClientProvider>
         </RelayEnvironmentProvider>
       </ThemeProvider>
-    </StrictMode>
+    </StrictMode>,
   );
 });
