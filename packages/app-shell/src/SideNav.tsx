@@ -61,7 +61,7 @@ export function SideNav({ navigation, open }: SideNavProps) {
         >
           {navigation.map((group, groupIndex) => (
             <Fragment key={groupIndex}>
-              {groupIndex > 0 && <Divider />}
+              {groupIndex > 0 && <SectionDivider />}
               {group.sections.map((route) => (
                 <Entry key={route.path} route={route} open={open} />
               ))}
@@ -70,6 +70,14 @@ export function SideNav({ navigation, open }: SideNavProps) {
         </List>
       </Box>
     </Drawer>
+  );
+}
+
+function SectionDivider() {
+  return (
+    <Box sx={{ mb: 0.5 }}>
+      <Divider />
+    </Box>
   );
 }
 
@@ -92,7 +100,10 @@ function Entry(props: EntryProps) {
     </ListItemIcon>
   );
   return (
-    <ListItem disablePadding sx={{ mb: 0.5 }}>
+    <ListItem
+      disablePadding
+      sx={{ mb: 0.5 }} // the gap prop implemented with bottom margin
+    >
       <ListItemButton
         component={NavLink as React.ElementType}
         to={route.path}
