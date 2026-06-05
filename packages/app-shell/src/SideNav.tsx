@@ -15,6 +15,7 @@ import { NavLink } from "react-router-dom";
 import type { Section, SectionGroup } from "./Router";
 import type React from "react";
 import { Fragment } from "react";
+import { DiamondTheme } from "@diamondlightsource/sci-react-ui";
 
 interface SideNavProps {
   navigation: SectionGroup[];
@@ -34,6 +35,7 @@ const drawerTransition = (theme: Theme, opening: boolean) => {
 
 export function SideNav({ navigation, open }: SideNavProps) {
   const width = open ? 256 : 72;
+  console.log(DiamondTheme.spacing(1));
 
   return (
     <Drawer
@@ -90,13 +92,14 @@ function Entry(props: EntryProps) {
     </ListItemIcon>
   );
   return (
-    <ListItem disablePadding>
+    <ListItem disablePadding sx={{ mb: 0.5 }}>
       <ListItemButton
         component={NavLink as React.ElementType}
         to={route.path}
         sx={{
+          borderRadius: 1,
           "&.active": {
-            bgcolor: "action.selected",
+            bgcolor: "action.selected", // "primary.onContainer" when it exists
           },
         }}
         aria-label={route.name}
