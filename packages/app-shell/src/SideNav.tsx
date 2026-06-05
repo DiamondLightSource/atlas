@@ -9,6 +9,7 @@ import {
   ListItemText,
   Toolbar,
   Tooltip,
+  type Theme,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import type { Section, SectionGroup } from "./Router";
@@ -20,20 +21,33 @@ interface SideNavProps {
   open: boolean;
 }
 
+const drawerTransition = (theme: Theme, opening: boolean) => {
+  return theme.transitions.create("width", {
+    easing: opening
+      ? theme.transitions.easing.easeIn
+      : theme.transitions.easing.easeOut,
+    duration: opening
+      ? theme.transitions.duration.enteringScreen
+      : theme.transitions.duration.leavingScreen,
+  });
+};
+
 export function SideNav({ navigation, open }: SideNavProps) {
   const width = open ? 256 : 72;
 
   return (
     <Drawer
       variant="permanent"
-      sx={{
+      sx={(theme) => ({
         width: width,
         flexShrink: 0,
+        transition: drawerTransition(theme, open),
         [`& .MuiDrawer-paper`]: {
           width: width,
           boxSizing: "border-box",
+          transition: drawerTransition(theme, open),
         },
-      }}
+      })}
     >
       <Toolbar /> {/* spacer equal to the AppBar's height*/}
       <Box sx={{ overflow: "auto" }}>
@@ -96,10 +110,8 @@ function Entry(props: EntryProps) {
         <ListItemText // always render but conditionally hide
           primary={route.name}
           sx={{
-            opacity: props.open ? 1 : 0,
             width: props.open ? "auto" : 0,
             overflow: "hidden",
-            transition: "0.2s",
           }}
         />
       </ListItemButton>
