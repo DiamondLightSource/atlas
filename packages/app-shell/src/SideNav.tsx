@@ -83,6 +83,7 @@ function Entry(props: EntryProps) {
       sx={{
         minWidth: 0,
         mr: 2,
+        color: props.open ? "text.secondary" : "text.primary",
       }}
     >
       {route.icon}
