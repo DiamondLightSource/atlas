@@ -15,7 +15,6 @@ import { NavLink } from "react-router-dom";
 import type { Section, SectionGroup } from "./Router";
 import type React from "react";
 import { Fragment } from "react";
-import { DiamondTheme } from "@diamondlightsource/sci-react-ui";
 
 interface SideNavProps {
   navigation: SectionGroup[];
@@ -34,8 +33,7 @@ const drawerTransition = (theme: Theme, opening: boolean) => {
 };
 
 export function SideNav({ navigation, open }: SideNavProps) {
-  const width = open ? 256 : 72;
-  console.log(DiamondTheme.spacing(1));
+  const width = open ? 256 : 64;
 
   return (
     <Drawer
@@ -43,7 +41,7 @@ export function SideNav({ navigation, open }: SideNavProps) {
       sx={(theme) => ({
         width: width,
         flexShrink: 0,
-        transition: drawerTransition(theme, open),
+        transition: (theme) => drawerTransition(theme, open),
         [`& .MuiDrawer-paper`]: {
           width: width,
           boxSizing: "border-box",
@@ -91,8 +89,11 @@ function Entry(props: EntryProps) {
   const icon = (
     <ListItemIcon
       sx={{
-        minWidth: 0,
-        mr: 2,
+        minWidth: 32,
+        width: 32,
+        height: 32,
+        justifyContent: "center",
+        alignItems: "center",
         color: props.open ? "text.secondary" : "text.primary",
       }}
     >
@@ -108,10 +109,13 @@ function Entry(props: EntryProps) {
         component={NavLink as React.ElementType}
         to={route.path}
         sx={{
-          borderRadius: 1,
+          p: 1,
+          borderRadius: 2,
           "&.active": {
-            bgcolor: "action.selected", // "primary.onContainer" when it exists
+            bgcolor: "action.selected",
+            // color: "primary.onContainer", // when it exists
           },
+          gap: 1.5,
         }}
         aria-label={route.name}
       >
@@ -124,9 +128,16 @@ function Entry(props: EntryProps) {
         )}
         <ListItemText // always render but conditionally hide
           primary={route.name}
+          slotProps={{
+            primary: {
+              px: 1,
+              py: 0.5,
+            },
+          }}
           sx={{
-            width: props.open ? "auto" : 0,
-            overflow: "hidden",
+            m: 0,
+            overflow: "hidden", // otherwise we get a horizontal scrollbar in slim
+            minWidth: 0,
           }}
         />
       </ListItemButton>
