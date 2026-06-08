@@ -126,18 +126,10 @@ function NavItem(props: NavItemProps) {
             {icon}
           </Tooltip>
         )}
-        <ListItemText // always render but conditionally hide
+        <ListItemText
           primary={route.name}
-          slotProps={{
-            primary: {
-              px: 1,
-              py: 0.5,
-            },
-          }}
           sx={{
-            m: 0,
-            overflow: "hidden", // otherwise we get a horizontal scrollbar in slim
-            minWidth: 0,
+            overflow: "hidden",
             opacity: props.open ? 1 : 0,
             transition: (theme) =>
               theme.transitions.create("opacity", {
