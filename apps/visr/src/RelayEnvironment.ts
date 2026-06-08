@@ -37,8 +37,8 @@ import { createClient } from "graphql-ws";
 
 // export const RelayEnvironment = createRelayEnvironment();
 
-export const WS_ENDPOINT = "/api/graphql/ws";
-const HTTP_ENDPOINT = "/api/graphql";
+export const WS_ENDPOINT = "/graphql/ws";
+const HTTP_ENDPOINT = "/graphql";
 
 let RelayEnvironment: Environment | null = null;
 
