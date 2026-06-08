@@ -138,6 +138,11 @@ function Entry(props: EntryProps) {
             m: 0,
             overflow: "hidden", // otherwise we get a horizontal scrollbar in slim
             minWidth: 0,
+            opacity: props.open ? 1 : 0,
+            transition: (theme) =>
+              theme.transitions.create("opacity", {
+                duration: theme.transitions.duration.shorter,
+              }),
           }}
         />
       </ListItemButton>
