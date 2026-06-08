@@ -1,9 +1,9 @@
 import { render, screen, userEvent } from "@atlas/vitest-conf";
-import { SideNav } from "./SideNav";
-import type { Section, SectionGroup } from "./Router";
+import { SidebarNav } from "./SidebarNav";
+import type { SectionGroup } from "./Router";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-describe("SideNav", () => {
+describe("SidebarNav", () => {
   const groups: SectionGroup[] = [
     {
       sections: [
@@ -24,13 +24,22 @@ describe("SideNav", () => {
         },
       ],
     },
+    {
+      sections: [
+        {
+          name: "Log",
+          icon: <div data-testid="navicon4" />,
+          pages: [],
+        },
+      ],
+    },
   ];
 
   function renderSidenav(open: boolean) {
     const router = createMemoryRouter([
       {
         path: "/",
-        element: <SideNav navigation={groups} open={open} />,
+        element: <SidebarNav navigation={groups} open={open} />,
       },
     ]);
     render(<RouterProvider router={router} />);
@@ -47,7 +56,7 @@ describe("SideNav", () => {
       const label = screen.getByText(route.name);
       expect(label).toBeVisible();
     });
-    ["navicon1", "navicon2", "navicon3"].forEach((id) =>
+    ["navicon1", "navicon2", "navicon3", "navicon4"].forEach((id) =>
       expect(screen.getByTestId(id)).toBeVisible(),
     );
   });
@@ -62,7 +71,7 @@ describe("SideNav", () => {
       expect(label).toBeInTheDocument(); // label exists but
       expect(label).not.toBeVisible(); // not visible
     });
-    ["navicon1", "navicon2", "navicon3"].forEach((id) =>
+    ["navicon1", "navicon2", "navicon3", "navicon4"].forEach((id) =>
       expect(screen.getByTestId(id)).toBeVisible(),
     );
   });
@@ -90,5 +99,11 @@ describe("SideNav", () => {
       name: "Acquisition",
     });
     expect(tooltip).not.toBeInTheDocument();
+  });
+
+  it("creates divider between nav sections", () => {
+    renderSidenav(true);
+    const divider = screen.queryByRole("separator");
+    expect(divider).toBeInTheDocument();
   });
 });

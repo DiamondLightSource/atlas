@@ -32,8 +32,8 @@ const drawerTransition = (theme: Theme, opening: boolean) => {
   });
 };
 
-export function SideNav({ navigation, open }: SideNavProps) {
-  const width = open ? 256 : 64;
+export function SidebarNav({ navigation, open }: SideNavProps) {
+  const width = open ? 257 : 65; // 256/64 + 1 pixel for the border
 
   return (
     <Drawer
@@ -61,7 +61,7 @@ export function SideNav({ navigation, open }: SideNavProps) {
             <Fragment key={groupIndex}>
               {groupIndex > 0 && <SectionDivider />}
               {group.sections.map((route) => (
-                <Entry key={route.path} route={route} open={open} />
+                <NavItem key={route.path} route={route} open={open} />
               ))}
             </Fragment>
           ))}
@@ -79,12 +79,12 @@ function SectionDivider() {
   );
 }
 
-interface EntryProps {
+interface NavItemProps {
   route: Section;
   open: boolean;
 }
 
-function Entry(props: EntryProps) {
+function NavItem(props: NavItemProps) {
   const route = props.route;
   const icon = (
     <ListItemIcon
