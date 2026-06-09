@@ -55,7 +55,7 @@ export function sanitisePath(name: string) {
   return name.toLowerCase().replace(/\s/g, "_");
 }
 
-function routePath(route: LabelledRoute) {
+export function routePath(route: LabelledRoute) {
   return route.path ?? sanitisePath(route.name);
 }
 

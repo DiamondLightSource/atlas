@@ -11,15 +11,36 @@ import {
   Tooltip,
   type Theme,
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
-import type { Section, SectionGroup } from "./Router";
-import type React from "react";
-import { Fragment } from "react";
+import { Fragment, type ElementType, type ReactNode } from "react";
 
-interface SideNavProps {
-  navigation: SectionGroup[];
-  open: boolean;
-}
+export type Navigation = NavItemGroup[];
+
+type NavItemGroup = {
+  name?: string;
+  navItems: NavItemDefinition[];
+};
+
+type NavItemDefinition = {
+  label: string;
+  icon: ReactNode;
+  linkProps: LinkProps;
+};
+
+type LinkProps = ExternalLinkProps | InternalLinkProps;
+
+/** For native anchor tags */
+type ExternalLinkProps = {
+  href: string;
+  component?: never;
+  to?: never;
+};
+
+/** For SPA navigation */
+type InternalLinkProps = {
+  component: ElementType;
+  to: string;
+  href?: never;
+};
 
 const drawerTransition = (theme: Theme, opening: boolean) => {
   return theme.transitions.create("width", {
@@ -32,9 +53,13 @@ const drawerTransition = (theme: Theme, opening: boolean) => {
   });
 };
 
-export function SidebarNav({ navigation, open }: SideNavProps) {
-  const width = open ? 257 : 65; // 256/64 + 1 pixel for the border
+type NavProps = {
+  navigation: Navigation;
+  open: boolean;
+};
 
+export function SidebarNav({ navigation, open }: NavProps) {
+  const width = open ? 257 : 65; // 256/64 + 1 pixel for the border
   return (
     <Drawer
       variant="permanent"
@@ -60,9 +85,11 @@ export function SidebarNav({ navigation, open }: SideNavProps) {
           {navigation.map((group, groupIndex) => (
             <Fragment key={groupIndex}>
               {groupIndex > 0 && <SectionDivider />}
-              {group.sections.map((route) => (
-                <NavItem key={route.path} route={route} open={open} />
-              ))}
+              {group.navItems.map((item, itemIndex) => {
+                return (
+                  <NavItem key={itemIndex} definition={item} open={open} />
+                );
+              })}
             </Fragment>
           ))}
         </List>
@@ -80,12 +107,13 @@ function SectionDivider() {
 }
 
 interface NavItemProps {
-  route: Section;
+  definition: NavItemDefinition;
   open: boolean;
 }
 
 function NavItem(props: NavItemProps) {
-  const route = props.route;
+  const item = props.definition;
+  const open = props.open;
   const icon = (
     <ListItemIcon
       sx={{
@@ -94,43 +122,39 @@ function NavItem(props: NavItemProps) {
         height: 32,
         justifyContent: "center",
         alignItems: "center",
-        color: props.open ? "text.secondary" : "text.primary",
+        color: open ? "text.secondary" : "text.primary",
       }}
     >
-      {route.icon}
+      {item.icon}
     </ListItemIcon>
   );
+
   return (
-    <ListItem
-      disablePadding
-      sx={{ mb: 0.5 }} // the gap prop implemented with bottom margin
-    >
+    <ListItem disablePadding sx={{ mb: 0.5 }}>
       <ListItemButton
-        component={NavLink as React.ElementType}
-        to={route.path}
+        {...item.linkProps}
         sx={{
           p: 1,
           borderRadius: 2,
           "&.active": {
             bgcolor: "action.selected",
-            // color: "primary.onContainer", // when it exists
           },
           gap: 1.5,
         }}
-        aria-label={route.name}
+        aria-label={item.label}
       >
-        {props.open ? (
+        {open ? (
           icon
         ) : (
-          <Tooltip title={route.name} placement="right">
+          <Tooltip title={item.label} placement="right">
             {icon}
           </Tooltip>
         )}
-        <ListItemText
-          primary={route.name}
+        <ListItemText // always render but conditionally hide
+          primary={item.label}
           sx={{
             overflow: "hidden",
-            opacity: props.open ? 1 : 0,
+            opacity: open ? 1 : 0,
             transition: (theme) =>
               theme.transitions.create("opacity", {
                 duration: theme.transitions.duration.shorter,
