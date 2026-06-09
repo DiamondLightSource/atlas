@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
+import SliceViewer from "./SliceViewer";
 
 const SCAN_DURATION_MS = 3000;
 
@@ -51,7 +52,6 @@ function TomographyView() {
       }}
     >
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
-
         {/* Left panel */}
         <Box
           sx={{
@@ -67,6 +67,9 @@ function TomographyView() {
         {/* Right panel */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <VolumeViewer visible={volumeVisible} />
+        </Box>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <SliceViewer />
         </Box>
       </Box>
 
