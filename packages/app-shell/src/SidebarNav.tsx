@@ -139,6 +139,9 @@ function NavItem(props: NavItemProps) {
           "&.active": {
             bgcolor: "primary.container",
             color: "primary.onContainer",
+            "& svg": {
+              color: "primary.onContainer",
+            },
           },
           gap: 1.5,
         }}
