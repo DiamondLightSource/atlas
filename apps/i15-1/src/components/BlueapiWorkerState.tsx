@@ -1,8 +1,14 @@
 import { useGetWorkerState } from "@atlas/blueapi-query";
-import { Card, CardContent, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  useTheme,
+  type Theme,
+} from "@mui/material";
 
-function getStateColorMap() {
-  const theme = useTheme();
+function getStateColorMap(theme: Theme) {
   return {
     IDLE: theme.palette.info.main,
     RUNNING: theme.palette.success.main,
@@ -20,7 +26,7 @@ function getStateColorMap() {
 export function BlueapiWorkerState() {
   const theme = useTheme();
   const workerState = useGetWorkerState();
-  const stateMap = getStateColorMap();
+  const stateMap = getStateColorMap(theme);
 
   return (
     <Card

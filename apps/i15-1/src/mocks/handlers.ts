@@ -72,8 +72,7 @@ export const handlers = [
   }),
 
   http.put("/api/worker/state", async ({ request }) => {
-    // @ts-ignore
-    const { new_state } = await request.json();
+    const { new_state } = (await request.json()) as { new_state: string };
     if (new_state === "ABORTING") {
       setWorkerState(new_state);
     }
