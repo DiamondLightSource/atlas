@@ -137,7 +137,8 @@ function NavItem(props: NavItemProps) {
           p: 1,
           borderRadius: 2,
           "&.active": {
-            bgcolor: "action.selected",
+            bgcolor: "primary.container",
+            color: "primary.onContainer",
           },
           gap: 1.5,
         }}
