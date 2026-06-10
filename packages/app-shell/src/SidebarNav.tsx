@@ -140,7 +140,7 @@ function NavItem(props: NavItemProps) {
             bgcolor: "primary.container",
             color: "primary.onContainer",
             "& svg": {
-              color: "primary.onContainer",
+              color: "primary.main",
             },
           },
           gap: 1.5,
