@@ -54,12 +54,13 @@ ui-base:
   host: douglas.diamond.ac.uk
 
   image:
-    repository: ghcr.io/douglaswinter/atlas/visr
+    repository: ghcr.io/diamondlightsource/atlas/visr
     tag: 0.1.8
 
+  # Note that if these have changed you may need to manually restart the oauth2-proxy pod on deployment
   upstreams:
     - id: blueapi
-      path: /api/
+      path: /api/blueapi/
       rewriteTarget: /
       target:
         external:
@@ -129,6 +130,8 @@ upstreams:
         name: dataserver
         port: 8000
 ```
+
+Note that if these have changed you may need to manually restart the `oauth2-proxy` pod on deployment.
 
 #### Fields
 

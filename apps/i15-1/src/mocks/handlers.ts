@@ -46,20 +46,20 @@ function setWorkerState(new_state: string) {
 const fakePvws = ws.link("wss://pvws.diamond.ac.uk/pvws/pv");
 
 export const handlers = [
-  http.put("/api/worker/task", () => {
+  http.put("/api/blueapi/worker/task", () => {
     setWorkerState("RUNNING");
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
   }),
 
-  http.post("/api/tasks", () => {
+  http.post("/api/blueapi/tasks", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
   }),
 
-  http.get("/api/tasks/:task_id", () => {
+  http.get("/api/blueapi/tasks/:task_id", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
       task: { name: "fake-task", params: {}, metadata: {} },
@@ -71,7 +71,7 @@ export const handlers = [
     });
   }),
 
-  http.put("/api/worker/state", async ({ request }) => {
+  http.put("/api/blueapi/worker/state", async ({ request }) => {
     const { new_state } = (await request.json()) as { new_state: string };
     if (new_state === "ABORTING") {
       setWorkerState(new_state);
@@ -83,7 +83,7 @@ export const handlers = [
     return HttpResponse.json({ preferredUsername: "abc123456" });
   }),
 
-  http.get("/api/worker/state", () => {
+  http.get("/api/blueapi/worker/state", () => {
     if (workerStatus.duration >= 10) {
       workerStatus.status = "IDLE";
       workerStatus.duration = 0;
@@ -99,7 +99,7 @@ export const handlers = [
     console.log("WebSocket client connecting...");
   }),
 
-  http.get("/api/plans", () => {
+  http.get("/api/blueapi/plans", () => {
     return HttpResponse.json(plansResponse);
   }),
 ];

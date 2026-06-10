@@ -15,7 +15,7 @@ async function enableMocking() {
   }
 }
 
-const api = createApi("/api");
+const api = createApi("/api/blueapi");
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(

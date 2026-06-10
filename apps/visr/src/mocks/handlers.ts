@@ -25,28 +25,28 @@ export const handlers = [
     });
   }),
 
-  http.get("/api/plans", () => {
+  http.get("/api/blueapi/plans", () => {
     return HttpResponse.json(plansResponse);
   }),
 
-  http.put("/api/worker/task", () => {
+  http.put("/api/blueapi/worker/task", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
   }),
 
-  http.post("/api/tasks", () => {
+  http.post("/api/blueapi/tasks", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
       status: 201,
     });
   }),
 
-  http.put("/api/worker/state", () => {
+  http.put("/api/blueapi/worker/state", () => {
     return HttpResponse.json("IDLE");
   }),
 
-  http.get("/api/worker/state", () => {
+  http.get("/api/blueapi/worker/state", () => {
     return HttpResponse.json("IDLE");
   }),
 

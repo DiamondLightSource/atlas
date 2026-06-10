@@ -12,27 +12,27 @@ const triggerRunningState = async () => {
   }, 1000);
 };
 export const handlers = [
-  http.get("/api/plans", () => {
+  http.get("/api/blueapi/plans", () => {
     return HttpResponse.json(plansResponse);
   }),
-  http.get("/api/devices", () => {
+  http.get("/api/blueapi/devices", () => {
     return HttpResponse.json(devicesResponse);
   }),
-  http.get("/api/worker/state", () => {
+  http.get("/api/blueapi/worker/state", () => {
     return HttpResponse.json(workerState);
   }),
-  http.put("/api/worker/task", () => {
+  http.put("/api/blueapi/worker/task", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
   }),
-  http.get("/api/worker/task", () => {
+  http.get("/api/blueapi/worker/task", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
   }),
 
-  http.post("/api/tasks", () => {
+  http.post("/api/blueapi/tasks", () => {
     triggerRunningState();
     return HttpResponse.json({ task_id: fakeTaskId }, { status: 201 });
   }),
