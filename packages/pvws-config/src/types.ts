@@ -1,6 +1,7 @@
-import { DType } from "@diamondlightsource/cs-web-lib";
+import { type DType } from "@diamondlightsource/cs-web-lib";
 
 type NotConnected = "not connected";
+
 export type RawValue = DType | undefined | NotConnected;
 // NOTE - ACHTUNG! DTYPE not exported anymore in newer versions
 // Problem is that useConnection returns latest value as Dtype so we need it

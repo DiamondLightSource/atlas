@@ -1,5 +1,5 @@
 import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
-import RunPlanButton from "../RunPlanButton";
+import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
 import { useState } from "react";
 import { NumberInput } from "../NumberInput";

@@ -1,0 +1,179 @@
+{
+  "devices": [
+    {
+      "name": "panda",
+      "protocols": [
+        {
+          "name": "Flyable",
+          "types": []
+        },
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "WritesExternalAssets",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Triggerable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "sample_stage",
+      "protocols": [
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "filter",
+      "protocols": [
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "andor2_point",
+      "protocols": [
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Triggerable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "angle_stage",
+      "protocols": [
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "andor2_det",
+      "protocols": [
+        {
+          "name": "Flyable",
+          "types": []
+        },
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "WritesExternalAssets",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Triggerable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    },
+    {
+      "name": "lab_stage",
+      "protocols": [
+        {
+          "name": "Readable",
+          "types": []
+        },
+        {
+          "name": "Stageable",
+          "types": []
+        },
+        {
+          "name": "Configurable",
+          "types": []
+        },
+        {
+          "name": "Device",
+          "types": []
+        }
+      ]
+    }
+  ]
+}

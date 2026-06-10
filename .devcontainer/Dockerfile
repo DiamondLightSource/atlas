@@ -1,10 +1,11 @@
 # Base stage with Node.js and pnpm
-FROM node:20-bullseye AS base
+FROM node:22-bullseye AS base
 WORKDIR /workspaces
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     vim \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm and turbo globally

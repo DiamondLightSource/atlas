@@ -2,7 +2,6 @@ import {
   Alert,
   Button,
   Snackbar,
-  Tooltip,
   type SnackbarCloseReason,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -12,12 +11,10 @@ import {
   useGetWorkerState,
   useSetActiveTask,
   useSubmitTask,
-  useTask,
 } from "@atlas/blueapi-query";
 import type { TaskRequest, TaskResponse } from "@atlas/blueapi";
-import { useUserAuth } from "../context/userAuth/useUserAuth";
 
-type RunPlanButtonProps = {
+export type RunPlanButtonProps = {
   name: string;
   params?: object;
   instrumentSession: string;
@@ -26,19 +23,17 @@ type RunPlanButtonProps = {
 
 type SeverityLevel = "success" | "info" | "warning" | "error";
 
-const RunPlanButton = ({
+export function RunPlanButton({
   name,
   params,
   instrumentSession,
   buttonText = "Run",
-}: RunPlanButtonProps) => {
+}: RunPlanButtonProps) {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [msg, setMsg] = useState<string>(`Running ${name} plan`);
   const [severity, setSeverity] = useState<SeverityLevel>("info");
 
   const [loading, setLoading] = useState<boolean>(false);
-
-  const user = useUserAuth();
 
   const workerState = useGetWorkerState();
   const blueapi = useBlueapi();
@@ -115,10 +110,9 @@ const RunPlanButton = ({
   };
 
   const isButtonDisabled = () => {
-    const disable =
-      user.person == null ||
-      user.person == undefined ||
-      workerState.data !== "IDLE";
+    const workerState = useGetWorkerState();
+    const disable = workerState.data !== "IDLE";
+
     return disable;
   };
 
@@ -145,6 +139,4 @@ const RunPlanButton = ({
       </Snackbar>
     </React.Fragment>
   );
-};
-
-export default RunPlanButton;
+}

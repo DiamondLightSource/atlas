@@ -5,3 +5,11 @@ ui-base:
   image:
     repository: ghcr.io/diamondlightsource/atlas/p99
     tag: # Updated by CI job with latest release version
+
+  upstreams:
+    - id: blueapi
+      path: /api/
+      rewriteTarget: /
+      target:
+        external:
+          uri: https://p99-blueapi.diamond.ac.uk/

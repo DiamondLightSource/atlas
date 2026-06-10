@@ -14,6 +14,14 @@ ui-base:
         external:
           uri: http://i15-1-blueapi.diamond.ac.uk
 
+    - id: supergraph
+      path: /api/graphql
+      rewriteTarget: /graphql
+      target:
+        external:
+          uri: https://graph-nightly.diamond.ac.uk
+      passHostHeader: false
+
   authConfigFlags: |
     skip_auth_routes = ["GET=^/$", "GET=^/assets"]
     api_routes = ["^/oauth2", "^/api"]

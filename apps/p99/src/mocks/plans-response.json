@@ -1,0 +1,1496 @@
+{
+  "plans": [
+    {
+      "name": "stxm_fast",
+      "description": "\n    Initiates a 2-axis scan, targeting a maximum scan speed of around 10Hz.\n    Calculates the number of data points based on the detector's count time.\n    If no step size is provided, aims for a uniform distribution of points.\n    Adjusts scan speed and step size to fit the desired scan duration.\n\n    Parameters\n    ----------\n    dets : list[Readable]\n        List of detectors to use for the scan.\n    count_time : float\n        Detector count time.\n    step_motor : Motor\n        Motor for the slow axis.\n    step_start : float\n        Starting position for the step motor.\n    step_end : float\n        Ending position for the step motor.\n    scan_motor : Motor\n        Motor for the continuously moving axis.\n    scan_start : float\n        Starting position for the scan motor.\n    scan_end : float\n        Ending position for the scan motor.\n    plan_time : float\n        Desired duration of the scan in seconds.\n    point_correction : float, optional\n        Scaling factor for the number of points, by default 1.\n    step_size : float, optional\n        Step size for the slow axis, by default None.\n    home : bool, optional\n        If True, move back to the original position after the scan, by default False.\n    snake_axes : bool, optional\n        If True, perform a snake scan, by default True.\n    md : dict, optional\n        Metadata for the scan, by default None.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "count_time": {
+            "title": "Count Time",
+            "type": "number"
+          },
+          "step_motor": {
+            "enum": [],
+            "title": "Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "step_start": {
+            "title": "Step Start",
+            "type": "number"
+          },
+          "step_end": {
+            "title": "Step End",
+            "type": "number"
+          },
+          "scan_motor": {
+            "enum": [],
+            "title": "Scan Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "scan_start": {
+            "title": "Scan Start",
+            "type": "number"
+          },
+          "scan_end": {
+            "title": "Scan End",
+            "type": "number"
+          },
+          "plan_time": {
+            "title": "Plan Time",
+            "type": "number"
+          },
+          "point_correction": {
+            "title": "Point Correction",
+            "type": "number"
+          },
+          "step_size": {
+            "title": "Step Size",
+            "type": "number"
+          },
+          "home": {
+            "title": "Home",
+            "type": "boolean"
+          },
+          "snake_axes": {
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dets",
+          "count_time",
+          "step_motor",
+          "step_start",
+          "step_end",
+          "scan_motor",
+          "scan_start",
+          "scan_end",
+          "plan_time"
+        ],
+        "title": "stxm_fast",
+        "type": "object"
+      }
+    },
+    {
+      "name": "stxm_step",
+      "description": "\n    Standard Bluesky grid scan adapted to use step size.\n    Optionally moves back to the original position after scan.\n\n    Parameters\n    ----------\n    dets : Sequence[Readable]\n        Area detectors or readable devices.\n    count_time : float\n        Detector count time.\n    x_step_motor : Motor\n        Motor for the X axis.\n    x_step_start : float\n        Starting position for x_step_motor.\n    x_step_end : float\n        Ending position for x_step_motor.\n    x_step_size : float\n        Step size for x motor.\n    y_step_motor : Motor\n        Motor for the Y axis.\n    y_step_start : float\n        Starting position for y_step_motor.\n    y_step_end : float\n        Ending position for y_step_motor.\n    y_step_size : float\n        Step size for y motor.\n    home : bool, optional\n        If True, move back to position before scan.\n    snake : bool, optional\n        If True, do grid scan without moving scan axis back to start position.\n    md : dict, optional\n        Metadata.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "count_time": {
+            "title": "Count Time",
+            "type": "number"
+          },
+          "x_step_motor": {
+            "enum": [],
+            "title": "X Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "x_step_start": {
+            "title": "X Step Start",
+            "type": "number"
+          },
+          "x_step_end": {
+            "title": "X Step End",
+            "type": "number"
+          },
+          "x_step_size": {
+            "title": "X Step Size",
+            "type": "number"
+          },
+          "y_step_motor": {
+            "enum": [],
+            "title": "Y Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "y_step_start": {
+            "title": "Y Step Start",
+            "type": "number"
+          },
+          "y_step_end": {
+            "title": "Y Step End",
+            "type": "number"
+          },
+          "y_step_size": {
+            "title": "Y Step Size",
+            "type": "number"
+          },
+          "home": {
+            "title": "Home",
+            "type": "boolean"
+          },
+          "snake": {
+            "title": "Snake",
+            "type": "boolean"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dets",
+          "count_time",
+          "x_step_motor",
+          "x_step_start",
+          "x_step_end",
+          "x_step_size",
+          "y_step_motor",
+          "y_step_start",
+          "y_step_end",
+          "y_step_size"
+        ],
+        "title": "stxm_step",
+        "type": "object"
+      }
+    },
+    {
+      "name": "set_area_detector_acquire_time",
+      "description": "\n    Set the acquire time on an area detector.\n\n    Parameters\n    ----------\n    det : AreaDetector | SingleTriggerDetector\n        The detector whose acquire time is to be set.\n    acquire_time : float\n        The desired acquire time.\n    wait : bool, optional\n        Whether to wait for the operation to complete, by default True.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for setting the acquire time.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "det": {
+            "anyOf": [
+              {
+                "enum": ["andor2_det"],
+                "type": "ophyd_async.epics.adcore._core_detector.AreaDetector"
+              },
+              {
+                "enum": ["andor2_point"],
+                "type": "ophyd_async.epics.adcore._single_trigger.SingleTriggerDetector"
+              }
+            ],
+            "title": "Det"
+          },
+          "acquire_time": {
+            "title": "Acquire Time",
+            "type": "number"
+          },
+          "wait": {
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": ["det", "acquire_time"],
+        "title": "set_area_detector_acquire_time",
+        "type": "object"
+      }
+    },
+    {
+      "name": "move_motor_with_look_up",
+      "description": "Perform a step scan with the range and starting motor position\n      given/calculated by using a look up table(dictionary).\n      Move to the peak position after the scan and update the lookup table.\n\n    Parameters\n    ----------\n    motor: Motor\n        Motor devices that is being centre.\n    size: float\n        The motor position or name in the motor_table.\n    motor_table: dict[str, float],\n        Look up table for motor position,\n    use_motor_position: bool = False,\n        If Ture it will take motor position as size.\n    wait: bool = True,\n        If Ture, it will wait until position is reached.\n    group: Hashable | None = None,\n        Bluesky group identifier used by ‘wait’.\n\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "slit": {
+            "enum": [],
+            "title": "Slit",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "size": {
+            "title": "Size",
+            "type": "number"
+          },
+          "motor_table": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Motor Table",
+            "type": "object"
+          },
+          "use_motor_position": {
+            "title": "Use Motor Position",
+            "type": "boolean"
+          },
+          "wait": {
+            "title": "Wait",
+            "type": "boolean"
+          },
+          "group": {
+            "title": "Group"
+          }
+        },
+        "required": ["slit", "size", "motor_table"],
+        "title": "move_motor_with_look_up",
+        "type": "object"
+      }
+    },
+    {
+      "name": "set_slit_size",
+      "description": "Set opening of x-y slit.\n\n    Parameters\n    ----------\n    xy_slit: Slits\n        A slits device.\n    x_size: float\n        The x opening size.\n    y_size: float\n        The y opening size.\n    wait: bool\n        If this is True it will wait for all motions to finish.\n    group (optional): Hashable\n        Bluesky group identifier used by ‘wait’.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "xy_slit": {
+            "enum": [],
+            "title": "Xy Slit",
+            "type": "dodal.devices.slits.Slits"
+          },
+          "x_size": {
+            "title": "X Size",
+            "type": "number"
+          },
+          "y_size": {
+            "title": "Y Size",
+            "type": "number"
+          },
+          "wait": {
+            "title": "Wait",
+            "type": "boolean"
+          },
+          "group": {
+            "title": "Group"
+          }
+        },
+        "required": ["xy_slit", "x_size"],
+        "title": "set_slit_size",
+        "type": "object"
+      }
+    },
+    {
+      "name": "fast_scan_and_move_fit",
+      "description": "Does a fast non-stopping scan and move to the fitted position.\n\n    Parameters\n    ----------\n    det: StandardReadable,\n        Detector to be use for alignment.\n    motor: Motor\n        Motor devices that is being centre.\n    fitted_loc: StatPosition\n        Which fitted position to move to see StatPosition.\n    detname_suffix: Str\n        Name of the fitted axis within the detector\n    start: float,\n        Starting position for the scan.\n    end: float,\n        Ending position for the scan.\n    motor_speed: Optional[float] = None,\n        Speed of the motor.\n    ",
+      "schema": {
+        "$defs": {
+          "StatPosition": {
+            "description": "Data table to help access the fit data.\n\nCom: Centre of mass\n\nCEN: Peak position\n\nMIN: Minimum value\n\nMAX: Maximum value\n\nD: Differential",
+            "enum": [
+              ["stats", "com"],
+              ["stats", "cen"],
+              ["stats", "min"],
+              ["stats", "max"],
+              ["derivative_stats", "com"],
+              ["derivative_stats", "cen"],
+              ["derivative_stats", "min"],
+              ["derivative_stats", "max"]
+            ],
+            "title": "StatPosition",
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "det": {
+            "enum": [
+              "andor2_point",
+              "angle_stage",
+              "filter",
+              "lab_stage",
+              "sample_stage"
+            ],
+            "title": "Det",
+            "type": "ophyd_async.core._readable.StandardReadable"
+          },
+          "motor": {
+            "enum": [],
+            "title": "Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "fitted_loc": {
+            "$ref": "#/$defs/StatPosition"
+          },
+          "detname_suffix": {
+            "title": "Detname Suffix",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "motor_speed": {
+            "title": "Motor Speed",
+            "type": "number"
+          }
+        },
+        "required": [
+          "det",
+          "motor",
+          "fitted_loc",
+          "detname_suffix",
+          "start",
+          "end"
+        ],
+        "title": "fast_scan_and_move_fit",
+        "type": "object"
+      }
+    },
+    {
+      "name": "step_scan_and_move_fit",
+      "description": "\n    Perform a step scan and move to the fitted position.\n\n    Parameters\n    ----------\n    det : StandardReadable\n        The detector to use for alignment.\n    motor : Motor\n        The motor to center.\n    fitted_loc : StatPosition\n        The fitted position to move to (see StatPosition).\n    detname_suffix : str\n        The suffix for the detector name.\n    start : float\n        The starting position for the scan.\n    end : float\n        The ending position for the scan.\n    num : int\n        The number of steps in the scan.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "$defs": {
+          "StatPosition": {
+            "description": "Data table to help access the fit data.\n\nCom: Centre of mass\n\nCEN: Peak position\n\nMIN: Minimum value\n\nMAX: Maximum value\n\nD: Differential",
+            "enum": [
+              ["stats", "com"],
+              ["stats", "cen"],
+              ["stats", "min"],
+              ["stats", "max"],
+              ["derivative_stats", "com"],
+              ["derivative_stats", "cen"],
+              ["derivative_stats", "min"],
+              ["derivative_stats", "max"]
+            ],
+            "title": "StatPosition",
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "det": {
+            "enum": [
+              "andor2_point",
+              "angle_stage",
+              "filter",
+              "lab_stage",
+              "sample_stage"
+            ],
+            "title": "Det",
+            "type": "ophyd_async.core._readable.StandardReadable"
+          },
+          "motor": {
+            "enum": [],
+            "title": "Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "fitted_loc": {
+            "$ref": "#/$defs/StatPosition"
+          },
+          "detname_suffix": {
+            "title": "Detname Suffix",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "num": {
+            "title": "Num",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "det",
+          "motor",
+          "fitted_loc",
+          "detname_suffix",
+          "start",
+          "end",
+          "num"
+        ],
+        "title": "step_scan_and_move_fit",
+        "type": "object"
+      }
+    },
+    {
+      "name": "align_slit_with_look_up",
+      "description": "Perform a step scan with therange and starting motor position\n      given/calculated by using a look up table(dictionary).\n      Move to the peak position after the scan and update the lookup table.\n\n    Parameters\n    ----------\n    motor: Motor\n        Motor devices that is being centre.\n    size: float,\n        The size/name in the motor_table.\n    motor_table: dict[str, float],\n        Look up table for motor position, the str part should be the size of\n        the slit in um.\n    det: StandardReadable,\n        Detector to be use for alignment.\n    centre_type: StatPosition\n        Which fitted position to move to see StatPosition.\n    ",
+      "schema": {
+        "$defs": {
+          "StatPosition": {
+            "description": "Data table to help access the fit data.\n\nCom: Centre of mass\n\nCEN: Peak position\n\nMIN: Minimum value\n\nMAX: Maximum value\n\nD: Differential",
+            "enum": [
+              ["stats", "com"],
+              ["stats", "cen"],
+              ["stats", "min"],
+              ["stats", "max"],
+              ["derivative_stats", "com"],
+              ["derivative_stats", "cen"],
+              ["derivative_stats", "min"],
+              ["derivative_stats", "max"]
+            ],
+            "title": "StatPosition",
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "motor": {
+            "enum": [],
+            "title": "Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "size": {
+            "title": "Size",
+            "type": "number"
+          },
+          "slit_table": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Slit Table",
+            "type": "object"
+          },
+          "det": {
+            "enum": [
+              "andor2_point",
+              "angle_stage",
+              "filter",
+              "lab_stage",
+              "sample_stage"
+            ],
+            "title": "Det",
+            "type": "ophyd_async.core._readable.StandardReadable"
+          },
+          "centre_type": {
+            "$ref": "#/$defs/StatPosition"
+          }
+        },
+        "required": ["motor", "size", "slit_table", "det", "centre_type"],
+        "title": "align_slit_with_look_up",
+        "type": "object"
+      }
+    },
+    {
+      "name": "fast_scan_1d",
+      "description": "\n    Perform a fast scan along one axis.\n\n    Parameters\n    ----------\n    dets : list[Readable]\n        List of readable objects (e.g., detectors).\n    motor : Motor\n        The motor to move during the scan.\n    start : float\n        The starting position of the motor.\n    end : float\n        The ending position of the motor.\n    motor_speed : Optional[float], optional\n        The speed of the motor during the scan. If None,\n        the motor's current speed is used.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "motor": {
+            "enum": [],
+            "title": "Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "motor_speed": {
+            "title": "Motor Speed",
+            "type": "number"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": ["dets", "motor", "start", "end"],
+        "title": "fast_scan_1d",
+        "type": "object"
+      }
+    },
+    {
+      "name": "fast_scan_grid",
+      "description": "\n    Same as fast_scan_1d with an extra axis to step through forming a grid.\n\n    Parameters\n    ----------\n    detectors : list\n        list of 'readable' objects\n    step_motor :\n        Motor (moveable, readable)\n    step_start :\n        Starting position for slow/stepping motor.\n    step_end :\n        Ending position for step motro.\n    num_step:\n        Number of steps to take going from start to end.\n    scan_motor:  Motor (moveable, readable)\n        The motor that will not stop during measurements.\n    scan_start:\n        Scan motor starting position.\n    scan_end:\n        Scan motor ending position.\n    motor_speed: float optional.\n        Speed of the scanning motor during measurements.\n        If None, it will use current speed.\n    snake_axes:\n        If Ture. Scan motor will start an other line where it ended.\n    md:\n        place holder for meta data for future.\n\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "step_motor": {
+            "enum": [],
+            "title": "Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "step_start": {
+            "title": "Step Start",
+            "type": "number"
+          },
+          "step_end": {
+            "title": "Step End",
+            "type": "number"
+          },
+          "num_step": {
+            "title": "Num Step",
+            "type": "integer"
+          },
+          "scan_motor": {
+            "enum": [],
+            "title": "Scan Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "scan_start": {
+            "title": "Scan Start",
+            "type": "number"
+          },
+          "scan_end": {
+            "title": "Scan End",
+            "type": "number"
+          },
+          "motor_speed": {
+            "title": "Motor Speed",
+            "type": "number"
+          },
+          "snake_axes": {
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dets",
+          "step_motor",
+          "step_start",
+          "step_end",
+          "num_step",
+          "scan_motor",
+          "scan_start",
+          "scan_end"
+        ],
+        "title": "fast_scan_grid",
+        "type": "object"
+      }
+    },
+    {
+      "name": "grid_fast_scan",
+      "description": "\n    Initiates a 2-axis scan, targeting a maximum scan speed of around 10Hz.\n    Calculates the number of data points based on the detector's count time.\n    If no step size is provided, aims for a uniform distribution of points.\n    Adjusts scan speed and step size to fit the desired scan duration.\n\n    Parameters\n    ----------\n    dets : list[Readable]\n        List of detectors to use for the scan.\n    count_time : float\n        Detector count time.\n    step_motor : Motor\n        Motor for the slow axis.\n    step_start : float\n        Starting position for the step motor.\n    step_end : float\n        Ending position for the step motor.\n    scan_motor : Motor\n        Motor for the continuously moving axis.\n    scan_start : float\n        Starting position for the scan motor.\n    scan_end : float\n        Ending position for the scan motor.\n    plan_time : float\n        Desired duration of the scan in seconds.\n    point_correction : float, optional\n        Scaling factor for the number of points, by default 1.\n    step_size : float, optional\n        Step size for the slow axis, by default None.\n    home : bool, optional\n        If True, move back to the original position after the scan, by default False.\n    snake_axes : bool, optional\n        If True, perform a snake scan, by default True.\n    md : dict, optional\n        Metadata for the scan, by default None.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "count_time": {
+            "title": "Count Time",
+            "type": "number"
+          },
+          "step_motor": {
+            "enum": [],
+            "title": "Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "step_start": {
+            "title": "Step Start",
+            "type": "number"
+          },
+          "step_end": {
+            "title": "Step End",
+            "type": "number"
+          },
+          "scan_motor": {
+            "enum": [],
+            "title": "Scan Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "scan_start": {
+            "title": "Scan Start",
+            "type": "number"
+          },
+          "scan_end": {
+            "title": "Scan End",
+            "type": "number"
+          },
+          "plan_time": {
+            "title": "Plan Time",
+            "type": "number"
+          },
+          "point_correction": {
+            "title": "Point Correction",
+            "type": "number"
+          },
+          "step_size": {
+            "title": "Step Size",
+            "type": "number"
+          },
+          "home": {
+            "title": "Home",
+            "type": "boolean"
+          },
+          "snake_axes": {
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dets",
+          "count_time",
+          "step_motor",
+          "step_start",
+          "step_end",
+          "scan_motor",
+          "scan_start",
+          "scan_end",
+          "plan_time"
+        ],
+        "title": "grid_fast_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "grid_step_scan",
+      "description": "\n    Standard Bluesky grid scan adapted to use step size.\n    Optionally moves back to the original position after scan.\n\n    Parameters\n    ----------\n    dets : Sequence[Readable]\n        Area detectors or readable devices.\n    count_time : float\n        Detector count time.\n    x_step_motor : Motor\n        Motor for the X axis.\n    x_step_start : float\n        Starting position for x_step_motor.\n    x_step_end : float\n        Ending position for x_step_motor.\n    x_step_size : float\n        Step size for x motor.\n    y_step_motor : Motor\n        Motor for the Y axis.\n    y_step_start : float\n        Starting position for y_step_motor.\n    y_step_end : float\n        Ending position for y_step_motor.\n    y_step_size : float\n        Step size for y motor.\n    home : bool, optional\n        If True, move back to position before scan.\n    snake : bool, optional\n        If True, do grid scan without moving scan axis back to start position.\n    md : dict, optional\n        Metadata.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for the scan.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Dets",
+            "type": "array"
+          },
+          "count_time": {
+            "title": "Count Time",
+            "type": "number"
+          },
+          "x_step_motor": {
+            "enum": [],
+            "title": "X Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "x_step_start": {
+            "title": "X Step Start",
+            "type": "number"
+          },
+          "x_step_end": {
+            "title": "X Step End",
+            "type": "number"
+          },
+          "x_step_size": {
+            "title": "X Step Size",
+            "type": "number"
+          },
+          "y_step_motor": {
+            "enum": [],
+            "title": "Y Step Motor",
+            "type": "ophyd_async.epics.motor.Motor"
+          },
+          "y_step_start": {
+            "title": "Y Step Start",
+            "type": "number"
+          },
+          "y_step_end": {
+            "title": "Y Step End",
+            "type": "number"
+          },
+          "y_step_size": {
+            "title": "Y Step Size",
+            "type": "number"
+          },
+          "home": {
+            "title": "Home",
+            "type": "boolean"
+          },
+          "snake": {
+            "title": "Snake",
+            "type": "boolean"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dets",
+          "count_time",
+          "x_step_motor",
+          "x_step_start",
+          "x_step_end",
+          "x_step_size",
+          "y_step_motor",
+          "y_step_start",
+          "y_step_end",
+          "y_step_size"
+        ],
+        "title": "grid_step_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "trigger_img",
+      "description": "\n    Set the acquire time and trigger the detector to read data.\n\n    Parameters\n    ----------\n    dets : Andor2Detector\n        The detector to trigger.\n    value : int\n        The acquire time to set on the detector.\n\n    Returns\n    -------\n    MsgGenerator\n        A Bluesky generator for triggering the detector.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "dets": {
+            "enum": ["andor2_det"],
+            "title": "Dets",
+            "type": "ophyd_async.epics.adandor._andor.Andor2Detector"
+          },
+          "acquire_time": {
+            "title": "Acquire Time",
+            "type": "integer"
+          },
+          "md": {
+            "additionalProperties": true,
+            "title": "Md",
+            "type": "object"
+          }
+        },
+        "required": ["dets", "acquire_time"],
+        "title": "trigger_img",
+        "type": "object"
+      }
+    },
+    {
+      "name": "count",
+      "description": "Reads from a number of devices.\n    Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable\n    parameters and metadata.\n    ",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Detectors",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "num": {
+            "title": "Num",
+            "type": "integer"
+          },
+          "delay": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              }
+            ],
+            "title": "Delay"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors"],
+        "title": "count",
+        "type": "object"
+      }
+    },
+    {
+      "name": "spec_scan",
+      "description": "Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.\n    A `Spec` is an N-dimensional path.\n    ",
+      "schema": {
+        "$defs": {
+          "Concat_Reference_": {
+            "additionalProperties": false,
+            "description": "Concatenate two Specs together, running one after the other.\n\nEach Dimension of left and right must contain the same axes. Typically\nformed using `Spec.concat`.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 3, 3).concat(Linspace(\"x\", 4, 5, 5)))",
+            "properties": {
+              "left": {
+                "$ref": "#/$defs/Spec",
+                "description": "The left-hand Spec to Concat, midpoints will appear earlier"
+              },
+              "right": {
+                "$ref": "#/$defs/Spec",
+                "description": "The right-hand Spec to Concat, midpoints will appear later"
+              },
+              "gap": {
+                "default": false,
+                "description": "If True, force a gap in the output at the join",
+                "title": "Gap",
+                "type": "boolean"
+              },
+              "check_path_changes": {
+                "default": true,
+                "description": "If True path through scan will not be modified by squash",
+                "title": "Check Path Changes",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Concat",
+                "default": "Concat",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["left", "right"],
+            "title": "Concat",
+            "type": "object"
+          },
+          "ConstantDuration_Reference_": {
+            "additionalProperties": false,
+            "description": "Apply a constant duration to every point in a Spec.\n\nTypically applied with the ``@`` modifier.\n\n.. example_spec::\n\n    from scanspec.specs import Linspace\n\n    spec = 0.1 @ Linspace(\"x\", 1, 2, 3)",
+            "properties": {
+              "constant_duration": {
+                "description": "The value at each point",
+                "title": "Constant Duration",
+                "type": "number"
+              },
+              "spec": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Spec contaning the path to be followed"
+              },
+              "type": {
+                "const": "ConstantDuration",
+                "default": "ConstantDuration",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["constant_duration"],
+            "title": "ConstantDuration",
+            "type": "object"
+          },
+          "Ellipse_Reference_": {
+            "additionalProperties": false,
+            "description": "Grid of points masked to an elliptical footprint.\n\nConstructs a 2-D scan over an axis-aligned ellipse defined by\n``(x_axis, y_axis)``, centred at (``x_centre``, ``y_centre``), with\ndiameters ``x_diameter`` and ``y_diameter``. Grid spacing along each axis is\ncontrolled by ``x_step`` and ``y_step``. If ``snake`` is True, the fast\naxis will zigzag like a snake. If ``vertical`` is True, the y axis will be\nthe fast axis.\n\nStarts from one of the four extremes of the ellipse identified by the signs of\n``x_step`` and ``y_step``.\n\n.. example_spec::\n\n    from scanspec.specs import Ellipse, Fly\n\n    # An elliptical region centred at (0, 0) on axes \"x\" and \"y\",\n    # with 10x6 diameters and steps of 0.5 in both directions.\n    spec = Fly(\n        Ellipse(\n            \"x\", 0, 10, 0.5,\n            \"y\", 0, 6,\n            snake=True,\n            vertical=False,\n        )\n    )",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "x_centre": {
+                "description": "x centre of the spiral",
+                "title": "X Centre",
+                "type": "number"
+              },
+              "x_diameter": {
+                "description": "x width of the spiral",
+                "title": "X Diameter",
+                "type": "number"
+              },
+              "x_step": {
+                "description": "Spacing along x",
+                "exclusiveMinimum": 0,
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_centre": {
+                "description": "y centre of the spiral",
+                "title": "Y Centre",
+                "type": "number"
+              },
+              "y_diameter": {
+                "description": "y width of the spiral (defaults to x_diameter)",
+                "title": "Y Diameter",
+                "type": "number"
+              },
+              "y_step": {
+                "description": "Spacing along y (defaults to x_step)",
+                "exclusiveMinimum": 0,
+                "title": "Y Step",
+                "type": "number"
+              },
+              "snake": {
+                "default": false,
+                "description": "If True, path zigzag like a snake (defaults to False)",
+                "title": "Snake",
+                "type": "boolean"
+              },
+              "vertical": {
+                "default": false,
+                "description": "If True, y axis is the fast axis (defaults to False)",
+                "title": "Vertical",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Ellipse",
+                "default": "Ellipse",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "x_axis",
+              "x_centre",
+              "x_diameter",
+              "x_step",
+              "y_axis",
+              "y_centre"
+            ],
+            "title": "Ellipse",
+            "type": "object"
+          },
+          "Fly_Reference_": {
+            "additionalProperties": false,
+            "description": "Move through lower to upper bounds of the Spec rather than stopping.\n\nThis is commonly termed a \"fly scan\" rather than a \"step scan\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 3))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "Spec contaning the path to be followed"
+              },
+              "type": {
+                "const": "Fly",
+                "default": "Fly",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Fly",
+            "type": "object"
+          },
+          "Linspace_Reference_": {
+            "additionalProperties": false,
+            "description": "Linearly spaced frames with start and stop as first and last midpoints.\n\nThis class is intended to handle linearly spaced frames defined with a\nspecific number of frames.\n\n.. seealso::\n    `Range`: For linearly spaced frames defined with a step size.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 5))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "start": {
+                "description": "Midpoint of the first point of the line",
+                "title": "Start",
+                "type": "number"
+              },
+              "stop": {
+                "description": "Midpoint of the last point of the line",
+                "title": "Stop",
+                "type": "number"
+              },
+              "num": {
+                "default": 1,
+                "description": "Number of frames to produce (defaults to 1)",
+                "minimum": 1,
+                "title": "Num",
+                "type": "integer"
+              },
+              "type": {
+                "const": "Linspace",
+                "default": "Linspace",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "start", "stop"],
+            "title": "Linspace",
+            "type": "object"
+          },
+          "Polygon_Reference_": {
+            "additionalProperties": false,
+            "description": "Grid of points masked to a polygonal footprint.\n\nConstructs a 2-D scan over an axis-aligned polygon defined by an ordered\nlist of vertices \"(x, y)\" given in ``vertices``. The polygon may be convex\nor concave, and the interior is determined using an even-odd ray-casting\nrule. Grid spacing along each axis is controlled by ``x_step`` and ``y_step``,\nIf ``snake`` is True, the fast axis will zigzag like a snake. If ``vertical`` is\nTrue, the y axis will be the fast axis.\n\n.. example_spec::\n\n    from scanspec.specs import Polygon, Fly\n\n    # A triangular region on axes \"x\" and \"y\", stepped by 0.2 units\n    # in both directions.\n    spec = Fly(\n        Polygon(\n            x_axis=\"x\",\n            y_axis=\"y\",\n            vertices=[(0, 0), (5, 0), (2.5, 4)],\n            x_step=0.2,\n            y_step=0.2,\n            snake=True,\n            vertical=False,\n        )\n    )",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "vertices": {
+                "description": "List of (x, y) vertices defining the polygon",
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "title": "Vertices",
+                "type": "array"
+              },
+              "x_step": {
+                "description": "Spacing along x",
+                "exclusiveMinimum": 0,
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_step": {
+                "description": "Spacing along y (defaults to x_step)",
+                "exclusiveMinimum": 0,
+                "title": "Y Step",
+                "type": "number"
+              },
+              "snake": {
+                "default": false,
+                "description": "If True, path zigzag like a snake (defaults to False)",
+                "title": "Snake",
+                "type": "boolean"
+              },
+              "vertical": {
+                "default": false,
+                "description": "If True, y axis is the fast axis (defaults to False)",
+                "title": "Vertical",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Polygon",
+                "default": "Polygon",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["x_axis", "y_axis", "vertices", "x_step"],
+            "title": "Polygon",
+            "type": "object"
+          },
+          "Product_Reference_": {
+            "additionalProperties": false,
+            "description": "Outer product of two Specs, nesting inner within outer.\n\nThis means that inner will run in its entirety at each point in outer.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 3, 4, 12))\n\nAn inner integer can be used to repeat the same point many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * 2)\n\nAn outer integer can be used to repeat the same scan many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(2 * ~Linspace.bounded(\"x\", 3, 4, 1))\n\nIf you want snaked axes to have no gap between iterations you can do:\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Product\n\n    spec = Fly(Product(2, ~Linspace.bounded(\"x\", 3, 4, 1), gap=False))\n\n.. note:: There is no turnaround arrow at x=4",
+            "properties": {
+              "outer": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "description": "Will be executed once",
+                "title": "Outer"
+              },
+              "inner": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "description": "Will be executed len(outer) times",
+                "title": "Inner"
+              },
+              "gap": {
+                "default": true,
+                "description": "If False and the outer spec is an integer and the inner spec is snaked then the end and start of consecutive iterations of inner will have no gap",
+                "title": "Gap",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Product",
+                "default": "Product",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["outer", "inner"],
+            "title": "Product",
+            "type": "object"
+          },
+          "Range_Reference_": {
+            "additionalProperties": false,
+            "description": "Linearly spaced frames with start and stop as the bounding midpoints.\n\n``step`` defines the distance between midpoints.\n\n.. seealso::\n    `Linspace`: For linearly spaced frames defined with a number of frames.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Range\n\n    spec = Fly(Range(\"x\", 1, 2, 0.25))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "start": {
+                "description": "Midpoint of the first point of the line",
+                "title": "Start",
+                "type": "number"
+              },
+              "stop": {
+                "description": "Midpoint of the last point of the line",
+                "title": "Stop",
+                "type": "number"
+              },
+              "step": {
+                "description": "Step size (defaults to stop - start)",
+                "exclusiveMinimum": 0,
+                "title": "Step",
+                "type": "number"
+              },
+              "type": {
+                "const": "Range",
+                "default": "Range",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "start", "stop"],
+            "title": "Range",
+            "type": "object"
+          },
+          "Snake_Reference_": {
+            "additionalProperties": false,
+            "description": "Run the Spec in reverse on every other iteration when nested.\n\nTypically created with the ``~`` operator.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 3, 3) * ~Linspace(\"x\", 3, 5, 5))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "The Spec to run in reverse every other iteration"
+              },
+              "type": {
+                "const": "Snake",
+                "default": "Snake",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Snake",
+            "type": "object"
+          },
+          "Spec": {
+            "discriminator": {
+              "mapping": {
+                "Concat": "#/$defs/Concat_Reference_",
+                "ConstantDuration": "#/$defs/ConstantDuration_Reference_",
+                "Ellipse": "#/$defs/Ellipse_Reference_",
+                "Fly": "#/$defs/Fly_Reference_",
+                "Linspace": "#/$defs/Linspace_Reference_",
+                "Polygon": "#/$defs/Polygon_Reference_",
+                "Product": "#/$defs/Product_Reference_",
+                "Range": "#/$defs/Range_Reference_",
+                "Snake": "#/$defs/Snake_Reference_",
+                "Spiral": "#/$defs/Spiral_Reference_",
+                "Squash": "#/$defs/Squash_Reference_",
+                "Static": "#/$defs/Static_Reference_",
+                "Zip": "#/$defs/Zip_Reference_"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Product_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Zip_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Snake_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Concat_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Squash_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Linspace_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Range_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Fly_Reference_"
+              },
+              {
+                "$ref": "#/$defs/ConstantDuration_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Static_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Spiral_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Ellipse_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Polygon_Reference_"
+              }
+            ]
+          },
+          "Spiral_Reference_": {
+            "additionalProperties": false,
+            "description": "Archimedean spiral of \"x_axis\" and \"y_axis\".\n\nStarts at centre point (\"x_start\", \"y_start\")\". Produces \"num\" points in a\nspiral spanning width of \"x_range\" and height of \"y_range\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Spiral\n\n    spec = Fly(Spiral(\"x\", 1, 10, 2.5, \"y\", 5, 50))",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "x_centre": {
+                "description": "x centre of the spiral",
+                "title": "X Centre",
+                "type": "number"
+              },
+              "x_diameter": {
+                "description": "x width of the spiral",
+                "title": "X Diameter",
+                "type": "number"
+              },
+              "x_step": {
+                "description": "Radial spacing along x",
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_centre": {
+                "description": "y centre of the spiral",
+                "title": "Y Centre",
+                "type": "number"
+              },
+              "y_diameter": {
+                "description": "y width of the spiral (defaults to x_diameter)",
+                "title": "Y Diameter",
+                "type": "number"
+              },
+              "type": {
+                "const": "Spiral",
+                "default": "Spiral",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "x_axis",
+              "x_centre",
+              "x_diameter",
+              "x_step",
+              "y_axis",
+              "y_centre"
+            ],
+            "title": "Spiral",
+            "type": "object"
+          },
+          "Squash_Reference_": {
+            "additionalProperties": false,
+            "description": "Squash a stack of Dimension together into a single expanded Dimension object.\n\nSee Also:\n    `why-squash-can-change-path`\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Squash\n\n    spec = Fly(Squash(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 0, 1, 4)))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "The Spec to squash the dimensions of"
+              },
+              "check_path_changes": {
+                "default": true,
+                "description": "If True path through scan will not be modified by squash",
+                "title": "Check Path Changes",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Squash",
+                "default": "Squash",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Squash",
+            "type": "object"
+          },
+          "Static_Reference_": {
+            "additionalProperties": false,
+            "description": "A static frame, repeated num times, with axis at value.\n\nCan be used to set axis=value at every point in a scan.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Static\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3).zip(Static(\"x\", 3)))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "value": {
+                "description": "The value at each point",
+                "title": "Value",
+                "type": "number"
+              },
+              "num": {
+                "default": 1,
+                "description": "Number of frames to produce",
+                "minimum": 1,
+                "title": "Num",
+                "type": "integer"
+              },
+              "type": {
+                "const": "Static",
+                "default": "Static",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "value"],
+            "title": "Static",
+            "type": "object"
+          },
+          "Zip_Reference_": {
+            "additionalProperties": false,
+            "description": "Run two Specs in parallel, merging their midpoints together.\n\nTypically formed using `Spec.zip`.\n\nStacks of Dimension are merged by:\n\n- If right creates a stack of a single Dimension object of size 1, expand it to\n  the size of the fastest Dimension object created by left\n- Merge individual Dimension objects together from fastest to slowest\n\nThis means that Zipping a Spec producing stack [l2, l1] with a Spec\nproducing stack [r1] will assert len(l1)==len(r1), and produce\nstack [l2, l1.zip(r1)].\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(\n        Linspace(\"z\", 1, 2, 3) * Linspace(\"y\", 3, 4, 5).zip(Linspace(\"x\", 4, 5, 5))\n    )",
+            "properties": {
+              "left": {
+                "$ref": "#/$defs/Spec",
+                "description": "The left-hand Spec to Zip, will appear earlier in axes"
+              },
+              "right": {
+                "$ref": "#/$defs/Spec",
+                "description": "The right-hand Spec to Zip, will appear later in axes"
+              },
+              "type": {
+                "const": "Zip",
+                "default": "Zip",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["left", "right"],
+            "title": "Zip",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "enum": [
+                "andor2_det",
+                "andor2_point",
+                "angle_stage",
+                "filter",
+                "lab_stage",
+                "panda",
+                "sample_stage"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Detectors",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "spec": {
+            "$ref": "#/$defs/Spec"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "spec"],
+        "title": "spec_scan",
+        "type": "object"
+      }
+    }
+  ]
+}

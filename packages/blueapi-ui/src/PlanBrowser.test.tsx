@@ -1,6 +1,6 @@
 import type { Plan } from "@atlas/blueapi";
 import { render, screen, userEvent } from "@atlas/vitest-conf";
-import PlanBrowser from "./PlanBrowser";
+import { PlanBrowser } from "./PlanBrowser";
 
 const plans: Plan[] = [
   { name: "Plan 1", schema: {}, description: "" },

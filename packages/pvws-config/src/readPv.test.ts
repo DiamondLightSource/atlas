@@ -1,5 +1,5 @@
 import { parseNumericPV, parseStringPv } from "./readPv";
-import { DType } from "@diamondlightsource/cs-web-lib";
+import { type DType } from "@diamondlightsource/cs-web-lib";
 
 describe("Test Pv utils", () => {
   it("parse numerical value returns string with correct decimals", () => {

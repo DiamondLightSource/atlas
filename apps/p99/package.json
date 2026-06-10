@@ -14,12 +14,17 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@atlas/blueapi": "workspace:*",
+    "@atlas/blueapi-query": "workspace:*",
     "@diamondlightsource/sci-react-ui": "^0.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "<7.0.0",
-    "react-router-dom": "^7.7.1"
+    "@tanstack/react-query": "^5.90.21",
+    "@testing-library/react": "^15.0.7",
+    "msw": "^2.12.10",
+    "vite-plugin-relay": "^2.1.0"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
