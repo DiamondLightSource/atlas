@@ -1,8 +1,22 @@
 import { Box, Typography, Slider } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function SliceViewer() {
   // view different image slices with slider
+
+  const [images, setImages] = useState([
+    "/test-data/seal.png",
+    "/test-data/littleFoot.jpg",
+    "/test-data/seal.png",
+    "/test-data/littleFoot.jpg",
+  ]);
+  const [value, setValue] = useState<number>(0);
+
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    const newIndex = Array.isArray(newValue) ? newValue[0] : newValue;
+    setValue(newIndex);
+  };
+
   return (
     <Box
       sx={{
@@ -42,8 +56,8 @@ export default function SliceViewer() {
       >
         <Box
           component="img"
-          src="/test-data/seal.png"
-          alt="projection"
+          src={images[value]}
+          alt="image"
           sx={{
             width: "100%",
             height: "100%",
@@ -52,18 +66,18 @@ export default function SliceViewer() {
           }}
         />
       </Box>
-
       <Slider
-        aria-label="Slice View"
-        defaultValue={1}
-        // onChange = {handleChange}
+        value={value}
+        onChange={handleChange}
         // getAriaValueText={valuetext}
         valueLabelDisplay="auto"
         shiftStep={1}
-        step={1}
+        defaultValue={0}
         marks
-        min={1}
-        max={10}
+        step={1}
+        min={0}
+        max={images.length - 1}
+        aria-label="Slice View"
       />
     </Box>
   );
