@@ -41,8 +41,8 @@ export function RunPlanButton({
   const submitTask = useSubmitTask();
   const startTask = useSetActiveTask();
 
-  const waitForIdle = async (ms: number): Promise<void> => {
-    return new Promise((res) => setTimeout(res, ms));
+  const waitForIdle = async (timeoutInMs: number): Promise<void> => {
+    return new Promise((res) => setTimeout(res, timeoutInMs));
   };
 
   const runTask = async (task_id: string) => {
