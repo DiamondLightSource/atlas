@@ -23,6 +23,9 @@ export type RunPlanButtonProps = {
 
 type SeverityLevel = "success" | "info" | "warning" | "error";
 
+const idleState = "IDLE";
+const abortState = "ABORTING";
+
 export function RunPlanButton({
   name,
   params,
@@ -49,7 +52,7 @@ export function RunPlanButton({
     await startTask.mutateAsync(task_id).then(async (response) => {
       if (response) {
         let status = workerState.data;
-        while (status !== "IDLE" && status !== "ABORTING") {
+        while (status !== idleState && status !== abortState) {
           await waitForIdle(10);
           status = workerState.data;
         }
@@ -111,7 +114,7 @@ export function RunPlanButton({
 
   const isButtonDisabled = () => {
     const workerState = useGetWorkerState();
-    const disable = workerState.data !== "IDLE";
+    const disable = workerState.data !== idleState;
 
     return disable;
   };
