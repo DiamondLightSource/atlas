@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import { useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
@@ -12,6 +12,7 @@ function TomographyView() {
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // const [revolve, setRevolve] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // run waits 3 seconds, updating progress bar then allows mock volume to be seen
   const handleRun = () => {
@@ -51,11 +52,11 @@ function TomographyView() {
         bgcolor: "background.default",
       }}
     >
-      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
-        {/* Left panel */}
+      <Stack divider={<Divider orientation="horizontal" />}>
+        {/* Upper panel */}
         <Box
           sx={{
-            width: "38%",
+            width: "40%",
             minWidth: 260,
             display: "flex",
             flexDirection: "column",
@@ -64,14 +65,19 @@ function TomographyView() {
           <CameraViewer />
         </Box>
 
-        {/* Right panel */}
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <VolumeViewer visible={volumeVisible} />
-        </Box>
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <SliceViewer />
-        </Box>
-      </Box>
+        {/* Lower panel */}
+        <Stack
+          direction={menuOpen ? "column" : "row"}
+          divider={<Divider orientation="vertical" />}
+        >
+          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <VolumeViewer visible={volumeVisible} />
+          </Box>
+          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <SliceViewer />
+          </Box>
+        </Stack>
+      </Stack>
 
       <Controls onRun={handleRun} onReset={handleReset} progress={progress} />
     </Box>
