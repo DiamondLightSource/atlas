@@ -5,9 +5,16 @@ import {
   Navbar,
   NavLink,
   NavLinks,
+  User,
 } from "@diamondlightsource/sci-react-ui";
+import { useUserAuth } from "../context/userAuth/useUserAuth";
 
-function P99Navbar() {
+const P99Navbar = () => {
+  const user = useUserAuth();
+
+  const handleLogIn = () => window.location.assign("/oauth2/sign_in");
+  const handleLogOut = () => window.location.assign("/oauth2/sign_out");
+
   return (
     <Navbar
       logo="theme"
@@ -24,7 +31,7 @@ function P99Navbar() {
           }}
         >
           <NavLinks>
-            <NavLink to="/" linkComponent={Link}>
+            <NavLink to="/" linkComponent={Link} test-id="home-button">
               Home
             </NavLink>
             <NavLink to="plans" linkComponent={Link}>
@@ -38,11 +45,21 @@ function P99Navbar() {
       }
       rightSlot={
         <Box sx={{ marginLeft: 4 }}>
+          <User
+            onLogin={handleLogIn}
+            onLogout={handleLogOut}
+            user={
+              user.person == null || user.person == undefined
+                ? null
+                : { fedid: user.person }
+            }
+            colour="white"
+          />
           <ColourSchemeButton />
         </Box>
       }
     />
   );
-}
+};
 
 export default P99Navbar;
