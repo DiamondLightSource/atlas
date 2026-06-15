@@ -1,6 +1,7 @@
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, graphql } from "msw";
 import plansResponse from "./plans-response.json";
 import devicesResponse from "./devices-response.json";
+import templateResponse from "./template-response.json";
 
 const fakeTaskId = "46709394";
 let workerState = "IDLE";
@@ -35,5 +36,23 @@ export const handlers = [
   http.post("/api/blueapi/tasks", () => {
     triggerRunningState();
     return HttpResponse.json({ task_id: fakeTaskId }, { status: 201 });
+  }),
+
+  http.get("/oauth2/userinfo", () => {
+    return HttpResponse.json({ preferredUsername: "abc123456" });
+  }),
+
+  graphql.query("templateViewQuery", async () => {
+    return HttpResponse.json(templateResponse);
+  }),
+
+  graphql.mutation("submitWorkflowTemplateMutation", async () => {
+    return HttpResponse.json({
+      data: {
+        submitWorkflowTemplate: {
+          name: "ptypy-p99-from-config-1234",
+        },
+      },
+    });
   }),
 ];

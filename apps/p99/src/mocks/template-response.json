@@ -1,0 +1,48 @@
+{
+  "data": {
+    "workflowTemplate": {
+      "title": "PtyPy Reconstruction for P99",
+      "name": "ptypy-p99-from-config",
+      "maintainer": "imaging-ptypy-group",
+      "description": "Runs a PtyPy reconstruction job inside a container based on data collected at P99.\n",
+      "repository": "https://github.com/DiamondLightSource/imaging-workflows",
+      "arguments": {
+        "properties": {
+          "id": {
+            "title": "Scan Number",
+            "type": "integer"
+          },
+          "inpath": {
+            "default": "processing/writenData/reconstruction_test_data",
+            "title": "Path to raw data folder",
+            "type": "string"
+          },
+          "memory": {
+            "default": "20Gi",
+            "pattern": "^[0-9]+[GMK]i$",
+            "title": "Requested CPU memory",
+            "type": "string"
+          },
+          "nprocs": {
+            "default": 1,
+            "title": "Nr. of processes",
+            "type": "integer"
+          },
+          "outpath": {
+            "default": "processing/workflows/ptypy",
+            "title": "Path to output folder",
+            "type": "string"
+          },
+          "usegpu": {
+            "default": false,
+            "title": "Use GPU",
+            "type": "boolean"
+          }
+        },
+        "required": ["id", "inpath", "memory", "nprocs", "outpath", "usegpu"],
+        "type": "object"
+      },
+      "uiSchema": null
+    }
+  }
+}
