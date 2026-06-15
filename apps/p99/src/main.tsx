@@ -13,9 +13,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment.ts";
+import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
 import Plans from "./routes/Plans.tsx";
 import Workflows from "./routes/Workflows.tsx";
+import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -52,9 +53,11 @@ enableMocking().then(() => {
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
         <RelayEnvironmentProvider environment={RelayEnvironment}>
           <QueryClientProvider client={queryClient}>
-            <BlueapiProvider api={api}>
-              <RouterProvider router={router} />
-            </BlueapiProvider>
+            <UserAuthProvider>
+              <BlueapiProvider api={api}>
+                <RouterProvider router={router} />
+              </BlueapiProvider>
+            </UserAuthProvider>
           </QueryClientProvider>
         </RelayEnvironmentProvider>
       </ThemeProvider>
