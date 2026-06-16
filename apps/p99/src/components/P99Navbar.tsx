@@ -31,7 +31,7 @@ const P99Navbar = () => {
           }}
         >
           <NavLinks>
-            <NavLink to="/" linkComponent={Link} test-id="home-button">
+            <NavLink to="/" linkComponent={Link}>
               Home
             </NavLink>
             <NavLink to="plans" linkComponent={Link}>

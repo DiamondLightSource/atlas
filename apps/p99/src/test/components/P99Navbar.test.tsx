@@ -7,7 +7,16 @@ import {
 import P99Navbar from "./P99Navbar";
 
 describe("P99Navbar", () => {
-  it("renders the Navbar with a Home link", () => {
+  beforeAll(() => {
+    server.listen();
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  const renderComponent = async () => {
+    const queryClient = new QueryClient();
     render(
       <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
         <MemoryRouter>
@@ -15,7 +24,21 @@ describe("P99Navbar", () => {
         </MemoryRouter>
       </ThemeProvider>,
     );
+  };
 
-    expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
+  it("renders the Navbar with all of the nav buttons", async () => {
+    await renderComponent();
+
+    expect(screen.getByText("Home", { selector: "nav a"})).toBeInTheDocument();
+    expect(screen.getByText("Plans", { selector: "nav a"})).toBeInTheDocument();
+    expect(screen.getByText("Workflows", { selector: "nav a"})).toBeInTheDocument();
+  });
+
+  it("displays the logged in user", async () => {
+    await renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText("abc123456")).toBeVisible();
+    })
   });
 });
