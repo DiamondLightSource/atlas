@@ -15,12 +15,11 @@ ui-base:
         external:
           uri: https://p99-blueapi.diamond.ac.uk/
 
-    - id: workflows
-      path: /api/workflows
-      rewriteTarget: /graphql
+    - id: supergraph
+      path: /api/supergraph
       target:
         external:
-          uri: https://workflows.diamond.ac.uk
+          uri: https://graph.diamond.ac.uk
 
   authConfigFlags: |
     skip_auth_routes = ["GET=^/$", "GET=^/assets"]
