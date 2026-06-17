@@ -66,7 +66,7 @@ export function PlanCard({
   const requiredFields = planSchema?.required || [];
 
   const handleInputChange = (paramName: string, value: string) => {
-    setFormValues(prev => ({ ...prev, [paramName]: value }));
+    setFormValues((prev) => ({ ...prev, [paramName]: value }));
   };
 
   const handleSubmit = async () => {
@@ -86,8 +86,8 @@ export function PlanCard({
           if (typeof userValue === "string") {
             processedParams[key] = userValue
               .split(",")
-              .map(item => item.trim())
-              .filter(item => item !== "");
+              .map((item) => item.trim())
+              .filter((item) => item !== "");
           } else {
             processedParams[key] = [userValue];
           }
@@ -221,7 +221,7 @@ export function PlanCard({
                         : "text"
                     }
                     value={formValues[key] ?? ""}
-                    onChange={e => handleInputChange(key, e.target.value)}
+                    onChange={(e) => handleInputChange(key, e.target.value)}
                     helperText={
                       value.type === "array"
                         ? `Enter values separated by commas (e.g. det1, det2). ${value.description || ""}`

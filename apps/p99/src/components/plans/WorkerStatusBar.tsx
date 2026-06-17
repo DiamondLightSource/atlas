@@ -65,7 +65,7 @@ export function WorkerStatusBar({
             label="Session ID"
             size="small"
             value={instrumentSession}
-            onChange={e => onInstrumentSessionChange(e.target.value)}
+            onChange={(e) => onInstrumentSessionChange(e.target.value)}
             sx={{ minWidth: 180, bgcolor: "background.paper" }}
             slotProps={{ inputLabel: { shrink: true } }}
           />

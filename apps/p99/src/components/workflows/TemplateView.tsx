@@ -37,13 +37,13 @@ const TemplateView = ({
       variables: { templateName, visit, parameters },
       onCompleted: (response, errors) => {
         if (errors?.length) {
-          setSubmissionData(prev => [
+          setSubmissionData((prev) => [
             { submissionResult: { type: "graphQLError", errors }, visit },
             ...prev,
           ]);
         } else {
           const submittedName = response.submitWorkflowTemplate.name;
-          setSubmissionData(prev => [
+          setSubmissionData((prev) => [
             {
               submissionResult: {
                 type: "success",
@@ -57,8 +57,8 @@ const TemplateView = ({
           localStorage.setItem("instrumentSessionID", visitToText(visit));
         }
       },
-      onError: err => {
-        setSubmissionData(prev => [
+      onError: (err) => {
+        setSubmissionData((prev) => [
           { submissionResult: { type: "networkError", error: err }, visit },
           ...prev,
         ]);

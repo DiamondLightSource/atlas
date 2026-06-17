@@ -36,7 +36,7 @@ const SubscribeAndRender = ({
       () => ({
         subscription: subscribeAndRenderSubscription,
         variables: { visit, name: workflowName },
-        onNext: response => {
+        onNext: (response) => {
           setWorkflowData(response ?? null);
         },
         onError: (error: unknown) => {
