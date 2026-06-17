@@ -6,17 +6,15 @@ import {
 } from "@diamondlightsource/sci-react-ui";
 import P99Navbar from "./P99Navbar";
 
+vi.mock("../context/userAuth/useUserAuth", () => ({
+  useUserAuth: vi.fn(() => ({
+    person: "ab12345",
+    person_status: "OK",
+  })),
+}));
+
 describe("P99Navbar", () => {
-  beforeAll(() => {
-    server.listen();
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   const renderComponent = async () => {
-    const queryClient = new QueryClient();
     render(
       <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
         <MemoryRouter>
@@ -42,7 +40,7 @@ describe("P99Navbar", () => {
     await renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText("abc123456")).toBeVisible();
+      expect(screen.getByText("ab12345")).toBeVisible();
     });
   });
 });
