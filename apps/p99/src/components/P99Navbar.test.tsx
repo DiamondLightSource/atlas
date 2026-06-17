@@ -29,9 +29,13 @@ describe("P99Navbar", () => {
   it("renders the Navbar with all of the nav buttons", async () => {
     await renderComponent();
 
-    expect(screen.getByText("Home", { selector: "nav a"})).toBeInTheDocument();
-    expect(screen.getByText("Plans", { selector: "nav a"})).toBeInTheDocument();
-    expect(screen.getByText("Workflows", { selector: "nav a"})).toBeInTheDocument();
+    expect(screen.getByText("Home", { selector: "nav a" })).toBeInTheDocument();
+    expect(
+      screen.getByText("Plans", { selector: "nav a" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Workflows", { selector: "nav a" }),
+    ).toBeInTheDocument();
   });
 
   it("displays the logged in user", async () => {
@@ -39,6 +43,6 @@ describe("P99Navbar", () => {
 
     await waitFor(() => {
       expect(screen.getByText("abc123456")).toBeVisible();
-    })
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@atlas/vitest-conf";
 import { fireEvent } from "@testing-library/react";
-import { PlanCard } from "../../../components/plans/PlanCard";
+import { PlanCard } from "./PlanCard";
 import type { Plan } from "@atlas/blueapi";
 
 const mockUseGetWorkerState = vi.fn(() => ({ data: "IDLE" }));
@@ -93,7 +93,7 @@ describe("PlanCard", () => {
     );
 
     const buttons = screen.getAllByRole("button");
-    const runButton = buttons.find(btn => btn.textContent?.includes("Run"));
+    const runButton = buttons.find((btn) => btn.textContent?.includes("Run"));
     expect(runButton).not.toBeDisabled();
   });
 
@@ -110,7 +110,7 @@ describe("PlanCard", () => {
     );
 
     const buttons = screen.getAllByRole("button");
-    const runButton = buttons.find(btn => btn.textContent?.includes("Run"));
+    const runButton = buttons.find((btn) => btn.textContent?.includes("Run"));
     expect(runButton).toBeDisabled();
   });
 

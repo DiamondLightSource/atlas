@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@atlas/vitest-conf";
-import { WorkerStatusBar } from "../../../components/plans/WorkerStatusBar";
+import { WorkerStatusBar } from "./WorkerStatusBar";
 
 describe("WorkerStatusBar", () => {
   const mockOnSync = vi.fn();
