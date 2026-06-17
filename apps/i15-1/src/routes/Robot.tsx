@@ -3,7 +3,11 @@ import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import { ReadOnlyPv } from "@atlas/pvws-config";
+import {
+  ReadOnlyPv,
+  useParsedPvConnection,
+  type ParsePvProps,
+} from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
 
 import { Webcam, newRelativePosition } from "@diamondlightsource/cs-web-lib";
@@ -117,14 +121,16 @@ function WebCams() {
   const theme = useTheme();
   const relativePos = newRelativePosition("0", "0", "250", "250");
 
+  const jweb1PvProps: ParsePvProps = {
+    label: "jweb1",
+    pv: "BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV",
+  };
+  const jweb1Url = useParsedPvConnection(jweb1PvProps);
+
   return (
     <Box sx={{ ml: 5 }}>
       {" "}
-      <Webcam
-        name="Robot"
-        url="http://i15-k8s-serv-01.diamond.ac.uk:8094/JWEB1.mjpg.mjpg"
-        position={relativePos}
-      />
+      <Webcam name="Robot" url={jweb1Url} position={relativePos} />
     </Box>
   );
 }
