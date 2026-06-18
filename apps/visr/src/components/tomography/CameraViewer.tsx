@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
-export default function CameraViewer() {
+import SliceViewer from "./SliceViewer";
 
+export default function CameraViewer() {
   // static image showing camera view/projection feed
   return (
     <Box
@@ -27,7 +28,6 @@ export default function CameraViewer() {
         <Typography variant="overline" color="primary">
           Camera View
         </Typography>
-        
       </Box>
 
       <Box
@@ -40,7 +40,7 @@ export default function CameraViewer() {
           p: 0.5,
         }}
       >
-        <Box
+        {/* <Box
           component="img"
           src="/test-data/seal.png"
           alt="projection"
@@ -50,7 +50,9 @@ export default function CameraViewer() {
             objectFit: "contain",
             imageRendering: "pixelated",
           }}
-        />
+        /> */}
+
+        <SliceViewer />
       </Box>
     </Box>
   );
