@@ -1,5 +1,7 @@
 import { Box, Typography, Slider } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Volume } from "./VolumeViewer";
+import SliceRenderer from "./SliceRenderer";
 
 export default function SliceViewer() {
   // view different image slices with slider
@@ -11,6 +13,28 @@ export default function SliceViewer() {
     "/test-data/littleFoot.jpg",
   ]);
   const [value, setValue] = useState<number>(0);
+  const [volume, setVolume] = useState<Volume | null>(null);
+  //getting data into usable format - same as in VolumeViewer
+  useEffect(() => {
+    async function loadTestVolume() {
+      const [metaRes, rawRes] = await Promise.all([
+        fetch("/test-data/volume.json"),
+        fetch("/test-data/volume.raw"),
+      ]);
+      console.log("metaRes" + metaRes);
+      const meta = (await metaRes.json()) as {
+        shape: [number, number, number];
+      };
+      const buffer = await rawRes.arrayBuffer();
+      setVolume({
+        volumeData: new Uint8Array(buffer),
+        volumeShape: meta.shape,
+      });
+    }
+
+    loadTestVolume();
+    console.log(volume);
+  }, []);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     const newIndex = Array.isArray(newValue) ? newValue[0] : newValue;
@@ -54,7 +78,7 @@ export default function SliceViewer() {
           p: 0.5,
         }}
       >
-        <Box
+        {/* <Box
           component="img"
           src={images[value]}
           alt="image"
@@ -64,7 +88,8 @@ export default function SliceViewer() {
             objectFit: "contain",
             imageRendering: "pixelated",
           }}
-        />
+        /> */}
+        {volume ? <SliceRenderer volume={volume} axis={0} slice={0} /> : ""}
       </Box>
       <Slider
         value={value}
