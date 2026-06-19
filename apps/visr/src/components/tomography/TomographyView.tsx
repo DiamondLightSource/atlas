@@ -79,19 +79,16 @@ function TomographyView() {
           </Box>
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <SliceViewer depth={slice} />
-            <Slider
-              shiftStep={1}
-              step={1}
-              min={1}
-              max={127}
-              marks
-              onChange={handleSlider}
-            ></Slider>
           </Box>
         </Stack>
       </Stack>
 
-      <Controls onRun={handleRun} onReset={handleReset} progress={progress} />
+      <Controls
+        onRun={handleRun}
+        onReset={handleReset}
+        onSlide={handleSlider}
+        progress={progress}
+      />
     </Box>
   );
 }
