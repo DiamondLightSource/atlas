@@ -6,9 +6,10 @@ ui-base:
     repository: ghcr.io/diamondlightsource/atlas/visr
     tag: # Updated by CI job with latest release version
 
+  # Note that if these have changed you may need to manually restart the oauth2-proxy pod on deployment
   upstreams:
     - id: blueapi
-      path: /api/
+      path: /api/blueapi/
       rewriteTarget: /
       target:
         external:

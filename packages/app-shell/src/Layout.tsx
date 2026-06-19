@@ -13,7 +13,10 @@ export function Layout(props: RouterProps) {
     <Box sx={{ display: "flex" }}>
       <TopBar title={props.title} open={open} setOpen={setOpen} />
       <SideNav navigation={props.navigation} open={open} />
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box
+        component="main"
+        sx={{ display: "flex", flex: 1, flexDirection: "column" }}
+      >
         {/* The Toolbar acts as a spacer,
             same size as the toolbar used inside the TopBar's AppBar*/}
         <Toolbar />

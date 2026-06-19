@@ -1,8 +1,7 @@
 import type { Plan } from "@atlas/blueapi";
 import { render, screen } from "@atlas/vitest-conf";
 
-import PlanParameters from "./PlanParameters";
-import { InstrumentSessionProvider } from "../../context/instrumentSession/InstrumentSessionProvider";
+import { PlanParameters } from "./PlanParameters";
 
 const mockJsonFormsImpl = vi.fn(() => {
   return <div data-testid="jsonforms-sentinel" />;
@@ -15,8 +14,11 @@ vi.mock("@jsonforms/react", () => {
 });
 
 // mock run plan button which is out of scope of this test
-vi.mock("../RunPlanButton", () => ({
-  default: () => <button>Run</button>,
+export function RunPlanButton() {
+  return <button>Run</button>;
+}
+vi.mock("./RunPlanButton", () => ({
+  RunPlanButton: RunPlanButton,
 }));
 
 const plan: Plan = {
@@ -31,11 +33,7 @@ describe("PlanParameters", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("renders a plan's name, description, parameters, session, and run button", () => {
-    render(
-      <InstrumentSessionProvider>
-        <PlanParameters plan={plan} />
-      </InstrumentSessionProvider>,
-    );
+    render(<PlanParameters plan={plan} />);
 
     expect(screen.getByText(plan.name)).toBeInTheDocument();
     expect(screen.getByText(plan.description!)).toBeInTheDocument();
@@ -54,11 +52,7 @@ describe("PlanParameters", () => {
       throw new Error("I can't do it!");
     });
 
-    render(
-      <InstrumentSessionProvider>
-        <PlanParameters plan={plan} />
-      </InstrumentSessionProvider>,
-    );
+    render(<PlanParameters plan={plan} />);
 
     expect(screen.getByText("UI unavailable")).toBeInTheDocument();
 

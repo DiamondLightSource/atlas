@@ -30,7 +30,7 @@ const router = createBrowserRouter([
 ]);
 
 const queryClient = new QueryClient();
-export const api = createApi("/api");
+export const api = createApi("/api/blueapi");
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>

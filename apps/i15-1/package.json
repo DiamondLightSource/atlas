@@ -7,28 +7,40 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "generate:graphql": "graphql-codegen --config graphqlCodegen.ts",
+    "generate:queue": "npx @hey-api/openapi-ts -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/main/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@apollo/client": "^4.2.3",
     "@atlas/app-shell": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
+    "@atlas/blueapi-ui": "workspace:*",
     "@atlas/pvws-config": "workspace:*",
-    "@diamondlightsource/cs-web-lib": "0.9.5",
+    "@diamondlightsource/cs-web-lib": "0.10.15",
     "@diamondlightsource/sci-react-ui": "^0.4.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "<7.0.0",
     "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.4",
+    "graphql": "^16.14.2",
     "lucide-react": "^1.17.0",
+    "material-react-table": "^3.2.1",
     "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
+    "@graphql-codegen/cli": "^7.1.2",
+    "@graphql-codegen/near-operation-file-preset": "^5.2.1",
+    "@graphql-codegen/typescript-operations": "^6.0.3",
     "@types/react-redux": "7.1.34",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
+    "get-graphql-schema": "^2.1.2",
     "globals": "^16.5.0",
     "msw": "^2.10.4",
     "react-redux": "^7.2.9",
@@ -36,7 +48,7 @@
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-relay": "^2.1.0",
-    "vitest": "*"
+    "vitest": "^4.0.18"
   },
   "msw": {
     "workerDirectory": [

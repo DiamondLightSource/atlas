@@ -60,7 +60,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-const api = createApi("/api");
+const api = createApi("/api/blueapi");
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {

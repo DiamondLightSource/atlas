@@ -14,14 +14,14 @@ export type PlanBrowserProps = {
   renderPlan: (plan: Plan) => ReactNode;
 };
 
-export default function PlanBrowser({ plans, renderPlan }: PlanBrowserProps) {
+export function PlanBrowser({ plans, renderPlan }: PlanBrowserProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   return (
     <Container sx={{ height: "85vh", width: "80%" }}>
-      <Grid container spacing={1} sx={{ height: "100%" }}>
+      <Grid container spacing={0} sx={{ height: "100%" }}>
         <Grid size={{ xs: 4 }}>
-          <Paper elevation={2} sx={{ height: "100%" }}>
+          <Paper elevation={0} sx={{ height: "100%" }}>
             <SearchablePlanList
               plans={plans}
               selectedPlan={selectedPlan}

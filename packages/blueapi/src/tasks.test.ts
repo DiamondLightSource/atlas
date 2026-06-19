@@ -45,6 +45,7 @@ describe("createTasksApi", () => {
           is_complete: false,
           is_pending: true,
           errors: [],
+          outcome: { outcome: "success" },
         },
       ],
     };

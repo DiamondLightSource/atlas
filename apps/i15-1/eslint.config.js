@@ -8,7 +8,7 @@ import { globalIgnores } from "eslint/config";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "generated"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [

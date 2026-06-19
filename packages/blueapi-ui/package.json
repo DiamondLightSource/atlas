@@ -1,0 +1,27 @@
+{
+  "name": "@atlas/blueapi-ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@atlas/blueapi": "workspace:*",
+    "@atlas/blueapi-query": "workspace:*",
+    "@jsonforms/core": "3.6.0",
+    "@jsonforms/material-renderers": "3.6.0",
+    "@jsonforms/react": "3.6.0",
+    "@tanstack/react-query": "^5.90.21",
+    "react-error-boundary": "^6.0.0"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "@mui/material": "^6.5.0",
+    "vitest": "*"
+  }
+}

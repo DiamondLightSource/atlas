@@ -12,6 +12,20 @@ export interface Task {
   metadata: object;
 }
 
+type TaskResult = {
+  outcome: "success";
+  result?: any;
+  type?: string;
+};
+
+type TaskError = {
+  outcome: "error";
+  type?: string;
+  message?: string;
+};
+
+export type TaskOutcome = TaskResult | TaskError | null;
+
 /** A representation of a task that the worker recognizes */
 export interface TrackableTask {
   task_id: string;
@@ -20,6 +34,7 @@ export interface TrackableTask {
   is_complete: boolean;
   is_pending: boolean;
   errors: string[];
+  outcome: TaskOutcome;
 }
 
 /** Diagnostic information on the tasks */

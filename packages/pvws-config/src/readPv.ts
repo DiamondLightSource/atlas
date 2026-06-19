@@ -19,11 +19,14 @@ export function ReadPvRawValue({
 export function parseStringPv(value: RawValue | string | number): string {
   let displayValue: string;
   if (value != "not connected" && value != undefined) {
-    const stringVal =
-      typeof (value as DType)["getStringValue"] === "function"
-        ? (value as DType).getStringValue()
+    if (typeof value === "string" || typeof value === "number") {
+      displayValue = value.toString();
+    } else {
+      const stringVal = (value as DType).value.stringValue
+        ? (value as DType).value.stringValue
         : value;
-    displayValue = stringVal ? stringVal.toString() : "undefined";
+      displayValue = stringVal ? stringVal.toString() : "undefined";
+    }
   } else if (value === "not connected") {
     displayValue = "not connected";
   } else {
@@ -48,22 +51,26 @@ export function parseNumericPV(
   let displayValue: string;
   const decimalsToUse = decimals ? decimals : 2;
   const scaleToUse = scaleFactor ? scaleFactor : 1;
-  if (value === "not connected") {
-    displayValue = "not connected";
-  } else if (value === "undefined") {
-    displayValue = "undefined";
-  } else {
-    if (typeof (value as DType)["getStringValue"] === "function") {
-      const numValue = (value as DType).getDoubleValue();
+  if (value != "not connected" && value != undefined) {
+    if (typeof value === "number") {
+      displayValue = scaleAndApprox(Number(value), decimalsToUse, scaleToUse);
+    } else if (typeof value === "string") {
+      displayValue =
+        value === "undefined"
+          ? "undefined"
+          : scaleAndApprox(parseFloat(value), decimalsToUse, scaleToUse);
+    } else {
+      const numValue = (value as DType).value.doubleValue;
       if (!numValue) {
         displayValue = "undefined";
       } else {
         displayValue = scaleAndApprox(numValue, decimalsToUse, scaleToUse);
       }
-    } else {
-      const val = typeof value === "string" ? parseFloat(value) : Number(value);
-      displayValue = scaleAndApprox(val, decimalsToUse, scaleToUse);
     }
+  } else if (value === "not connected") {
+    displayValue = "not connected";
+  } else {
+    displayValue = "undefined";
   }
   return displayValue;
 }

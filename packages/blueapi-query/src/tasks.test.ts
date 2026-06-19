@@ -55,6 +55,7 @@ describe("Task hooks", () => {
       is_pending: true,
       is_complete: false,
       errors: [],
+      outcome: { outcome: "success" },
     };
 
     (api.tasks.get as any).mockResolvedValue(task);

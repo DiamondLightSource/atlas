@@ -9,6 +9,8 @@ import { BlueapiProvider } from "@atlas/blueapi-query";
 import { store } from "@diamondlightsource/cs-web-lib";
 import { useLoadPvwsConfig } from "@atlas/pvws-config";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider";
+import { ApolloProvider } from "@apollo/client/react";
+import { client } from "./context/experimentDefinitions/apolloClient";
 
 type Props = {
   api: Api;
@@ -24,7 +26,9 @@ export function AppProviders({ api, theme, children }: Props) {
         <ReduxProvider store={store(config)}>
           <QueryClientProvider client={new QueryClient()}>
             <UserAuthProvider>
-              <BlueapiProvider api={api}>{children}</BlueapiProvider>
+              <BlueapiProvider api={api}>
+                <ApolloProvider client={client}>{children}</ApolloProvider>
+              </BlueapiProvider>
             </UserAuthProvider>
           </QueryClientProvider>
         </ReduxProvider>

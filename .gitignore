@@ -22,7 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.devcontainer/*lock.json
+**/.devcontainer/*lock.json
 
 # Turborepo
 .turbo
