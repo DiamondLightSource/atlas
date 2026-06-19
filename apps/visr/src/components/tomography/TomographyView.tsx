@@ -14,6 +14,7 @@ function TomographyView() {
   // const [revolve, setRevolve] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [slice, setSlice] = useState<number>(1);
+  const [plane, setPlane] = useState<string>("Z");
   // run waits 3 seconds, updating progress bar then allows mock volume to be seen
   const handleRun = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -43,8 +44,13 @@ function TomographyView() {
     const slice = typeof newValue == "number" ? newValue : newValue[0];
     setSlice(slice);
   };
-  // revolve to be implemented
 
+  const handlePlane = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPlane((event.target as HTMLInputElement).value);
+  };
+
+  // revolve to be implemented
+  console.log("plane: " + plane);
   return (
     <Box
       sx={{
@@ -78,7 +84,7 @@ function TomographyView() {
             <VolumeViewer visible={volumeVisible} />
           </Box>
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <SliceViewer depth={slice} />
+            <SliceViewer depth={slice} plane={plane} />
           </Box>
         </Stack>
       </Stack>
@@ -87,6 +93,8 @@ function TomographyView() {
         onRun={handleRun}
         onReset={handleReset}
         onSlide={handleSlider}
+        onSetDirection={handlePlane}
+        plane={plane}
         progress={progress}
       />
     </Box>

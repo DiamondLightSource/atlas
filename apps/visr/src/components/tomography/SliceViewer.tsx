@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SliceRenderer from "./SliceRenderer";
 import { Box } from "@mui/material";
+import type { mx_bits_to_01 } from "three/examples/jsm/nodes/materialx/lib/mx_noise.js";
 
 enum Plane {
   X,
@@ -15,11 +16,11 @@ interface Volume {
 interface Props {
   // volumeData: Uint8Array;
   // volumeShape: [number, number, number];
-  // plane: Plane;
+  plane: string; //Plane;
   depth: number; // maybe not the right name?
 }
 
-export default function SliceViewer({ depth }: Props) {
+export default function SliceViewer({ plane, depth }: Props) {
   // add props
   const [volume, setVolume] = useState<Volume | null>(null);
 
@@ -43,6 +44,9 @@ export default function SliceViewer({ depth }: Props) {
   }, []);
 
   console.log(volume?.volumeData);
+  if (volume == undefined) {
+    return <Box />;
+  }
   //////////////////////// dummy array /////////////////////////
   const sliceraw = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -66,35 +70,59 @@ export default function SliceViewer({ depth }: Props) {
     [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
-  const slice = sliceraw.map(row => row.map(value => value * 255));
+  //const slice = sliceraw.map(row => row.map(value => value * 255));
   /////////////////////////////////////////////////////////////
   console.log("depth: " + depth);
-  console.log("depth types: " + typeof depth);
-  // if (depth == undefined) {
-  //   depth = 1;
-  // }
-  const value = depth;
-  const firstSlice = volume?.volumeData.slice(
-    91 * 91 * value,
-    91 * 91 * (depth + 1),
-  );
-  console.log("first slice: " + firstSlice);
-  if (firstSlice == undefined) {
-    return <Box />;
+  console.log("plane: " + plane);
+
+  let slice: Uint8Array<ArrayBuffer> | undefined;
+  plane = "Z";
+  if (plane == "Z") {
+    slice = volume?.volumeData.slice(
+      volume.volumeShape[1] * volume.volumeShape[2] * depth,
+      volume.volumeShape[1] * volume.volumeShape[2] * (depth + 1),
+    );
   }
-  function TwoDimensional(arr: Uint8Array, size: number) {
+  console.log("first slice: " + slice);
+
+  let sliceArray: number[] = [];
+  // if (plane == "X") {
+  var array = [];
+  for (var i = depth; i < depth + 91 * 91 * 128; i = i + 91 * 128) {
+    var arr = volume.volumeData.slice(i, i + 91);
+    array.push(arr);
+  }
+  console.log(array);
+  // }
+  console.log("SLICE ARRAY: " + sliceArray);
+
+  function TwoDimensional(
+    arr: Uint8Array | number[] | undefined,
+    size: number,
+  ) {
+    if (typeof arr == "undefined") {
+      return [];
+    }
     var res = [];
     for (var i = 0; i < arr.length; i = i + size)
       res.push(arr.slice(i, i + size));
     return res;
   }
-  const firstSlice2D: number[][] = [].slice.call(
-    TwoDimensional(firstSlice, 91),
+
+  const slice2D: number[][] = [].slice.call(TwoDimensional(slice, 91));
+
+  const sliceArray2D: number[][] = [].slice.call(
+    TwoDimensional(sliceArray, 91),
   );
-  console.log("2D: " + firstSlice2D);
+  console.log("2D array: " + sliceArray2D);
   // useEffect(() => {
   //   // maths to find the correct slice from the volume
   // }, []); // useffect should be retriggered by a change in choice of plane or depth (which will be changed form the controls)
 
-  return <SliceRenderer slicearray={firstSlice2D} />;
+  return (
+    <Box>
+      <SliceRenderer slicearray={[].slice.call(slice2D)} />
+      <SliceRenderer slicearray={[].slice.call(array)} />
+    </Box>
+  );
 }

@@ -1,7 +1,10 @@
 import {
   Box,
   Button,
+  FormControlLabel,
   LinearProgress,
+  Radio,
+  RadioGroup,
   Slider,
   Stack,
   TextField,
@@ -11,10 +14,19 @@ interface Props {
   onRun: () => void;
   onReset: () => void;
   onSlide: (event: Event, newValue: number | number[]) => void;
+  onSetDirection: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  plane: string;
   progress: number;
 }
 
-export default function Controls({ onRun, onReset, onSlide, progress }: Props) {
+export default function Controls({
+  onRun,
+  onReset,
+  onSlide,
+  onSetDirection,
+  plane,
+  progress,
+}: Props) {
   return (
     <Box
       sx={{
@@ -59,10 +71,21 @@ export default function Controls({ onRun, onReset, onSlide, progress }: Props) {
           shiftStep={1}
           step={1}
           min={1}
-          max={127}
+          max={90}
           marks
           onChange={onSlide}
         ></Slider>
+        <RadioGroup
+          // aria-labelledby={`${id}-label`}
+          // name="controlled-radio-buttons-group"
+          value={plane}
+          onChange={onSetDirection}
+          // defaultValue={"Z"}
+        >
+          <FormControlLabel value="X" control={<Radio />} label="X" />
+          <FormControlLabel value="Y" control={<Radio />} label="Y" />
+          <FormControlLabel value="Z" control={<Radio />} label="Z" />
+        </RadioGroup>
       </Stack>
 
       <LinearProgress
