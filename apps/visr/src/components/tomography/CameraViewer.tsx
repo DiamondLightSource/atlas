@@ -40,7 +40,7 @@ export default function CameraViewer() {
           p: 0.5,
         }}
       >
-        {/* <Box
+        <Box
           component="img"
           src="/test-data/seal.png"
           alt="projection"
@@ -50,9 +50,9 @@ export default function CameraViewer() {
             objectFit: "contain",
             imageRendering: "pixelated",
           }}
-        /> */}
+        />
 
-        <SliceViewer />
+        {/* <SliceViewer /> */}
       </Box>
     </Box>
   );

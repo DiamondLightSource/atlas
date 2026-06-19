@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  LinearProgress,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
 
 interface Props {
   onRun: () => void;
@@ -27,8 +21,6 @@ export default function Controls({ onRun, onReset, progress }: Props) {
       }}
     >
       <Stack direction="row" spacing={1} alignItems="center">
-
-        
         <TextField
           label="angles"
           type="number"
@@ -62,7 +54,6 @@ export default function Controls({ onRun, onReset, progress }: Props) {
         value={progress}
         sx={{ height: 8, borderRadius: 1 }}
       />
-
     </Box>
   );
 }

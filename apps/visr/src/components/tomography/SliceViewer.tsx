@@ -13,13 +13,13 @@ interface Volume {
 }
 
 interface Props {
-  volumeData: Uint8Array;
-  volumeShape: [number, number, number];
-  plane: Plane;
+  // volumeData: Uint8Array;
+  // volumeShape: [number, number, number];
+  // plane: Plane;
   depth: number; // maybe not the right name?
 }
 
-export default function SliceViewer() {
+export default function SliceViewer({ depth }: Props) {
   // add props
   const [volume, setVolume] = useState<Volume | null>(null);
 
@@ -57,9 +57,9 @@ export default function SliceViewer() {
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 10, 10, 11, 9, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 82, 83, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    [0, 0, 1, 0, 0, 0, 0, 1, 0, 74, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
     [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0],
     [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
     [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
@@ -68,8 +68,17 @@ export default function SliceViewer() {
   ];
   const slice = sliceraw.map(row => row.map(value => value * 255));
   /////////////////////////////////////////////////////////////
-  const firstSlice = volume?.volumeData.slice(91 * 91 * 64, 91 * 91 * 65);
-  console.log(firstSlice);
+  console.log("depth: " + depth);
+  console.log("depth types: " + typeof depth);
+  // if (depth == undefined) {
+  //   depth = 1;
+  // }
+  const value = depth;
+  const firstSlice = volume?.volumeData.slice(
+    91 * 91 * value,
+    91 * 91 * (depth + 1),
+  );
+  console.log("first slice: " + firstSlice);
   if (firstSlice == undefined) {
     return <Box />;
   }
@@ -82,7 +91,7 @@ export default function SliceViewer() {
   const firstSlice2D: number[][] = [].slice.call(
     TwoDimensional(firstSlice, 91),
   );
-  console.log(firstSlice2D);
+  console.log("2D: " + firstSlice2D);
   // useEffect(() => {
   //   // maths to find the correct slice from the volume
   // }, []); // useffect should be retriggered by a change in choice of plane or depth (which will be changed form the controls)

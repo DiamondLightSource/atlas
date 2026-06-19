@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Divider, Slider, Stack } from "@mui/material";
 import { useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
@@ -13,7 +13,7 @@ function TomographyView() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // const [revolve, setRevolve] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [slice, setSlice] = useState<number>(1);
   // run waits 3 seconds, updating progress bar then allows mock volume to be seen
   const handleRun = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -39,6 +39,10 @@ function TomographyView() {
     setProgress(0);
   };
 
+  const handleSlider = (event: Event, newValue: number | number[]) => {
+    const slice = typeof newValue == "number" ? newValue : newValue[0];
+    setSlice(slice);
+  };
   // revolve to be implemented
 
   return (
@@ -74,7 +78,15 @@ function TomographyView() {
             <VolumeViewer visible={volumeVisible} />
           </Box>
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <SliceViewer />
+            <SliceViewer depth={slice} />
+            <Slider
+              shiftStep={1}
+              step={1}
+              min={1}
+              max={127}
+              marks
+              onChange={handleSlider}
+            ></Slider>
           </Box>
         </Stack>
       </Stack>
