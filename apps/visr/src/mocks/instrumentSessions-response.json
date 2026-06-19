@@ -1,70 +1,21 @@
 {
   "data": {
-    "instrument": {
+    "instrumentByName": {
       "instrumentSessions": [
-        {
-          "instrumentSessionNumber": 1,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
-        },
-        {
-          "instrumentSessionNumber": 2,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
-        },
-        {
-          "instrumentSessionNumber": 3,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 39125
-          }
-        },
-        {
-          "instrumentSessionNumber": 1,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        },
-        {
-          "instrumentSessionNumber": 2,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        },
-        {
-          "instrumentSessionNumber": 3,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        },
-        {
-          "instrumentSessionNumber": 4,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        },
-        {
-          "instrumentSessionNumber": 5,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        },
-        {
-          "instrumentSessionNumber": 6,
-          "proposal": {
-            "proposalCategory": "CM",
-            "proposalNumber": 40661
-          }
-        }
+        { "instrumentSessionReference": "CM39125-1", "state": "Completed" },
+        { "instrumentSessionReference": "CM39125-2", "state": "Completed" },
+        { "instrumentSessionReference": "CM39125-3", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-1", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-2", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-3", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-4", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-5", "state": "Completed" },
+        { "instrumentSessionReference": "CM40661-6", "state": "Completed" },
+        { "instrumentSessionReference": "CM44191-1", "state": "Completed" },
+        { "instrumentSessionReference": "CM44191-2", "state": "Completed" },
+        { "instrumentSessionReference": "CM44191-3", "state": "In Progress" },
+        { "instrumentSessionReference": "CM44191-4", "state": "Future" },
+        { "instrumentSessionReference": "CM44191-5", "state": "Future" }
       ]
     }
   }

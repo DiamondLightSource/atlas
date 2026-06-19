@@ -13,7 +13,14 @@ ui-base:
       rewriteTarget: /
       target:
         external:
-          uri: http://i15-1-blueapi.diamond.ac.uk
+          uri: https://i15-1-blueapi.diamond.ac.uk
+
+    - id: daq-queue
+      path: /api/daq-queue/
+      rewriteTarget: /
+      target:
+        external:
+          uri: https://i15-1-daq-queue.diamond.ac.uk
 
     - id: supergraph
       path: /api/graphql

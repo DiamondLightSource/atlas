@@ -10,7 +10,11 @@ import {
   MenuItem,
 } from "@mui/material";
 
-function InstrumentSessionView({ sessionsList }: { sessionsList: string[] }) {
+function InstrumentSessionView({
+  sessionsList,
+}: {
+  sessionsList: (string | null | undefined)[];
+}) {
   const { instrumentSession, setInstrumentSession } = useInstrumentSession();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
