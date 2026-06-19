@@ -1,45 +1,32 @@
 import type { Plan } from "@atlas/blueapi";
+import {
+  collapseAnyOfEnumBranches,
+  replaceUnknownEnumTypes,
+} from "./sanitisers";
 
-const JSON_SCHEMA_TYPES = new Set([
-  "string",
-  "number",
-  "integer",
-  "boolean",
-  "object",
-  "array",
-  "null",
-]);
+export type SchemaNode = Record<string, unknown>;
 
-/** Replaces any unknown types for `string` when an enum field exists */
-function replaceUnknownTypes(
-  node: Record<string, unknown>,
-): Record<string, unknown> {
-  if (
-    node.enum &&
-    typeof node.type === "string" &&
-    !JSON_SCHEMA_TYPES.has(node.type)
-  ) {
-    node.type = "string";
-  }
+/** Mutating sanitising operation */
+export type Sanitiser = (node: SchemaNode) => void;
 
-  return node;
-}
+const SANITISERS: Sanitiser[] = [
+  collapseAnyOfEnumBranches,
+  replaceUnknownEnumTypes,
+];
 
-function sanitiseSchemaNode(node: unknown): unknown {
+function sanitiseNode(node: unknown): unknown {
   if (Array.isArray(node)) {
-    return node.map(sanitiseSchemaNode);
+    return node.map(sanitiseNode);
   }
 
   if (node && typeof node === "object") {
-    const result: Record<string, unknown> = {};
+    const record = Object.fromEntries(
+      Object.entries(node).map(([key, value]) => [key, sanitiseNode(value)]),
+    );
 
-    for (const [key, value] of Object.entries(node)) {
-      result[key] = sanitiseSchemaNode(value);
-    }
+    SANITISERS.forEach((sanitiser) => sanitiser(record));
 
-    const validTypes = replaceUnknownTypes(result);
-
-    return validTypes;
+    return record;
   }
 
   return node;
@@ -48,6 +35,6 @@ function sanitiseSchemaNode(node: unknown): unknown {
 export function sanitisePlan(plan: Plan): Plan {
   return {
     ...plan,
-    schema: sanitiseSchemaNode(plan.schema) as object,
+    schema: sanitiseNode(plan.schema) as object,
   };
 }
