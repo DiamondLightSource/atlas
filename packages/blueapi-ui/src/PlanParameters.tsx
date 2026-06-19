@@ -5,7 +5,7 @@ import {
   materialRenderers,
   materialCells,
 } from "@jsonforms/material-renderers";
-import sanitizeSchema from "./utils/schema";
+import { sanitisePlan } from "./utils/schema";
 import type { Plan } from "@atlas/blueapi";
 import { RunPlanButton } from "./RunPlanButton";
 
@@ -28,7 +28,7 @@ type PlanParametersProps = {
 export const PlanParameters: React.FC<PlanParametersProps> = (
   props: PlanParametersProps,
 ) => {
-  const schema = sanitizeSchema(props.plan.schema);
+  const plan = sanitisePlan(props.plan);
 
   const [planParameters, setPlanParameters] = useState({});
   // TODO: Remove InstrumentSession box and state, retrieve from context when submitting.
@@ -51,7 +51,7 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
           </Typography>
         )}
         <JsonForms
-          schema={schema}
+          schema={plan.schema}
           data={planParameters}
           renderers={materialRenderers}
           cells={materialCells}
