@@ -80,10 +80,24 @@ function TomographyView() {
           direction={menuOpen ? "column" : "row"}
           divider={<Divider orientation="vertical" />}
         >
-          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Box
+            sx={{
+              flex: 1,
+              // width: "40%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <VolumeViewer visible={volumeVisible} />
           </Box>
-          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Box
+            sx={{
+              flex: 1,
+              // width: "40%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <SliceViewer depth={slice} plane={plane} />
           </Box>
         </Stack>

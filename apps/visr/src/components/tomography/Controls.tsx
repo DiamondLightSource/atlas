@@ -71,7 +71,7 @@ export default function Controls({
           shiftStep={1}
           step={1}
           min={1}
-          max={90}
+          max={plane === "Z" ? 127 : 91}
           marks
           onChange={onSlide}
         ></Slider>
