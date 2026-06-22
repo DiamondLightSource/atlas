@@ -11,6 +11,7 @@ import {
 import { StatusCard } from "../components/StatusCard";
 
 import { Webcam, newRelativePosition } from "@diamondlightsource/cs-web-lib";
+import { Web } from "@mui/icons-material";
 
 type RobotSampleFormData = {
   puck: number;
@@ -117,16 +118,22 @@ function RobotControl() {
   );
 }
 
-function WebCams() {
+function WebCamStream({
+  label,
+  sourceUrl,
+  pv,
+}: {
+  label: string;
+  sourceUrl: string;
+  pv: string;
+}) {
   const relativePos = newRelativePosition("0", "0", "250", "250");
-
-  const jweb1Url = "http://i15-k8s-serv-01.diamond.ac.uk:8094/JWEB1.mjpg.mjpg";
 
   return (
     <Box sx={{ ml: 5 }}>
       {" "}
-      <ReadOnlyPv label="JWEB1" pv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV" />
-      <Webcam name="Robot" url={jweb1Url} position={relativePos} />
+      <ReadOnlyPv label={label} pv={pv} />
+      <Webcam name={label} url={sourceUrl} position={relativePos} />
     </Box>
   );
 }
@@ -146,7 +153,16 @@ function Robot() {
       <Stack direction={"column"} spacing={3} alignItems={"left"}>
         <StatusSidebar />
         <Stack direction={"row"} spacing={3} alignItems={"left"}>
-          <WebCams />
+          <WebCamStream
+            label="JWEB1"
+            sourceUrl="http://i15-k8s-serv-01.diamond.ac.uk:8094/JWEB1.mjpg.mjpg"
+            pv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
+          />
+          <WebCamStream
+            label="JCAM2"
+            sourceUrl="http://i15-k8s-serv-01.diamond.ac.uk:8081/JCAM2.mjpg.mjpg"
+            pv="ca://BL15J-DI-CAM-02:MJPG:MJPG_URL_RBV"
+          />
           <RobotControl />
         </Stack>
       </Stack>
