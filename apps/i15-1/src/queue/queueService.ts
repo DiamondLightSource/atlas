@@ -12,9 +12,10 @@ import { client } from "../../generated/queue/client.gen";
 import type { QueuedTasks } from "./tasks";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
-const QUEUE_MODE = import.meta.env.VITE_QUEUE_MODE;
-const QUEUE_SOCKET: string =
-  QUEUE_MODE === "local" ? "http://127.0.0.1:8001" : "/api/daq-queue";
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
+const QUEUE_SOCKET: string = USE_LOCAL
+  ? "http://127.0.0.1:8001"
+  : "/api/daq-queue";
 
 client.setConfig({ baseUrl: QUEUE_SOCKET });
 

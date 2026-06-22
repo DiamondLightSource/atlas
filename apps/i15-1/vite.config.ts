@@ -11,4 +11,14 @@ export default defineConfig({
     },
     global: {},
   },
+  server: {
+    proxy: {
+      "/api/blueapi": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/blueapi/, ""),
+      },
+    },
+  },
 });
