@@ -31,8 +31,6 @@ export default function SliceRenderer({ slicearray }: SliceRendererProps) {
       component="canvas"
       ref={canvasRef}
       sx={{
-        width: "100%",
-        height: "100%",
         imageRendering: "pixelated",
       }}
     />

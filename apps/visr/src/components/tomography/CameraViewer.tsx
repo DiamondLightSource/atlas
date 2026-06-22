@@ -51,8 +51,6 @@ export default function CameraViewer() {
             imageRendering: "pixelated",
           }}
         />
-
-        {/* <SliceViewer /> */}
       </Box>
     </Box>
   );

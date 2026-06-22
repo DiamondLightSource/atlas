@@ -62,11 +62,14 @@ function TomographyView() {
         bgcolor: "background.default",
       }}
     >
-      <Stack divider={<Divider orientation="horizontal" />}>
+      <Stack
+        direction={menuOpen ? "column" : "row"}
+        divider={<Divider orientation="vertical" />}
+      >
         {/* Upper panel */}
         <Box
           sx={{
-            width: "40%",
+            width: "30%",
             minWidth: 260,
             display: "flex",
             flexDirection: "column",
@@ -76,31 +79,27 @@ function TomographyView() {
         </Box>
 
         {/* Lower panel */}
-        <Stack
-          direction={menuOpen ? "column" : "row"}
-          divider={<Divider orientation="vertical" />}
+
+        <Box
+          sx={{
+            flex: 1,
+            width: "30%",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
-          <Box
-            sx={{
-              flex: 1,
-              // width: "40%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <VolumeViewer visible={volumeVisible} />
-          </Box>
-          <Box
-            sx={{
-              flex: 1,
-              // width: "40%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <SliceViewer depth={slice} plane={plane} />
-          </Box>
-        </Stack>
+          <VolumeViewer visible={volumeVisible} />
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            width: "30%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <SliceViewer depth={slice} plane={plane} />
+        </Box>
       </Stack>
 
       <Controls
