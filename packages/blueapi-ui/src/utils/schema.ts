@@ -2,6 +2,7 @@ import type { Plan } from "@atlas/blueapi";
 import {
   collapseAnyOfEnumBranches,
   replaceUnknownEnumTypes,
+  skipRecursiveSchemas,
 } from "./sanitisers";
 
 export type SchemaNode = Record<string, unknown>;
@@ -10,6 +11,7 @@ export type SchemaNode = Record<string, unknown>;
 export type Sanitiser = (node: SchemaNode) => void;
 
 const SANITISERS: Sanitiser[] = [
+  skipRecursiveSchemas,
   collapseAnyOfEnumBranches,
   replaceUnknownEnumTypes,
 ];

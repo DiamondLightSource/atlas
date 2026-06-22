@@ -2,7 +2,7 @@ import type { Plan } from "@atlas/blueapi";
 import { sanitisePlan } from "./schema";
 
 describe("sanitiseSchema", () => {
-  (it("replaces unknown JSON types for string when there is an enum provided", () => {
+  it("replaces unknown JSON types for string when there is an enum provided", () => {
     const plan: Plan = {
       name: "prepare_beamline_for_robot_load",
       description: undefined,
@@ -35,96 +35,140 @@ describe("sanitiseSchema", () => {
 
     expect(schema.properties.blower.type).toBe("string");
     expect(schema.properties.cobra.type).toBe("string");
-  }),
-    it("(perhaps too conservatively) does not replace unknown types when no enum is provided", () => {
-      // unsure whether this is a realistic scenario...
+  });
 
-      const exoticType = "some.vendor.Device";
+  it("(perhaps too conservatively) does not replace unknown types when no enum is provided", () => {
+    // unsure whether this is a realistic scenario...
 
-      const plan: Plan = {
-        name: "Test plan",
-        description: "plan with exotic type",
-        schema: {
-          properties: {
-            device: {
-              title: "Device",
-              type: exoticType,
-            },
-          },
-        },
-      };
+    const exoticType = "some.vendor.Device";
 
-      const schema = sanitisePlan(plan).schema as {
+    const plan: Plan = {
+      name: "Test plan",
+      description: "plan with exotic type",
+      schema: {
         properties: {
-          device: { type: string };
-        };
-      };
+          device: {
+            title: "Device",
+            type: exoticType,
+          },
+        },
+      },
+    };
 
-      expect(schema.properties.device.type).toBe(exoticType);
-    }),
-    it("recursively sanitises all nodes", () => {
-      const typeToReplace = "bluesky.protocols.Movable";
-      const matchingNode = {
-        enum: ["robot", "stage_y"],
-        type: typeToReplace,
+    const schema = sanitisePlan(plan).schema as {
+      properties: {
+        device: { type: string };
       };
+    };
 
-      const plan = {
-        name: "my plan",
-        description: "",
-        schema: {
-          level1: {
+    expect(schema.properties.device.type).toBe(exoticType);
+  });
+
+  it("recursively sanitises all nodes", () => {
+    const typeToReplace = "bluesky.protocols.Movable";
+    const matchingNode = {
+      enum: ["robot", "stage_y"],
+      type: typeToReplace,
+    };
+
+    const plan = {
+      name: "my plan",
+      description: "",
+      schema: {
+        level1: {
+          ...matchingNode,
+          level2: {
             ...matchingNode,
-            level2: {
-              ...matchingNode,
-            },
           },
         },
-      };
+      },
+    };
 
-      // first a sanity check:
-      expect(JSON.stringify(plan)).toContain(typeToReplace);
-      // verify type is gone in sanitised schema:
-      expect(JSON.stringify(sanitisePlan(plan))).not.toContain(typeToReplace);
-    }),
-    it("collapses anyOf enum branches", () => {
-      const plan: Plan = {
-        name: "",
-        description: "",
-        schema: {
-          properties: {
-            detectors: {
-              items: {
-                anyOf: [
-                  {
-                    type: "bluesky.protocols.Readable",
-                    enum: ["cam1", "cam2"],
-                  },
-                  {
-                    type: "ophyd_async.core._protocol.AsyncReadable",
-                    enum: ["cam1", "cam3"],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      };
-      const collapsed = sanitisePlan(plan).schema as {
+    // first a sanity check:
+    expect(JSON.stringify(plan)).toContain(typeToReplace);
+    // verify type is gone in sanitised schema:
+    expect(JSON.stringify(sanitisePlan(plan))).not.toContain(typeToReplace);
+  });
+
+  it("collapses anyOf enum branches", () => {
+    const plan: Plan = {
+      name: "",
+      description: "",
+      schema: {
         properties: {
           detectors: {
             items: {
-              type: string;
-              enum: string[];
-            };
+              anyOf: [
+                {
+                  type: "bluesky.protocols.Readable",
+                  enum: ["cam1", "cam2"],
+                },
+                {
+                  type: "ophyd_async.core._protocol.AsyncReadable",
+                  enum: ["cam1", "cam3"],
+                },
+              ],
+            },
+          },
+        },
+      },
+    };
+    const collapsed = sanitisePlan(plan).schema as {
+      properties: {
+        detectors: {
+          items: {
+            type: string;
+            enum: string[];
           };
         };
       };
+    };
 
-      expect(collapsed.properties.detectors.items.enum).toEqual([
-        "cam1",
-        "cam2",
-        "cam3",
-      ]);
-    }));
+    expect(collapsed.properties.detectors.items.enum).toEqual([
+      "cam1",
+      "cam2",
+      "cam3",
+    ]);
+  });
+
+  it("Identifies and skips recursive schemas", () => {
+    const recursivePlan: Plan = {
+      name: "Spec",
+      description: "Captures the recursive nature of spec_scan",
+      schema: {
+        $defs: {
+          A: { spec: "#/$defs/Spec" },
+          B: {
+            spec: {
+              anyOf: [
+                {
+                  $ref: "#/$defs/Spec",
+                },
+                {
+                  type: "null",
+                },
+              ],
+            },
+            C: {
+              num: {
+                title: "Num",
+                type: "integer",
+              },
+            },
+            Spec: {
+              oneOf: [
+                { $ref: "#/$defs/A" },
+                { $ref: "#/$defs/B" },
+                { $ref: "#/$defs/C" },
+              ],
+            },
+          },
+        },
+      },
+    };
+
+    const sanitised = sanitisePlan(recursivePlan);
+    const schema = sanitised.schema as { skip: boolean };
+    expect(schema.skip).toBe(true);
+  });
 });
