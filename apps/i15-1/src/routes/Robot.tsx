@@ -125,7 +125,7 @@ function WebCams() {
   return (
     <Box sx={{ ml: 5 }}>
       {" "}
-      <ReadOnlyPv label="JWEB1" pv="BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV" />
+      <ReadOnlyPv label="JWEB1" pv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV" />
       <Webcam name="Robot" url={jweb1Url} position={relativePos} />
     </Box>
   );
