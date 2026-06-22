@@ -74,3 +74,27 @@ export function parseNumericPV(
   }
   return displayValue;
 }
+
+export function parseByteArrPV(value: RawValue | string | number): string {
+  let displayValue: string;
+  if (value != "not connected" && value != undefined) {
+    const arrValue = (value as DType).value.arrayValue;
+    if (!arrValue) {
+      displayValue = "undefined";
+    } else {
+      let result = "";
+      for (let i = 0; i < arrValue.length; i++) {
+        if (Number(arrValue[i]) === 0) {
+          break;
+        }
+        result += String.fromCharCode(Number(arrValue[i]));
+      }
+      displayValue = result;
+    }
+  } else if (value == "not connected") {
+    displayValue = "not connected";
+  } else {
+    displayValue = "undefined";
+  }
+  return displayValue;
+}
