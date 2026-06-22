@@ -118,30 +118,20 @@ function RobotControl() {
 }
 
 function WebCams() {
-  const theme = useTheme();
   const relativePos = newRelativePosition("0", "0", "250", "250");
 
-  const jweb1PvProps: ParsePvProps = {
-    label: "jweb1",
-    pv: "BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV",
-  };
-  const jweb1Url = useParsedPvConnection(jweb1PvProps);
+  const jweb1Url = "http://i15-k8s-serv-01.diamond.ac.uk:8094/JWEB1.mjpg.mjpg";
 
   return (
     <Box sx={{ ml: 5 }}>
       {" "}
+      <ReadOnlyPv label="JWEB1" pv="BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV" />
       <Webcam name="Robot" url={jweb1Url} position={relativePos} />
     </Box>
   );
 }
 
 function Robot() {
-  const { instrumentSession } = useInstrumentSession();
-  const [formData, setFormData] = useState<RobotSampleFormData>({
-    puck: 1,
-    position: 1,
-  });
-  const theme = useTheme();
   return (
     <Box
       // component={"section"}
