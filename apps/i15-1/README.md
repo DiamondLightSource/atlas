@@ -9,8 +9,8 @@ To run this locally:
 1.  Start the devcontainer in VSCode
 1.  To make sure you have the most up-to-date environment either run `pnpm install` in the container or rebuild the container (via the Ctrl+Shift+P menu in VSCode)
 1.  In a terminal in this devcontainer run either:
-    - `VITE_USE_LOCAL=true turbo dev --filter @atlas/i15-1` if running a local queue server on http://127.0.0.1:8001, **OR**
-    - `turbo dev --filter @atlas/i15-1` to use mocked backends
+    - If wanting to test against local services (see [here](https://github.com/DiamondLightSource/daq-queuing-service#daq_queuing_service) for spinning up local serives) run using `VITE_USE_LOCAL=true turbo dev --filter @atlas/i15-1`, **OR**
+    - If you want to test against mocked behaviour run `turbo dev --filter @atlas/i15-1`
 1.  Navigate to http://localhost:5173/
 
 ## Updating Supergraph Schema Types

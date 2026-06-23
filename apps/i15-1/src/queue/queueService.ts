@@ -12,6 +12,8 @@ import { client } from "../../generated/queue/client.gen";
 import type { QueuedTasks } from "./tasks";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
+// Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
+// with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 const QUEUE_SOCKET: string = USE_LOCAL
   ? "http://127.0.0.1:8001"

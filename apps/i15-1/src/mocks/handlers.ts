@@ -2,7 +2,6 @@ import { http, HttpResponse, ws, passthrough } from "msw";
 import plansResponse from "./plans-response.json";
 
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
-console.log(USE_LOCAL);
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 const workerStatus = { status: "IDLE", duration: 0 };
