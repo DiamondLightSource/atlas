@@ -10,13 +10,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Plane } from "./SliceViewer";
 
 interface Props {
   onRun: () => void;
   onReset: () => void;
   onSlide: (event: Event, newValue: number | number[]) => void;
   onSetDirection: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  plane: string;
+  plane: Plane;
   progress: number;
   slice: number;
 }
@@ -78,7 +79,7 @@ export default function Controls({
             shiftStep={1}
             step={1}
             min={1}
-            max={plane === "Z" ? 127 : 91}
+            max={plane === Plane.Z ? 127 : 91}
             marks
             onChange={onSlide}
             value={slice}
@@ -88,9 +89,9 @@ export default function Controls({
             Axis
           </Typography>
           <RadioGroup row value={plane} onChange={onSetDirection}>
-            <FormControlLabel value="X" control={<Radio />} label="X" />
-            <FormControlLabel value="Y" control={<Radio />} label="Y" />
-            <FormControlLabel value="Z" control={<Radio />} label="Z" />
+            <FormControlLabel value={Plane.X} control={<Radio />} label="X" />
+            <FormControlLabel value={Plane.Y} control={<Radio />} label="Y" />
+            <FormControlLabel value={Plane.Z} control={<Radio />} label="Z" />
           </RadioGroup>
         </Box>
       </Stack>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SliceRenderer from "./SliceRenderer";
 import { Box, Typography } from "@mui/material";
 
-enum Plane {
+export enum Plane {
   X,
   Y,
   Z,
@@ -15,7 +15,7 @@ interface Volume {
 interface Props {
   // volumeData: Uint8Array;
   // volumeShape: [number, number, number];
-  plane: string; //Plane;
+  plane: Plane;
   depth: number; // maybe not the right name?
 }
 function TwoDimensional(arr: Uint8Array | number[], size: number) {
@@ -78,7 +78,7 @@ export default function SliceViewer({ plane, depth }: Props) {
 
   let slice: Uint8Array<ArrayBuffer>;
   let slice2D: number[][] = new Array(new Array(91));
-  if (plane == "Z") {
+  if (plane == Plane.Z) {
     slice = volume?.volumeData.slice(
       volume.volumeShape[1] * volume.volumeShape[2] * depth,
       volume.volumeShape[1] * volume.volumeShape[2] * (depth + 1),
@@ -87,7 +87,7 @@ export default function SliceViewer({ plane, depth }: Props) {
   }
 
   const array: number[][] = [];
-  if (plane == "X") {
+  if (plane == Plane.X) {
     for (let i = 0; i < 128; i++) {
       const line: number[] = [];
       for (let col = 0; col < 91; col++) {
@@ -97,7 +97,7 @@ export default function SliceViewer({ plane, depth }: Props) {
       array.push(line);
     }
   }
-  if (plane == "Y") {
+  if (plane == Plane.Y) {
     for (let i = 0; i < 128; i++) {
       const line: number[] = [];
       for (let row = 0; row < 91; row++) {
@@ -145,11 +145,11 @@ export default function SliceViewer({ plane, depth }: Props) {
             flex: 1,
             display: "flex",
             justifyContent: "center",
-            transform: plane === "Z" ? "rotate(180deg)" : "rotate(270deg)",
+            transform: plane === Plane.Z ? "rotate(180deg)" : "rotate(270deg)",
           }}
         >
           <SliceRenderer
-            slicearray={plane === "Z" ? [].slice.call(slice2D) : array}
+            slicearray={plane === Plane.Z ? [].slice.call(slice2D) : array}
           />
           {/* <SliceRenderer slicearray={array} />/ */}
           {/* <SliceRenderer slicearray={[].slice.call(nd2d2d2D)} /> */}

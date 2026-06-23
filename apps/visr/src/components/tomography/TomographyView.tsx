@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
-import SliceViewer from "./SliceViewer";
+import SliceViewer, { Plane } from "./SliceViewer";
 
 const SCAN_DURATION_MS = 3000;
 
@@ -14,10 +14,11 @@ function TomographyView() {
   // const [revolve, setRevolve] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [slice, setSlice] = useState<number>(1);
-  const [plane, setPlane] = useState<string>("Z");
+  const [plane, setPlane] = useState<Plane>(Plane.Z);
 
+  //use local storage to persist values across multiple open tabs
   useEffect(() => {
-    localStorage.setItem("plane", plane);
+    localStorage.setItem("plane", plane.toString());
     localStorage.setItem("volumeVisible", volumeVisible.toString());
     localStorage.setItem("slice", slice.toString());
     console.log(localStorage.getItem("slice"));
@@ -34,7 +35,6 @@ function TomographyView() {
         }
         case "volumeVisible": {
           setVolumeVisible(newValue);
-          console.log("volumeVisible in useEffect: " + volumeVisible);
           break;
         }
         case "slice": {
@@ -85,7 +85,8 @@ function TomographyView() {
   };
 
   const handlePlane = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPlane((event.target as HTMLInputElement).value);
+    const radioValue = Number((event.target as HTMLInputElement).value);
+    setPlane(radioValue);
   };
 
   // revolve to be implemented
@@ -105,7 +106,6 @@ function TomographyView() {
         direction={menuOpen ? "column" : "row"}
         divider={<Divider orientation="vertical" />}
       >
-        {/* Upper panel */}
         <Box
           sx={{
             width: "30%",
