@@ -112,6 +112,10 @@ function RobotControl() {
   );
 }
 
+// TODO: Webcams currently not visible unless streams are not automatically
+// upgraded to https (and not available outside the beamline network). Stream
+// serving needs to be updated when available.
+// https://github.com/DiamondLightSource/atlas/issues/90
 function Robot() {
   return (
     <Box
