@@ -77,31 +77,37 @@ export default function SliceViewer({ plane, depth }: Props) {
   /////////////////////////////////////////////////////////////
 
   let slice: Uint8Array<ArrayBuffer>;
-  let slice2D: number[][] = new Array(new Array(91));
+  let slice2D: number[][] = new Array(new Array(volume.volumeShape[1]));
   if (plane == Plane.Z) {
     slice = volume?.volumeData.slice(
       volume.volumeShape[1] * volume.volumeShape[2] * depth,
       volume.volumeShape[1] * volume.volumeShape[2] * (depth + 1),
     );
-    slice2D = [].slice.call(TwoDimensional(slice, 91));
+    slice2D = [].slice.call(TwoDimensional(slice, volume.volumeShape[1]));
   }
 
   const array: number[][] = [];
   if (plane == Plane.X) {
-    for (let i = 0; i < 128; i++) {
+    for (let i = 0; i < volume.volumeShape[0]; i++) {
       const line: number[] = [];
-      for (let col = 0; col < 91; col++) {
-        const index = col + depth * 91 + i * 91 * 91;
+      for (let col = 0; col < volume.volumeShape[1]; col++) {
+        const index =
+          col +
+          depth * volume.volumeShape[1] +
+          i * volume.volumeShape[1] * volume.volumeShape[2];
         line.push(volume.volumeData[index]);
       }
       array.push(line);
     }
   }
   if (plane == Plane.Y) {
-    for (let i = 0; i < 128; i++) {
+    for (let i = 0; i < volume.volumeShape[0]; i++) {
       const line: number[] = [];
-      for (let row = 0; row < 91; row++) {
-        const index = depth + row * 91 + i * 91 * 91;
+      for (let row = 0; row < volume.volumeShape[2]; row++) {
+        const index =
+          depth +
+          row * volume.volumeShape[2] +
+          i * volume.volumeShape[1] * volume.volumeShape[2];
         line.push(volume.volumeData[index]);
       }
       array.push(line);
@@ -151,8 +157,6 @@ export default function SliceViewer({ plane, depth }: Props) {
           <SliceRenderer
             slicearray={plane === Plane.Z ? [].slice.call(slice2D) : array}
           />
-          {/* <SliceRenderer slicearray={array} />/ */}
-          {/* <SliceRenderer slicearray={[].slice.call(nd2d2d2D)} /> */}
         </Box>
       </Box>
     </Box>

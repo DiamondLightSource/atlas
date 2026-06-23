@@ -21,7 +21,6 @@ function TomographyView() {
     localStorage.setItem("plane", plane.toString());
     localStorage.setItem("volumeVisible", volumeVisible.toString());
     localStorage.setItem("slice", slice.toString());
-    console.log(localStorage.getItem("slice"));
     localStorage.setItem("progress", progress.toString());
   }, [plane, volumeVisible, slice, progress]);
 
@@ -53,7 +52,6 @@ function TomographyView() {
     };
   }, []);
 
-  console.log("volumeVisible: " + volumeVisible);
   // run waits 3 seconds, updating progress bar then allows mock volume to be seen
   const handleRun = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -90,7 +88,6 @@ function TomographyView() {
   };
 
   // revolve to be implemented
-  console.log("plane: " + plane);
   return (
     <Box
       sx={{
