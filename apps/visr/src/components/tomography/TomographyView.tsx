@@ -1,4 +1,4 @@
-import { Box, Divider, Slider, Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import { useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
@@ -77,8 +77,6 @@ function TomographyView() {
         >
           <CameraViewer />
         </Box>
-
-        {/* Lower panel */}
 
         <Box
           sx={{

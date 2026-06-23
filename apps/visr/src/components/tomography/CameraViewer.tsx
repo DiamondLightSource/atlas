@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import SliceViewer from "./SliceViewer";
 
 export default function CameraViewer() {
   // static image showing camera view/projection feed

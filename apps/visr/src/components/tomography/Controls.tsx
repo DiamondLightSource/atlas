@@ -75,13 +75,7 @@ export default function Controls({
           marks
           onChange={onSlide}
         ></Slider>
-        <RadioGroup
-          // aria-labelledby={`${id}-label`}
-          // name="controlled-radio-buttons-group"
-          value={plane}
-          onChange={onSetDirection}
-          // defaultValue={"Z"}
-        >
+        <RadioGroup value={plane} onChange={onSetDirection}>
           <FormControlLabel value="X" control={<Radio />} label="X" />
           <FormControlLabel value="Y" control={<Radio />} label="Y" />
           <FormControlLabel value="Z" control={<Radio />} label="Z" />
