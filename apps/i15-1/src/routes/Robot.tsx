@@ -5,7 +5,7 @@ import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
-import { WebcamStreamFromPv, WebcamStreamFromUrl } from "../components/Webcam";
+import { WebcamStreamFromPv } from "../components/Webcam";
 
 type RobotSampleFormData = {
   puck: number;
@@ -132,9 +132,9 @@ function Robot() {
             sourcePv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
             size="250"
           />
-          <WebcamStreamFromUrl
+          <WebcamStreamFromPv
             label="JCAM2"
-            sourceUrl="http://i15-k8s-serv-01.diamond.ac.uk:8081/JCAM2.mjpg.mjpg"
+            sourcePv="ca://BL15J-DI-CAM-02:MJPG:MJPG_URL_RBV"
             size="250"
           />
           <RobotControl />

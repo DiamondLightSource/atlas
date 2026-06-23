@@ -14,7 +14,7 @@ export function WebcamStreamFromUrl(props: WebcamStreamProps) {
 
   return (
     <Box sx={{ ml: 5 }}>
-      {" "}
+      {props.label}
       <Webcam name={props.label} url={props.sourceUrl} position={relativePos} />
     </Box>
   );
