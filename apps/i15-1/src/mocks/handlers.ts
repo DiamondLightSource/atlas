@@ -1,5 +1,7 @@
-import { http, HttpResponse, ws } from "msw";
+import { http, HttpResponse, ws, passthrough } from "msw";
 import plansResponse from "./plans-response.json";
+
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 const workerStatus = { status: "IDLE", duration: 0 };
@@ -13,7 +15,7 @@ const fakeExperiments = {
             node: {
               name: "Test experiment",
               sample: {
-                name: "Test_sample",
+                name: "Test_8_1",
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -37,7 +39,7 @@ const fakeExperiments = {
             node: {
               name: "Test experiment 2",
               sample: {
-                name: "Test_sample 2",
+                name: "Test_8_2",
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -169,6 +171,8 @@ const fakeQueue = [
 ];
 
 export const handlers = [
+  ...(USE_LOCAL ? [http.all("/api/blueapi/*", () => passthrough())] : []),
+
   http.put("/api/blueapi/worker/task", () => {
     workerStatus.status = "RUNNING";
     return HttpResponse.json({
