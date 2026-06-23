@@ -8,6 +8,7 @@ import {
   Slider,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   onSetDirection: (event: React.ChangeEvent<HTMLInputElement>) => void;
   plane: string;
   progress: number;
+  slice: number;
 }
 
 export default function Controls({
@@ -26,6 +28,7 @@ export default function Controls({
   onSetDirection,
   plane,
   progress,
+  slice,
 }: Props) {
   return (
     <Box
@@ -67,19 +70,29 @@ export default function Controls({
         >
           Revolve
         </ToggleButton> */}
-        <Slider
-          shiftStep={1}
-          step={1}
-          min={1}
-          max={plane === "Z" ? 127 : 91}
-          marks
-          onChange={onSlide}
-        ></Slider>
-        <RadioGroup value={plane} onChange={onSetDirection}>
-          <FormControlLabel value="X" control={<Radio />} label="X" />
-          <FormControlLabel value="Y" control={<Radio />} label="Y" />
-          <FormControlLabel value="Z" control={<Radio />} label="Z" />
-        </RadioGroup>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body1" color="primary">
+            Slice
+          </Typography>
+          <Slider
+            shiftStep={1}
+            step={1}
+            min={1}
+            max={plane === "Z" ? 127 : 91}
+            marks
+            onChange={onSlide}
+            value={slice}
+            // defaultValue={1}
+          ></Slider>{" "}
+          <Typography variant="body1" color="primary">
+            Axis
+          </Typography>
+          <RadioGroup row value={plane} onChange={onSetDirection}>
+            <FormControlLabel value="X" control={<Radio />} label="X" />
+            <FormControlLabel value="Y" control={<Radio />} label="Y" />
+            <FormControlLabel value="Z" control={<Radio />} label="Z" />
+          </RadioGroup>
+        </Box>
       </Stack>
 
       <LinearProgress

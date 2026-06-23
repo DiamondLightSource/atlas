@@ -1,5 +1,5 @@
 import { Box, Divider, Stack } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
@@ -15,6 +15,45 @@ function TomographyView() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [slice, setSlice] = useState<number>(1);
   const [plane, setPlane] = useState<string>("Z");
+
+  useEffect(() => {
+    localStorage.setItem("plane", plane);
+    localStorage.setItem("volumeVisible", volumeVisible.toString());
+    localStorage.setItem("slice", slice.toString());
+    console.log(localStorage.getItem("slice"));
+    localStorage.setItem("progress", progress.toString());
+  }, [plane, volumeVisible, slice, progress]);
+
+  useEffect(() => {
+    const onReceiveMessage = (e: { key: any; newValue: any }) => {
+      const { key, newValue } = e;
+      switch (key) {
+        case "plane": {
+          setPlane(newValue);
+          break;
+        }
+        case "volumeVisible": {
+          setVolumeVisible(newValue);
+          console.log("volumeVisible in useEffect: " + volumeVisible);
+          break;
+        }
+        case "slice": {
+          setSlice(Number(newValue));
+          break;
+        }
+        case "progress": {
+          setProgress(Number(newValue));
+          break;
+        }
+      }
+    };
+    window.addEventListener("storage", onReceiveMessage);
+    return () => {
+      window.removeEventListener("storage", onReceiveMessage);
+    };
+  }, []);
+
+  console.log("volumeVisible: " + volumeVisible);
   // run waits 3 seconds, updating progress bar then allows mock volume to be seen
   const handleRun = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -107,6 +146,7 @@ function TomographyView() {
         onSetDirection={handlePlane}
         plane={plane}
         progress={progress}
+        slice={slice}
       />
     </Box>
   );

@@ -47,7 +47,6 @@ export default function SliceViewer({ plane, depth }: Props) {
     loadTestVolume();
   }, []);
 
-  console.log(volume?.volumeData);
   if (volume == undefined) {
     return <Box />;
   }
@@ -76,8 +75,6 @@ export default function SliceViewer({ plane, depth }: Props) {
   // ];
   //const slice = sliceraw.map(row => row.map(value => value * 255));
   /////////////////////////////////////////////////////////////
-  console.log("depth: " + depth);
-  console.log("plane: " + plane);
 
   let slice: Uint8Array<ArrayBuffer>;
   let slice2D: number[][] = new Array(new Array(91));
