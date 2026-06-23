@@ -5,7 +5,7 @@ import {
   materialRenderers,
   materialCells,
 } from "@jsonforms/material-renderers";
-import sanitizeSchema from "./utils/schema";
+import { sanitisePlan, type SchemaNode } from "./utils/schema";
 import type { Plan } from "@atlas/blueapi";
 import { RunPlanButton } from "./RunPlanButton";
 
@@ -13,6 +13,9 @@ import { ErrorBoundary } from "react-error-boundary";
 
 /**
  * If the UI generation fails, we show a simple apology
+ * TODO: This should instead be a JSON editor,
+ * ideally with an initial JSON object derived from the selected plan's schema
+ * See https://github.com/DiamondLightSource/atlas/issues/83
  */
 function UIFallback() {
   return (
@@ -28,7 +31,7 @@ type PlanParametersProps = {
 export const PlanParameters: React.FC<PlanParametersProps> = (
   props: PlanParametersProps,
 ) => {
-  const schema = sanitizeSchema(props.plan.schema);
+  const plan = sanitisePlan(props.plan);
 
   const [planParameters, setPlanParameters] = useState({});
   // TODO: Remove InstrumentSession box and state, retrieve from context when submitting.
@@ -50,13 +53,17 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
             {props.plan.description}
           </Typography>
         )}
-        <JsonForms
-          schema={schema}
-          data={planParameters}
-          renderers={materialRenderers}
-          cells={materialCells}
-          onChange={({ data }) => setPlanParameters(data)}
-        />
+        {(plan.schema as SchemaNode).skip ? (
+          <UIFallback />
+        ) : (
+          <JsonForms
+            schema={plan.schema}
+            data={planParameters}
+            renderers={materialRenderers}
+            cells={materialCells}
+            onChange={({ data }) => setPlanParameters(data)}
+          />
+        )}
       </Box>
       {/* TODO: Remove InstrumentSession box and state, retrieve from context when submitting.
                 See https://github.com/DiamondLightSource/atlas/issues/57 */}
