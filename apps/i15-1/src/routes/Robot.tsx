@@ -3,15 +3,9 @@ import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import {
-  ReadOnlyPv,
-  useParsedPvConnection,
-  type ParsePvProps,
-} from "@atlas/pvws-config";
+import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
-
-import { Webcam, newRelativePosition } from "@diamondlightsource/cs-web-lib";
-import { Web } from "@mui/icons-material";
+import { WebcamStreamFromPv, WebcamStreamFromUrl } from "../components/Webcam";
 
 type RobotSampleFormData = {
   puck: number;
@@ -118,26 +112,6 @@ function RobotControl() {
   );
 }
 
-function WebCamStream({
-  label,
-  sourceUrl,
-  pv,
-}: {
-  label: string;
-  sourceUrl: string;
-  pv: string;
-}) {
-  const relativePos = newRelativePosition("0", "0", "250", "250");
-
-  return (
-    <Box sx={{ ml: 5 }}>
-      {" "}
-      <ReadOnlyPv label={label} pv={pv} />
-      <Webcam name={label} url={sourceUrl} position={relativePos} />
-    </Box>
-  );
-}
-
 function Robot() {
   return (
     <Box
@@ -153,15 +127,15 @@ function Robot() {
       <Stack direction={"column"} spacing={3} alignItems={"left"}>
         <StatusSidebar />
         <Stack direction={"row"} spacing={3} alignItems={"left"}>
-          <WebCamStream
+          <WebcamStreamFromPv
             label="JWEB1"
-            sourceUrl="http://i15-k8s-serv-01.diamond.ac.uk:8094/JWEB1.mjpg.mjpg"
-            pv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
+            sourcePv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
+            size="250"
           />
-          <WebCamStream
+          <WebcamStreamFromUrl
             label="JCAM2"
             sourceUrl="http://i15-k8s-serv-01.diamond.ac.uk:8081/JCAM2.mjpg.mjpg"
-            pv="ca://BL15J-DI-CAM-02:MJPG:MJPG_URL_RBV"
+            size="250"
           />
           <RobotControl />
         </Stack>
