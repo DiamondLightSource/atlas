@@ -13,6 +13,12 @@ To run this locally:
     - If you want to test against mocked behaviour run `turbo dev --filter @atlas/i15-1`
 1.  Navigate to http://localhost:5173/
 
+## Updating Queue Types
+
+You can generate types from the queue API automatically using the following command:
+
+`pnpm --filter i15-1 generate:queue`
+
 ## Updating Supergraph Schema Types
 
 1. Navigate to app containing folder (i.e. `.../atlas/apps/i15-1`)
