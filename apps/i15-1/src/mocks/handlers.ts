@@ -173,6 +173,13 @@ const fakeQueue = [
 export const handlers = [
   ...(USE_LOCAL ? [http.all("/api/blueapi/*", () => passthrough())] : []),
 
+  ...(USE_LOCAL
+    ? [
+        http.all("http://127.0.0.1:8001/*", () => passthrough()),
+        http.all("http://localhost:8001/*", () => passthrough()),
+      ]
+    : []),
+
   http.put("/api/blueapi/worker/task", () => {
     workerStatus.status = "RUNNING";
     return HttpResponse.json({
