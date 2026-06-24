@@ -5,9 +5,15 @@ import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
 import SliceViewer, { Plane } from "./SliceViewer";
 
+interface Volume {
+  volumeData: Uint8Array;
+  volumeShape: [number, number, number];
+}
+
 const SCAN_DURATION_MS = 3000;
 
 function TomographyView() {
+  const [volume, setVolume] = useState<Volume | null>(null);
   const [volumeVisible, setVolumeVisible] = useState(false);
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -15,6 +21,25 @@ function TomographyView() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [slice, setSlice] = useState<number>(1);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
+
+  useEffect(() => {
+    async function loadTestVolume() {
+      const [metaRes, rawRes] = await Promise.all([
+        fetch("/test-data/volume.json"),
+        fetch("/test-data/volume.raw"),
+      ]);
+      const meta = (await metaRes.json()) as {
+        shape: [number, number, number];
+      };
+      const buffer = await rawRes.arrayBuffer();
+      setVolume({
+        volumeData: new Uint8Array(buffer),
+        volumeShape: meta.shape,
+      });
+    }
+
+    loadTestVolume();
+  }, []);
 
   //use local storage to persist values across multiple open tabs
   useEffect(() => {
@@ -29,7 +54,7 @@ function TomographyView() {
       const { key, newValue } = e;
       switch (key) {
         case "plane": {
-          setPlane(newValue);
+          setPlane(Number(newValue));
           break;
         }
         case "volumeVisible": {
@@ -132,7 +157,16 @@ function TomographyView() {
             flexDirection: "column",
           }}
         >
-          <SliceViewer slice={slice} plane={plane} />
+          {volume ? (
+            <SliceViewer
+              volumeData={volume.volumeData}
+              volumeShape={volume.volumeShape}
+              slice={slice}
+              plane={plane}
+            />
+          ) : (
+            <Box />
+          )}
         </Box>
       </Stack>
 

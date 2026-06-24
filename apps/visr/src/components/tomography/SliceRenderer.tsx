@@ -12,9 +12,9 @@ export default function SliceRenderer({ slicearray }: SliceRendererProps) {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
-
+    console.log(slicearray);
     const rows = slicearray.length;
-    const cols = slicearray[0].length;
+    const cols = slicearray[0]?.length;
     canvas.width = cols;
     canvas.height = rows;
 
