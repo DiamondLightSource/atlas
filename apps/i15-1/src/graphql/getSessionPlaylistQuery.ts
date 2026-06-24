@@ -12,10 +12,15 @@ export const getSessionPlaylistQuery = gql`
             name
             sample {
               name
+              id
+              instrumentSessions {
+                instrumentSessionReference
+              }
               data
             }
             experimentDefinition {
               name
+              id
               data
             }
           }
