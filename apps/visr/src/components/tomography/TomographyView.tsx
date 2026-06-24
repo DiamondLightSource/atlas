@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
-import SliceViewer, { Plane } from "./SliceViewer";
+import SliceViewer from "./SliceViewer";
+import { Plane } from "./PlaneEnum";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -186,6 +187,7 @@ function TomographyView() {
         plane={plane}
         progress={progress}
         slice={slice}
+        volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
       />
     </Box>
   );

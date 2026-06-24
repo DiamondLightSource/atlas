@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
 import SliceRenderer from "./SliceRenderer";
 import { Box, Typography } from "@mui/material";
+import { Plane } from "./PlaneEnum";
 
-export enum Plane {
-  X,
-  Y,
-  Z,
-}
 interface Props {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
@@ -49,7 +44,6 @@ export default function SliceViewer({
         }
         array.push(line);
       }
-      console.log("array in case plane " + array);
       break;
     }
     case Plane.X: {
@@ -83,7 +77,6 @@ export default function SliceViewer({
       break;
     }
   }
-  console.log("array in sliceViewer: " + array);
   // useEffect(() => {
   //   // maths to find the correct slice from the volume
   // }, []); // useffect should be retriggered by a change in choice of plane or slice (which will be changed form the controls)

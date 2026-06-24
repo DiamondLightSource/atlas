@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plane } from "./SliceViewer";
+import { Plane } from "./PlaneEnum";
 
 interface Props {
   onRun: () => void;
@@ -20,6 +20,7 @@ interface Props {
   plane: Plane;
   progress: number;
   slice: number;
+  volumeShape: [number, number, number];
 }
 
 export default function Controls({
@@ -30,6 +31,7 @@ export default function Controls({
   plane,
   progress,
   slice,
+  volumeShape,
 }: Props) {
   return (
     <Box
@@ -79,7 +81,13 @@ export default function Controls({
             shiftStep={1}
             step={1}
             min={1}
-            max={plane === Plane.Z ? 127 : 91}
+            max={
+              plane === Plane.Z
+                ? volumeShape[0]
+                : plane === Plane.Y
+                  ? volumeShape[1]
+                  : volumeShape[2]
+            }
             marks
             onChange={onSlide}
             value={slice}
