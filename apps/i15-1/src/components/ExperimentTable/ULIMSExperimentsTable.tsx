@@ -57,9 +57,8 @@ export function ExperimentList() {
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
     await Promise.all(
-      selected.map((exp, index) =>
+      selected.map((exp) =>
         submitTaskAsync({
-          taskPosition: index,
           experiment: {
             experiment_definition: exp.experiment
               .experimentDefinition as ExperimentDefinition,

@@ -62,9 +62,10 @@ export function QueueView() {
             instrumentSession: task.experiment.instrument_session,
             sampleId: exp.sample.id,
             samplePosition: positionFromName(exp.sample.name),
-            density: exp.experiment_definition.data.density as number,
-            beamSize: exp.experiment_definition.data.beamSize as number,
-            timePerPDF: exp.experiment_definition.data.timePerPDF as number,
+            density: exp.sample.data.density as number,
+            beamSize: exp.experiment_definition.data
+              .focused_beam_size as number,
+            timePerPDF: exp.experiment_definition.data.time_per_pdf as number,
             status: task.status,
           };
         } else {
@@ -84,7 +85,7 @@ export function QueueView() {
         }
       }) ?? []
     );
-  }, [tasksToDisplay]);
+  }, [tasksToDisplay.data]);
 
   const colorMap = useMemo(() => getChipColorMap(), []);
 

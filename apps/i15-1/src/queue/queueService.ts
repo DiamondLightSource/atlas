@@ -256,11 +256,11 @@ export const clearHistory = async (): Promise<number> => {
 };
 
 export const submitQueueTask = async ({
-  taskPosition,
   experiment,
+  taskPosition,
 }: {
-  taskPosition: number;
   experiment: Experiment;
+  taskPosition?: number;
 }) => {
   const data: AddTasksToQueueQueuePostData = {
     url: `/queue`,
