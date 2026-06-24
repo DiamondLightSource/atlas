@@ -6,10 +6,13 @@ import type {
   QueueState,
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
+  ExperimentDefinition,
+  Sample,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
 import type { QueuedTasks } from "./tasks";
+import type { ExperimentNode } from "../graphql/getSessionPlaylistQueryTyped";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
@@ -251,12 +254,12 @@ export const clearHistory = async (): Promise<number> => {
   return response.data;
 };
 
-export const submitTask = async ({
+export const submitQueueTask = async ({
   taskPosition,
-  taskParams,
+  experiment,
 }: {
   taskPosition: number;
-  taskParams: Record<string, unknown>;
+  experiment: ExperimentNode<unknown, unknown>;
 }) => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const sampleId = `test_1_${timestamp}`;
@@ -265,10 +268,13 @@ export const submitTask = async ({
     url: `/queue`,
     body: [
       {
-        plan_name: "run_full_collection",
-        sample_id: sampleId,
-        params: taskParams,
-        instrument_session: "cm44163-3",
+        experiment_definition:
+          // cast needed as id from graph schema has type unknown.
+          experiment.experimentDefinition as ExperimentDefinition,
+        sample: experiment.sample as Sample,
+        instrument_session:
+          experiment.sample.instrumentSessions[0]?.instrumentSessionReference ??
+          "",
       },
     ],
     query: {
@@ -282,10 +288,10 @@ export const submitTask = async ({
   return await addTasksToQueueQueuePost(data);
 };
 
-export function useSumbitTask() {
+export function useSumbitQueueTask() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: submitTask,
+    mutationFn: submitQueueTask,
     onSuccess: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ["queue"] }),
