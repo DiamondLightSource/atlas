@@ -132,7 +132,7 @@ function TomographyView() {
             flexDirection: "column",
           }}
         >
-          <SliceViewer depth={slice} plane={plane} />
+          <SliceViewer slice={slice} plane={plane} />
         </Box>
       </Stack>
 
