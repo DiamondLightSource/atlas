@@ -19,6 +19,10 @@ You can generate types from the queue API automatically using the following comm
 
 `pnpm --filter i15-1 generate:queue`
 
+This will generate from main on GitHub, to target a branch, use:
+
+`npx @hey-api/openapi-ts -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/{BRANCH_NAME}/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue`
+
 ## Updating Supergraph Schema Types
 
 1. Navigate to app containing folder (i.e. `.../atlas/apps/i15-1`)

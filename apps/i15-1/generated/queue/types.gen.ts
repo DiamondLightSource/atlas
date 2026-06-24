@@ -9,10 +9,7 @@ export type ClientOptions = {
  */
 export type AppConfig = {
     blueapi: ApplicationConfig;
-    /**
-     * Blueapi Call Constructor
-     */
-    blueapi_call_constructor: string;
+    converter: ConverterConfig;
 };
 
 /**
@@ -113,6 +110,20 @@ export type CorsConfig = {
 export type CallStatus = 'Waiting' | 'Claimed' | 'In progress' | 'Success' | 'Error';
 
 /**
+ * ConverterConfig
+ */
+export type ConverterConfig = {
+    /**
+     * Path
+     */
+    path: string;
+    /**
+     * Name
+     */
+    name: string;
+};
+
+/**
  * DeviceManagerSource
  */
 export type DeviceManagerSource = {
@@ -187,17 +198,21 @@ export type EnvironmentConfig = {
     /**
      * Sources
      */
-    sources?: Array<({
-        kind: 'planFunctions';
-    } & PlanSource) | ({
-        kind: 'deviceFunctions';
-    } & DeviceSource) | ({
-        kind: 'dodal';
-    } & DodalSource) | ({
-        kind: 'deviceManager';
-    } & DeviceManagerSource)>;
+    sources?: Array<PlanSource | DeviceSource | DodalSource | DeviceManagerSource>;
     events?: WorkerEventConfig;
     metadata?: MetadataConfig | null;
+};
+
+/**
+ * Experiment
+ */
+export type Experiment = {
+    /**
+     * Instrument Session
+     */
+    instrument_session: string;
+    sample: Sample;
+    experiment_definition: ExperimentDefinition;
 };
 
 /**
@@ -205,25 +220,19 @@ export type EnvironmentConfig = {
  */
 export type ExperimentDefinition = {
     /**
-     * Plan Name
+     * Name
      */
-    plan_name: string;
+    name: string;
     /**
-     * Sample Id
+     * Id
      */
-    sample_id: string;
+    id: string;
     /**
-     * Params
-     *
-     * Values for parameters to plan, if any
+     * Data
      */
-    params?: {
+    data: {
         [key: string]: unknown;
     };
-    /**
-     * Instrument Session
-     */
-    instrument_session: string;
 };
 
 /**
@@ -363,6 +372,26 @@ export type RestConfig = {
 };
 
 /**
+ * Sample
+ */
+export type Sample = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Data
+     */
+    data: {
+        [key: string]: unknown;
+    };
+};
+
+/**
  * ScratchConfig
  */
 export type ScratchConfig = {
@@ -484,6 +513,11 @@ export type TaskError = {
 };
 
 /**
+ * TaskKind
+ */
+export type TaskKind = 'Experiment' | 'Plan';
+
+/**
  * TaskRequest
  *
  * Request to run a task with related info
@@ -539,7 +573,10 @@ export type TaskResult = {
  * TaskWithPosition
  */
 export type TaskWithPosition = {
-    experiment_definition: ExperimentDefinition;
+    /**
+     * Experiment
+     */
+    experiment: Experiment | TaskRequest;
     /**
      * Id
      */
@@ -553,6 +590,7 @@ export type TaskWithPosition = {
      * Position
      */
     position: number | null;
+    kind: TaskKind;
 };
 
 /**
@@ -622,10 +660,7 @@ export type WorkerEventConfig = {
  */
 export type AppConfigWritable = {
     blueapi: ApplicationConfigWritable;
-    /**
-     * Blueapi Call Constructor
-     */
-    blueapi_call_constructor: string;
+    converter: ConverterConfig;
 };
 
 /**
@@ -808,9 +843,9 @@ export type GetQueuedTasksQueueGetResponse = GetQueuedTasksQueueGetResponses[key
 
 export type AddTasksToQueueQueuePostData = {
     /**
-     * Experiment Definitions
+     * Experiments
      */
-    body: Array<ExperimentDefinition>;
+    body: Array<TaskRequest | Experiment>;
     path?: never;
     query?: {
         /**
