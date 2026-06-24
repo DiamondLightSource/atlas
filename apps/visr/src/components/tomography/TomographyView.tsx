@@ -147,7 +147,15 @@ function TomographyView() {
             flexDirection: "column",
           }}
         >
-          <VolumeViewer visible={volumeVisible} />
+          {volume ? (
+            <VolumeViewer
+              volumeData={volume.volumeData}
+              volumeShape={volume.volumeShape}
+              visible={volumeVisible}
+            />
+          ) : (
+            <Box />
+          )}
         </Box>
         <Box
           sx={{

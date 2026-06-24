@@ -2,39 +2,19 @@ import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import VolumeRenderer from "./VolumeRenderer";
 
-interface Volume {
+interface Props {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
-}
-
-interface Props {
   visible: boolean;
   // revolve?: boolean
 }
 
 // Currently loads a static test volume from public/test-data/
-export default function VolumeViewer({ visible }: Props) {
-  const [volume, setVolume] = useState<Volume | null>(null);
-
-  useEffect(() => {
-    async function loadTestVolume() {
-      const [metaRes, rawRes] = await Promise.all([
-        fetch("/test-data/volume.json"),
-        fetch("/test-data/volume.raw"),
-      ]);
-      const meta = (await metaRes.json()) as {
-        shape: [number, number, number];
-      };
-      const buffer = await rawRes.arrayBuffer();
-      setVolume({
-        volumeData: new Uint8Array(buffer),
-        volumeShape: meta.shape,
-      });
-    }
-
-    loadTestVolume();
-  }, []);
-
+export default function VolumeViewer({
+  volumeData,
+  volumeShape,
+  visible,
+}: Props) {
   return (
     <Box
       sx={{
@@ -57,11 +37,11 @@ export default function VolumeViewer({ visible }: Props) {
         </Typography>
       </Box>
 
-      {visible && volume ? (
+      {visible && volumeData ? (
         <Box sx={{ flex: 1 }}>
           <VolumeRenderer
-            volumeData={volume.volumeData}
-            volumeShape={volume.volumeShape}
+            volumeData={volumeData}
+            volumeShape={volumeShape}
             // revolve={revolve}
           />
         </Box>
