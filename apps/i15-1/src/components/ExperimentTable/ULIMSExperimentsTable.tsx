@@ -16,6 +16,7 @@ import type {
   GetSessionPlaylistQueryVariables,
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
+import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -59,7 +60,14 @@ export function ExperimentList() {
       selected.map((exp, index) =>
         submitTaskAsync({
           taskPosition: index,
-          experiment: exp.experiment,
+          experiment: {
+            experiment_definition: exp.experiment
+              .experimentDefinition as ExperimentDefinition,
+            sample: exp.experiment.sample as Sample,
+            instrument_session:
+              exp.experiment.sample.instrumentSessions[0]?.instrumentSessionReference?.toLowerCase() ??
+              "",
+          },
         }),
       ),
     );

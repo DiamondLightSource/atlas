@@ -8,6 +8,7 @@ import type {
   AddTasksToQueueQueuePostData,
   ExperimentDefinition,
   Sample,
+  Experiment,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
@@ -259,29 +260,13 @@ export const submitQueueTask = async ({
   experiment,
 }: {
   taskPosition: number;
-  experiment: ExperimentNode<unknown, unknown>;
+  experiment: Experiment;
 }) => {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const sampleId = `test_1_${timestamp}`;
-
   const data: AddTasksToQueueQueuePostData = {
     url: `/queue`,
-    body: [
-      {
-        experiment_definition:
-          // cast needed as id from graph schema has type unknown.
-          experiment.experimentDefinition as ExperimentDefinition,
-        sample: experiment.sample as Sample,
-        instrument_session:
-          experiment.sample.instrumentSessions[0]?.instrumentSessionReference ??
-          "",
-      },
-    ],
+    body: [experiment],
     query: {
       position: taskPosition,
-      // @ts-expect-error - validation is still a bit in flux,
-      // see https://github.com/DiamondLightSource/daq-queuing-service/issues/42
-      validate_with_blueapi: false,
     },
   };
 
