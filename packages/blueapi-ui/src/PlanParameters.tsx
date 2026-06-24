@@ -24,16 +24,21 @@ function UIFallback() {
     </Typography>
   );
 }
+
 type PlanParametersProps = {
   plan: Plan;
 };
+
+interface PlansParameters {
+  [key: string]: any;
+}
 
 export const PlanParameters: React.FC<PlanParametersProps> = (
   props: PlanParametersProps,
 ) => {
   const plan = sanitisePlan(props.plan);
 
-  const [planParameters, setPlanParameters] = useState({});
+  const [planParameters, setPlanParameters] = useState<PlansParameters>({});
   // TODO: Remove InstrumentSession box and state, retrieve from context when submitting.
   //       See https://github.com/DiamondLightSource/atlas/issues/57
   const [instrumentSession, setInstrumentSession] = useState("cm12345-1");
@@ -58,10 +63,12 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
         ) : (
           <JsonForms
             schema={plan.schema}
-            data={planParameters}
+            data={planParameters[props.plan.name]}
             renderers={materialRenderers}
             cells={materialCells}
-            onChange={({ data }) => setPlanParameters(data)}
+            onChange={({ data }) =>
+              setPlanParameters({ ...planParameters, [props.plan.name]: data })
+            }
           />
         )}
       </Box>
@@ -78,7 +85,7 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
       <Box sx={{ mt: 2 }}>
         <RunPlanButton
           name={props.plan.name}
-          params={planParameters}
+          params={planParameters[props.plan.name]}
           instrumentSession={instrumentSession}
         />
       </Box>
