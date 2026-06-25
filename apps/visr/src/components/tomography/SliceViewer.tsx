@@ -1,6 +1,8 @@
 import SliceRenderer from "./SliceRenderer";
 import { Box, Typography } from "@mui/material";
 import { Plane } from "./PlaneEnum";
+import { HeatmapPlot } from "@diamondlightsource/davidia";
+import ndarray from "ndarray";
 
 interface Props {
   volumeData: Uint8Array;
@@ -23,12 +25,12 @@ export default function SliceViewer({
   if (volumeData == undefined || volumeShape == undefined) {
     return <Box />;
   }
-  // let sliceData: Uint8Array<ArrayBuffer>;
+  // let sliceData: Uint8Array<ArrayBuffer> = new Uint8Array();
   // let slice2D: number[][] = new Array(new Array(volumeShape[1]));
-  const array: number[][] = [];
+  const array: Array<number> = [];
   switch (plane) {
     case Plane.Z: {
-      // slice = volume?.volumeData.slice(
+      // sliceData = volumeData.slice(
       //   volumeShape[1] * volumeShape[2] * slice,
       //   volumeShape[1] * volumeShape[2] * (slice + 1),
       // );
@@ -40,9 +42,9 @@ export default function SliceViewer({
             col +
             row * volumeShape[1] +
             slice * volumeShape[1] * volumeShape[2];
-          line.push(volumeData[index]);
+          array.push(volumeData[index]);
         }
-        array.push(line);
+        // array.push(line);
       }
       break;
     }
@@ -55,9 +57,9 @@ export default function SliceViewer({
             col +
             slice * volumeShape[1] +
             depth * volumeShape[1] * volumeShape[2];
-          line.push(volumeData[index]);
+          array.push(volumeData[index]);
         }
-        array.push(line);
+        // array.push(line);
       }
       break;
     }
@@ -70,13 +72,18 @@ export default function SliceViewer({
             slice +
             row * volumeShape[2] +
             depth * volumeShape[1] * volumeShape[2];
-          line.push(volumeData[index]);
+          array.push(volumeData[index]);
         }
-        array.push(line);
+        // array.push(line);
       }
       break;
     }
   }
+
+  const sliceData = new Uint8Array(array);
+  const sliceMapped = sliceData.map(value => value * 255);
+  const slicendarray = ndarray(sliceMapped, [91, 91]);
+
   // useEffect(() => {
   //   // maths to find the correct slice from the volume
   // }, []); // useffect should be retriggered by a change in choice of plane or slice (which will be changed form the controls)
@@ -117,11 +124,23 @@ export default function SliceViewer({
             transform: plane === Plane.Z ? "rotate(180deg)" : "rotate(270deg)",
           }}
         >
-          <SliceRenderer
+          {/* <SliceRenderer
             slicearray={array} //plane === Plane.Z ? [].slice.call(slice2D) : array}
-          />
+            uintarray={sliceData}
+          /> */}
         </Box>
       </Box>
+      <HeatmapPlot
+        aspect="auto"
+        plotConfig={{
+          title: "Sample Image Plot",
+          xLabel: "x-axis",
+          yLabel: "y-axis",
+        }}
+        values={slicendarray}
+        domain={[0, 255]}
+        // colourMap="Spectral"
+      />
     </Box>
   );
 }

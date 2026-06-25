@@ -83,10 +83,10 @@ export default function Controls({
             min={1}
             max={
               plane === Plane.Z
-                ? volumeShape[0]
+                ? volumeShape[0] - 1
                 : plane === Plane.Y
-                  ? volumeShape[1]
-                  : volumeShape[2]
+                  ? volumeShape[1] - 1
+                  : volumeShape[2] - 1
             }
             marks
             onChange={onSlide}
