@@ -1,8 +1,4 @@
-import type { BlueapiCallResponse, Status } from "../../generated/queue";
-import type {
-  ExperimentDefinitionData,
-  SampleData,
-} from "../components/ExperimentTable/ULIMSExperimentsTable";
+import type { Status } from "../../generated/queue";
 
 export type QueueTableData = {
   position: number | null;

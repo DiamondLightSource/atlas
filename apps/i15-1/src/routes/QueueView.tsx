@@ -26,7 +26,7 @@ import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import type { QueuedTasks } from "../queue/tasks";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
-import type { Experiment, Status, TaskRequest } from "../../generated/queue";
+import type { Experiment, Status } from "../../generated/queue";
 
 function getChipColorMap(): Record<Status, ChipProps["color"]> {
   return {
@@ -69,8 +69,6 @@ export function QueueView() {
             status: task.status,
           };
         } else {
-          const exp = task.experiment as TaskRequest;
-
           return {
             position: task.position,
             id: task.id,

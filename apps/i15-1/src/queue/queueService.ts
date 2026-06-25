@@ -6,14 +6,11 @@ import type {
   QueueState,
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
-  ExperimentDefinition,
-  Sample,
   Experiment,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
 import type { QueuedTasks } from "./tasks";
-import type { ExperimentNode } from "../graphql/getSessionPlaylistQueryTyped";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
