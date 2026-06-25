@@ -64,7 +64,7 @@ export function ExperimentList() {
               .experimentDefinition as ExperimentDefinition,
             sample: exp.experiment.sample as Sample,
             instrument_session:
-              exp.experiment.sample.instrumentSessions[0]?.instrumentSessionReference?.toLowerCase() ??
+              exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
               "",
           },
         }),
