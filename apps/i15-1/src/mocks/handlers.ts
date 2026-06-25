@@ -30,7 +30,7 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
                   q_max: 67,
@@ -61,7 +61,7 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
                 id: "b645e887-85b4-40d6-a8f0-500a436bc395",
                 data: {
                   q_max: 67,
