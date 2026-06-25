@@ -18,7 +18,7 @@ type WithTypedData<
   },
   TSampleData,
   TExperimentDefinitionData,
-> = Omit<TNode, never> & {
+> = Omit<TNode, "sample" | "experimentDefinition"> & {
   sample: Omit<TNode["sample"], "data"> & {
     data: TSampleData;
   };
