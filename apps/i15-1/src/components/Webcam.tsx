@@ -5,8 +5,8 @@ import { useParsedPvConnection, type ParsePvProps } from "@atlas/pvws-config";
 type WebcamStreamProps = {
   label: string;
   sourceUrl?: string;
-  sourcePv?: string;
-  size?: string;
+  sourcePv?: string; // PV from which a sourceUrl is fetched
+  size?: string; // Width and height of the webcam widget in pixels
 };
 
 export function WebcamStreamFromUrl(props: WebcamStreamProps) {

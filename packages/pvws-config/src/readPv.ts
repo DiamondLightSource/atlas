@@ -16,6 +16,9 @@ export function ReadPvRawValue({
   return rawValue;
 }
 
+// TODO: Simplify PV parsing functions with newly exposed cs-web-lib utils
+// https://github.com/DiamondLightSource/atlas/issues/93
+
 export function parseStringPv(value: RawValue | string | number): string {
   let displayValue: string;
   if (value != "not connected" && value != undefined) {
