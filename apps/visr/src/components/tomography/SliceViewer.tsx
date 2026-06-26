@@ -140,8 +140,8 @@ export default function SliceViewer({
         aspect="auto"
         plotConfig={{
           title: "Slice View",
-          xLabel: "x-axis",
-          yLabel: "y-axis",
+          // xLabel: "x-axis",
+          // yLabel: "y-axis",
         }}
         values={sliceNdarray}
         domain={[0, 255]}
