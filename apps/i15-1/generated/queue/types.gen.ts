@@ -107,7 +107,7 @@ export type CorsConfig = {
 /**
  * CallStatus
  */
-export type CallStatus = 'Waiting' | 'Claimed' | 'In progress' | 'Success' | 'Error';
+export type CallStatus = 'Waiting' | 'Claimed' | 'In progress' | 'Success' | 'Error' | 'Skipped';
 
 /**
  * ConverterConfig
@@ -458,7 +458,7 @@ export type ServiceAccount = {
 /**
  * Status
  */
-export type Status = 'Queued' | 'In progress' | 'Complete' | 'Cancelled';
+export type Status = 'Queued' | 'In progress' | 'Complete' | 'Error' | 'Cancelled';
 
 /**
  * StompConfig
