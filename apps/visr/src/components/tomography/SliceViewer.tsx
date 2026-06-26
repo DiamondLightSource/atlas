@@ -25,6 +25,10 @@ export default function SliceViewer({
   if (volumeData == undefined || volumeShape == undefined) {
     return <Box />;
   }
+
+  let sliceData: Uint8Array;
+  let sliceNdarray: ndarray.NdArray<ndarray.TypedArray>;
+
   // let sliceData: Uint8Array<ArrayBuffer> = new Uint8Array();
   // let slice2D: number[][] = new Array(new Array(volumeShape[1]));
   const array: Array<number> = [];
@@ -46,28 +50,15 @@ export default function SliceViewer({
         }
         // array.push(line);
       }
-      break;
-    }
-    case Plane.X: {
-      for (let depth = 0; depth < volumeShape[0]; depth++) {
-        const line: number[] = [];
-        for (let col = 0; col < volumeShape[2]; col++) {
-          //maybe col < volumeShape[1]
-          const index =
-            col +
-            slice * volumeShape[1] +
-            depth * volumeShape[1] * volumeShape[2];
-          array.push(volumeData[index]);
-        }
-        // array.push(line);
-      }
+      sliceData = new Uint8Array(array);
+      sliceNdarray = ndarray(sliceData, [volumeShape[1], volumeShape[2]]);
       break;
     }
     case Plane.Y: {
       for (let depth = 0; depth < volumeShape[0]; depth++) {
         const line: number[] = [];
-        for (let row = 0; row < volumeShape[1]; row++) {
-          //maybe row < volumeShape[2]
+        for (let row = 0; row < volumeShape[2]; row++) {
+          //maybe row < volumeShape[1]
           const index =
             slice +
             row * volumeShape[2] +
@@ -76,13 +67,28 @@ export default function SliceViewer({
         }
         // array.push(line);
       }
+      sliceData = new Uint8Array(array);
+      sliceNdarray = ndarray(sliceData, [volumeShape[0], volumeShape[2]]);
+      break;
+    }
+    case Plane.X: {
+      for (let depth = 0; depth < volumeShape[0]; depth++) {
+        const line: number[] = [];
+        for (let col = 0; col < volumeShape[1]; col++) {
+          //maybe col < volumeShape[2]
+          const index =
+            col +
+            slice * volumeShape[1] +
+            depth * volumeShape[1] * volumeShape[2];
+          array.push(volumeData[index]);
+        }
+        // array.push(line);
+      }
+      sliceData = new Uint8Array(array);
+      sliceNdarray = ndarray(sliceData, [volumeShape[0], volumeShape[1]]);
       break;
     }
   }
-
-  const sliceData = new Uint8Array(array);
-  const sliceMapped = sliceData.map(value => value * 255);
-  const slicendarray = ndarray(sliceMapped, [91, 91]);
 
   // useEffect(() => {
   //   // maths to find the correct slice from the volume
@@ -109,7 +115,7 @@ export default function SliceViewer({
           Slice View
         </Typography>
       </Box>
-      <Box
+      {/* <Box
         sx={{
           flex: 1,
           display: "flex",
@@ -124,20 +130,20 @@ export default function SliceViewer({
             transform: plane === Plane.Z ? "rotate(180deg)" : "rotate(270deg)",
           }}
         >
-          {/* <SliceRenderer
+          <SliceRenderer
             slicearray={array} //plane === Plane.Z ? [].slice.call(slice2D) : array}
             uintarray={sliceData}
-          /> */}
+          />
         </Box>
-      </Box>
+      </Box> */}
       <HeatmapPlot
         aspect="auto"
         plotConfig={{
-          title: "Sample Image Plot",
+          title: "Slice View",
           xLabel: "x-axis",
           yLabel: "y-axis",
         }}
-        values={slicendarray}
+        values={sliceNdarray}
         domain={[0, 255]}
         // colourMap="Spectral"
       />
