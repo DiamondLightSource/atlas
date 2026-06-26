@@ -1,4 +1,4 @@
-import { parseNumericPV, parseStringPv } from "./readPv";
+import { parseNumericPV, parseStringPv, parseByteArrPV } from "./readPv";
 import { type DType } from "@diamondlightsource/cs-web-lib";
 
 describe("Test Pv utils", () => {
@@ -20,5 +20,10 @@ describe("Test Pv utils", () => {
     expect(parseStringPv(newDType)).toEqual("Open");
     expect(parseStringPv(10)).toEqual("10");
     expect(parseStringPv("Close")).toEqual("Close");
+  });
+
+  it("parses byte array values to a string", () => {
+    expect(parseByteArrPV("not connected")).toEqual("not connected");
+    expect(parseByteArrPV(undefined)).toEqual("undefined");
   });
 });
