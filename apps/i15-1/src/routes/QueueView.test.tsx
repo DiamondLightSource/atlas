@@ -55,6 +55,7 @@ describe("QueueView", () => {
           position: 0,
           status: "Queued",
           experiment: {
+            name: "Exp 1",
             instrument_session: "session2",
             sample: { id: "sample2", name: "my_sample", data: {} },
             experiment_definition: {
