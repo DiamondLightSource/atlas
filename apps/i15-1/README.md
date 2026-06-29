@@ -80,3 +80,10 @@ export function QueryData() {
   return data?.instrumentSession?.state || [];
 }
 ```
+
+## Viewing Camera Streams on Firefox
+
+1. Ensure you are on the beamline network
+1. Type `about:config` in the address bar and press the return key.
+1. Click `Accpt the Risk and Continue` on the warning screen.
+1. Search for the following preference `security.mixed_content.upgrade_display_content.image` and change the value to `false`.
