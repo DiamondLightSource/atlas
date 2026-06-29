@@ -26,7 +26,7 @@ import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import type { QueuedTasks } from "../queue/tasks";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
-import type { Experiment, Status } from "../../generated/queue";
+import type { Experiment, Status, TaskRequest } from "../../generated/queue";
 
 function getChipColorMap(): Record<Status, ChipProps["color"]> {
   return {
@@ -34,6 +34,7 @@ function getChipColorMap(): Record<Status, ChipProps["color"]> {
     "In progress": "info",
     Complete: "success",
     Cancelled: "warning",
+    Error: "error",
   };
 }
 
@@ -58,6 +59,7 @@ export function QueueView() {
 
           return {
             position: task.position,
+            name: exp.name,
             id: task.id,
             instrumentSession: task.experiment.instrument_session,
             sampleId: exp.sample.id,
@@ -69,8 +71,11 @@ export function QueueView() {
             status: task.status,
           };
         } else {
+          const plan = task.experiment as TaskRequest;
+
           return {
             position: task.position,
+            name: plan.name,
             id: task.id,
             instrumentSession: task.experiment.instrument_session,
             sampleId: "",
@@ -90,12 +95,12 @@ export function QueueView() {
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
       { accessorKey: "position", header: "Position", size: 100 },
+      { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
         header: "Instrument Session",
         size: 150,
       },
-      { accessorKey: "sampleId", header: "Sample ID", size: 150 },
       { accessorKey: "samplePosition", header: "Sample Position", size: 150 },
       { accessorKey: "density", header: "Density", size: 150 },
       { accessorKey: "beamSize", header: "Beam size (μm)", size: 150 },

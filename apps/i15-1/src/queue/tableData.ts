@@ -2,6 +2,7 @@ import type { Status } from "../../generated/queue";
 
 export type QueueTableData = {
   position: number | null;
+  name: string;
   id: string;
   instrumentSession: string;
   sampleId: string;

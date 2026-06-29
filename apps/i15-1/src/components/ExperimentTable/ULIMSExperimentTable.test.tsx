@@ -191,6 +191,7 @@ describe("ExperimentList", () => {
       expect(mutateAsync).toHaveBeenCalledTimes(1);
       expect(mutateAsync).toHaveBeenCalledWith({
         experiment: {
+          name: "Exp 1",
           instrument_session: "",
           experiment_definition: {
             data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
@@ -226,6 +227,7 @@ describe("ExperimentList", () => {
       expect(mutateAsync).toHaveBeenCalledTimes(2);
       expect(mutateAsync).toHaveBeenNthCalledWith(1, {
         experiment: {
+          name: "Exp 1",
           instrument_session: "",
           experiment_definition: {
             data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
@@ -239,6 +241,7 @@ describe("ExperimentList", () => {
       });
       expect(mutateAsync).toHaveBeenNthCalledWith(2, {
         experiment: {
+          name: "Exp 2",
           instrument_session: "",
           experiment_definition: {
             data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },

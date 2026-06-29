@@ -60,6 +60,7 @@ export function ExperimentList() {
       selected.map((exp) =>
         submitTaskAsync({
           experiment: {
+            name: exp.experiment.name,
             experiment_definition: exp.experiment
               .experimentDefinition as ExperimentDefinition,
             sample: exp.experiment.sample as Sample,
