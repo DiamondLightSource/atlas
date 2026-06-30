@@ -429,7 +429,7 @@ export type ServiceAccount = {
 /**
  * Status
  */
-export type Status = 'Queued' | 'In progress' | 'Complete' | 'Cancelled';
+export type Status = 'Queued' | 'In progress' | 'Complete' | 'Cancelled' | 'Error';
 
 /**
  * StompConfig

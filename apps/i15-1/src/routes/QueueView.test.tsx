@@ -99,6 +99,26 @@ describe("QueueView", () => {
       Error
     >);
 
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: [
+        {
+          id: "0",
+          position: null,
+          status: "Complete",
+          experiment_definition: {
+            instrument_session: "session1",
+            sample_id: "sample1",
+            plan_name: "planA",
+            params: { time: 1 },
+          },
+          blueapi_calls: [],
+        },
+      ],
+    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
+      QueuedTasks,
+      Error
+    >);
+
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
@@ -107,11 +127,39 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "cancelTasks").mockImplementation(vi.fn());
   });
 
-  it("renders just queue data if Show historic tasks is off", () => {
+  it("renders queue if Show historic tasks is off", () => {
     render(<QueueView />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.queryByText("sample1")).not.toBeInTheDocument();
+    expect(screen.getByText("sample2")).toBeInTheDocument();
+  });
+
+  it("renders queue and last error if Show historic tasks is off", () => {
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: [
+        {
+          id: "0",
+          position: null,
+          status: "Error",
+          experiment_definition: {
+            instrument_session: "session1",
+            sample_id: "sample1",
+            plan_name: "planA",
+            params: { time: 1 },
+          },
+          blueapi_calls: [],
+        },
+      ],
+    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
+      QueuedTasks,
+      Error
+    >);
+
+    render(<QueueView />);
+
+    expect(screen.getByTestId("mock-table")).toBeInTheDocument();
+    expect(screen.getByText("sample1")).toBeInTheDocument();
     expect(screen.getByText("sample2")).toBeInTheDocument();
   });
 
