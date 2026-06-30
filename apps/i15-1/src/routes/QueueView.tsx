@@ -25,8 +25,8 @@ import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import type { QueuedTasks } from "../queue/tasks";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { calculateNewPosition } from "../queue/queueUtils";
-import type { Status } from "../../generated/queue";
+import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
+import type { Experiment, Status, TaskRequest } from "../../generated/queue";
 
 function getChipColorMap(): Record<Status, ChipProps["color"]> {
   return {
@@ -34,6 +34,7 @@ function getChipColorMap(): Record<Status, ChipProps["color"]> {
     "In progress": "info",
     Complete: "success",
     Cancelled: "warning",
+    Error: "error",
   };
 }
 
@@ -52,17 +53,40 @@ export function QueueView() {
 
   const data = useMemo<QueueTableData[]>(() => {
     return (
-      tasksToDisplay.data?.map((task) => ({
-        position: task.position,
-        id: task.id,
-        instrumentSession: task.experiment_definition.instrument_session,
-        sampleId: task.experiment_definition.sample_id,
-        planRunning: task.experiment_definition.plan_name,
-        // Should investigate a nicer way to display params, see https://github.com/DiamondLightSource/atlas/issues/52
-        parameters: JSON.stringify(task.experiment_definition.params),
-        status: task.status,
-        blueapTasks: task.blueapi_calls,
-      })) ?? []
+      tasksToDisplay.data?.map((task) => {
+        if (task.kind === "Experiment") {
+          const exp = task.experiment as Experiment;
+
+          return {
+            position: task.position,
+            name: exp.name,
+            id: task.id,
+            instrumentSession: task.experiment.instrument_session,
+            sampleId: exp.sample.id,
+            samplePosition: positionFromName(exp.sample.name),
+            density: exp.sample.data.density as number,
+            beamSize: exp.experiment_definition.data
+              .focused_beam_size as number,
+            timePerPDF: exp.experiment_definition.data.time_per_pdf as number,
+            status: task.status,
+          };
+        } else {
+          const plan = task.experiment as TaskRequest;
+
+          return {
+            position: task.position,
+            name: plan.name,
+            id: task.id,
+            instrumentSession: task.experiment.instrument_session,
+            sampleId: "",
+            samplePosition: "",
+            density: null,
+            beamSize: null,
+            timePerPDF: null,
+            status: task.status,
+          };
+        }
+      }) ?? []
     );
   }, [tasksToDisplay.data]);
 
@@ -71,14 +95,16 @@ export function QueueView() {
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
       { accessorKey: "position", header: "Position", size: 100 },
+      { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
         header: "Instrument Session",
         size: 150,
       },
-      { accessorKey: "sampleId", header: "Sample ID", size: 150 },
-      { accessorKey: "planRunning", header: "Plan", size: 150 },
-      { accessorKey: "parameters", header: "Plan parameters", size: 150 },
+      { accessorKey: "samplePosition", header: "Sample Position", size: 150 },
+      { accessorKey: "density", header: "Density", size: 150 },
+      { accessorKey: "beamSize", header: "Beam size (μm)", size: 150 },
+      { accessorKey: "timePerPDF", header: "Time per PDF (sec)", size: 150 },
       {
         accessorKey: "status",
         header: "Status",
@@ -92,7 +118,6 @@ export function QueueView() {
           ></Chip>
         ),
       },
-      { accessorKey: "calls", header: "BlueAPI tasks", size: 150 },
       {
         accessorKey: "cancel",
         header: "",

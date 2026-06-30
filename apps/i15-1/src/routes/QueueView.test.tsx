@@ -8,6 +8,7 @@ import type { QueuedTasks } from "../queue/tasks";
 type MockRow = {
   id: string;
   sampleId: string;
+  instrumentSession: string;
 };
 
 type MockTableOptions = {
@@ -24,7 +25,7 @@ vi.mock("material-react-table", () => ({
     <div>
       <div data-testid="mock-table">
         {table.options.data.map((row: MockRow) => (
-          <div key={row.id}>{row.sampleId}</div>
+          <div key={row.id}>{row.instrumentSession}</div>
         ))}
       </div>
 
@@ -53,13 +54,18 @@ describe("QueueView", () => {
           id: "1",
           position: 0,
           status: "Queued",
-          experiment_definition: {
+          experiment: {
+            name: "Exp 1",
             instrument_session: "session2",
-            sample_id: "sample2",
-            plan_name: "planB",
-            params: { time: 1 },
+            sample: { id: "sample2", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "PlanB",
+              id: "123",
+              data: { time: 1 },
+            },
           },
           blueapi_calls: [],
+          kind: "Experiment",
         },
       ],
     } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
@@ -73,25 +79,29 @@ describe("QueueView", () => {
           id: "0",
           position: null,
           status: "Complete",
-          experiment_definition: {
+          experiment: {
             instrument_session: "session1",
-            sample_id: "sample1",
-            plan_name: "planA",
+            name: "planA",
             params: { time: 1 },
           },
           blueapi_calls: [],
+          kind: "Plan",
         },
         {
           id: "1",
           position: 0,
           status: "Queued",
-          experiment_definition: {
+          experiment: {
             instrument_session: "session2",
-            sample_id: "sample2",
-            plan_name: "planB",
-            params: { time: 1 },
+            sample: { id: "sample2", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "planB",
+              id: "123",
+              data: { time: 1 },
+            },
           },
           blueapi_calls: [],
+          kind: "Experiment",
         },
       ],
     } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
@@ -111,8 +121,8 @@ describe("QueueView", () => {
     render(<QueueView />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
-    expect(screen.queryByText("sample1")).not.toBeInTheDocument();
-    expect(screen.getByText("sample2")).toBeInTheDocument();
+    expect(screen.queryByText("session1")).not.toBeInTheDocument();
+    expect(screen.getByText("session2")).toBeInTheDocument();
   });
 
   it("renders all tasks if Show historic tasks is on", () => {
@@ -123,8 +133,8 @@ describe("QueueView", () => {
 
     expect(showHistory).toBeChecked();
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
-    expect(screen.getByText("sample1")).toBeInTheDocument();
-    expect(screen.getByText("sample2")).toBeInTheDocument();
+    expect(screen.getByText("session1")).toBeInTheDocument();
+    expect(screen.getByText("session2")).toBeInTheDocument();
   });
 
   it("shows QueueStatusPanel", () => {

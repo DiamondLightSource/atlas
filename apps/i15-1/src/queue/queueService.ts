@@ -6,6 +6,7 @@ import type {
   QueueState,
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
+  Experiment,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
@@ -251,41 +252,28 @@ export const clearHistory = async (): Promise<number> => {
   return response.data;
 };
 
-export const submitTask = async ({
+export const submitQueueTask = async ({
+  experiment,
   taskPosition,
-  taskParams,
 }: {
-  taskPosition: number;
-  taskParams: Record<string, unknown>;
+  experiment: Experiment;
+  taskPosition?: number;
 }) => {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const sampleId = `test_1_${timestamp}`;
-
   const data: AddTasksToQueueQueuePostData = {
     url: `/queue`,
-    body: [
-      {
-        plan_name: "run_full_collection",
-        sample_id: sampleId,
-        params: taskParams,
-        instrument_session: "cm44163-3",
-      },
-    ],
+    body: [experiment],
     query: {
       position: taskPosition,
-      // @ts-expect-error - validation is still a bit in flux,
-      // see https://github.com/DiamondLightSource/daq-queuing-service/issues/42
-      validate_with_blueapi: false,
     },
   };
 
   return await addTasksToQueueQueuePost(data);
 };
 
-export function useSumbitTask() {
+export function useSumbitQueueTask() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: submitTask,
+    mutationFn: submitQueueTask,
     onSuccess: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ["queue"] }),

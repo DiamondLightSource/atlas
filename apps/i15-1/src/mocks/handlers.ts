@@ -16,6 +16,12 @@ const fakeExperiments = {
               name: "Test experiment",
               sample: {
                 name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                instrumentSessions: [
+                  {
+                    instrumentSessionReference: "CM44163-3",
+                  },
+                ],
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -24,7 +30,8 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
                   q_max: 67,
                   frames: 90,
@@ -40,6 +47,12 @@ const fakeExperiments = {
               name: "Test experiment 2",
               sample: {
                 name: "Test_8_2",
+                id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+                instrumentSessions: [
+                  {
+                    instrumentSessionReference: "CM44163-3",
+                  },
+                ],
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -48,7 +61,8 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
+                id: "b645e887-85b4-40d6-a8f0-500a436bc395",
                 data: {
                   q_max: 67,
                   frames: 100,
@@ -172,6 +186,13 @@ const fakeQueue = [
 
 export const handlers = [
   ...(USE_LOCAL ? [http.all("/api/blueapi/*", () => passthrough())] : []),
+
+  ...(USE_LOCAL
+    ? [
+        http.all("http://127.0.0.1:8001/*", () => passthrough()),
+        http.all("http://localhost:8001/*", () => passthrough()),
+      ]
+    : []),
 
   http.put("/api/blueapi/worker/task", () => {
     workerStatus.status = "RUNNING";
