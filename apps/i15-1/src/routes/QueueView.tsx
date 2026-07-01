@@ -190,7 +190,7 @@ export function QueueView() {
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     enableExpanding: true,
-    muiDetailPanelProps: { sx: { py: 0 } },
+    muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
       const isDraggable = row.original.status === "Queued";
       return {
