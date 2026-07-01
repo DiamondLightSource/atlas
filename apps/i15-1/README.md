@@ -13,6 +13,16 @@ To run this locally:
     - If you want to test against mocked behaviour run `turbo dev --filter @atlas/i15-1`
 1.  Navigate to http://localhost:5173/
 
+## Updating Queue Types
+
+You can generate types from the queue API automatically using the following command:
+
+`pnpm --filter i15-1 generate:queue`
+
+This will generate from main on GitHub, to target a branch, use:
+
+`npx @hey-api/openapi-ts -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/{BRANCH_NAME}/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue`
+
 ## Updating Supergraph Schema Types
 
 1. Navigate to app containing folder (i.e. `.../atlas/apps/i15-1`)
