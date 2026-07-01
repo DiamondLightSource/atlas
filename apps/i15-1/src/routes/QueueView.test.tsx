@@ -92,6 +92,7 @@ describe("QueueView", () => {
           position: 0,
           status: "Queued",
           experiment: {
+            name: "exp_2",
             instrument_session: "session2",
             sample: { id: "sample2", name: "my_sample", data: {} },
             experiment_definition: {
@@ -115,13 +116,18 @@ describe("QueueView", () => {
           id: "0",
           position: null,
           status: "Complete",
-          experiment_definition: {
+          experiment: {
+            name: "exp_1",
             instrument_session: "session1",
-            sample_id: "sample1",
-            plan_name: "planA",
-            params: { time: 1 },
+            sample: { id: "sample1", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "planA",
+              id: "123",
+              data: { time: 1 },
+            },
           },
           blueapi_calls: [],
+          kind: "Experiment",
         },
       ],
     } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
@@ -152,13 +158,18 @@ describe("QueueView", () => {
           id: "0",
           position: null,
           status: "Error",
-          experiment_definition: {
+          experiment: {
+            name: "exp_1",
             instrument_session: "session1",
-            sample_id: "sample1",
-            plan_name: "planA",
-            params: { time: 1 },
+            sample: { id: "sample1", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "planA",
+              id: "123",
+              data: { time: 1 },
+            },
           },
           blueapi_calls: [],
+          kind: "Experiment",
         },
       ],
     } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
@@ -169,8 +180,8 @@ describe("QueueView", () => {
     render(<QueueView />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
-    expect(screen.getByText("sample1")).toBeInTheDocument();
-    expect(screen.getByText("sample2")).toBeInTheDocument();
+    expect(screen.getByText("session1")).toBeInTheDocument();
+    expect(screen.getByText("session2")).toBeInTheDocument();
   });
 
   it("renders all tasks if Show historic tasks is on", () => {
