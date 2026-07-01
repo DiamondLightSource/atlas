@@ -23,10 +23,18 @@ import {
 } from "../queue/queueService";
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
-import type { QueuedTasks } from "../queue/tasks";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
-import type { Experiment, Status, TaskRequest } from "../../generated/queue";
+import {
+  calculateNewPosition,
+  getTableData,
+  positionFromName,
+} from "../queue/queueUtils";
+import type {
+  Experiment,
+  Status,
+  TaskRequest,
+  TaskWithPosition,
+} from "../../generated/queue";
 
 function getChipColorMap(): Record<Status, ChipProps["color"]> {
   return {
@@ -46,48 +54,15 @@ export function QueueView() {
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
-  const tasksToDisplay = useMemo<UseQueryResult<QueuedTasks, Error>>(() => {
+  const tasksToDisplay = useMemo<
+    UseQueryResult<TaskWithPosition[], Error>
+  >(() => {
     if (showHistoric) return allTasks;
     else return queuedTasks;
   }, [queuedTasks, allTasks, showHistoric]);
 
   const data = useMemo<QueueTableData[]>(() => {
-    return (
-      tasksToDisplay.data?.map((task) => {
-        if (task.kind === "Experiment") {
-          const exp = task.experiment as Experiment;
-
-          return {
-            position: task.position,
-            name: exp.name,
-            id: task.id,
-            instrumentSession: task.experiment.instrument_session,
-            sampleId: exp.sample.id,
-            samplePosition: positionFromName(exp.sample.name),
-            density: exp.sample.data.density as number,
-            beamSize: exp.experiment_definition.data
-              .focused_beam_size as number,
-            timePerPDF: exp.experiment_definition.data.time_per_pdf as number,
-            status: task.status,
-          };
-        } else {
-          const plan = task.experiment as TaskRequest;
-
-          return {
-            position: task.position,
-            name: plan.name,
-            id: task.id,
-            instrumentSession: task.experiment.instrument_session,
-            sampleId: "",
-            samplePosition: "",
-            density: null,
-            beamSize: null,
-            timePerPDF: null,
-            status: task.status,
-          };
-        }
-      }) ?? []
-    );
+    return getTableData(tasksToDisplay.data ?? []);
   }, [tasksToDisplay.data]);
 
   const colorMap = useMemo(() => getChipColorMap(), []);

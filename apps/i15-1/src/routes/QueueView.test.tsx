@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueueView } from "./QueueView";
 import * as queueService from "../queue/queueService";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { QueuedTasks } from "../queue/tasks";
+import type { TaskWithPosition } from "../../generated/queue";
 
 type MockRow = {
   id: string;
@@ -68,8 +68,8 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
-      QueuedTasks,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
       Error
     >);
 
@@ -104,8 +104,8 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
-      QueuedTasks,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
       Error
     >);
 
