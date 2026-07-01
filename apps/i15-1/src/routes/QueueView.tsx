@@ -17,6 +17,7 @@ import {
   cancelTasks,
   clearHistory,
   useGetAllTasks,
+  useGetHistoricTasks,
   useGetQueuedTasks,
   useMoveTask,
   useQueueEvents,
@@ -24,7 +25,6 @@ import {
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import type { QueuedTasks } from "../queue/tasks";
-import type { UseQueryResult } from "@tanstack/react-query";
 import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
 import type { Experiment, Status, TaskRequest } from "../../generated/queue";
 
@@ -43,17 +43,26 @@ export function QueueView() {
 
   const queuedTasks = useGetQueuedTasks();
   const allTasks = useGetAllTasks();
+  const historicTasks = useGetHistoricTasks();
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
-  const tasksToDisplay = useMemo<UseQueryResult<QueuedTasks, Error>>(() => {
-    if (showHistoric) return allTasks;
-    else return queuedTasks;
-  }, [queuedTasks, allTasks, showHistoric]);
+  const tasksToDisplay = useMemo<QueuedTasks>(() => {
+    if (showHistoric) return allTasks.data ?? [];
+
+    const queued = queuedTasks.data ?? [];
+    const latestHistoricTask = historicTasks.data?.at(-1);
+
+    if (latestHistoricTask == null || latestHistoricTask.status !== "Error") {
+      return queued;
+    }
+
+    return [latestHistoricTask, ...queued];
+  }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
 
   const data = useMemo<QueueTableData[]>(() => {
     return (
-      tasksToDisplay.data?.map((task) => {
+      tasksToDisplay.map((task) => {
         if (task.kind === "Experiment") {
           const exp = task.experiment as Experiment;
 
@@ -88,7 +97,7 @@ export function QueueView() {
         }
       }) ?? []
     );
-  }, [tasksToDisplay.data]);
+  }, [tasksToDisplay]);
 
   const colorMap = useMemo(() => getChipColorMap(), []);
 

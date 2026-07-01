@@ -92,10 +92,36 @@ describe("QueueView", () => {
           position: 0,
           status: "Queued",
           experiment: {
+            name: "exp_2",
             instrument_session: "session2",
             sample: { id: "sample2", name: "my_sample", data: {} },
             experiment_definition: {
               name: "planB",
+              id: "123",
+              data: { time: 1 },
+            },
+          },
+          blueapi_calls: [],
+          kind: "Experiment",
+        },
+      ],
+    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
+      QueuedTasks,
+      Error
+    >);
+
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: [
+        {
+          id: "0",
+          position: null,
+          status: "Complete",
+          experiment: {
+            name: "exp_1",
+            instrument_session: "session1",
+            sample: { id: "sample1", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "planA",
               id: "123",
               data: { time: 1 },
             },
@@ -117,11 +143,44 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "cancelTasks").mockImplementation(vi.fn());
   });
 
-  it("renders just queue data if Show historic tasks is off", () => {
+  it("renders queue if Show historic tasks is off", () => {
     render(<QueueView />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.queryByText("session1")).not.toBeInTheDocument();
+    expect(screen.getByText("session2")).toBeInTheDocument();
+  });
+
+  it("renders queue and last error if Show historic tasks is off", () => {
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: [
+        {
+          id: "0",
+          position: null,
+          status: "Error",
+          experiment: {
+            name: "exp_1",
+            instrument_session: "session1",
+            sample: { id: "sample1", name: "my_sample", data: {} },
+            experiment_definition: {
+              name: "planA",
+              id: "123",
+              data: { time: 1 },
+            },
+          },
+          blueapi_calls: [],
+          kind: "Experiment",
+        },
+      ],
+    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
+      QueuedTasks,
+      Error
+    >);
+
+    render(<QueueView />);
+
+    expect(screen.getByTestId("mock-table")).toBeInTheDocument();
+    expect(screen.getByText("session1")).toBeInTheDocument();
     expect(screen.getByText("session2")).toBeInTheDocument();
   });
 
