@@ -5,9 +5,10 @@ import {
   FormControlLabel,
   Stack,
   Switch,
+  Typography,
   type ChipProps,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { cloneElement, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -24,26 +25,88 @@ import {
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  calculateNewPosition,
-  getTableData,
-  positionFromName,
-} from "../queue/queueUtils";
+import { calculateNewPosition, getTableData } from "../queue/queueUtils";
 import type {
+  BlueapiCallResponse,
+  CallStatus,
   Experiment,
   Status,
   TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
 
-function getChipColorMap(): Record<Status, ChipProps["color"]> {
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
+
+function getChipColorMap(): Record<Status | CallStatus, ChipProps["color"]> {
   return {
-    Queued: "default",
+    Queued: "primary",
+    Waiting: "primary",
     "In progress": "info",
+    Claimed: "info",
     Complete: "success",
+    Success: "success",
     Cancelled: "warning",
     Error: "error",
+    Skipped: "primary",
   };
+}
+
+function getChipIconMap(): Record<CallStatus, ChipProps["icon"]> {
+  return {
+    Success: <CheckCircleIcon />,
+    Error: <ErrorIcon />,
+    "In progress": <CircularProgress size={10} thickness={4} />,
+    Claimed: <CircularProgress size={20} thickness={6} />,
+    Waiting: <CircleOutlinedIcon />,
+    Skipped: <DoDisturbIcon />,
+  };
+}
+
+function DetailPanelTable({ data }: { data: BlueapiCallResponse[] }) {
+  const tableData = useMemo(
+    () =>
+      data.map((call) => ({
+        status: call.status,
+        name: call.task_request.name,
+      })),
+    [data],
+  );
+
+  const colorMap = useMemo(() => getChipColorMap(), []);
+  const iconMap = useMemo(() => getChipIconMap(), []);
+
+  return (
+    <Box>
+      {tableData.map((row, i) => {
+        const status = row.status;
+        const color = colorMap[status];
+
+        const icon = cloneElement(iconMap[status] as React.ReactElement, {
+          color: color,
+        });
+
+        return (
+          <Box
+            key={`${row.name}-${i}`}
+            sx={{
+              padding: 26,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              py: 0.4,
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>{icon}</Box>
+            <Typography variant="body2">{row.name}</Typography>
+          </Box>
+        );
+      })}
+    </Box>
+  );
 }
 
 export function QueueView() {
@@ -126,6 +189,8 @@ export function QueueView() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    enableExpanding: true,
+    muiDetailPanelProps: { sx: { py: 0 } },
     muiRowDragHandleProps: ({ row, table }) => {
       const isDraggable = row.original.status === "Queued";
       return {
@@ -186,6 +251,16 @@ export function QueueView() {
         <QueueStatusPanel />
       </Stack>
     ),
+
+    renderDetailPanel: ({ row }) => {
+      const blueapi_calls = row.original.task.blueapi_calls;
+
+      return (
+        <Box sx={{ p: 2 }}>
+          <DetailPanelTable data={blueapi_calls} />
+        </Box>
+      );
+    },
   });
 
   return (
