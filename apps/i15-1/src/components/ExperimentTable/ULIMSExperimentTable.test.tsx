@@ -18,11 +18,11 @@ vi.mock("../../queue/queueService", async (importOriginal) => {
     await importOriginal<typeof import("../../queue/queueService")>();
   return {
     ...actual,
-    useSumbitTask: vi.fn(),
+    useSumbitQueueTask: vi.fn(),
   };
 });
 
-const mockedUseSubmitTask = queueService.useSumbitTask as unknown as Mock;
+const mockedUseSubmitTask = queueService.useSumbitQueueTask as unknown as Mock;
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
 
 afterEach(() => {
@@ -190,15 +190,17 @@ describe("ExperimentList", () => {
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledTimes(1);
       expect(mutateAsync).toHaveBeenCalledWith({
-        taskPosition: 0,
-        taskParams: {
-          experimentName: "Exp 1",
-          sampleName: "Sample A",
-          density: 1.2,
-          composition: "H2O",
-          beamEnergy: 20,
-          timePerPDF: 10,
-          beamSize: 5,
+        experiment: {
+          name: "Exp 1",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 1",
+          },
+          sample: {
+            data: { composition: "H2O", density: 1.2 },
+            name: "Sample A",
+          },
         },
       });
     });
@@ -224,27 +226,31 @@ describe("ExperimentList", () => {
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledTimes(2);
       expect(mutateAsync).toHaveBeenNthCalledWith(1, {
-        taskPosition: 0,
-        taskParams: {
-          experimentName: "Exp 1",
-          sampleName: "Sample A",
-          density: 1.2,
-          composition: "H2O",
-          beamEnergy: 20,
-          timePerPDF: 10,
-          beamSize: 5,
+        experiment: {
+          name: "Exp 1",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 1",
+          },
+          sample: {
+            data: { composition: "H2O", density: 1.2 },
+            name: "Sample A",
+          },
         },
       });
       expect(mutateAsync).toHaveBeenNthCalledWith(2, {
-        taskPosition: 1,
-        taskParams: {
-          experimentName: "Exp 2",
-          sampleName: "Sample B",
-          density: 1.2,
-          composition: "CO2",
-          beamEnergy: 20,
-          timePerPDF: 10,
-          beamSize: 5,
+        experiment: {
+          name: "Exp 2",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 2",
+          },
+          sample: {
+            data: { composition: "CO2", density: 1.2 },
+            name: "Sample B",
+          },
         },
       });
     });

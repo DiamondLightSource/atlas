@@ -1,9 +1,15 @@
-import { parseNumericPV, parseStringPv, ReadPvRawValue } from "./readPv";
+import {
+  parseNumericPV,
+  parseByteArrPV,
+  parseStringPv,
+  ReadPvRawValue,
+} from "./readPv";
 import type { ParsePvProps } from "./types";
 
 export function useParsedPvConnection(props: ParsePvProps): string {
   const rawValue = ReadPvRawValue({ label: props.label, pv: props.pv });
   const numericPv = props.parseNumeric ? props.parseNumeric : false;
+  const byeArrPv = props.parseByeArr ? props.parseByeArr : false;
   let returnValue;
   if (rawValue === "not connected") {
     returnValue = "not connected";
@@ -13,6 +19,8 @@ export function useParsedPvConnection(props: ParsePvProps): string {
   } else {
     if (numericPv) {
       returnValue = parseNumericPV(rawValue, props.decimals, props.scaleFactor);
+    } else if (byeArrPv) {
+      returnValue = parseByteArrPV(rawValue);
     } else {
       returnValue = parseStringPv(rawValue);
     }

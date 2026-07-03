@@ -1,5 +1,7 @@
-import { http, HttpResponse, ws } from "msw";
+import { http, HttpResponse, ws, passthrough } from "msw";
 import plansResponse from "./plans-response.json";
+
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 const workerStatus = { status: "IDLE", duration: 0 };
@@ -13,7 +15,13 @@ const fakeExperiments = {
             node: {
               name: "Test experiment",
               sample: {
-                name: "Test_sample",
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                instrumentSessions: [
+                  {
+                    instrumentSessionReference: "CM44163-3",
+                  },
+                ],
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -22,7 +30,8 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
                   q_max: 67,
                   frames: 90,
@@ -37,7 +46,13 @@ const fakeExperiments = {
             node: {
               name: "Test experiment 2",
               sample: {
-                name: "Test_sample 2",
+                name: "Test_8_2",
+                id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+                instrumentSessions: [
+                  {
+                    instrumentSessionReference: "CM44163-3",
+                  },
+                ],
                 data: {
                   density: 56,
                   capillary: "bs1.5",
@@ -46,7 +61,8 @@ const fakeExperiments = {
                 },
               },
               experimentDefinition: {
-                name: "My Experiment",
+                name: "run_full_collection",
+                id: "b645e887-85b4-40d6-a8f0-500a436bc395",
                 data: {
                   q_max: 67,
                   frames: 100,
@@ -71,16 +87,82 @@ const fakePvws = ws.link("wss://pvws.diamond.ac.uk/pvws/pv");
 
 const fakeHistory = [
   {
-    experiment_definition: {
-      plan_name: "sleep",
-      sample_id: "1",
+    experiment: {
+      name: "Test experiment",
+      instrument_session: "cm44163-3",
+      sample: {
+        name: "Test_8_2",
+        id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+        data: {
+          density: 56,
+          capillary: "bs1.5",
+          composition: "Stuff",
+          packing_fraction: 0.5,
+        },
+      },
+      experiment_definition: {
+        name: "run_full_collection",
+        id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+        data: {
+          q_max: 67,
+          frames: 90,
+          beam_energy: 40,
+          time_per_pdf: 2,
+          focused_beam_size: 10,
+        },
+      },
+    },
+    id: "b715f350-401a-48b9-929f-d6bcad064264",
+    status: "Complete",
+    blueapi_calls: [],
+    position: null,
+    kind: "Experiment",
+  },
+  {
+    experiment: {
+      name: "Test experiment",
+      instrument_session: "cm44163-3",
+      sample: {
+        name: "Test_9_4",
+        id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+        data: {
+          density: 56,
+          capillary: "bs1.5",
+          composition: "Stuff",
+          packing_fraction: 0.5,
+        },
+      },
+      experiment_definition: {
+        name: "run_full_collection",
+        id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+        data: {
+          q_max: 67,
+          frames: 90,
+          beam_energy: 40,
+          time_per_pdf: 2,
+          focused_beam_size: 10,
+        },
+      },
+    },
+    id: "b715f350-401a-48b9-929f-d6bcad064264",
+    status: "Error",
+    blueapi_calls: [],
+    position: null,
+    kind: "Experiment",
+  },
+];
+
+const fakeQueue = [
+  {
+    experiment: {
+      name: "sleep",
       params: {
         time: 10,
       },
-      instrument_session: "cm12345-1",
+      instrument_session: "string",
     },
-    id: "aaa",
-    status: "Complete",
+    id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
+    status: "Queued",
     blueapi_calls: [
       {
         task_request: {
@@ -88,91 +170,115 @@ const fakeHistory = [
           params: {
             time: 10,
           },
-          instrument_session: "cm12345-1",
+          instrument_session: "string",
         },
-        status: "Success",
-        parent_task_id: "aaa",
-        result: { outcome: "success" },
+        parent_task_id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
+        result: null,
         errors: [],
-        time_started: "2026-05-28T15:09:29.507128",
-        time_completed: "2026-05-28T15:09:39.561053",
-        blueapi_id: fakeTaskId,
+        blueapi_id: null,
       },
     ],
     position: 0,
+    kind: "Plan",
   },
-];
-
-const fakeQueue = [
   {
-    experiment_definition: {
-      plan_name: "robot_load",
-      sample_id: "1",
-      params: {
-        puck: 1,
-        position: 1,
+    experiment: {
+      name: "Test experiment",
+      instrument_session: "cm44163-3",
+      sample: {
+        name: "Test_8_1",
+        id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+        data: {
+          density: 56,
+          capillary: "bs1.5",
+          composition: "Stuff",
+          packing_fraction: 0.5,
+        },
       },
-      instrument_session: "cm12345-1",
+      experiment_definition: {
+        name: "run_full_collection",
+        id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+        data: {
+          q_max: 67,
+          frames: 90,
+          beam_energy: 40,
+          time_per_pdf: 2,
+          focused_beam_size: 10,
+        },
+      },
     },
-    id: "bbb",
-    status: "In progress",
+    id: "b715f350-401a-48b9-929f-d6bcad064264",
+    status: "Queued",
     blueapi_calls: [
       {
         task_request: {
           name: "robot_load",
           params: {
-            puck: 1,
-            position: 1,
+            puck: "1",
+            position: "8",
           },
-          instrument_session: "cm12345-1",
+          instrument_session: "cm44163-3",
         },
-        status: "In progress",
-        parent_task_id: "bbb",
+        parent_task_id: "b715f350-401a-48b9-929f-d6bcad064264",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
         result: null,
         errors: [],
-        time_started: "2026-05-28T15:09:39.812345",
+        blueapi_id: null,
+      },
+      {
+        task_request: {
+          name: "centre_sample",
+          params: {
+            start_z: -5,
+            end_z: 5,
+            steps: 20,
+            exposure_time: 0.01,
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b715f350-401a-48b9-929f-d6bcad064264",
+        status: "Waiting",
+        time_started: null,
         time_completed: null,
-        blueapi_id: fakeTaskId,
+        result: null,
+        errors: [],
+        blueapi_id: null,
+      },
+      {
+        task_request: {
+          name: "robot_unload",
+          params: {},
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b715f350-401a-48b9-929f-d6bcad064264",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: null,
       },
     ],
     position: 1,
-  },
-  {
-    experiment_definition: {
-      plan_name: "static_collection_plan",
-      sample_id: "1",
-      params: {
-        frames: 10,
-        exposure_time: 0.5,
-      },
-      instrument_session: "cm12345-1",
-    },
-    id: "ccc",
-    status: "Queued",
-    blueapi_calls: [
-      {
-        task_request: {
-          name: "Queued",
-          params: {
-            frames: 10,
-            exposure_time: 0.5,
-          },
-          instrument_session: "cm12345-1",
-        },
-        status: "Waiting",
-        parent_task_id: "ccc",
-        result: null,
-        errors: [],
-        time_started: null,
-        time_completed: null,
-        blueapi_id: fakeTaskId,
-      },
-    ],
-    position: 2,
+    kind: "Experiment",
   },
 ];
 
 export const handlers = [
+  ...(USE_LOCAL ? [http.all("/api/blueapi/*", () => passthrough())] : []),
+
+  ...(USE_LOCAL
+    ? [
+        http.all("http://127.0.0.1:8001/*", () => passthrough()),
+        http.all("http://localhost:8001/*", () => passthrough()),
+      ]
+    : []),
+
   http.put("/api/blueapi/worker/task", () => {
     setWorkerState("RUNNING");
     return HttpResponse.json({

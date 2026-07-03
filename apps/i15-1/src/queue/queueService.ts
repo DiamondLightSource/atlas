@@ -6,15 +6,19 @@ import type {
   QueueState,
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
+  Experiment,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
 import type { QueuedTasks } from "./tasks";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
-const QUEUE_MODE = import.meta.env.VITE_QUEUE_MODE;
-const QUEUE_SOCKET: string =
-  QUEUE_MODE === "local" ? "http://127.0.0.1:8001" : "/api/daq-queue";
+// Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
+// with the websockets needed for `events`
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
+const QUEUE_SOCKET: string = USE_LOCAL
+  ? "http://127.0.0.1:8001"
+  : "/api/daq-queue";
 
 client.setConfig({ baseUrl: QUEUE_SOCKET });
 
@@ -248,41 +252,28 @@ export const clearHistory = async (): Promise<number> => {
   return response.data;
 };
 
-export const submitTask = async ({
+export const submitQueueTask = async ({
+  experiment,
   taskPosition,
-  taskParams,
 }: {
-  taskPosition: number;
-  taskParams: Record<string, unknown>;
+  experiment: Experiment;
+  taskPosition?: number;
 }) => {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const sampleId = `test_1_${timestamp}`;
-
   const data: AddTasksToQueueQueuePostData = {
     url: `/queue`,
-    body: [
-      {
-        plan_name: "run_full_collection",
-        sample_id: sampleId,
-        params: taskParams,
-        instrument_session: "cm44163-3",
-      },
-    ],
+    body: [experiment],
     query: {
       position: taskPosition,
-      // @ts-expect-error - validation is still a bit in flux,
-      // see https://github.com/DiamondLightSource/daq-queuing-service/issues/42
-      validate_with_blueapi: false,
     },
   };
 
   return await addTasksToQueueQueuePost(data);
 };
 
-export function useSumbitTask() {
+export function useSumbitQueueTask() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: submitTask,
+    mutationFn: submitQueueTask,
     onSuccess: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ["queue"] }),
