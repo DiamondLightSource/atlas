@@ -1,20 +1,12 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Button,
   Chip,
-  Collapse,
   FormControlLabel,
   Stack,
   Switch,
-  Typography,
-  type ChipProps,
-  type SxProps,
-  type Theme,
 } from "@mui/material";
-import { cloneElement, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -32,119 +24,10 @@ import {
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import { calculateNewPosition, getTableData } from "../queue/queueUtils";
-import type {
-  BlueapiCallResponse,
-  CallStatus,
-  Status,
-  TaskWithPosition,
-} from "../../generated/queue";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import DoDisturbIcon from "@mui/icons-material/DoDisturb";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import CircularProgress from "@mui/material/CircularProgress";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-const CHIP_COLOR_MAP = {
-  Queued: "primary",
-  Waiting: "primary",
-  "In progress": "info",
-  Claimed: "info",
-  Complete: "success",
-  Success: "success",
-  Cancelled: "warning",
-  Error: "error",
-  Skipped: "primary",
-} satisfies Record<Status | CallStatus, ChipProps["color"]>;
-
-const CHIP_SX_MAP: Partial<Record<Status | CallStatus, SxProps<Theme>>> = {
-  Waiting: {
-    color: "grey.500",
-    borderColor: "grey.300",
-  },
-  Skipped: {
-    color: "grey.500",
-    borderColor: "grey.300",
-  },
-};
-
-export const CHIP_ICON_MAP = {
-  Success: <CheckCircleIcon />,
-  Error: <ErrorIcon />,
-  "In progress": <CircularProgress size={10} thickness={4} />,
-  Claimed: <CircularProgress size={20} thickness={6} />,
-  Waiting: <CircleOutlinedIcon />,
-  Skipped: <DoDisturbIcon />,
-} satisfies Record<CallStatus, React.ReactNode>;
-
-function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
-  const tableData = useMemo(
-    () =>
-      data.map((call) => ({
-        status: call.status,
-        task_request: call.task_request,
-      })),
-    [data],
-  );
-
-  return (
-    <Box>
-      {tableData.map((row, i) => {
-        const status = row.status;
-        const icon = cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
-          color: CHIP_COLOR_MAP[status],
-          sx: CHIP_SX_MAP[status],
-        });
-        const [open, setOpen] = useState(false);
-        return (
-          <Box sx={{ paddingLeft: 6 }}>
-            <Box
-              onClick={() => setOpen(!open)}
-              sx={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                py: 0.4,
-              }}
-            >
-              <ExpandMoreIcon
-                sx={{
-                  transform: open ? "rotate(0deg)" : "rotate(-90deg)",
-                  transition: "0.2s",
-                  color: "action.active",
-                }}
-              />
-              {icon}
-              <Typography>{row.task_request.name}</Typography>
-            </Box>
-
-            <Collapse in={open}>
-              <JsonView data={row.task_request} />
-            </Collapse>
-          </Box>
-        );
-      })}
-    </Box>
-  );
-}
-
-function JsonView({ data }: { data: any }) {
-  return (
-    <Box
-      component="pre"
-      sx={{
-        p: 1,
-        ml: 4,
-        overflow: "auto",
-        fontFamily: "monospace",
-        bgcolor: "action.hover",
-      }}
-    >
-      {JSON.stringify(data, null, 2)}
-    </Box>
-  );
-}
+import type { Status, TaskWithPosition } from "../../generated/queue";
+import { CHIP_COLOR_MAP } from "../queue/queueConstants";
+import { PlanStatusPanel } from "../queue/PlanStatusPanel";
+import { JsonView } from "../components/JsonView";
 
 export function QueueView() {
   useQueueEvents();
@@ -220,7 +103,7 @@ export function QueueView() {
         },
       },
     ],
-    [CHIP_COLOR_MAP],
+    [],
   );
 
   const table = useMaterialReactTable({
