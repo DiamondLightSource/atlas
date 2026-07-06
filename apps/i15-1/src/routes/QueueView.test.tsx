@@ -130,8 +130,8 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
-      QueuedTasks,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
       Error
     >);
 
@@ -172,8 +172,8 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as Partial<UseQueryResult<QueuedTasks, Error>> as UseQueryResult<
-      QueuedTasks,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
       Error
     >);
 

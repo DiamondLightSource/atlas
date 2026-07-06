@@ -7,6 +7,8 @@ import {
   Switch,
   Typography,
   type ChipProps,
+  type SxProps,
+  type Theme,
 } from "@mui/material";
 import { cloneElement, useMemo, useState } from "react";
 import {
@@ -32,7 +34,6 @@ import type {
   Status,
   TaskWithPosition,
 } from "../../generated/queue";
-
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
@@ -50,6 +51,17 @@ const CHIP_COLOR_MAP = {
   Error: "error",
   Skipped: "primary",
 } satisfies Record<Status | CallStatus, ChipProps["color"]>;
+
+const CHIP_SX_MAP: Partial<Record<Status | CallStatus, SxProps<Theme>>> = {
+  Waiting: {
+    color: "grey.500",
+    borderColor: "grey.300",
+  },
+  Skipped: {
+    color: "grey.500",
+    borderColor: "grey.300",
+  },
+};
 
 export const CHIP_ICON_MAP = {
   Success: <CheckCircleIcon />,
@@ -76,6 +88,7 @@ function DetailPanelTable({ data }: { data: BlueapiCallResponse[] }) {
         const status = row.status;
         const icon = cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
           color: CHIP_COLOR_MAP[status],
+          sx: CHIP_SX_MAP[status],
         });
 
         return (
