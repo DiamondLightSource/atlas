@@ -14,9 +14,10 @@ import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
-import Plans from "./routes/Plans.tsx";
-import Workflows from "./routes/Workflows.tsx";
+// import Plans from "./routes/Plans.tsx";
+// import Workflows from "./routes/Workflows.tsx";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
+import { router } from "./router.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -24,26 +25,6 @@ async function enableMocking() {
     return worker.start();
   }
 }
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "plans",
-        element: <Plans />,
-      },
-      {
-        path: "workflows",
-        element: <Workflows />,
-      },
-    ],
-  },
-]);
 
 const queryClient = new QueryClient();
 export const api = createApi("/api/blueapi");

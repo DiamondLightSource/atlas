@@ -8,7 +8,7 @@ const Dashboard = () => (
       <Typography variant="h3">Welcome to P99!</Typography>
       <Button
         component={Link}
-        to="plans"
+        to="/Acquisition/Plans"
         variant="contained"
         startIcon={<FileText />}
         sx={{ width: 150, height: 50 }}
@@ -17,7 +17,7 @@ const Dashboard = () => (
       </Button>
       <Button
         component={Link}
-        to="workflows"
+        to="/Workflows/Workflows"
         variant="contained"
         startIcon={<ServerCog />}
         sx={{ width: 150, height: 50 }}
