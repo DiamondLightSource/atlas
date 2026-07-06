@@ -18,20 +18,18 @@ import {
   cancelTasks,
   clearHistory,
   useGetAllTasks,
+  useGetHistoricTasks,
   useGetQueuedTasks,
   useMoveTask,
   useQueueEvents,
 } from "../queue/queueService";
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
-import type { UseQueryResult } from "@tanstack/react-query";
 import { calculateNewPosition, getTableData } from "../queue/queueUtils";
 import type {
   BlueapiCallResponse,
   CallStatus,
-  Experiment,
   Status,
-  TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
 
@@ -114,19 +112,26 @@ export function QueueView() {
 
   const queuedTasks = useGetQueuedTasks();
   const allTasks = useGetAllTasks();
+  const historicTasks = useGetHistoricTasks();
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
-  const tasksToDisplay = useMemo<
-    UseQueryResult<TaskWithPosition[], Error>
-  >(() => {
-    if (showHistoric) return allTasks;
-    else return queuedTasks;
-  }, [queuedTasks, allTasks, showHistoric]);
+  const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
+    if (showHistoric) return allTasks.data ?? [];
+
+    const queued = queuedTasks.data ?? [];
+    const latestHistoricTask = historicTasks.data?.at(-1);
+
+    if (latestHistoricTask == null || latestHistoricTask.status !== "Error") {
+      return queued;
+    }
+
+    return [latestHistoricTask, ...queued];
+  }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
 
   const data = useMemo<QueueTableData[]>(() => {
-    return getTableData(tasksToDisplay.data ?? []);
-  }, [tasksToDisplay.data]);
+    return getTableData(tasksToDisplay ?? []);
+  }, [tasksToDisplay]);
 
   const colorMap = useMemo(() => getChipColorMap(), []);
 
