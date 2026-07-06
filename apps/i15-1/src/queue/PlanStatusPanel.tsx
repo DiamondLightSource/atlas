@@ -1,13 +1,13 @@
 import { Box, Collapse, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { cloneElement, useState } from "react";
+import { useState } from "react";
 import type {
   BlueapiCallResponse,
   CallStatus,
   TaskRequest,
 } from "../../generated/queue/types.gen";
-import { CHIP_COLOR_MAP, CHIP_SX_MAP, CHIP_ICON_MAP } from "./queueConstants";
 import { JsonView } from "../components/JsonView";
+import { QueueStatusIcon } from "./StatusIcon";
 
 function PlanStatusRow({
   status,
@@ -16,10 +16,6 @@ function PlanStatusRow({
   status: CallStatus;
   task_request: TaskRequest;
 }) {
-  const icon = cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
-    color: CHIP_COLOR_MAP[status],
-    sx: CHIP_SX_MAP[status],
-  });
   const [open, setOpen] = useState(false);
   return (
     <Box sx={{ paddingLeft: 6 }}>
@@ -40,7 +36,7 @@ function PlanStatusRow({
             color: "action.active",
           }}
         />
-        {icon}
+        <QueueStatusIcon status={status} />
         <Typography>{task_request.name}</Typography>
       </Box>
 

@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 
-export function JsonView({ data }: { data: any }) {
+export function JsonView({ data }: { data: unknown }) {
   return (
     <Box
       component="pre"
