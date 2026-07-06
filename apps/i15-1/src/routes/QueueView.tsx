@@ -1,7 +1,11 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Chip,
+  Collapse,
   FormControlLabel,
   Stack,
   Switch,
@@ -39,6 +43,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CircularProgress from "@mui/material/CircularProgress";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const CHIP_COLOR_MAP = {
   Queued: "primary",
@@ -77,7 +82,7 @@ function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
     () =>
       data.map((call) => ({
         status: call.status,
-        name: call.task_request.name,
+        task_request: call.task_request,
       })),
     [data],
   );
@@ -90,20 +95,33 @@ function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
           color: CHIP_COLOR_MAP[status],
           sx: CHIP_SX_MAP[status],
         });
-
+        const [open, setOpen] = useState(false);
         return (
-          <Box
-            key={`${row.name}-${i}`}
-            sx={{
-              padding: 26,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              py: 0.4,
-            }}
-          >
-            <Box sx={{ display: "flex", justifyContent: "center" }}>{icon}</Box>
-            <Typography variant="body2">{row.name}</Typography>
+          <Box sx={{ paddingLeft: 6 }}>
+            <Box
+              onClick={() => setOpen(!open)}
+              sx={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                py: 0.4,
+              }}
+            >
+              <ExpandMoreIcon
+                sx={{
+                  transform: open ? "rotate(0deg)" : "rotate(-90deg)",
+                  transition: "0.2s",
+                  color: "action.active",
+                }}
+              />
+              {icon}
+              <Typography>{row.task_request.name}</Typography>
+            </Box>
+
+            <Collapse in={open}>
+              <JsonView data={row.task_request} />
+            </Collapse>
           </Box>
         );
       })}
@@ -116,11 +134,11 @@ function JsonView({ data }: { data: any }) {
     <Box
       component="pre"
       sx={{
-        p: 2,
-        m: 0,
+        p: 1,
+        ml: 4,
         overflow: "auto",
         fontFamily: "monospace",
-        bgcolor: "background.paper",
+        bgcolor: "action.hover",
       }}
     >
       {JSON.stringify(data, null, 2)}
