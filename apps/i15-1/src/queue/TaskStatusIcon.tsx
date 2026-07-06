@@ -16,7 +16,7 @@ const CHIP_ICON_MAP = {
   Skipped: <DoDisturbIcon />,
 } satisfies Record<CallStatus, React.ReactNode>;
 
-export function QueueStatusIcon({ status }: { status: CallStatus }) {
+export function TaskStatusIcon({ status }: { status: CallStatus }) {
   return cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
     color: CHIP_COLOR_MAP[status],
     sx: CHIP_SX_MAP[status],

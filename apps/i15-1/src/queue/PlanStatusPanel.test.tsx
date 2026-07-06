@@ -10,8 +10,8 @@ vi.mock("../components/JsonView", () => ({
   ),
 }));
 
-vi.mock("./StatusIcon", () => ({
-  QueueStatusIcon: ({ status }: { status: string }) => (
+vi.mock("./TaskStatusIcon", () => ({
+  TaskStatusIcon: ({ status }: { status: string }) => (
     <div data-testid="status-icon">{status}</div>
   ),
 }));
@@ -71,7 +71,7 @@ describe("PlanStatusPanel", () => {
     });
   });
 
-  it("passes status to QueueStatusIcon", () => {
+  it("passes status to TaskStatusIcon", () => {
     render(<PlanStatusPanel data={data} />);
 
     const icons = screen.getAllByTestId("status-icon");

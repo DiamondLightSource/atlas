@@ -7,7 +7,7 @@ import type {
   TaskRequest,
 } from "../../generated/queue/types.gen";
 import { JsonView } from "../components/JsonView";
-import { QueueStatusIcon } from "./StatusIcon";
+import { TaskStatusIcon } from "./TaskStatusIcon";
 
 function PlanStatusRow({
   status,
@@ -36,7 +36,7 @@ function PlanStatusRow({
             color: "action.active",
           }}
         />
-        <QueueStatusIcon status={status} />
+        <TaskStatusIcon status={status} />
         <Typography>{task_request.name}</Typography>
       </Box>
 
