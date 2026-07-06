@@ -153,6 +153,9 @@ importers:
 
   apps/p99:
     dependencies:
+      "@atlas/app-shell":
+        specifier: workspace:*
+        version: link:../../packages/app-shell
       "@atlas/blueapi":
         specifier: workspace:*
         version: link:../../packages/blueapi

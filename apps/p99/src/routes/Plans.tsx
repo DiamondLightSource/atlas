@@ -4,7 +4,7 @@ import {
   useGetWorkerState,
   usePlans,
 } from "@atlas/blueapi-query";
-import { Alert, Box, Container, Grid2 } from "@mui/material";
+import { Alert, Box, Container, Grid } from "@mui/material";
 import { useState } from "react";
 import { WorkerStatusBar } from "../components/plans/WorkerStatusBar";
 import { PlanCard } from "../components/plans/PlanCard";
@@ -71,12 +71,12 @@ const Plans = () => {
           </Alert>
         )}
 
-        <Grid2 container spacing={3} alignItems="flex-start">
+        <Grid container spacing={3} alignItems="flex-start">
           {/* LEFT COLUMN: Scrollable Plans Library */}
-          <Grid2 size={{ xs: 12, md: 8, lg: 9 }}>
-            <Grid2 container spacing={3}>
+          <Grid size={{ xs: 12, md: 8, lg: 9 }}>
+            <Grid container spacing={3}>
               {(plansData?.plans || []).map((plan: Plan) => (
-                <Grid2
+                <Grid
                   size={{ xs: 12, lg: 6 }}
                   key={plan.name || "unknown-plan"}
                 >
@@ -90,13 +90,13 @@ const Plans = () => {
                       setFeedback({ type: "error", msg })
                     }
                   />
-                </Grid2>
+                </Grid>
               ))}
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
 
           {/* RIGHT COLUMN: Persistent Device Panel */}
-          <Grid2
+          <Grid
             size={{ xs: 12, md: 4, lg: 3 }}
             sx={{
               position: "sticky",
@@ -106,8 +106,8 @@ const Plans = () => {
             }}
           >
             <DevicePanel devices={devicesData?.devices || []} />
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );
