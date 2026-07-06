@@ -72,13 +72,7 @@ export const CHIP_ICON_MAP = {
   Skipped: <DoDisturbIcon />,
 } satisfies Record<CallStatus, React.ReactNode>;
 
-function DetailPanelTable({
-  data,
-  display_as_json = false,
-}: {
-  data: BlueapiCallResponse[];
-  display_as_json?: boolean;
-}) {
+function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
   const tableData = useMemo(
     () =>
       data.map((call) => ({
@@ -88,57 +82,50 @@ function DetailPanelTable({
     [data],
   );
 
-  if (!display_as_json) {
-    return (
-      <Box>
-        {tableData.map((row, i) => {
-          const status = row.status;
-          const icon = cloneElement(
-            CHIP_ICON_MAP[status] as React.ReactElement,
-            {
-              color: CHIP_COLOR_MAP[status],
-              sx: CHIP_SX_MAP[status],
-            },
-          );
+  return (
+    <Box>
+      {tableData.map((row, i) => {
+        const status = row.status;
+        const icon = cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
+          color: CHIP_COLOR_MAP[status],
+          sx: CHIP_SX_MAP[status],
+        });
 
-          return (
-            <Box
-              key={`${row.name}-${i}`}
-              sx={{
-                padding: 26,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                py: 0.4,
-              }}
-            >
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                {icon}
-              </Box>
-              <Typography variant="body2">{row.name}</Typography>
-            </Box>
-          );
-        })}
-      </Box>
-    );
-  } else {
-    return (
-      <Box
-        component="pre"
-        sx={{
-          p: 2,
-          m: 0,
-          overflow: "auto",
-          fontFamily: "monospace",
-          fontSize: "0.875rem",
-          bgcolor: "grey.100",
-          borderRadius: 1,
-        }}
-      >
-        {data.length ? JSON.stringify(data[0].task_request, null, 2) : null}
-      </Box>
-    );
-  }
+        return (
+          <Box
+            key={`${row.name}-${i}`}
+            sx={{
+              padding: 26,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              py: 0.4,
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>{icon}</Box>
+            <Typography variant="body2">{row.name}</Typography>
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
+function JsonView({ data }: { data: any }) {
+  return (
+    <Box
+      component="pre"
+      sx={{
+        p: 2,
+        m: 0,
+        overflow: "auto",
+        fontFamily: "monospace",
+        bgcolor: "background.paper",
+      }}
+    >
+      {JSON.stringify(data, null, 2)}
+    </Box>
+  );
 }
 
 export function QueueView() {
@@ -294,10 +281,11 @@ export function QueueView() {
 
       return (
         <Box sx={{ p: 2 }}>
-          <DetailPanelTable
-            data={blueapi_calls}
-            display_as_json={row.original.task.kind == "Plan"}
-          />
+          {row.original.task.kind == "Experiment" ? (
+            <PlanStatusPanel data={blueapi_calls} />
+          ) : (
+            <JsonView data={blueapi_calls[0].task_request} />
+          )}
         </Box>
       );
     },
