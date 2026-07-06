@@ -40,7 +40,7 @@ function PlanStatusRow({
         <Typography>{task_request.name}</Typography>
       </Box>
 
-      <Collapse in={open}>
+      <Collapse in={open} unmountOnExit>
         <JsonView data={task_request} />
       </Collapse>
     </Box>

@@ -3,17 +3,24 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueueView } from "./QueueView";
 import * as queueService from "../queue/queueService";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { TaskWithPosition } from "../../generated/queue";
+import type {
+  BlueapiCallResponse,
+  TaskWithPosition,
+} from "../../generated/queue";
 
 type MockRow = {
   id: string;
   sampleId: string;
   instrumentSession: string;
+  blueapi_calls: BlueapiCallResponse[];
 };
 
 type MockTableOptions = {
   data: MockRow[];
   renderTopToolbarCustomActions?: () => React.ReactNode;
+  renderDetailPanel?: (props: {
+    row: { original: MockRow };
+  }) => React.ReactNode;
 };
 
 type MockTable = {
@@ -25,7 +32,12 @@ vi.mock("material-react-table", () => ({
     <div>
       <div data-testid="mock-table">
         {table.options.data.map((row: MockRow) => (
-          <div key={row.id}>{row.instrumentSession}</div>
+          <div key={row.id}>
+            {row.instrumentSession}
+            {table.options.renderDetailPanel?.({
+              row: { original: row },
+            })}
+          </div>
         ))}
       </div>
 
@@ -40,6 +52,14 @@ vi.mock("material-react-table", () => ({
 
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => <div>QueueStatusPanel</div>,
+}));
+
+vi.mock("../queue/PlanStatusPanel", () => ({
+  PlanStatusPanel: () => <div>PlanStatusPanel</div>,
+}));
+
+vi.mock("../components/JsonView", () => ({
+  JsonView: () => <div>JsonView</div>,
 }));
 
 describe("QueueView", () => {
@@ -64,7 +84,18 @@ describe("QueueView", () => {
               data: { time: 1 },
             },
           },
-          blueapi_calls: [],
+          blueapi_calls: [
+            {
+              parent_task_id: "1",
+              status: "Waiting",
+              result: null,
+              errors: [],
+              time_started: null,
+              time_completed: null,
+              task_request: { name: "sleep", instrument_session: "session2" },
+              blueapi_id: "1",
+            },
+          ],
           kind: "Experiment",
         },
       ],
@@ -84,7 +115,22 @@ describe("QueueView", () => {
             name: "planA",
             params: { time: 1 },
           },
-          blueapi_calls: [],
+          blueapi_calls: [
+            {
+              parent_task_id: "0",
+              status: "Success",
+              result: {
+                outcome: "success",
+                result: null,
+                type: "NoneType",
+              },
+              errors: [],
+              time_started: "2026-07-06T10:23:45.045920",
+              time_completed: "2026-07-06T10:23:55.100463",
+              task_request: { name: "sleep", instrument_session: "session1" },
+              blueapi_id: "0",
+            },
+          ],
           kind: "Plan",
         },
         {
@@ -101,7 +147,18 @@ describe("QueueView", () => {
               data: { time: 1 },
             },
           },
-          blueapi_calls: [],
+          blueapi_calls: [
+            {
+              parent_task_id: "1",
+              status: "Waiting",
+              result: null,
+              errors: [],
+              time_started: null,
+              time_completed: null,
+              task_request: { name: "sleep", instrument_session: "session2" },
+              blueapi_id: "1",
+            },
+          ],
           kind: "Experiment",
         },
       ],
@@ -240,5 +297,40 @@ describe("QueueView", () => {
     fireEvent.click(button);
 
     expect(clearSpy).toHaveBeenCalled();
+  });
+
+  it("renders PlanStatusPanel for Experiment tasks", () => {
+    render(<QueueView />);
+
+    expect(screen.getByText("PlanStatusPanel")).toBeInTheDocument();
+    expect(screen.queryByText("JsonView")).not.toBeInTheDocument();
+  });
+
+  it("renders JsonView for Plan tasks", () => {
+    vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue({
+      data: [
+        {
+          id: "1",
+          position: 0,
+          status: "Queued",
+          experiment: {
+            instrument_session: "session1",
+            name: "planA",
+            params: {},
+          },
+          blueapi_calls: [
+            {
+              task_request: { name: "Plan A" },
+            },
+          ],
+          kind: "Plan",
+        },
+      ],
+    } as UseQueryResult<TaskWithPosition[], Error>);
+
+    render(<QueueView />);
+
+    expect(screen.queryByText("PlanStatusPanel")).not.toBeInTheDocument();
+    expect(screen.getByText("JsonView")).toBeInTheDocument();
   });
 });
