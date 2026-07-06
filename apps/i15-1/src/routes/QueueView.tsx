@@ -39,30 +39,26 @@ import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CircularProgress from "@mui/material/CircularProgress";
 
-function getChipColorMap(): Record<Status | CallStatus, ChipProps["color"]> {
-  return {
-    Queued: "primary",
-    Waiting: "primary",
-    "In progress": "info",
-    Claimed: "info",
-    Complete: "success",
-    Success: "success",
-    Cancelled: "warning",
-    Error: "error",
-    Skipped: "primary",
-  };
-}
+const CHIP_COLOR_MAP = {
+  Queued: "primary",
+  Waiting: "primary",
+  "In progress": "info",
+  Claimed: "info",
+  Complete: "success",
+  Success: "success",
+  Cancelled: "warning",
+  Error: "error",
+  Skipped: "primary",
+} satisfies Record<Status | CallStatus, ChipProps["color"]>;
 
-function getChipIconMap(): Record<CallStatus, ChipProps["icon"]> {
-  return {
-    Success: <CheckCircleIcon />,
-    Error: <ErrorIcon />,
-    "In progress": <CircularProgress size={10} thickness={4} />,
-    Claimed: <CircularProgress size={20} thickness={6} />,
-    Waiting: <CircleOutlinedIcon />,
-    Skipped: <DoDisturbIcon />,
-  };
-}
+export const CHIP_ICON_MAP = {
+  Success: <CheckCircleIcon />,
+  Error: <ErrorIcon />,
+  "In progress": <CircularProgress size={10} thickness={4} />,
+  Claimed: <CircularProgress size={20} thickness={6} />,
+  Waiting: <CircleOutlinedIcon />,
+  Skipped: <DoDisturbIcon />,
+} satisfies Record<CallStatus, React.ReactNode>;
 
 function DetailPanelTable({ data }: { data: BlueapiCallResponse[] }) {
   const tableData = useMemo(
@@ -74,17 +70,12 @@ function DetailPanelTable({ data }: { data: BlueapiCallResponse[] }) {
     [data],
   );
 
-  const colorMap = useMemo(() => getChipColorMap(), []);
-  const iconMap = useMemo(() => getChipIconMap(), []);
-
   return (
     <Box>
       {tableData.map((row, i) => {
         const status = row.status;
-        const color = colorMap[status];
-
-        const icon = cloneElement(iconMap[status] as React.ReactElement, {
-          color: color,
+        const icon = cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
+          color: CHIP_COLOR_MAP[status],
         });
 
         return (
@@ -129,11 +120,9 @@ export function QueueView() {
     return [latestHistoricTask, ...queued];
   }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
 
-  const data = useMemo<QueueTableData[]>(() => {
+  const tableData = useMemo<QueueTableData[]>(() => {
     return getTableData(tasksToDisplay ?? []);
   }, [tasksToDisplay]);
-
-  const colorMap = useMemo(() => getChipColorMap(), []);
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
@@ -157,7 +146,7 @@ export function QueueView() {
             size="small"
             label={cell.getValue<string>()}
             variant="outlined"
-            color={colorMap[cell.getValue<Status>()]}
+            color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
           ></Chip>
         ),
       },
@@ -183,12 +172,12 @@ export function QueueView() {
         },
       },
     ],
-    [colorMap],
+    [CHIP_COLOR_MAP],
   );
 
   const table = useMaterialReactTable({
-    columns,
-    data,
+    columns: columns,
+    data: tableData,
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
