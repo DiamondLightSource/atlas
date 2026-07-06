@@ -2,20 +2,15 @@ import {
   DiamondDSTheme,
   ThemeProvider,
 } from "@diamondlightsource/sci-react-ui";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-
-import Dashboard from "./routes/Dashboard.tsx";
-import { Layout } from "./routes/Layout.tsx";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
-// import Plans from "./routes/Plans.tsx";
-// import Workflows from "./routes/Workflows.tsx";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
 
