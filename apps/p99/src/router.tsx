@@ -26,8 +26,8 @@ const navigation: SectionGroup[] = [
           {
             name: "Plans",
             element: <Plans />,
-          }
-        ]
+          },
+        ],
       },
       {
         name: "Workflows",
@@ -37,11 +37,11 @@ const navigation: SectionGroup[] = [
           {
             name: "Workflows",
             element: <Workflows />,
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
 ];
 
-export const router = createRouter({title: "P99", navigation})
+export const router = createRouter({ title: "P99", navigation });
