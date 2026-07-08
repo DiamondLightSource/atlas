@@ -10,14 +10,12 @@ function createArrayFromView<T extends Uint8Array>(
   view: NdArray<T>,
 ): NdArray<T> {
   const { data, size, shape } = view;
-
   const array = ndarray(
     (Array.isArray(data)
       ? []
       : new (data.constructor as Uint8ArrayConstructor)(size)) as T,
     shape,
   );
-
   assign(array, view);
   return array;
 }
@@ -25,7 +23,7 @@ interface Props {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
   plane: Plane;
-  slice: number; // maybe not the right name?
+  slice: number;
 }
 export default function SliceViewer({
   volumeData,
@@ -58,28 +56,6 @@ export default function SliceViewer({
     }
   }
 
-  //temporary code to convert ndarray to number[][] whilst Davidia not working with ndarray.pick
-  // // Extract dimensions from the shape property
-  // const rows = sliceNdarray.shape[0];
-  // const cols = sliceNdarray.shape[1];
-
-  // // Initialize the 2D TypeScript array
-  // const normal2DArray: number[][] = [];
-
-  // // Loop through rows and columns to reconstruct the 2D array
-  // for (let r = 0; r < rows; r++) {
-  //   const row: number[] = [];
-  //   for (let c = 0; c < cols; c++) {
-  //     row.push(sliceNdarray.get(r, c)); // Safely get the value at [row, col]
-  //   }
-  //   normal2DArray.push(row);
-  // }
-  // console.log(normal2DArray);
-
-  // useEffect(() => {
-  //   // maths to find the correct slice from the volume
-  // }, []); // useffect should be retriggered by a change in choice of plane or slice (which will be changed form the controls)
-
   return (
     <Box
       sx={{
@@ -101,25 +77,9 @@ export default function SliceViewer({
           Slice View
         </Typography>
       </Box>
-      {/* <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <SliceRenderer
-          slicearray={normal2DArray} //plane === Plane.Z ? [].slice.call(slice2D) : array}
-          // uintarray={sliceData}
-        />
-      </Box> */}
       <HeatmapPlot
         aspect="auto"
-        plotConfig={{
-          title: "Slice View",
-          // xLabel: "x-axis",
-          // yLabel: "y-axis",
-        }}
+        plotConfig={{}}
         values={sliceNdarray}
         domain={[0, 255]}
         colourMap="Spectral"

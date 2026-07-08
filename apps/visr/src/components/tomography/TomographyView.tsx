@@ -37,7 +37,7 @@ function TomographyView() {
         volumeData: new Uint8Array(buffer),
         volumeShape: meta.shape,
       });
-      //remove code to run properly
+      //test data - to be removed
       const testData: Volume = {
         volumeData: new Uint8Array([
           0, 1, 2, 3, 224, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
@@ -48,7 +48,7 @@ function TomographyView() {
         volumeShape: [3, 4, 5],
       };
 
-      // setVolume(testData); //remove for code to run properlys
+      // setVolume(testData); //uncomment to use simple test data
       console.log("test data", testData);
     }
 
