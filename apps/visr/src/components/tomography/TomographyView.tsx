@@ -19,7 +19,6 @@ function TomographyView() {
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // const [revolve, setRevolve] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
 
@@ -64,7 +63,7 @@ function TomographyView() {
   }, [plane, volumeVisible, slice, progress]);
 
   useEffect(() => {
-    const onReceiveMessage = (e: { key: any; newValue: any }) => {
+    const onReceiveMessage = (e: StorageEvent) => {
       const { key, newValue } = e;
       switch (key) {
         case "plane": {
@@ -72,7 +71,7 @@ function TomographyView() {
           break;
         }
         case "volumeVisible": {
-          setVolumeVisible(newValue);
+          setVolumeVisible(Boolean(newValue));
           break;
         }
         case "slice": {
@@ -138,10 +137,7 @@ function TomographyView() {
         bgcolor: "background.default",
       }}
     >
-      <Stack
-        direction={menuOpen ? "column" : "row"}
-        divider={<Divider orientation="vertical" />}
-      >
+      <Stack direction="row" divider={<Divider orientation="vertical" />}>
         <Box
           sx={{
             width: "30%",

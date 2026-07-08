@@ -1,4 +1,3 @@
-import SliceRenderer from "./SliceRenderer";
 import { Box, Typography } from "@mui/material";
 import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
