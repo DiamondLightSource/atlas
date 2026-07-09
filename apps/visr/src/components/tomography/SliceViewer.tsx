@@ -81,7 +81,7 @@ export default function SliceViewer({
         plotConfig={{}}
         values={sliceNdarray}
         domain={[0, 255]}
-        colourMap="Spectral"
+        customToolbarChildren={null}
       />
     </Box>
   );
