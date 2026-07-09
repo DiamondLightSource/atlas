@@ -91,7 +91,6 @@ export default function Controls({
             marks
             onChange={onSlide}
             value={slice}
-            // defaultValue={1}
           ></Slider>{" "}
           <Typography variant="body1" color="primary">
             Axis

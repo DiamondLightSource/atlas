@@ -40,17 +40,14 @@ export default function SliceViewer({
   switch (plane) {
     case Plane.Z: {
       sliceNdarray = createArrayFromView(volume.pick(slice, null, null));
-      console.log("sliceNdArray", sliceNdarray);
       break;
     }
     case Plane.Y: {
       sliceNdarray = createArrayFromView(volume.pick(null, slice, null));
-      console.log(sliceNdarray);
       break;
     }
     case Plane.X: {
       sliceNdarray = createArrayFromView(volume.pick(null, null, slice));
-      console.log(sliceNdarray);
       break;
     }
   }
