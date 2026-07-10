@@ -11,7 +11,12 @@ export function Layout(props: RouterProps) {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <TopBar title={props.title} open={open} setOpen={setOpen} />
+      <TopBar
+        title={props.title}
+        open={open}
+        setOpen={setOpen}
+        actions={props.actions}
+      />
       <SideNav navigation={props.navigation} open={open} />
       <Box
         component="main"

@@ -11,6 +11,7 @@ import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
 import Plans from "./routes/Plans";
 import { QueueView } from "./routes/QueueView";
+import { AbortButton } from "./components/AbortButton";
 
 const navigation: SectionGroup[] = [
   {
@@ -101,4 +102,8 @@ const navigation: SectionGroup[] = [
   },
 ];
 
-export const router = createRouter({ title: "i15-1", navigation });
+export const router = createRouter({
+  title: "i15-1",
+  navigation,
+  actions: <AbortButton />,
+});
