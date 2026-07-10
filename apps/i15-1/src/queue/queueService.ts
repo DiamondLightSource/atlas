@@ -133,6 +133,11 @@ export function usePatchQueueState() {
   });
 }
 
+export function usePauseQueue() {
+  const mutation = usePatchQueueState();
+  return () => mutation.mutateAsync(true);
+}
+
 export function useToggleQueueState() {
   const { data } = useGetQueueState();
   const mutation = usePatchQueueState();
