@@ -69,32 +69,22 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("My Button Text"));
   });
 
-  // it("presses button", () => {
-  //   const mockResponse: TaskResponse = {
-  //     task_id: "92e6a0c3-52ff-4161-84ec-73096697e571",
-  //   };
-  //   vi.mocked(api.worker.setActiveTask).mockResolvedValue(mockResponse);
+  it("presses button", () => {
+    const mockResponse: TaskResponse = {
+      task_id: "92e6a0c3-52ff-4161-84ec-73096697e571",
+    };
+    vi.mocked(api.worker.setActiveTask).mockResolvedValue(mockResponse);
 
-  //   render(
-  //     <BlueapiProvider api={api}>
-  //       <QueryClientProvider client={queryClient}>
-  //         <RunPlanButton
-  //           name="test_plan"
-  //           params={[]}
-  //           instrumentSession="cm12345-1"
-  //         />
-  //       </QueryClientProvider>
-  //       ,
-  //     </BlueapiProvider>,
-  //   );
-  //   // screen.getByText("Run").click();
-
-  //   const runPlanButton = screen.getByText("Run");
-  //   const user = userEvent.setup();
-  //   user.click(runPlanButton);
-  //   expect(screen.queryByText("successful")).toBeInTheDocument();
-
-  //   // const message = queryByText("successful");
-  //   // expect(message).toBeInTheDocument();
-  // });
+    renderComponentWithProviders(
+      api,
+      queryClient,
+      <RunPlanButton
+        name="test_plan"
+        params={[]}
+        instrumentSession="cm12345-1"
+      />,
+    );
+    screen.getByText("Run").click();
+    expect(screen.findByText("successful"));
+  });
 });
