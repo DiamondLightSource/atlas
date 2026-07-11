@@ -1,18 +1,10 @@
 import * as React from "react";
-import {
-  render,
-  screen,
-  within,
-  userEvent,
-  queryByText,
-  getByText,
-} from "@atlas/vitest-conf";
+import { render, screen } from "@atlas/vitest-conf";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { RunPlanButton } from "./RunPlanButton";
 import { BlueapiProvider } from "@atlas/blueapi-query";
-import { createTestQueryClient, useSubmitTask } from "@atlas/blueapi-query";
+import { createTestQueryClient } from "@atlas/blueapi-query";
 import type { Api, TaskResponse } from "@atlas/blueapi";
-import { Snackbar } from "@mui/material";
 
 function renderComponentWithProviders(
   apiMock: Api,
@@ -69,7 +61,7 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("My Button Text"));
   });
 
-  it("presses button", () => {
+  it("success message appears when button is pressed with successful response", () => {
     const mockResponse: TaskResponse = {
       task_id: "92e6a0c3-52ff-4161-84ec-73096697e571",
     };
@@ -84,7 +76,25 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
+
     screen.getByText("Run").click();
-    expect(screen.findByText("successful"));
+    expect(screen.findByText("Plan submission successful!"));
+  });
+
+  it("failure message appears when button is pressed with failed response", () => {
+    vi.mocked(api.worker.setActiveTask).mockRejectedValue;
+
+    renderComponentWithProviders(
+      api,
+      queryClient,
+      <RunPlanButton
+        name="test_plan"
+        params={[]}
+        instrumentSession="cm12345-1"
+      />,
+    );
+
+    screen.getByText("Run").click();
+    expect(screen.findByTestId("Plan submission failed!"));
   });
 });
