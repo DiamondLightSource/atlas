@@ -1,11 +1,18 @@
 import { Button } from "@mui/material";
 import { usePauseQueue } from "../queue/queueService";
 import DangerousIcon from "@mui/icons-material/Dangerous";
+import { useBlueapi } from "@atlas/blueapi-query";
 
 export function AbortButton() {
+  const blueapi = useBlueapi();
   const pause_queue = usePauseQueue();
+
   const abort = () => {
     pause_queue();
+    blueapi.worker.setState({
+      new_state: "ABORTING",
+      reason: "Abort button pressed in the UI",
+    });
   };
 
   return (
