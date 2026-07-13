@@ -112,6 +112,8 @@ export function useGetQueueState() {
     queryFn: getQueueState,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -166,6 +168,8 @@ export function useGetQueuedTasks() {
     queryFn: getQueuedTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -180,6 +184,8 @@ export function useGetAllTasks() {
     queryFn: getAllTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -194,6 +200,8 @@ export function useGetHistoricTasks() {
     queryFn: getHistoricTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
