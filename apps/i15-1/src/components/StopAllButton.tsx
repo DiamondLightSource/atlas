@@ -3,7 +3,7 @@ import { usePauseQueue } from "../queue/queueService";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import { useBlueapi } from "@atlas/blueapi-query";
 
-export function AbortButton() {
+export function StopAllButton() {
   const blueapi = useBlueapi();
   const pause_queue = usePauseQueue();
 
@@ -35,7 +35,7 @@ export function AbortButton() {
       onClick={abort}
       startIcon={<DangerousIcon />}
     >
-      ABORT
+      STOP ALL
     </Button>
   );
 }

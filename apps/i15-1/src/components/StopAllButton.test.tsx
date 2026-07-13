@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AbortButton } from "./AbortButton";
+import { StopAllButton } from "./StopAllButton";
 import { fireEvent, render, screen } from "@atlas/vitest-conf";
 
 const pauseQueueMock = vi.fn();
@@ -17,29 +17,31 @@ vi.mock("@atlas/blueapi-query", () => ({
   }),
 }));
 
-describe("AbortButton", () => {
+describe("StopAllButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders the abort button", () => {
-    render(<AbortButton />);
+    render(<StopAllButton />);
 
-    expect(screen.getByRole("button", { name: /abort/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /stop all/i }),
+    ).toBeInTheDocument();
   });
 
   it("pauses the queue when clicked", () => {
-    render(<AbortButton />);
+    render(<StopAllButton />);
 
-    fireEvent.click(screen.getByRole("button", { name: /abort/i }));
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
 
     expect(pauseQueueMock).toHaveBeenCalledTimes(1);
   });
 
   it("sets the worker state to ABORTING when clicked", () => {
-    render(<AbortButton />);
+    render(<StopAllButton />);
 
-    fireEvent.click(screen.getByRole("button", { name: /abort/i }));
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
 
     expect(setStateMock).toHaveBeenCalledWith({
       new_state: "ABORTING",
@@ -48,9 +50,9 @@ describe("AbortButton", () => {
   });
 
   it("pauses the queue before aborting the worker", () => {
-    render(<AbortButton />);
+    render(<StopAllButton />);
 
-    fireEvent.click(screen.getByRole("button", { name: /abort/i }));
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
 
     expect(pauseQueueMock.mock.invocationCallOrder[0]).toBeLessThan(
       setStateMock.mock.invocationCallOrder[0],
