@@ -5,9 +5,9 @@ import {
   materialRenderers,
   materialCells,
 } from "@jsonforms/material-renderers";
-import { sanitisePlan, type SchemaNode } from "./utils/schema";
+import { sanitisePlan, type SchemaNode } from "../utils/schema";
 import type { Plan } from "@atlas/blueapi";
-import { RunPlanButton } from "./RunPlanButton";
+import { RunPlanButton } from "../RunPlanButton";
 
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -79,7 +79,7 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
           id="instrumentSession"
           label="Instrument Session"
           defaultValue={instrumentSession}
-          onChange={(e) => setInstrumentSession(e.target.value)}
+          onChange={e => setInstrumentSession(e.target.value)}
         ></TextField>
       </Box>
       <Box sx={{ mt: 2 }}>

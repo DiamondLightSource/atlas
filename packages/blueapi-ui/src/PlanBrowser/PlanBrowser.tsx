@@ -8,14 +8,17 @@ import {
   Typography,
 } from "@mui/material";
 import SearchablePlanList from "./SearchablePlanList";
+import { usePlans } from "@atlas/blueapi-query";
 
 export type PlanBrowserProps = {
-  plans: Plan[];
   renderPlan: (plan: Plan) => ReactNode;
 };
 
-export function PlanBrowser({ plans, renderPlan }: PlanBrowserProps) {
+export function PlanBrowser({ renderPlan }: PlanBrowserProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  const { data } = usePlans();
+  const plans = data ? data.plans : [];
 
   return (
     <Container sx={{ height: "85vh", width: "80%" }}>

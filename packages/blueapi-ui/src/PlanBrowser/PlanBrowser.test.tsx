@@ -1,19 +1,26 @@
-import type { Plan } from "@atlas/blueapi";
+import type { Plan, PlansResponse } from "@atlas/blueapi";
 import { render, screen, userEvent } from "@atlas/vitest-conf";
 import { PlanBrowser } from "./PlanBrowser";
+import { usePlans } from "@atlas/blueapi-query";
 
-const plans: Plan[] = [
-  { name: "Plan 1", schema: {}, description: "" },
-  { name: "Plan 2", schema: {}, description: "" },
-  { name: "Plan 3", schema: {}, description: "" },
-];
+// mock usePlans hook
+vi.mock("@atlas/blueapi-query");
+const usePlansMock = vi.mocked(usePlans);
+const plansResponse: PlansResponse = {
+  plans: [
+    { name: "Plan 1", schema: {}, description: "" },
+    { name: "Plan 2", schema: {}, description: "" },
+    { name: "Plan 3", schema: {}, description: "" },
+  ],
+};
+usePlansMock.mockReturnValue({ data: plansResponse } as any);
 
 const renderPlan = (plan: Plan) => (
   <div data-testid="plan-view">{plan.name}</div>
 );
 
 function renderBrowser() {
-  return render(<PlanBrowser plans={plans} renderPlan={renderPlan} />);
+  return render(<PlanBrowser renderPlan={renderPlan} />);
 }
 
 describe("PlanBrowser", () => {
@@ -28,7 +35,7 @@ describe("PlanBrowser", () => {
 
   it("does not invoke renderPlan before selection", () => {
     const mockRender = vi.fn();
-    render(<PlanBrowser plans={plans} renderPlan={mockRender} />);
+    render(<PlanBrowser renderPlan={mockRender} />);
     expect(mockRender).not.toBeCalled();
   });
 
