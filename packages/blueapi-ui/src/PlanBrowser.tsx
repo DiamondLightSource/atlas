@@ -23,7 +23,11 @@ export function PlanBrowser({ plans, renderPlan }: PlanBrowserProps) {
         <Grid size={{ xs: 4 }}>
           <Paper elevation={0} sx={{ height: "100%" }}>
             <SearchablePlanList
-              plans={plans}
+              plans={plans.sort((a, b) =>
+                a.name.localeCompare(b.name, undefined, {
+                  sensitivity: "base",
+                }),
+              )}
               selectedPlan={selectedPlan}
               updateSelection={setSelectedPlan}
             />
