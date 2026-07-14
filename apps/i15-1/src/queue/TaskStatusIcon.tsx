@@ -11,8 +11,8 @@ import type { SxProps, Theme } from "@mui/material";
 const CHIP_ICON_MAP = {
   Success: <CheckCircleIcon />,
   Error: <ErrorIcon />,
-  "In progress": <CircularProgress size={10} thickness={4} />,
-  Claimed: <CircularProgress size={10} thickness={4} />,
+  "In progress": <CircularProgress size={20} thickness={5} />,
+  Claimed: <CircularProgress size={20} thickness={4} />,
   Waiting: <CircleOutlinedIcon />,
   Skipped: <DoDisturbIcon />,
 } satisfies Record<CallStatus, React.ReactNode>;
