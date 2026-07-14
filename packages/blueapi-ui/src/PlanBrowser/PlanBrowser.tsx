@@ -18,7 +18,7 @@ export function PlanBrowser() {
   const plans = data ? data.plans : [];
 
   return (
-    <Container sx={{ height: "85vh", width: "80%" }}>
+    <Box sx={{ height: "85vh" }}>
       <Grid container spacing={0} sx={{ height: "100%" }}>
         <Grid size={{ xs: 4 }}>
           <Paper elevation={0} sx={{ height: "100%" }}>
@@ -59,6 +59,6 @@ export function PlanBrowser() {
           </Paper>
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 }

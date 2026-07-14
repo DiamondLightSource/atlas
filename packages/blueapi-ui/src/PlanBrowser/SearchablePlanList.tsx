@@ -23,7 +23,7 @@ export default function SearchablePlanList({
   const matchingPlans = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return plans;
-    return plans.filter((plan) => plan.name.toLowerCase().includes(q));
+    return plans.filter(plan => plan.name.toLowerCase().includes(q));
   }, [plans, query]);
 
   return (
@@ -43,11 +43,11 @@ export default function SearchablePlanList({
             size="small"
             label="Search plans"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
           />
         </Box>
         {/* <Divider /> */}
-        {matchingPlans.map((plan) => {
+        {matchingPlans.map(plan => {
           const selected = selectedPlan?.name === plan.name;
           return (
             <ListItemButton
