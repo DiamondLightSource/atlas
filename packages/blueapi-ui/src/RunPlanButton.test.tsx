@@ -1,10 +1,6 @@
-import * as React from "react";
 import { render, screen } from "@atlas/vitest-conf";
-import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { RunPlanButton } from "./RunPlanButton";
-import { BlueapiProvider } from "@atlas/blueapi-query";
 import { useGetWorkerState, useSubmitTask } from "@atlas/blueapi-query";
-import { createTestQueryClient } from "@atlas/blueapi-query";
 import type { Api, TaskResponse } from "@atlas/blueapi";
 
 vi.mock("@atlas/blueapi-query");
@@ -15,21 +11,6 @@ const mockResponse: TaskResponse = {
 };
 
 describe("RunPlanButton", () => {
-  let queryClient: QueryClient;
-  let api: Api;
-
-  beforeEach(() => {
-    queryClient = createTestQueryClient();
-    api = {
-      tasks: {
-        submit: vi.fn(),
-      },
-      worker: {
-        setActiveTask: vi.fn(),
-      },
-    } as unknown as Api;
-  });
-
   it("renders default button with Run", () => {
     workerStateMock.mockReturnValue({ data: "IDLE" } as any);
     submitTaskMock.mockReturnValue({ data: mockResponse } as any);
