@@ -2,6 +2,7 @@ import type { Plan, PlansResponse } from "@atlas/blueapi";
 import { render, screen, userEvent } from "@atlas/vitest-conf";
 import { PlanBrowser } from "./PlanBrowser";
 import { usePlans } from "@atlas/blueapi-query";
+import { PlanParameters } from "./PlanParameters";
 
 // mock usePlans hook
 vi.mock("@atlas/blueapi-query");
@@ -15,12 +16,18 @@ const plansResponse: PlansResponse = {
 };
 usePlansMock.mockReturnValue({ data: plansResponse } as any);
 
-const renderPlan = (plan: Plan) => (
+// mock JSONForms
+const renderPlan = ({ plan }: { plan: Plan }) => (
   <div data-testid="plan-view">{plan.name}</div>
 );
 
+vi.mock("./PlanParameters");
+const paramsComponentMock = vi.mocked(PlanParameters);
+paramsComponentMock.mockImplementation(renderPlan);
+
+// render component under test
 function renderBrowser() {
-  return render(<PlanBrowser renderPlan={renderPlan} />);
+  return render(<PlanBrowser />);
 }
 
 describe("PlanBrowser", () => {
@@ -35,7 +42,7 @@ describe("PlanBrowser", () => {
 
   it("does not invoke renderPlan before selection", () => {
     const mockRender = vi.fn();
-    render(<PlanBrowser renderPlan={mockRender} />);
+    render(<PlanBrowser />);
     expect(mockRender).not.toBeCalled();
   });
 

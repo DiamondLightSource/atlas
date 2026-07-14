@@ -25,18 +25,12 @@ function UIFallback() {
   );
 }
 
-type PlanParametersProps = {
-  plan: Plan;
-};
-
 interface PlansParameters {
   [key: string]: any;
 }
 
-export const PlanParameters: React.FC<PlanParametersProps> = (
-  props: PlanParametersProps,
-) => {
-  const plan = sanitisePlan(props.plan);
+export function PlanParameters({ plan }: { plan: Plan }) {
+  const sanitisedPlan = sanitisePlan(plan);
 
   const [planParameters, setPlanParameters] = useState<PlansParameters>({});
   // TODO: Remove InstrumentSession box and state, retrieve from context when submitting.
@@ -44,30 +38,30 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
   const [instrumentSession, setInstrumentSession] = useState("cm12345-1");
 
   return (
-    <ErrorBoundary FallbackComponent={UIFallback} resetKeys={[props.plan.name]}>
+    <ErrorBoundary FallbackComponent={UIFallback} resetKeys={[plan.name]}>
       <Box sx={{ mt: 2 }}>
         <Typography
           variant="h5"
           component="h1"
           sx={{ mb: 2, fontWeight: "bold" }}
         >
-          {props.plan.name}
+          {plan.name}
         </Typography>
-        {props.plan.description && (
+        {plan.description && (
           <Typography pt={2} pb={4}>
-            {props.plan.description}
+            {plan.description}
           </Typography>
         )}
-        {(plan.schema as SchemaNode).skip ? (
+        {(sanitisedPlan.schema as SchemaNode).skip ? (
           <UIFallback />
         ) : (
           <JsonForms
-            schema={plan.schema}
-            data={planParameters[props.plan.name]}
+            schema={sanitisedPlan.schema}
+            data={planParameters[plan.name]}
             renderers={materialRenderers}
             cells={materialCells}
             onChange={({ data }) =>
-              setPlanParameters({ ...planParameters, [props.plan.name]: data })
+              setPlanParameters({ ...planParameters, [plan.name]: data })
             }
           />
         )}
@@ -84,11 +78,11 @@ export const PlanParameters: React.FC<PlanParametersProps> = (
       </Box>
       <Box sx={{ mt: 2 }}>
         <RunPlanButton
-          name={props.plan.name}
-          params={planParameters[props.plan.name]}
+          name={plan.name}
+          params={planParameters[plan.name]}
           instrumentSession={instrumentSession}
         />
       </Box>
     </ErrorBoundary>
   );
-};
+}

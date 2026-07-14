@@ -9,12 +9,9 @@ import {
 } from "@mui/material";
 import SearchablePlanList from "./SearchablePlanList";
 import { usePlans } from "@atlas/blueapi-query";
+import { PlanParameters } from "./PlanParameters";
 
-export type PlanBrowserProps = {
-  renderPlan: (plan: Plan) => ReactNode;
-};
-
-export function PlanBrowser({ renderPlan }: PlanBrowserProps) {
+export function PlanBrowser() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const { data } = usePlans();
@@ -47,7 +44,7 @@ export function PlanBrowser({ renderPlan }: PlanBrowserProps) {
           >
             {selectedPlan ? (
               <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-                {renderPlan(selectedPlan)}
+                <PlanParameters plan={selectedPlan} />
               </Box>
             ) : (
               <Box sx={{ m: "auto", textAlign: "center" }}>
