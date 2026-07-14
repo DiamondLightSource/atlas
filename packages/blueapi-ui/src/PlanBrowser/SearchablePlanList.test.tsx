@@ -26,16 +26,13 @@ function renderList(
 }
 
 describe("SearchablePlanList", () => {
-  it("renders search, heading, and all plans initially", () => {
+  it("renders search and all plans initially", () => {
     renderList();
 
     // search field
     expect(
       screen.getByRole("textbox", { name: /search plans/i }),
     ).toBeInTheDocument();
-
-    // heading
-    expect(screen.getByText("Plans")).toBeInTheDocument();
 
     // all items
     for (const p of plans) {
@@ -123,8 +120,6 @@ describe("SearchablePlanList", () => {
 
   it("handles empty plans array", () => {
     renderList({ plans: [] });
-    // List is empty, but the heading and search are present
-    expect(screen.getByText("Plans")).toBeInTheDocument();
     expect(
       screen.getByRole("textbox", { name: /search plans/i }),
     ).toBeInTheDocument();

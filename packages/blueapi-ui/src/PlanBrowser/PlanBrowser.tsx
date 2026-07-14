@@ -1,12 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Plan } from "@atlas/blueapi";
-import {
-  Box,
-  Container,
-  Grid2 as Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Grid2 as Grid, Paper, Typography } from "@mui/material";
 import SearchablePlanList from "./SearchablePlanList";
 import { usePlans } from "@atlas/blueapi-query";
 import { PlanParameters } from "./PlanParameters";
@@ -18,10 +12,10 @@ export function PlanBrowser() {
   const plans = data ? data.plans : [];
 
   return (
-    <Box sx={{ height: "85vh" }}>
-      <Grid container spacing={0} sx={{ height: "100%" }}>
+    <Box>
+      <Grid container spacing={1}>
         <Grid size={{ xs: 4 }}>
-          <Paper elevation={0} sx={{ height: "100%" }}>
+          <Paper>
             <SearchablePlanList
               plans={plans.sort((a, b) =>
                 a.name.localeCompare(b.name, undefined, {
