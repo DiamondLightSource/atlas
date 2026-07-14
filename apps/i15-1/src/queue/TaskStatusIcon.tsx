@@ -17,17 +17,16 @@ const CHIP_ICON_MAP = {
   Skipped: <DoDisturbIcon />,
 } satisfies Record<CallStatus, React.ReactNode>;
 
-export const CHIP_SX_MAP: Partial<Record<Status | CallStatus, SxProps<Theme>>> =
-  {
-    Waiting: {
-      color: "grey.500",
-      borderColor: "grey.300",
-    },
-    Skipped: {
-      color: "grey.500",
-      borderColor: "grey.300",
-    },
-  };
+const CHIP_SX_MAP: Partial<Record<Status | CallStatus, SxProps<Theme>>> = {
+  Waiting: {
+    color: "grey.500",
+    borderColor: "grey.300",
+  },
+  Skipped: {
+    color: "grey.500",
+    borderColor: "grey.300",
+  },
+};
 
 export function TaskStatusIcon({ status }: { status: CallStatus }) {
   return cloneElement(CHIP_ICON_MAP[status] as React.ReactElement, {
