@@ -1,16 +1,88 @@
 import { useState } from "react";
 import type { Plan } from "@atlas/blueapi";
-import { Box, Grid2 as Grid, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Drawer,
+  Grid2 as Grid,
+  Paper,
+  Stack,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import SearchablePlanList from "./SearchablePlanList";
 import { usePlans } from "@atlas/blueapi-query";
 import { PlanParameters } from "./PlanParameters";
+import { LucideArrowRight } from "lucide-react";
 
-export function PlanBrowser() {
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+type Props = {
+  plans: Plan[];
+  selected: Plan | null;
+  select: (plan: Plan) => void;
+};
 
-  const { data } = usePlans();
-  const plans = data ? data.plans : [];
+function CompactLayout({ plans, selected, select }: Props) {
+  const [open, setOpen] = useState<boolean>(false);
+  return (
+    <Box>
+      <Drawer variant="temporary" open={open} onClose={() => setOpen(false)}>
+        <Toolbar />
+        <Paper>
+          <SearchablePlanList
+            plans={plans}
+            selectedPlan={selected}
+            updateSelection={select}
+          />
+        </Paper>
+      </Drawer>
+      <Paper
+        elevation={2}
+        sx={{
+          height: "100%",
+          p: 2,
+          display: "flex",
+        }}
+      >
+        <Stack>
+          <Box>
+            <Button
+              endIcon={<LucideArrowRight />}
+              onClick={() => setOpen(true)}
+            >
+              View plans
+            </Button>
+          </Box>
+          <PlanParametersWrapper selected={selected} />
+        </Stack>
+      </Paper>
+    </Box>
+  );
+}
 
+function PlanParametersWrapper({ selected }: { selected: Plan | null }) {
+  return (
+    <Box sx={{ display: "flex", flex: 1, height: "100%" }}>
+      {selected ? (
+        <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
+          <PlanParameters plan={selected} />
+        </Box>
+      ) : (
+        <Box sx={{ m: "auto", textAlign: "center" }}>
+          <Typography variant="h6" gutterBottom>
+            Select a plan
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Choose from the list to see details.
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+function FullLayout({ plans, selected, select }: Props) {
   return (
     <Box>
       <Grid container spacing={1}>
@@ -22,8 +94,8 @@ export function PlanBrowser() {
                   sensitivity: "base",
                 }),
               )}
-              selectedPlan={selectedPlan}
-              updateSelection={setSelectedPlan}
+              selectedPlan={selected}
+              updateSelection={select}
             />
           </Paper>
         </Grid>
@@ -36,23 +108,43 @@ export function PlanBrowser() {
               display: "flex",
             }}
           >
-            {selectedPlan ? (
-              <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-                <PlanParameters plan={selectedPlan} />
-              </Box>
-            ) : (
-              <Box sx={{ m: "auto", textAlign: "center" }}>
-                <Typography variant="h6" gutterBottom>
-                  Select a plan
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Choose from the list on the left to see details.
-                </Typography>
-              </Box>
-            )}
+            <PlanParametersWrapper selected={selected} />
           </Paper>
         </Grid>
       </Grid>
     </Box>
+  );
+}
+
+export function PlanBrowser() {
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  const { data } = usePlans();
+  const plans = data
+    ? data.plans.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          sensitivity: "base",
+        }),
+      )
+    : [];
+
+  const theme = useTheme();
+  const bigEnoughForFullLayout = useMediaQuery(theme.breakpoints.up("md"));
+
+  if (bigEnoughForFullLayout) {
+    return (
+      <FullLayout
+        plans={plans}
+        selected={selectedPlan}
+        select={setSelectedPlan}
+      />
+    );
+  }
+  return (
+    <CompactLayout
+      plans={plans}
+      selected={selectedPlan}
+      select={setSelectedPlan}
+    />
   );
 }
