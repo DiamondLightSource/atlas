@@ -60,8 +60,9 @@ export default function SearchablePlanList({
                 <ListItemButton
                   key={plan.name}
                   selected={selected}
-                  aria-selected={selected}
                   onClick={() => updateSelection(plan)}
+                  aria-label={plan.name}
+                  aria-current={selected}
                 >
                   {plan.name}
                 </ListItemButton>

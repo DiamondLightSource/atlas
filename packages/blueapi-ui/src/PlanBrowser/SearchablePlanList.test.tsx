@@ -42,7 +42,7 @@ describe("SearchablePlanList", () => {
     // no selection initially
     for (const p of plans) {
       expect(screen.getByRole("button", { name: p.name })).toHaveAttribute(
-        "aria-selected",
+        "aria-current",
         "false",
       );
     }
@@ -69,16 +69,16 @@ describe("SearchablePlanList", () => {
     const selectedButton = screen.getByRole("button", { name: "Dark Current" });
 
     // none selected initially
-    expect(selectedButton).toHaveAttribute("aria-selected", "false");
+    expect(selectedButton).toHaveAttribute("aria-current", "false");
 
     // re-render with selected plan
     const selected = { name: "Dark Current", schema: {}, description: "" };
     rerender(<SearchablePlanList {...props} selectedPlan={selected} />);
-    // selected plan marked so with aria-selected
-    expect(selectedButton).toHaveAttribute("aria-selected", "true");
+    // selected plan marked so with aria-current
+    expect(selectedButton).toHaveAttribute("aria-current", "true");
     // others remain unselected
     expect(screen.getByRole("button", { name: "Align Beam" })).toHaveAttribute(
-      "aria-selected",
+      "aria-current",
       "false",
     );
   });
