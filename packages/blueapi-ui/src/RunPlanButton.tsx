@@ -83,6 +83,10 @@ export function RunPlanButton({
     });
   };
 
+  const [planSubmitted, setPlanSubmitted] = useState<boolean>(false);
+  const [planSubmissionResult, setPlanSubmissionResult] = useState<
+    boolean | null
+  >(null);
   const handleClick = async () => {
     setOpenSnackbar(true);
     setLoading(true);
@@ -110,7 +114,28 @@ export function RunPlanButton({
     }
 
     setOpenSnackbar(false);
+    setPlanSubmitted(false);
+    setPlanSubmissionResult(null);
   };
+  // MERGE AND THEN FIGURE OUT HOW TO HANDLE BOTH
+  //   setLoading(true);
+  //   try {
+  //     await submitAndRunTask(taskRequest);
+  //     setPlanSubmissionResult(true);
+  //     setPlanSubmitted(true);
+  //   } catch (error) {
+  //     setPlanSubmissionResult(false);
+  //     setPlanSubmitted(true);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const snackbarMessage = planSubmissionResult
+  //   ? "Plan submission successful!"
+  //   : planSubmissionResult === false
+  //     ? "Plan submission failed!"
+  //     : "Plan submission state unknown!";
 
   const isButtonDisabled = () => {
     const workerState = useGetWorkerState();
@@ -131,7 +156,7 @@ export function RunPlanButton({
         {buttonText}
       </Button>
       <Snackbar
-        open={openSnackbar}
+        open={openSnackbar} // open={planSubmitted}
         autoHideDuration={10000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
