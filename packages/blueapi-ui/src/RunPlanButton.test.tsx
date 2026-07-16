@@ -101,8 +101,8 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByText("Plan submission successful!"));
-    expect(screen.findByText("Plan succeeded"));
+    expect(screen.findByTestId("Plan submission successful!"));
+    expect(screen.findByTestId("Plan succeeded"));
   });
 
   it("failure message appears when button is pressed with failed response", async () => {
@@ -115,9 +115,9 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByText("Plan submission failed!"));
+    expect(screen.findByTestId("Plan submission failed!"));
     expect(
-      screen.findByText(
+      screen.findByTestId(
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
       ),
     );
@@ -136,9 +136,9 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByText("Plan submission successful!"));
+    expect(screen.findByTestId("Plan submission successful!"));
     expect(
-      screen.findByText(
+      screen.findByTestId(
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
       ),
     );
@@ -169,9 +169,9 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByText("Plan submission successful!"));
+    expect(screen.findByTestId("Plan submission successful!"));
     expect(
-      screen.findByText(
+      screen.findByTestId(
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
       ),
     );
