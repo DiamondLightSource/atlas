@@ -88,6 +88,7 @@ describe("RunPlanButton", () => {
     );
     screen.getByText("Run").click();
     expect(screen.findByText("Plan submission successful!"));
+    expect(screen.findByText("Running plan!"));
   });
 
   it("failure message appears when button is pressed with failed response", () => {

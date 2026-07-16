@@ -50,7 +50,8 @@ export function RunPlanButton({
   const runTask = async (task_id: string) => {
     await startTask.mutateAsync(task_id).then(async (response) => {
       if (response) {
-        console.log("Running plan");
+        setSeverity("info");
+        setMsg("Running plan!");
         let status = await blueapi.worker.getState();
         while (status !== idleState && status !== abortState) {
           console.log(`status: ${status}`);
@@ -76,9 +77,8 @@ export function RunPlanButton({
   ): Promise<TaskResponse | void> => {
     await submitTask.mutateAsync(task).then(async (response) => {
       if (response) {
-        console.log("Plan successfully submitted");
         setSeverity("info");
-        setMsg("Plan submission successful!");
+        setMsg("Running plan!");
         await runTask(response.task_id).catch((error) => {
           throw new Error(error);
         });
