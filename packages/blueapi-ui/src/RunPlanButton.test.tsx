@@ -1,4 +1,4 @@
-import { render, screen } from "@atlas/vitest-conf";
+import { act, render, screen } from "@atlas/vitest-conf";
 import { RunPlanButton } from "./RunPlanButton";
 import {
   useGetWorkerState,
@@ -90,15 +90,20 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("Run")).toBeDisabled();
   });
 
-  it("success message appears when button is pressed with successful response", () => {
+  it("success message appears when button is pressed with successful response", async () => {
     workerStateMock.mockReturnValue({ data: "IDLE" } as any);
     submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
-    render(
-      <RunPlanButton
-        name="test_plan"
-        params={[]}
-        instrumentSession="cm12345-1"
-      />,
+    setActiveTaskMock.mutateAsync.mockReturnValue({
+      data: mockTask,
+    } as any);
+    await act(async () =>
+      render(
+        <RunPlanButton
+          name="test_plan"
+          params={[]}
+          instrumentSession="cm12345-1"
+        />,
+      ),
     );
     screen.getByText("Run").click();
     expect(screen.findByTestId("Plan submission successful!"));
