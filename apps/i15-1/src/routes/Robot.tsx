@@ -5,7 +5,6 @@ import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
-import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
 // import { AbortPlanButton } from "../components/AbortPlanButton";
 import { WebcamStreamFromPv } from "../components/Webcam";
 
@@ -18,19 +17,6 @@ function StatusSidebar() {
   const theme = useTheme();
   return (
     <Box sx={{ ml: 5 }}>
-      <Stack direction={"column"} spacing={2}>
-        <BlueapiWorkerState />
-        <StatusCard
-          title="Currently loaded"
-          bgColor={theme.palette.info.light}
-          cardColor={theme.palette.primary.main}
-        >
-          <ReadOnlyPv label="Puck" pv="ca://BL15J-EA-LOC-01:PUCK:INDEX" />
-          <ReadOnlyPv
-            label="Sample Pin"
-            pv="ca://BL15J-EA-LOC-01:SAMPLE:INDEX"
-          />
-        </StatusCard>
       <Stack direction={"row"} spacing={2}>
         <StatusCard
           title="Ring status"
