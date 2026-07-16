@@ -74,19 +74,19 @@ export function RunPlanButton({
   ): Promise<TaskResponse | void> => {
     await submitTask.mutateAsync(task).then(async (response) => {
       if (response) {
+        setSeverity("info");
+        setMsg("Plan submission successful!");
         await runTask(response.task_id).catch((error) => {
           throw new Error(error);
         });
       } else {
+        setSeverity("error");
+        setMsg("Plan submission failed!");
         throw new Error("Task couldn't be submitted");
       }
     });
   };
 
-  const [planSubmitted, setPlanSubmitted] = useState<boolean>(false);
-  const [planSubmissionResult, setPlanSubmissionResult] = useState<
-    boolean | null
-  >(null);
   const handleClick = async () => {
     setOpenSnackbar(true);
     setLoading(true);
@@ -114,28 +114,7 @@ export function RunPlanButton({
     }
 
     setOpenSnackbar(false);
-    setPlanSubmitted(false);
-    setPlanSubmissionResult(null);
   };
-  // MERGE AND THEN FIGURE OUT HOW TO HANDLE BOTH
-  //   setLoading(true);
-  //   try {
-  //     await submitAndRunTask(taskRequest);
-  //     setPlanSubmissionResult(true);
-  //     setPlanSubmitted(true);
-  //   } catch (error) {
-  //     setPlanSubmissionResult(false);
-  //     setPlanSubmitted(true);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const snackbarMessage = planSubmissionResult
-  //   ? "Plan submission successful!"
-  //   : planSubmissionResult === false
-  //     ? "Plan submission failed!"
-  //     : "Plan submission state unknown!";
 
   const isButtonDisabled = () => {
     const workerState = useGetWorkerState();
@@ -156,7 +135,7 @@ export function RunPlanButton({
         {buttonText}
       </Button>
       <Snackbar
-        open={openSnackbar} // open={planSubmitted}
+        open={openSnackbar}
         autoHideDuration={10000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
