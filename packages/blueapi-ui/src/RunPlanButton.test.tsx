@@ -102,7 +102,7 @@ describe("RunPlanButton", () => {
     );
     screen.getByText("Run").click();
     expect(screen.findByText("Plan submission successful!"));
-    expect(screen.findByText("Running plan!"));
+    expect(screen.findByText("Plan succeeded"));
   });
 
   it("failure message appears when button is pressed with failed response", async () => {
