@@ -6,7 +6,7 @@ import {
   useSetActiveTask,
   useBlueapi,
 } from "@atlas/blueapi-query";
-import type { Api, TaskResponse } from "@atlas/blueapi";
+import type { Api, TaskResponse, TrackableTask } from "@atlas/blueapi";
 
 // Mocks with starting return values
 const mockResponse: TaskResponse = {
@@ -18,12 +18,26 @@ const submitTaskMock = {
 };
 const setActiveTaskMock = { mutateAsync: vi.fn(() => Promise.resolve()) };
 
+const mockTask: TrackableTask = {
+  task_id: "92e6a0c3-52ff-4161-84ec-73096697e571",
+  task: { name: "test_plan", params: {}, metadata: {} },
+  request_id: null,
+  is_complete: true,
+  is_pending: false,
+  errors: [],
+  outcome: { outcome: "success" },
+};
+
+const api = {
+  worker: { get: vi.fn(() => Promise.resolve("IDLE")) },
+  tasks: { get: vi.fn(() => Promise.resolve(mockTask)) },
+} as unknown as Api;
+
 vi.mock("@atlas/blueapi-query", () => ({
   useGetWorkerState: () => workerStateMock(),
   useSubmitTask: () => submitTaskMock,
   useSetActiveTask: () => setActiveTaskMock,
-  useBlueapi: vi.fn(),
-  // useBlueapi: { tasks: { get: vi.fn() } } as unknown as Api,
+  useBlueapi: () => api,
 }));
 
 describe("RunPlanButton", () => {
@@ -101,7 +115,7 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission failed!"));
+    expect(screen.findByText("Plan submission failed!"));
     expect(
       screen.findByText(
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
@@ -109,5 +123,22 @@ describe("RunPlanButton", () => {
     );
   });
 
-  it("Plan submission succeeds but plan fails during execution", () => {});
+  it("Plan submission succeeds but plan fails during execution", () => {
+    submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
+    setActiveTaskMock.mutateAsync.mockRejectedValue;
+    render(
+      <RunPlanButton
+        name="test_plan"
+        params={[]}
+        instrumentSession="cm12345-1"
+      />,
+    );
+    screen.getByText("Run").click();
+    expect(screen.findByText("Plan submission successful!"));
+    expect(
+      screen.findByText(
+        "Failed to run plan test_plan, see console and blueapi logs for full error.",
+      ),
+    );
+  });
 });

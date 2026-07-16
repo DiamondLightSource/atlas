@@ -78,7 +78,7 @@ export function RunPlanButton({
     await submitTask.mutateAsync(task).then(async (response) => {
       if (response) {
         setSeverity("info");
-        setMsg("Running plan!");
+        setMsg("Plan submission successful!");
         await runTask(response.task_id).catch((error) => {
           throw new Error(error);
         });
