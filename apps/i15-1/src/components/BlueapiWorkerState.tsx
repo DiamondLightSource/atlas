@@ -33,16 +33,26 @@ export function BlueapiWorkerState() {
       variant="outlined"
       sx={{
         minWidth: 250,
-        maxHeight: 100,
+        maxHeight: 200,
         bgcolor: theme.palette.background.paper,
         borderColor: theme.palette.text.primary,
       }}
     >
       <CardContent>
         <Stack direction={"column"} spacing={"1"}>
-          <Typography>Blueapi worker state: </Typography>
           <Typography
             variant="body1"
+            sx={{
+              fontSize: 16,
+              fontStyle: "italic",
+              fontWeight: "bold",
+            }}
+          >
+            Blueapi worker state:{" "}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontSize: 18, fontWeight: "bold" }}
             color={stateMap[workerState.data ? workerState.data : "UNKNOWN"]}
           >
             {workerState.data}

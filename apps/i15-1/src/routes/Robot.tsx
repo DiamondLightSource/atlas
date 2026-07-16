@@ -7,6 +7,7 @@ import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
 import { AbortPlanButton } from "../components/AbortPlanButton";
 import { WebcamStreamFromPv } from "../components/Webcam";
+import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
 
 type RobotSampleFormData = {
   puck: number;
@@ -54,6 +55,7 @@ function StatusSidebar() {
             pv="ca://BL15J-EA-LOC-01:SAMPLE:INDEX"
           />
         </StatusCard>
+        <BlueapiWorkerState />
       </Stack>
     </Box>
   );
