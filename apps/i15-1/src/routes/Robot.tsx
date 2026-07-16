@@ -5,7 +5,7 @@ import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
-// import { AbortPlanButton } from "../components/AbortPlanButton";
+import { AbortPlanButton } from "../components/AbortPlanButton";
 import { WebcamStreamFromPv } from "../components/Webcam";
 
 type RobotSampleFormData = {
@@ -97,17 +97,20 @@ function RobotControl() {
             }}
           />
         </Stack>
-        <RunPlanButton
-          name="robot_load"
-          params={formData}
-          instrumentSession={instrumentSession}
-          buttonText="Load Sample"
-        />
-        <RunPlanButton
-          name="robot_unload"
-          instrumentSession={instrumentSession}
-          buttonText="Unload Sample"
-        />
+        <Stack direction={"row"} spacing={3} alignItems={"center"}>
+          <RunPlanButton
+            name="robot_load"
+            params={formData}
+            instrumentSession={instrumentSession}
+            buttonText="Load Sample"
+          />
+          <RunPlanButton
+            name="robot_unload"
+            instrumentSession={instrumentSession}
+            buttonText="Unload Sample"
+          />
+        </Stack>
+        <AbortPlanButton />
       </Stack>
     </Box>
   );
