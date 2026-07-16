@@ -105,7 +105,7 @@ describe("RunPlanButton", () => {
     expect(screen.findByText("Running plan!"));
   });
 
-  it("failure message appears when button is pressed with failed response", () => {
+  it("failure message appears when button is pressed with failed response", async () => {
     submitTaskMock.mutateAsync.mockRejectedValue;
     render(
       <RunPlanButton
@@ -121,9 +121,11 @@ describe("RunPlanButton", () => {
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
       ),
     );
+    const alert = await screen.findByRole("alert");
+    expect(alert).toBeVisible();
   });
 
-  it("Plan submission succeeds but plan fails during execution", () => {
+  it("Plan submission succeeds but plan fails on run", async () => {
     submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     setActiveTaskMock.mutateAsync.mockRejectedValue;
     render(
@@ -140,5 +142,40 @@ describe("RunPlanButton", () => {
         "Failed to run plan test_plan, see console and blueapi logs for full error.",
       ),
     );
+    const alert = await screen.findByRole("alert");
+    expect(alert).toBeVisible();
+  });
+
+  it("Plan submission succeeds but plan has errors during execution", async () => {
+    const mockFailedTask: TrackableTask = {
+      task_id: "92e6a0c3-52ff-4161-84ec-73096697e571",
+      task: { name: "test_plan", params: {}, metadata: {} },
+      request_id: null,
+      is_complete: true,
+      is_pending: false,
+      errors: ["Some error"],
+      outcome: { outcome: "error" },
+    };
+
+    submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
+    setActiveTaskMock.mutateAsync.mockReturnValue({
+      data: mockFailedTask,
+    } as any);
+    render(
+      <RunPlanButton
+        name="test_plan"
+        params={[]}
+        instrumentSession="cm12345-1"
+      />,
+    );
+    screen.getByText("Run").click();
+    expect(screen.findByText("Plan submission successful!"));
+    expect(
+      screen.findByText(
+        "Failed to run plan test_plan, see console and blueapi logs for full error.",
+      ),
+    );
+    const alert = await screen.findByRole("alert");
+    expect(alert).toBeVisible();
   });
 });
