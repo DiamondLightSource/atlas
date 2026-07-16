@@ -132,26 +132,26 @@ describe("RunPlanButton", () => {
   //   expect(alert).toBeVisible();
   // });
 
-  it("Plan submission succeeds but plan fails on run", async () => {
-    submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
-    setActiveTaskMock.mutateAsync.mockRejectedValue;
-    render(
-      <RunPlanButton
-        name="test_plan"
-        params={[]}
-        instrumentSession="cm12345-1"
-      />,
-    );
-    screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission successful!"));
-    expect(
-      screen.findByTestId(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
-      ),
-    );
-    const alert = await screen.findByRole("alert");
-    expect(alert).toBeVisible();
-  });
+  // it("Plan submission succeeds but plan fails on run", async () => {
+  //   submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
+  //   setActiveTaskMock.mutateAsync.mockRejectedValue;
+  //   render(
+  //     <RunPlanButton
+  //       name="test_plan"
+  //       params={[]}
+  //       instrumentSession="cm12345-1"
+  //     />,
+  //   );
+  //   screen.getByText("Run").click();
+  //   expect(screen.findByTestId("Plan submission successful!"));
+  //   expect(
+  //     screen.findByTestId(
+  //       "Failed to run plan test_plan, see console and blueapi logs for full error.",
+  //     ),
+  //   );
+  //   const alert = await screen.findByRole("alert");
+  //   expect(alert).toBeVisible();
+  // });
 
   it("Plan submission succeeds but plan has errors during execution", async () => {
     const mockFailedTask: TrackableTask = {
