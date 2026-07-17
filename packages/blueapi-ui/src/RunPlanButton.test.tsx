@@ -1,11 +1,5 @@
-import { act, render, screen } from "@atlas/vitest-conf";
+import { render, screen } from "@atlas/vitest-conf";
 import { RunPlanButton } from "./RunPlanButton";
-import {
-  useGetWorkerState,
-  useSubmitTask,
-  useSetActiveTask,
-  useBlueapi,
-} from "@atlas/blueapi-query";
 import type { Api, TaskResponse, TrackableTask } from "@atlas/blueapi";
 
 // Mocks with starting return values
