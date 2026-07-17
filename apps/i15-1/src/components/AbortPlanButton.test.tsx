@@ -1,7 +1,8 @@
 import { render, screen, userEvent } from "@atlas/vitest-conf";
 import { AbortPlanButton } from "./AbortPlanButton";
 import { useSetWorkerState } from "@atlas/blueapi-query";
-import type { WorkerStateRequest } from "@atlas/blueapi";
+import type { WorkerState, WorkerStateRequest } from "@atlas/blueapi";
+import type { UseMutationResult } from "@tanstack/react-query";
 
 describe("AbortPlanButton", () => {
   vi.mock("@atlas/blueapi-query");
@@ -9,7 +10,11 @@ describe("AbortPlanButton", () => {
 
   const mutate = vi.fn();
 
-  mockedHook.mockReturnValue({ mutate } as any);
+  mockedHook.mockReturnValue({ mutate } as any as UseMutationResult<
+    WorkerState,
+    Error,
+    WorkerStateRequest
+  >);
 
   it("renders default Abort button", () => {
     render(<AbortPlanButton />);
