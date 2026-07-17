@@ -1,7 +1,9 @@
 import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
-import Box from "@mui/material/Box";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
+import PlotFrame from "./PlotFrame";
+
+import { useMemo, type ComponentProps } from "react";
 
 type RGBColor = "red" | "green" | "blue" | "gray";
 
@@ -71,47 +73,47 @@ async function fetchMap(
   return toNDT(mapResponse.values, colour);
 }
 
-function RawSpectroscopyData() {
-  const { data } = useSpectroscopyData(fetchMap);
+const CHANNELS = [
+  { key: "red", label: "Red channel" },
+  { key: "green", label: "Green channel" },
+  { key: "blue", label: "Blue channel" },
+  { key: "red", label: "Alpha channel" }, // using red channel again for now to stop typing errors
+] as const;
+
+type ChannelKey = (typeof CHANNELS)[number]["key"];
+type PlotValues = ComponentProps<typeof ImagePlot>["values"];
+export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
+
+interface RawSpectroscopyDataProps {
+  expanded: boolean;
+  plotAspectRatio: string;
+}
+
+function RawSpectroscopyData({
+  expanded,
+  plotAspectRatio,
+}: RawSpectroscopyDataProps) {
+
+  const { data: channels } = useSpectroscopyData(fetchMap);
+
+  const plots = useMemo(
+    () =>
+      CHANNELS.map(({ key }, i) => (
+        <ImagePlot
+          key={i}
+          aspect={1}
+          plotConfig={{}}
+          customToolbarChildren={null}
+          values={channels[key] ?? EMPTY_NDT}
+        />
+      )),
+    [channels],
+  );
+
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          sm: "1fr",
-          md: "1fr 1fr 1fr",
-        },
-        gap: 3,
-        flexGrow: 1,
-      }}
-    >
-      <ImagePlot
-        aspect="auto"
-        plotConfig={{
-          title: "Red channel",
-        }}
-        customToolbarChildren={null}
-        values={data.red || EMPTY_NDT}
-      />
-
-      <ImagePlot
-        aspect="auto"
-        plotConfig={{
-          title: "Green channel",
-        }}
-        customToolbarChildren={null}
-        values={data.green || EMPTY_NDT}
-      />
-
-      <ImagePlot
-        aspect="auto"
-        plotConfig={{
-          title: "Blue channel",
-        }}
-        customToolbarChildren={null}
-        values={data.blue || EMPTY_NDT}
-      />
-    </Box>
+    <PlotFrame expanded={expanded} aspectRatio={plotAspectRatio}>
+      {plots}
+    </PlotFrame>
   );
 }
 
