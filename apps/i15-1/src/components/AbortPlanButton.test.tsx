@@ -10,6 +10,7 @@ describe("AbortPlanButton", () => {
 
   const mutate = vi.fn();
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   mockedHook.mockReturnValue({ mutate } as any as UseMutationResult<
     WorkerState,
     Error,
