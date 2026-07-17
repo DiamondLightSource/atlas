@@ -106,7 +106,6 @@ describe("RunPlanButton", () => {
       />,
     ),
       screen.getByText("Run").click());
-    // Error here
     expect(screen.findByTestId("Plan submission successful!"));
     expect(screen.findByTestId("Plan succeeded"));
   });
