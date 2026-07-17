@@ -112,7 +112,7 @@ describe("RunPlanButton", () => {
   // });
 
   it("failure message appears when button is pressed with failed response", async () => {
-    submitTaskMock.mutateAsync.mockRejectedValue;
+    submitTaskMock.mutateAsync.mockReturnValue({ data: null } as any);
     setActiveTaskMock.mutateAsync.mockRejectedValue;
     render(
       <RunPlanButton
