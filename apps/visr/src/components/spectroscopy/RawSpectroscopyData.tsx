@@ -5,9 +5,7 @@ import PlotFrame from "./PlotFrame";
 
 import { useMemo, type ComponentProps } from "react";
 
-type RGBColor = "red" | "green" | "blue" | "gray";
-
-function toNDT(matrix: (number | null)[][], colour: RGBColor): NDT {
+function toNDT(matrix: (number | null)[][], colour: RGBColour): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
     return EMPTY_NDT; // skip invalid input
   }
@@ -77,7 +75,7 @@ const CHANNELS = [
   { key: "red", label: "Red channel" },
   { key: "green", label: "Green channel" },
   { key: "blue", label: "Blue channel" },
-  { key: "red", label: "Alpha channel" }, // using red channel again for now to stop typing errors
+  { key: "gray", label: "Gray channel" }, // using gray channel to stop typing errors
 ] as const;
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
@@ -93,7 +91,6 @@ function RawSpectroscopyData({
   expanded,
   plotAspectRatio,
 }: RawSpectroscopyDataProps) {
-
   const { data: channels } = useSpectroscopyData(fetchMap);
 
   const plots = useMemo(
