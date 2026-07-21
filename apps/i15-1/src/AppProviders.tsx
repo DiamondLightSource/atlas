@@ -2,7 +2,7 @@ import type { Api } from "@atlas/blueapi";
 import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
-import { InstrumentSessionProvider } from "./context/instrumentSession/InstrumentSessionProvider";
+import { InstrumentSessionProvider } from "@atlas/app-shell";
 import { Provider as ReduxProvider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";

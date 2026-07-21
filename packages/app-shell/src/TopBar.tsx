@@ -10,6 +10,8 @@ import { ColourSchemeButton, Logo } from "@diamondlightsource/sci-react-ui";
 import { Divider } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 
+import { InstrumentSessionView } from "./context/instrumentSession/InstrumentSessionView";
+
 type Props = {
   title: string;
   open: boolean;
@@ -66,6 +68,12 @@ export function TopBar({ title, open, setOpen }: Props) {
         >
           {title}
         </Typography>
+
+        <Divider orientation="vertical" variant="middle" flexItem />
+
+        <InstrumentSessionView
+          sessionsList={["cm12345-1"]}
+        ></InstrumentSessionView>
 
         <Box sx={{ ml: "auto" }}>
           <ColourSchemeButton />

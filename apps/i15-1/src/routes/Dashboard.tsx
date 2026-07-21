@@ -2,7 +2,7 @@ import { Container, Typography, Button, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import QueueIcon from "@mui/icons-material/Queue";
-import InstrumentSessionView from "../components/InstrumentSessionSelection/InstrumentSessionView.tsx";
+// import InstrumentSessionView from "../components/InstrumentSessionSelection/InstrumentSessionView.tsx";
 import { useUserAuth } from "../context/userAuth/useUserAuth.ts";
 import { User } from "@diamondlightsource/sci-react-ui";
 
@@ -27,7 +27,7 @@ function Dashboard() {
                 : { fedid: user.person }
             }
           />
-          <InstrumentSessionView
+          {/* <InstrumentSessionView
             sessionsList={[
               "cm12345-1",
               "cm12345-2",
@@ -35,7 +35,7 @@ function Dashboard() {
               "cm12345-4",
               "cm12345-5",
             ]}
-          />
+          /> */}
           <Stack direction={"row"} spacing={5}>
             <Button
               component={Link}

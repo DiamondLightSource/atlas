@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
-import { useInstrumentSession } from "./useInstrumentSession";
+import { useInstrumentSession } from "./InstrumentSessionProvider";
 import {
   Divider,
   List,
@@ -10,7 +10,11 @@ import {
   MenuItem,
 } from "@mui/material";
 
-function InstrumentSessionView({ sessionsList }: { sessionsList: string[] }) {
+export function InstrumentSessionView({
+  sessionsList,
+}: {
+  sessionsList: string[];
+}) {
   const { instrumentSession, setInstrumentSession } = useInstrumentSession();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -90,4 +94,4 @@ function InstrumentSessionView({ sessionsList }: { sessionsList: string[] }) {
   );
 }
 
-export default InstrumentSessionView;
+// export default InstrumentSessionView;
