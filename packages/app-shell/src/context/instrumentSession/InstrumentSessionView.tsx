@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { useInstrumentSession } from "./InstrumentSessionProvider";
-import {
-  Divider,
-  List,
-  ListItemButton,
-  ListItemText,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import * as React from "react";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
 
 export function InstrumentSessionView({
   sessionsList,
@@ -16,14 +13,16 @@ export function InstrumentSessionView({
   sessionsList: string[];
 }) {
   const { instrumentSession, setInstrumentSession } = useInstrumentSession();
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(1);
+
+  const id = React.useId();
+  const buttonId = `${id}-button`;
+  const menuId = `${id}-menu`;
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLElement>,
     index: number,
@@ -32,40 +31,44 @@ export function InstrumentSessionView({
     setAnchorEl(null);
     setInstrumentSession(event.currentTarget.textContent ?? "");
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <div>
-      <List component="nav" aria-label="Instrument sessions">
-        <ListItemButton
-          id="lock-button"
-          aria-haspopup="listbox"
-          aria-controls="is-menu"
-          aria-label="instrument session"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClickListItem}
-        >
-          <ListItemText
-            primary="Instrument Session"
-            secondary={instrumentSession}
-          />
-        </ListItemButton>
-      </List>
+      <Button
+        id={buttonId}
+        aria-controls={open ? menuId : undefined}
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={handleClick}
+        color="secondary" // to let you actually see it
+        variant="text"
+      >
+        {instrumentSession}
+      </Button>
       <Menu
-        id="is-menu"
+        id={menuId}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         slotProps={{
           list: {
-            "aria-labelledby": "lock-button",
-            role: "listbox",
+            "aria-labelledby": buttonId,
           },
         }}
       >
+        {sessionsList.map((option, index) => (
+          <MenuItem
+            key={option}
+            selected={index === selectedIndex}
+            onClick={(event) => handleMenuItemClick(event, index)}
+          >
+            {option}
+          </MenuItem>
+        ))}
+        <Divider />
         <MenuItem selected={true} onKeyDown={(e) => e.stopPropagation()}>
           <VisitInput
             visit={{
@@ -79,19 +82,7 @@ export function InstrumentSessionView({
             }}
           />
         </MenuItem>
-        <Divider />
-        {sessionsList.map((option, index) => (
-          <MenuItem
-            key={option}
-            selected={index === selectedIndex}
-            onClick={(event) => handleMenuItemClick(event, index)}
-          >
-            {option}
-          </MenuItem>
-        ))}
       </Menu>
     </div>
   );
 }
-
-// export default InstrumentSessionView;

@@ -64,6 +64,7 @@ export function TopBar({ title, open, setOpen }: Props) {
           sx={{
             ml: 1.5,
             mt: 1.25,
+            mr: 1.25,
           }}
         >
           {title}
@@ -71,9 +72,14 @@ export function TopBar({ title, open, setOpen }: Props) {
 
         <Divider orientation="vertical" variant="middle" flexItem />
 
-        <InstrumentSessionView
-          sessionsList={["cm12345-1"]}
-        ></InstrumentSessionView>
+        <Box
+          sx={{
+            ml: 1.5,
+            mt: 1.25,
+          }}
+        >
+          <InstrumentSessionView sessionsList={[]}></InstrumentSessionView>
+        </Box>
 
         <Box sx={{ ml: "auto" }}>
           <ColourSchemeButton />
