@@ -18,7 +18,7 @@
     "@atlas/app-shell": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
-    "@diamondlightsource/sci-react-ui": "0.6.2",
+    "@diamondlightsource/sci-react-ui": "^0.6.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@jsonforms/core": "3.6.0",
