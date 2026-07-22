@@ -10,6 +10,14 @@ vi.mock("@diamondlightsource/sci-react-ui", async () => {
   };
 });
 
+// mock instrument session view which is out of scope of this test
+export function InstrumentSessionView() {
+  return <button>cm12345-1</button>;
+}
+vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
+  InstrumentSessionView: InstrumentSessionView,
+}));
+
 describe("TopBar", () => {
   const barProps = {
     title: "Test application",

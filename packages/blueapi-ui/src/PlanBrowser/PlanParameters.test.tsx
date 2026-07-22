@@ -2,6 +2,11 @@ import type { Plan } from "@atlas/blueapi";
 import { render, screen } from "@atlas/vitest-conf";
 
 import { PlanParameters } from "./PlanParameters";
+import {
+  useInstrumentSession,
+  type InstrumentSessionContextType,
+} from "@atlas/app-shell";
+import { useState } from "react";
 
 const mockJsonFormsImpl = vi.fn(() => {
   return <div data-testid="jsonforms-sentinel" />;
@@ -21,6 +26,14 @@ vi.mock("../RunPlanButton", () => ({
   RunPlanButton: RunPlanButton,
 }));
 
+// mock use instrument session
+const mockUseIS = vi.fn(() => ({
+  instrumentSession: "cm12345-1",
+}));
+vi.mock("@atlas/app-shell", () => ({
+  useInstrumentSession: () => mockUseIS(),
+}));
+
 const plan: Plan = {
   name: "hi_plan",
   description: "Says hi to you",
@@ -38,7 +51,6 @@ describe("PlanParameters", () => {
     expect(screen.getByText(plan.name)).toBeInTheDocument();
     expect(screen.getByText(plan.description!)).toBeInTheDocument();
     expect(screen.getByTestId("jsonforms-sentinel")).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "Instrument Session" }));
     expect(screen.getByRole("button", { name: "Run" }));
   });
 

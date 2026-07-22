@@ -2,7 +2,6 @@ import { useState, useEffect, useContext, type ReactNode } from "react";
 import { createContext } from "react";
 
 const ID_STORAGE_KEY = "instrument-session-id";
-const LIST_STORAGE_KEY = "instrument-session-list";
 
 export type InstrumentSessionContextType = {
   instrumentSession: string;
