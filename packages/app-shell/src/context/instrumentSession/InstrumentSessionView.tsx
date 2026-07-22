@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { useInstrumentSession } from "./InstrumentSessionProvider";
+import { visitTextToVisit } from "../../utils/common";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 
-export function InstrumentSessionView({
-  sessionsList,
-}: {
-  sessionsList: string[];
-}) {
-  const { instrumentSession, setInstrumentSession } = useInstrumentSession();
+export function InstrumentSessionView() {
+  const { instrumentSession, setInstrumentSession, sessionsList } =
+    useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState(1);
 
   const id = React.useId();
@@ -43,7 +41,7 @@ export function InstrumentSessionView({
         aria-haspopup="true"
         aria-expanded={open}
         onClick={handleClick}
-        color="secondary" // to let you actually see it
+        color="inherit" // to let you actually see it
         variant="text"
       >
         {instrumentSession}
@@ -71,11 +69,13 @@ export function InstrumentSessionView({
         <Divider />
         <MenuItem selected={true} onKeyDown={(e) => e.stopPropagation()}>
           <VisitInput
-            visit={{
-              number: 1,
-              proposalCode: "cm",
-              proposalNumber: 12345,
-            }}
+            visit={
+              visitTextToVisit(instrumentSession) ?? {
+                number: 6,
+                proposalCode: "cm",
+                proposalNumber: 12345,
+              }
+            }
             onSubmit={(visit) => {
               setInstrumentSession(visitToText(visit));
               setAnchorEl(null);
