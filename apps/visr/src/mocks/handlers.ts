@@ -3,6 +3,7 @@ import workflowsResponse from "./workflows-response.json";
 import plansResponse from "./plans-response.json";
 import { mapData } from "./mock_data";
 import type { ScanEventMessage } from "../hooks/scanEvents";
+import instrumentSessionResponse from "./instrumentSessions-response.json";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 
@@ -11,6 +12,13 @@ export const handlers = [
   graphql.query("TemplateViewQuery", async () => {
     return HttpResponse.json({
       data: workflowsResponse.data,
+    });
+  }),
+
+  // Instrument session query handler
+  graphql.query("InstrumentSessionQuery", async () => {
+    return HttpResponse.json({
+      data: instrumentSessionResponse.data,
     });
   }),
 

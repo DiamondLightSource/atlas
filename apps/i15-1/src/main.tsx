@@ -8,10 +8,8 @@ import { router } from "./router.tsx";
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
 
-const QUEUE_MODE = import.meta.env.VITE_QUEUE_MODE;
-
 async function enableMocking() {
-  if (import.meta.env.DEV && QUEUE_MODE != "local") {
+  if (import.meta.env.DEV) {
     const { worker } = await import("./mocks/browser");
     return worker.start();
   }

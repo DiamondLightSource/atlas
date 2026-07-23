@@ -2,13 +2,25 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import axios, { type AxiosInstance } from "axios";
 import { useEffect, useRef } from "react";
-import type { QueueState, TaskCancelRequest } from "../../generated/queue";
-import type { QueuedTasks } from "./tasks";
+import type {
+  QueueState,
+  TaskCancelRequest,
+  AddTasksToQueueQueuePostData,
+  Experiment,
+  TaskWithPosition,
+} from "../../generated/queue";
+import { addTasksToQueueQueuePost } from "../../generated/queue";
+import { client } from "../../generated/queue/client.gen";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
-const QUEUE_MODE = import.meta.env.VITE_QUEUE_MODE;
-const QUEUE_SOCKET: string =
-  QUEUE_MODE === "local" ? "http://127.0.0.1:8001" : "/api/daq-queue";
+// Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
+// with the websockets needed for `events`
+const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
+const QUEUE_SOCKET: string = USE_LOCAL
+  ? "http://127.0.0.1:8001"
+  : "/api/daq-queue";
+
+client.setConfig({ baseUrl: QUEUE_SOCKET });
 
 const handlers = {
   state_update: "state",
@@ -138,8 +150,8 @@ export function useToggleQueueState() {
   };
 }
 
-const getQueuedTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/queue");
+const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/queue");
   return response.data;
 };
 
@@ -152,8 +164,8 @@ export function useGetQueuedTasks() {
   });
 }
 
-const getAllTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/tasks");
+const getAllTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/tasks");
   return response.data;
 };
 
@@ -166,8 +178,10 @@ export function useGetAllTasks() {
   });
 }
 
-const getHistoricTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/history");
+const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(
+    QUEUE_SOCKET + "/history",
+  );
   return response.data;
 };
 
@@ -180,8 +194,10 @@ export function useGetHistoricTasks() {
   });
 }
 
-export const cancelTasks = async (taskIds: string[]): Promise<QueuedTasks> => {
-  const response = await axios.delete<QueuedTasks>(
+export const cancelTasks = async (
+  taskIds: string[],
+): Promise<TaskWithPosition[]> => {
+  const response = await axios.delete<TaskWithPosition[]>(
     QUEUE_SOCKET + "/queue/tasks",
     {
       data: {
@@ -239,3 +255,34 @@ export const clearHistory = async (): Promise<number> => {
 
   return response.data;
 };
+
+export const submitQueueTask = async ({
+  experiment,
+  taskPosition,
+}: {
+  experiment: Experiment;
+  taskPosition?: number;
+}) => {
+  const data: AddTasksToQueueQueuePostData = {
+    url: `/queue`,
+    body: [experiment],
+    query: {
+      position: taskPosition,
+    },
+  };
+
+  return await addTasksToQueueQueuePost(data);
+};
+
+export function useSumbitQueueTask() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: submitQueueTask,
+    onSuccess: async () => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["queue"] }),
+        client.invalidateQueries({ queryKey: ["tasks"] }),
+      ]);
+    },
+  });
+}

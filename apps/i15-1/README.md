@@ -9,9 +9,19 @@ To run this locally:
 1.  Start the devcontainer in VSCode
 1.  To make sure you have the most up-to-date environment either run `pnpm install` in the container or rebuild the container (via the Ctrl+Shift+P menu in VSCode)
 1.  In a terminal in this devcontainer run either:
-    - `VITE_QUEUE_MODE=local turbo dev --filter @atlas/i15-1` if running a local queue server on http://127.0.0.1:8001, **OR**
-    - `turbo dev --filter @atlas/i15-1` to use mocked backends
+    - If wanting to test against local services (see [here](https://github.com/DiamondLightSource/daq-queuing-service#daq_queuing_service) for spinning up local serives) run using `VITE_USE_LOCAL=true turbo dev --filter @atlas/i15-1`, **OR**
+    - If you want to test against mocked behaviour run `turbo dev --filter @atlas/i15-1`
 1.  Navigate to http://localhost:5173/
+
+## Updating Queue Types
+
+You can generate types from the queue API automatically using the following command:
+
+`pnpm --filter i15-1 generate:queue`
+
+This will generate from main on GitHub, to target a branch, use:
+
+`npx @hey-api/openapi-ts -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/{BRANCH_NAME}/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue`
 
 ## Updating Supergraph Schema Types
 
@@ -70,3 +80,10 @@ export function QueryData() {
   return data?.instrumentSession?.state || [];
 }
 ```
+
+## Viewing Camera Streams on Firefox
+
+1. Ensure you are on the beamline network
+1. Type `about:config` in the address bar and press the return key.
+1. Click `Accpt the Risk and Continue` on the warning screen.
+1. Search for the following preference `security.mixed_content.upgrade_display_content.image` and change the value to `false`.

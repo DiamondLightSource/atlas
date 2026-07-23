@@ -5,7 +5,6 @@ import {
   FormControlLabel,
   Stack,
   Switch,
-  type ChipProps,
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import {
@@ -17,68 +16,58 @@ import {
   cancelTasks,
   clearHistory,
   useGetAllTasks,
+  useGetHistoricTasks,
   useGetQueuedTasks,
   useMoveTask,
   useQueueEvents,
 } from "../queue/queueService";
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
-import type { QueuedTasks } from "../queue/tasks";
-import type { UseQueryResult } from "@tanstack/react-query";
-import { calculateNewPosition } from "../queue/queueUtils";
-import type { Status } from "../../generated/queue";
-
-function getChipColorMap(): Record<Status, ChipProps["color"]> {
-  return {
-    Queued: "default",
-    "In progress": "info",
-    Complete: "success",
-    Cancelled: "warning",
-  };
-}
+import { calculateNewPosition, getTableData } from "../queue/queueUtils";
+import type { Status, TaskWithPosition } from "../../generated/queue";
+import { CHIP_COLOR_MAP } from "../queue/queueConstants";
+import { PlanStatusPanel } from "../queue/PlanStatusPanel";
+import { JsonView } from "../components/JsonView";
 
 export function QueueView() {
   useQueueEvents();
 
   const queuedTasks = useGetQueuedTasks();
   const allTasks = useGetAllTasks();
+  const historicTasks = useGetHistoricTasks();
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
-  const tasksToDisplay = useMemo<UseQueryResult<QueuedTasks, Error>>(() => {
-    if (showHistoric) return allTasks;
-    else return queuedTasks;
-  }, [queuedTasks, allTasks, showHistoric]);
+  const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
+    if (showHistoric) return allTasks.data ?? [];
 
-  const data = useMemo<QueueTableData[]>(() => {
-    return (
-      tasksToDisplay.data?.map((task) => ({
-        position: task.position,
-        id: task.id,
-        instrumentSession: task.experiment_definition.instrument_session,
-        sampleId: task.experiment_definition.sample_id,
-        planRunning: task.experiment_definition.plan_name,
-        // Should investigate a nicer way to display params, see https://github.com/DiamondLightSource/atlas/issues/52
-        parameters: JSON.stringify(task.experiment_definition.params),
-        status: task.status,
-        blueapTasks: task.blueapi_calls,
-      })) ?? []
-    );
-  }, [tasksToDisplay.data]);
+    const queued = queuedTasks.data ?? [];
+    const latestHistoricTask = historicTasks.data?.at(-1);
 
-  const colorMap = useMemo(() => getChipColorMap(), []);
+    if (latestHistoricTask == null || latestHistoricTask.status !== "Error") {
+      return queued;
+    }
+
+    return [latestHistoricTask, ...queued];
+  }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
+
+  const tableData = useMemo<QueueTableData[]>(() => {
+    return getTableData(tasksToDisplay ?? []);
+  }, [tasksToDisplay]);
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
       { accessorKey: "position", header: "Position", size: 100 },
+      { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
         header: "Instrument Session",
         size: 150,
       },
-      { accessorKey: "sampleId", header: "Sample ID", size: 150 },
-      { accessorKey: "planRunning", header: "Plan", size: 150 },
-      { accessorKey: "parameters", header: "Plan parameters", size: 150 },
+      { accessorKey: "samplePosition", header: "Sample Position", size: 150 },
+      { accessorKey: "density", header: "Density", size: 150 },
+      { accessorKey: "beamSize", header: "Beam size (μm)", size: 150 },
+      { accessorKey: "timePerPDF", header: "Time per PDF (sec)", size: 150 },
       {
         accessorKey: "status",
         header: "Status",
@@ -88,11 +77,10 @@ export function QueueView() {
             size="small"
             label={cell.getValue<string>()}
             variant="outlined"
-            color={colorMap[cell.getValue<Status>()]}
+            color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
           ></Chip>
         ),
       },
-      { accessorKey: "calls", header: "BlueAPI tasks", size: 150 },
       {
         accessorKey: "cancel",
         header: "",
@@ -115,17 +103,19 @@ export function QueueView() {
         },
       },
     ],
-    [colorMap],
+    [],
   );
 
   const table = useMaterialReactTable({
-    columns,
-    data,
+    columns: columns,
+    data: tableData,
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    enableExpanding: true,
+    muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
       const isDraggable = row.original.status === "Queued";
       return {
@@ -186,6 +176,20 @@ export function QueueView() {
         <QueueStatusPanel />
       </Stack>
     ),
+
+    renderDetailPanel: ({ row }) => {
+      const blueapi_calls = row.original.task.blueapi_calls;
+
+      return (
+        <Box sx={{ p: 2 }}>
+          {row.original.task.kind == "Experiment" ? (
+            <PlanStatusPanel data={blueapi_calls} />
+          ) : (
+            <JsonView data={blueapi_calls[0].task_request} />
+          )}
+        </Box>
+      );
+    },
   });
 
   return (

@@ -1,21 +1,38 @@
-import { render, screen, fireEvent } from "@atlas/vitest-conf";
+import { render, screen, fireEvent, waitFor } from "@atlas/vitest-conf";
 import { describe, it, expect, vi, afterEach, type Mock } from "vitest";
 import { ExperimentList } from "./ULIMSExperimentsTable";
 import * as apollo from "@apollo/client/react";
 import { MemoryRouter } from "react-router-dom";
+import * as queueService from "../../queue/queueService";
 
 vi.mock("@apollo/client/react", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import("@apollo/client/react")>();
   return {
-    actual,
+    ...actual,
     useQuery: vi.fn(),
   };
 });
 
+vi.mock("../../queue/queueService", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../queue/queueService")>();
+  return {
+    ...actual,
+    useSumbitQueueTask: vi.fn(),
+  };
+});
+
+const mockedUseSubmitTask = queueService.useSumbitQueueTask as unknown as Mock;
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  vi.clearAllMocks();
+});
+
+beforeEach(() => {
+  mockedUseSubmitTask.mockReturnValue({
+    mutateAsync: vi.fn().mockResolvedValue(undefined),
+  });
 });
 
 const mockExperiments = {
@@ -34,6 +51,26 @@ const mockExperiments = {
             },
             experimentDefinition: {
               name: "Def 1",
+              data: {
+                beam_energy: 20,
+                time_per_pdf: 10,
+                focused_beam_size: 5,
+              },
+            },
+          },
+        },
+        {
+          node: {
+            name: "Exp 2",
+            sample: {
+              name: "Sample B",
+              data: {
+                density: 1.2,
+                composition: "CO2",
+              },
+            },
+            experimentDefinition: {
+              name: "Def 2",
               data: {
                 beam_energy: 20,
                 time_per_pdf: 10,
@@ -126,5 +163,96 @@ describe("ExperimentList", () => {
         name: /add selected 1 to queue/i,
       }),
     ).toBeInTheDocument();
+  });
+
+  it("submits selected tasks when clicking 'Add selected ... to queue'", async () => {
+    const mutateAsync = vi.fn().mockResolvedValue(undefined);
+
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync,
+    });
+
+    renderComponent();
+
+    const checkbox = screen.getAllByRole("checkbox")[1];
+    fireEvent.click(checkbox);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /add selected 1 to queue/i }),
+    );
+
+    await waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledTimes(1);
+      expect(mutateAsync).toHaveBeenCalledWith({
+        experiment: {
+          name: "Exp 1",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 1",
+          },
+          sample: {
+            data: { composition: "H2O", density: 1.2 },
+            name: "Sample A",
+          },
+        },
+      });
+    });
+  });
+
+  it("submits all tasks when clicking 'Add all to queue'", async () => {
+    const mutateAsync = vi.fn().mockResolvedValue(undefined);
+
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync,
+    });
+
+    renderComponent();
+
+    fireEvent.click(screen.getByRole("button", { name: /add all to queue/i }));
+
+    await waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledTimes(2);
+      expect(mutateAsync).toHaveBeenNthCalledWith(1, {
+        experiment: {
+          name: "Exp 1",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 1",
+          },
+          sample: {
+            data: { composition: "H2O", density: 1.2 },
+            name: "Sample A",
+          },
+        },
+      });
+      expect(mutateAsync).toHaveBeenNthCalledWith(2, {
+        experiment: {
+          name: "Exp 2",
+          instrument_session: "",
+          experiment_definition: {
+            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+            name: "Def 2",
+          },
+          sample: {
+            data: { composition: "CO2", density: 1.2 },
+            name: "Sample B",
+          },
+        },
+      });
+    });
   });
 });

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bd1bc2c804b6142383c22bcdbb18504a>>
+ * @generated SignedSource<<9f36acc75fb37c686d8aef477c812c01>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,13 +13,10 @@ export type InstrumentSessionQuery$variables = {
   instrumentName: string;
 };
 export type InstrumentSessionQuery$data = {
-  readonly instrument: {
+  readonly instrumentByName: {
     readonly instrumentSessions: ReadonlyArray<{
-      readonly instrumentSessionNumber: number;
-      readonly proposal: {
-        readonly proposalCategory: string | null | undefined;
-        readonly proposalNumber: number;
-      } | null | undefined;
+      readonly instrumentSessionReference: string | null | undefined;
+      readonly state: string | null | undefined;
     }>;
   } | null | undefined;
 };
@@ -42,13 +39,13 @@ v1 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "instrumentName",
+        "name": "name",
         "variableName": "instrumentName"
       }
     ],
     "concreteType": "Instrument",
     "kind": "LinkedField",
-    "name": "instrument",
+    "name": "instrumentByName",
     "plural": false,
     "selections": [
       {
@@ -63,32 +60,14 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "instrumentSessionNumber",
+            "name": "instrumentSessionReference",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
-            "concreteType": "Proposal",
-            "kind": "LinkedField",
-            "name": "proposal",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "proposalCategory",
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "proposalNumber",
-                "storageKey": null
-              }
-            ],
+            "kind": "ScalarField",
+            "name": "state",
             "storageKey": null
           }
         ],
@@ -116,16 +95,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "625bde94466c698bcacfb6d41e195cbe",
+    "cacheID": "a04aa356857de97c58e11e861e1b53df",
     "id": null,
     "metadata": {},
     "name": "InstrumentSessionQuery",
     "operationKind": "query",
-    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrument(instrumentName: $instrumentName) {\n    instrumentSessions {\n      instrumentSessionNumber\n      proposal {\n        proposalCategory\n        proposalNumber\n      }\n    }\n  }\n}\n"
+    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrumentByName(name: $instrumentName) {\n    instrumentSessions {\n      instrumentSessionReference\n      state\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3cb865e4a1f45b6db5b70c2cb201f4e7";
+(node as any).hash = "72ef04fa18d968be31c314c0aa6a7011";
 
 export default node;

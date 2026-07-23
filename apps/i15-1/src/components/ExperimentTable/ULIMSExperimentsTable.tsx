@@ -9,15 +9,16 @@ import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
-
+import { useSumbitQueueTask } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
 import type {
   GetSessionPlaylistQueryVariables,
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
+import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 
-type ExperimentDefinitionData = {
+export type ExperimentDefinitionData = {
   q_max: number;
   frames: number;
   beam_energy: number;
@@ -25,7 +26,7 @@ type ExperimentDefinitionData = {
   focused_beam_size: number;
 };
 
-type SampleData = {
+export type SampleData = {
   density: number;
   capillary: string;
   composition: string;
@@ -35,6 +36,7 @@ type SampleData = {
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
 ): ExperimentTableData => ({
+  experiment: node,
   experimentName: node.name,
   sampleName: node.sample.name,
   density: node.sample.data.density,
@@ -51,6 +53,25 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 
 export function ExperimentList() {
   const location = useLocation();
+  const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
+
+  async function submitQueueTasks(selected: ExperimentTableData[]) {
+    await Promise.all(
+      selected.map((exp) =>
+        submitTaskAsync({
+          experiment: {
+            name: exp.experiment.name,
+            experiment_definition: exp.experiment
+              .experimentDefinition as ExperimentDefinition,
+            sample: exp.experiment.sample as Sample,
+            instrument_session:
+              exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
+              "",
+          },
+        }),
+      ),
+    );
+  }
 
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
     variables: {
@@ -102,18 +123,29 @@ export function ExperimentList() {
               variant="contained"
               color="primary"
               startIcon={<QueueIcon />}
-              onClick={() => {
+              onClick={async () => {
                 const selected = table
                   .getSelectedRowModel()
                   .rows.map((row) => row.original);
-
-                console.log("Selected:", selected);
+                await submitQueueTasks(selected);
               }}
             >
               Add selected {selectedCount} to queue
             </Button>
           ) : (
-            <Button variant="contained" startIcon={<QueueIcon />}>
+            <Button
+              variant="contained"
+              startIcon={<QueueIcon />}
+              onClick={async () => {
+                table.toggleAllRowsSelected(true);
+
+                const allRows = table
+                  .getPrePaginationRowModel()
+                  .rows.map((row) => row.original);
+
+                await submitQueueTasks(allRows);
+              }}
+            >
               Add all to queue
             </Button>
           )}

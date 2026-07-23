@@ -58,10 +58,6 @@ type Mutation {
     visit: VisitInput!
     parameters: JSON!
   ): Workflow!
-  instrumentSession(
-    proposalNumber: Int!
-    instrumentSessionNumber: Int!
-  ): InstrumentSessionMutations
   createOrValidateSamples(
     input: CreateOrValidateSampleInput!
   ): CreateSamplesResponse!
@@ -72,6 +68,13 @@ type Mutation {
     input: CreateExperimentDefinitionInput!
   ): ExperimentDefinition
   experimentDefinition(id: UUID!): ExperimentDefinitionMutations
+  createInstrumentSession(
+    input: CreateInstrumentSessionInput!
+  ): InstrumentSession!
+  instrumentSession(
+    proposalNumber: Int!
+    instrumentSessionNumber: Int!
+  ): InstrumentSessionMutations
 }
 
 """
@@ -126,53 +129,13 @@ type Query {
     limit: Int
     filter: WorkflowTemplatesFilter
   ): WorkflowTemplateConnection!
+  jsonSchema(url: String!): JSONSchema
+  jsonSchemas(type: String = null, instrument: String = null): [JSONSchema!]!
 
   """
-  Get a proposal by its number
+  Get a sample by its id
   """
-  proposal(proposalNumber: Int!): Proposal
-
-  """
-  Get a list of proposals
-  """
-  proposals(
-    proposalCategory: String = null
-    first: Int = null
-    last: Int = null
-    after: String = null
-    before: String = null
-  ): ProposalConnection!
-
-  """
-  Get a instrument session
-  """
-  instrumentSession(
-    proposalNumber: Int!
-    instrumentSessionNumber: Int!
-  ): InstrumentSession
-
-  """
-  Get a instrument session
-  """
-  instrumentSessions(
-    proposalNumber: Int = null
-    proposalCategory: String = null
-  ): [InstrumentSession!]
-
-  """
-  Get an instrument
-  """
-  instrument(instrumentName: String!): Instrument
-
-  """
-  Get a list of instruments
-  """
-  instruments(scienceGroup: String = null): [Instrument!]!
-
-  """
-  Get an account
-  """
-  account(username: String!): Account
+  sample(sampleId: UUID!): Sample
 
   """
   Get a list of samples associated with a given instrument session
@@ -210,11 +173,73 @@ type Query {
   ): ExperimentConnection
 
   """
-  Get a sample by its id
+  Get a proposal by its number
   """
-  sample(sampleId: UUID!): Sample
-  jsonSchema(url: String!): JSONSchema
-  jsonSchemas(type: String = null, instrument: String = null): [JSONSchema!]!
+  proposal(proposalNumber: Int!): Proposal
+
+  """
+  Get a list of proposals
+  """
+  proposals(
+    first: Int = null
+    last: Int = null
+    after: String = null
+    before: String = null
+    sortBy: [ProposalSortInput!] = null
+    filterBy: ProposalFilterInput = null
+  ): ProposalConnection!
+
+  """
+  Get a proposal by its reference string e.g. 'MX12345'. The lookup is case-insensitive.
+  """
+  proposalByReference(reference: String!): Proposal
+
+  """
+  Get a instrument session
+  """
+  instrumentSession(
+    proposalNumber: Int!
+    instrumentSessionNumber: Int!
+  ): InstrumentSession
+
+  """
+  Get an instrument session by its reference string e.g. 'MX12345-1'. The lookup is case-insensitive.
+  """
+  instrumentSessionByReference(reference: String!): InstrumentSession
+
+  """
+  Get a list of instrument sessions
+  """
+  instrumentSessions(
+    proposalNumber: Int = null
+    proposalCategory: String = null
+    first: Int = null
+    last: Int = null
+    after: String = null
+    before: String = null
+    sortBy: [InstrumentSessionSortInput!] = null
+    filterBy: InstrumentSessionFilterInput = null
+  ): InstrumentSessionConnection!
+
+  """
+  Get an instrument by name
+  """
+  instrumentByName(name: String!): Instrument
+
+  """
+  Get an instrument by key
+  """
+  instrumentByKey(key: String!): Instrument
+
+  """
+  Get a list of instruments
+  """
+  instruments(scienceGroup: String = null): [Instrument!]!
+
+  """
+  Get an account
+  """
+  account(username: String!): Account
 }
 
 """
@@ -715,140 +740,44 @@ input WorkflowTemplatesFilter {
   scienceGroup: [ScienceGroup!]
 }
 
-type Account {
-  accountId: Int!
-  username: String!
-  emailAddress: String
-  title: String
-  givenName: String
-  familyName: String
-  type: AccountType!
-  state: AccountState!
-  proposalRoles: [ProposalAccount!]!
-  instrumentSessionRoles: [InstrumentSessionRole!]!
-}
+"""
+A JSON schema
+"""
+type JSONSchema {
+  """
+  The identifier of the schema
+  """
+  id: String!
 
-enum AccountState {
-  enabled
-  disabled
-}
+  """
+  A URL from which the schema can be accessed
+  """
+  url: String!
 
-enum AccountType {
-  user
-  staff
-  functional
-}
-
-type Instrument {
-  name: String!
-  scienceGroup: String
-  description: String
-  proposals: [Proposal!]!
-  instrumentSessions: [InstrumentSession!]!
-}
-
-type InstrumentSession {
-  instrumentSessionId: Int!
-  instrumentSessionNumber: Int!
-  startTime: DateTime
-  endTime: DateTime
+  """
+  The type of object the shema describes (if known)
+  """
   type: String
-  state: String
-  riskRating: String
-  proposal: Proposal
-  instrument: Instrument!
-  roles: [InstrumentSessionRole!]!
 
   """
-  Samples associated with a given instrument session
+  The title of the schema
   """
-  samples(
-    first: Int!
-    filter: SampleFilterInput! = {
-      schemaUrl: null
-      createdTime: null
-      updatedTime: null
-      name: null
-      data: null
-    }
-    before: String = null
-    after: String = null
-    last: Int = null
-    orderBy: SampleOrder! = { name: null, createdTime: null, updatedTime: null }
-  ): SampleConnection!
-
-  """
-  Experiment Definitions
-  """
-  experimentDefinitions(
-    first: Int = null
-    last: Int = null
-    after: String = null
-    before: String = null
-  ): ExperimentDefinitionConnection!
-
-  """
-  Experiments associated with this session
-  """
-  experiments(
-    first: Int = null
-    last: Int = null
-    after: String = null
-    before: String = null
-  ): ExperimentConnection!
-}
-
-type InstrumentSessionMutations {
-  instrumentSessionNumber: Int!
-  proposalNumber: Int!
-
-  """
-  Create or validate samples associated with this instrument session
-  """
-  createOrValidateSamples(
-    input: CreateOrValidateSampleInputBase!
-  ): CreateSamplesResponse!
-  experiments: [Experiment!]!
-}
-
-type InstrumentSessionRole {
-  instrumentSession: InstrumentSession!
-  account: Account!
-  role: String!
-  onSite: Boolean!
-}
-
-type Proposal {
-  proposalNumber: Int!
-  proposalCategory: String
   title: String
-  summary: String
-  state: ProposalState!
-  instrumentSessions: [InstrumentSession!]!
-  instruments: [Instrument!]!
-  roles: [ProposalAccount!]!
-}
 
-type ProposalAccount {
-  proposal: Proposal!
-  account: Account!
-  role: String!
-}
+  """
+  The version of the schema
+  """
+  version: String
 
-type ProposalConnection {
-  edges: [ProposalEdge!]!
-  pageInfo: PageInfo!
-}
+  """
+  The instrument the schema was created for
+  """
+  instrument: String
 
-type ProposalEdge {
-  cursor: String!
-  node: Proposal!
-}
-
-enum ProposalState {
-  Open
-  Closed
-  Cancelled
+  """
+  The description og the schema
+  """
+  description: String
 }
 
 input AddSampleEventInput {
@@ -958,24 +887,85 @@ type ErrorDetails {
   message: String!
 }
 
-type InstrumentSessionConnection {
-  edges: [InstrumentSessionEdge!]!
-  pageInfo: PageInfo!
+type InstrumentSession {
+  instrumentSessionNumber: Int!
+  proposal: Proposal
+
+  """
+  Samples associated with a given instrument session
+  """
+  samples(
+    first: Int!
+    filter: SampleFilterInput! = {
+      schemaUrl: null
+      createdTime: null
+      updatedTime: null
+      name: null
+      data: null
+    }
+    before: String = null
+    after: String = null
+    last: Int = null
+    orderBy: SampleOrder! = { name: null, createdTime: null, updatedTime: null }
+  ): SampleConnection!
+
+  """
+  Experiment Definitions
+  """
+  experimentDefinitions(
+    first: Int = null
+    last: Int = null
+    after: String = null
+    before: String = null
+  ): ExperimentDefinitionConnection!
+
+  """
+  Experiments associated with this session
+  """
+  experiments(
+    first: Int = null
+    last: Int = null
+    after: String = null
+    before: String = null
+  ): ExperimentConnection!
+  instrumentSessionId: Int!
+    @deprecated(
+      reason: "instrument_session_id is deprecated and will be removed in a future version."
+    )
+  startTime: DateTime
+  endTime: DateTime
+  type: String
+  state: String
+  riskRating: String
+
+  """
+  A human-readable reference for this session in the form '<PROPOSALCATEGORY><PROPOSALNUMBER>-<SESSIONNUMBER>' e.g. 'MX12345-1'.
+  """
+  instrumentSessionReference: String
+  instrument: Instrument!
+  roles: [InstrumentSessionRole!]!
 }
 
-type InstrumentSessionEdge {
-  cursor: String!
-  node: InstrumentSession!
-}
-
+"""
+Values required to uniquely identify an instrument session
+"""
 input InstrumentSessionInput {
   proposalNumber: Int!
   instrumentSessionNumber: Int!
 }
 
-"""
-Currently receiving an error when generating types: input JSONOperator @oneOf
-"""
+type InstrumentSessionMutations {
+  instrumentSessionNumber: Int!
+  proposalNumber: Int!
+
+  """
+  Create or validate samples associated with this instrument session
+  """
+  createOrValidateSamples(
+    input: CreateOrValidateSampleInputBase!
+  ): CreateSamplesResponse!
+}
+
 input JSONOperator @oneOf {
   stringOperator: StringOperatorInput
   datetimeOperator: DatetimeOperatorInput
@@ -1004,6 +994,22 @@ input NumericOperatorInput {
   Will filter to items where the numeric field is less than the provided value
   """
   lt: Float = null
+}
+
+type Proposal {
+  proposalNumber: Int!
+  proposalCategory: String
+  title: String
+  summary: String
+  state: ProposalState!
+
+  """
+  A human-readable reference for this proposal in the form '<PROPOSALCATEGORY><PROPOSALNUMBER>' e.g. 'MX12345'.
+  """
+  proposalReference: String
+  instrumentSessions: [InstrumentSession!]!
+  instruments: [Instrument!]!
+  roles: [ProposalAccount!]!
 }
 
 type Sample {
@@ -1052,8 +1058,9 @@ type Sample {
   """
   The instrument sessions that this sample is associated with
   """
-  instrumentSessions: InstrumentSessionConnection!
+  instrumentSessions: [InstrumentSession!]!
   images: [SampleImage!]!
+  experiments: [Experiment!]!
 }
 
 type SampleConnection {
@@ -1136,6 +1143,7 @@ input SampleInLegacy {
 
 type SampleMutations {
   sampleId: UUID!
+  updateSample(input: UpdateSampleInput!): UpdateSampleResponse!
   linkInstrumentSessionToSample(
     proposalNumber: Int!
     instrumentSessionNumber: Int!
@@ -1205,6 +1213,43 @@ input StringOperatorInput {
 }
 
 scalar UUID
+
+input UpdateSampleInput {
+  """
+  Name of the sample
+  """
+  name: String
+
+  """
+  Data of the sample
+  """
+  data: JSON
+
+  """
+  URL of the JSON schema the samples' `data` should be validated against
+  """
+  dataSchemaUrl: String
+}
+
+"""
+Return type when creating or validating samples
+"""
+type UpdateSampleResponse {
+  """
+  Whether the operation has succeeded without validation errors
+  """
+  success: Boolean!
+
+  """
+  Sample that has been updated
+  """
+  sample: Sample
+
+  """
+  Errors that occurred during sample validation
+  """
+  errors: [SampleValidationError!]!
+}
 
 """
 Represents NULL values
@@ -1298,42 +1343,184 @@ input ExperimentInput {
   sampleId: UUID!
 }
 
-"""
-A JSON schema
-"""
-type JSONSchema {
-  """
-  The identifier of the schema
-  """
-  id: String!
-
-  """
-  A URL from which the schema can be accessed
-  """
-  url: String!
-
-  """
-  The type of object the shema describes (if known)
-  """
-  type: String
-
-  """
-  The title of the schema
-  """
+type Account {
+  accountId: Int!
+    @deprecated(
+      reason: "account_id is deprecated and will be removed in a future version."
+    )
+  username: String!
+  emailAddress: String
   title: String
+  givenName: String
+  familyName: String
+  type: AccountType!
+  state: AccountState!
+  proposalRoles: [ProposalAccount!]!
+  instrumentSessionRoles: [InstrumentSessionRole!]!
+}
+
+enum AccountState {
+  enabled
+  disabled
+}
+
+enum AccountType {
+  user
+  staff
+  functional
+}
+
+input CreateInstrumentSessionInput {
+  """
+  Number of the proposal the session is for
+  """
+  proposalNumber: Int!
 
   """
-  The version of the schema
+  Name of the instrument the session is for
   """
-  version: String
+  instrumentName: String!
 
   """
-  The instrument the schema was created for
+  Instrument Session information that isn't needed by the Session Service but should be passed through the UAS
   """
-  instrument: String
+  sessionInfo: String!
+}
 
-  """
-  The description og the schema
-  """
+input DateTimeFilterInput {
+  eq: DateTime = null
+  neq: DateTime = null
+  gt: DateTime = null
+  lt: DateTime = null
+  gte: DateTime = null
+  lte: DateTime = null
+}
+
+type Instrument {
+  name: String!
+  key: String!
+  scienceGroup: String
   description: String
+  proposals: [Proposal!]!
+  instrumentSessions: [InstrumentSession!]!
+}
+
+type InstrumentSessionConnection {
+  edges: [InstrumentSessionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type InstrumentSessionEdge {
+  cursor: String!
+  node: InstrumentSession!
+}
+
+input InstrumentSessionFilterInput {
+  instrumentSessionNumber: IntFilterInput = null
+  startTime: DateTimeFilterInput = null
+  endTime: DateTimeFilterInput = null
+  type: StringFilterInput = null
+  state: InstrumentSessionStateFilterInput = null
+  riskRating: StringFilterInput = null
+  proposalNumber: IntFilterInput = null
+}
+
+type InstrumentSessionRole {
+  instrumentSession: InstrumentSession!
+  account: Account!
+  role: String!
+  onSite: Boolean!
+}
+
+enum InstrumentSessionSortField {
+  instrumentSessionNumber
+  startTime
+  endTime
+  type
+  state
+  riskRating
+  proposalNumber
+}
+
+input InstrumentSessionSortInput {
+  field: InstrumentSessionSortField!
+  orderBy: SortOrder!
+}
+
+enum InstrumentSessionState {
+  CANCELLED
+  COMPLETED
+  FUTURE
+  IN_PROGRESS
+}
+
+input InstrumentSessionStateFilterInput {
+  eq: InstrumentSessionState = null
+  neq: InstrumentSessionState = null
+}
+
+input IntFilterInput {
+  eq: Int = null
+  neq: Int = null
+  gt: Int = null
+  lt: Int = null
+  gte: Int = null
+  lte: Int = null
+}
+
+type ProposalAccount {
+  proposal: Proposal!
+  account: Account!
+  role: String!
+}
+
+type ProposalConnection {
+  edges: [ProposalEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProposalEdge {
+  cursor: String!
+  node: Proposal!
+}
+
+input ProposalFilterInput {
+  proposalNumber: IntFilterInput = null
+  proposalCategory: StringFilterInput = null
+  title: StringFilterInput = null
+  state: ProposalStateFilterInput = null
+}
+
+enum ProposalSortField {
+  proposalNumber
+}
+
+input ProposalSortInput {
+  field: ProposalSortField!
+  orderBy: SortOrder!
+}
+
+enum ProposalState {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+input ProposalStateFilterInput {
+  eq: ProposalState = null
+  neq: ProposalState = null
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input StringFilterInput {
+  eq: String = null
+  neq: String = null
+  contains: String = null
+  notContains: String = null
+  startsWith: String = null
+  endsWith: String = null
 }
