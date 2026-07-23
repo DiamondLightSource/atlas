@@ -67,19 +67,22 @@ export default function SliceViewer({
           py: 1.25,
           borderBottom: 1,
           borderColor: "divider",
+          // height: "100%",
         }}
       >
         <Typography variant="overline" color="primary">
           Slice View
         </Typography>
       </Box>
-      <HeatmapPlot
-        aspect="auto"
-        plotConfig={{}}
-        values={sliceNdarray}
-        domain={[0, 255]}
-        customToolbarChildren={null}
-      />
+      <div style={{ display: "grid", height: "100%" }}>
+        <HeatmapPlot
+          aspect="auto"
+          plotConfig={{}}
+          values={sliceNdarray}
+          domain={[0, 255]}
+          customToolbarChildren={null}
+        />
+      </div>
     </Box>
   );
 }
