@@ -2,6 +2,7 @@ import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
 import PlotFrame from "./PlotFrame";
+import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
 
 import { useMemo, type ComponentProps } from "react";
 
@@ -93,24 +94,53 @@ function RawSpectroscopyData({
 }: RawSpectroscopyDataProps) {
   const { data: channels } = useSpectroscopyData(fetchMap);
 
+  const { width, containerRef, mounted } = useContainerWidth();
+
+  const h = 10;
+  const w = 1;
+
+  const layout = [
+    { i: "0", x: 0, y: 0, w: w, h: h },
+    { i: "1", x: 1, y: 0, w: w, h: h },
+    { i: "2", x: expanded ? 0 : 2, y: 0, w: w, h: h },
+    { i: "3", x: expanded ? 1 : 3, y: 0, w: w, h: h },
+  ];
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
-        <ImagePlot
-          key={i}
-          aspect={1}
-          plotConfig={{}}
-          customToolbarChildren={null}
-          values={channels[key] ?? EMPTY_NDT}
-        />
+        <div key={i}>
+          <ImagePlot
+            key={i}
+            aspect={1}
+            plotConfig={{}}
+            customToolbarChildren={null}
+            values={channels[key] ?? EMPTY_NDT}
+          />
+        </div>
       )),
     [channels],
   );
-
+  console.log("key", plots[0].key);
+  console.log("key", plots[0].key);
   return (
-    <PlotFrame expanded={expanded} aspectRatio={plotAspectRatio}>
-      {plots}
-    </PlotFrame>
+    <div>
+      {mounted && (
+        <ReactGridLayout
+          layout={layout}
+          width={width}
+          // positionStrategy={"relative"}
+          gridConfig={{
+            cols: !expanded ? plots.length : plots.length / 2,
+            rowHeight: 25,
+          }}
+        >
+          {plots}
+        </ReactGridLayout>
+      )}
+    </div>
+    // <PlotFrame expanded={expanded} aspectRatio={plotAspectRatio}>
+    //   {plots}
+    // </PlotFrame>
   );
 }
 
