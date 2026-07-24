@@ -2,11 +2,8 @@ import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
 import PlotFrame from "./PlotFrame";
-import ReactGridLayout, {
-  useContainerWidth,
-  Responsive,
-} from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
+import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
+// import "react-grid-layout/css/styles.css";
 // import "react-resizable/css/styles.css";
 
 import { useMemo, type ComponentProps } from "react";
@@ -98,8 +95,7 @@ function RawSpectroscopyData({
   plotAspectRatio,
 }: RawSpectroscopyDataProps) {
   const { data: channels } = useSpectroscopyData(fetchMap);
-  let { width, containerRef, mounted } = useContainerWidth();
-  console.log("width", width);
+  const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
   const w = 1;
 
@@ -110,20 +106,6 @@ function RawSpectroscopyData({
     { i: "3", x: expanded ? 1 : 3, y: expanded ? 1 : 0, w: w, h: h },
   ];
 
-  // const layouts = {
-  //   lg: [
-  //     { i: "0", x: 0, y: 0, w: w, h: h },
-  //     { i: "1", x: 1, y: 0, w: w, h: h },
-  //     { i: "2", x: 2, y: 0, w: w, h: h },
-  //     { i: "3", x: 3, y: 0, w: w, h: h },
-  //   ],
-  //   md: [
-  //     { i: "0", x: 0, y: 0, w: w, h: h },
-  //     { i: "1", x: 1, y: 0, w: w, h: h },
-  //     { i: "2", x: 0, y: 1, w: w, h: h },
-  //     { i: "3", x: 1, y: 1, w: w, h: h },
-  //   ],
-  // };
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
@@ -140,43 +122,23 @@ function RawSpectroscopyData({
     [channels],
   );
   console.log("key", plots[0].key);
-  console.log("key", plots[0].key);
+  console.log("containerRef", containerRef);
+
   return (
-    <div ref={containerRef as React.RefObject<HTMLDivElement>}>
+    <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
           layout={layout}
           width={width}
-          // positionStrategy={"relative"}
           gridConfig={{
             cols: !expanded ? plots.length : plots.length / 2,
-            rowHeight: 25,
+            rowHeight: 20,
           }}
         >
           {plots}
         </ReactGridLayout>
       )}
-      {/* {mounted && (
-        <Responsive
-          layouts={layouts}
-          width={width}
-          // breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-          cols={{
-            lg: 4, // !expanded ? plots.length : plots.length / 2,
-            md: 2,
-            sm: 2,
-            xs: 2,
-            xxs: 1,
-          }}
-        >
-          {plots}
-        </Responsive>
-      )} */}
     </div>
-
-    // <PlotFrame expanded={expanded} aspectRatio={plotAspectRatio}>
-    //   {plots}
-    // </PlotFrame>
   );
 }
 
