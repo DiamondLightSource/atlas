@@ -40,7 +40,7 @@ function SpectroscopyView() {
 
   const DRAWER_COLLAPSED_HEIGHT = 64;
   const NAVBAR_HEIGHT = 32;
-  const PLOT_ASPECT_RATIO = "4 / 3";
+  const PLOT_ASPECT_RATIO = 0.75;
 
   return (
     <Box

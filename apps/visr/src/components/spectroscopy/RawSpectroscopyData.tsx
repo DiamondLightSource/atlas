@@ -2,7 +2,12 @@ import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
 import PlotFrame from "./PlotFrame";
-import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
+import ReactGridLayout, {
+  useContainerWidth,
+  Responsive,
+} from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+// import "react-resizable/css/styles.css";
 
 import { useMemo, type ComponentProps } from "react";
 
@@ -85,7 +90,7 @@ export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 interface RawSpectroscopyDataProps {
   expanded: boolean;
-  plotAspectRatio: string;
+  plotAspectRatio: number;
 }
 
 function RawSpectroscopyData({
@@ -93,25 +98,39 @@ function RawSpectroscopyData({
   plotAspectRatio,
 }: RawSpectroscopyDataProps) {
   const { data: channels } = useSpectroscopyData(fetchMap);
-
-  const { width, containerRef, mounted } = useContainerWidth();
-
+  let { width, containerRef, mounted } = useContainerWidth();
+  console.log("width", width);
   const h = 10;
   const w = 1;
 
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h },
     { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: expanded ? 0 : 2, y: 0, w: w, h: h },
-    { i: "3", x: expanded ? 1 : 3, y: 0, w: w, h: h },
+    { i: "2", x: expanded ? 0 : 2, y: expanded ? 1 : 0, w: w, h: h },
+    { i: "3", x: expanded ? 1 : 3, y: expanded ? 1 : 0, w: w, h: h },
   ];
+
+  // const layouts = {
+  //   lg: [
+  //     { i: "0", x: 0, y: 0, w: w, h: h },
+  //     { i: "1", x: 1, y: 0, w: w, h: h },
+  //     { i: "2", x: 2, y: 0, w: w, h: h },
+  //     { i: "3", x: 3, y: 0, w: w, h: h },
+  //   ],
+  //   md: [
+  //     { i: "0", x: 0, y: 0, w: w, h: h },
+  //     { i: "1", x: 1, y: 0, w: w, h: h },
+  //     { i: "2", x: 0, y: 1, w: w, h: h },
+  //     { i: "3", x: 1, y: 1, w: w, h: h },
+  //   ],
+  // };
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
         <div key={i}>
           <ImagePlot
             key={i}
-            aspect={1}
+            aspect={plotAspectRatio}
             plotConfig={{}}
             customToolbarChildren={null}
             values={channels[key] ?? EMPTY_NDT}
@@ -123,7 +142,7 @@ function RawSpectroscopyData({
   console.log("key", plots[0].key);
   console.log("key", plots[0].key);
   return (
-    <div>
+    <div ref={containerRef as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
           layout={layout}
@@ -137,7 +156,24 @@ function RawSpectroscopyData({
           {plots}
         </ReactGridLayout>
       )}
+      {/* {mounted && (
+        <Responsive
+          layouts={layouts}
+          width={width}
+          // breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          cols={{
+            lg: 4, // !expanded ? plots.length : plots.length / 2,
+            md: 2,
+            sm: 2,
+            xs: 2,
+            xxs: 1,
+          }}
+        >
+          {plots}
+        </Responsive>
+      )} */}
     </div>
+
     // <PlotFrame expanded={expanded} aspectRatio={plotAspectRatio}>
     //   {plots}
     // </PlotFrame>
