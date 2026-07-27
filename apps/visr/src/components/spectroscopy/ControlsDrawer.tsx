@@ -36,7 +36,7 @@ function ControlsDrawer({
           height: 64,
         }}
       >
-        <Typography variant="subtitle1">Controls</Typography>
+        <Typography variant="overline">Controls</Typography>
         <IconButton onClick={onToggle}>
           {open ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
         </IconButton>

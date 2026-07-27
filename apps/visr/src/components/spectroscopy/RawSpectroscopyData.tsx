@@ -1,12 +1,11 @@
 import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
-import PlotFrame from "./PlotFrame";
 import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
 // import "react-grid-layout/css/styles.css";
-// import "react-resizable/css/styles.css";
 
 import { useMemo, type ComponentProps } from "react";
+import { Box } from "@mui/material";
 
 function toNDT(matrix: (number | null)[][], colour: RGBColour): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
@@ -103,15 +102,20 @@ function RawSpectroscopyData({
     { i: "0", x: 0, y: 0, w: w, h: h },
     { i: "1", x: 1, y: 0, w: w, h: h },
     { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h },
-    //{ i: "2", x: expanded ? 1 : 2, y: expanded ? 1 : 0, w: w, h: h },
     { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h },
-    //{ i: "3", x: expanded ? 2 : 3, y: expanded ? 1 : 0, w: w, h: h },
   ];
 
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
-        <div key={i}>
+        <Box
+          key={i}
+          sx={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
           <ImagePlot
             key={i}
             aspect={plotAspectRatio}
@@ -120,13 +124,11 @@ function RawSpectroscopyData({
             values={channels[key] ?? EMPTY_NDT}
             //tightAxes
           />
-        </div>
+        </Box>
       )),
     [channels],
   );
-  console.log("key", plots[0].key);
-  console.log("containerRef", containerRef);
-  console.log(expanded);
+
   return (
     <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
@@ -135,7 +137,7 @@ function RawSpectroscopyData({
           width={width}
           gridConfig={{
             cols: !expanded ? plots.length : plots.length / 2,
-            rowHeight: !expanded ? 20 : 25,
+            rowHeight: 25,
           }}
         >
           {plots}
