@@ -2,11 +2,6 @@ import type { Plan } from "@atlas/blueapi";
 import { render, screen } from "@atlas/vitest-conf";
 
 import { PlanParameters } from "./PlanParameters";
-import {
-  useInstrumentSession,
-  type InstrumentSessionContextType,
-} from "@atlas/app-shell";
-import { useState } from "react";
 
 const mockJsonFormsImpl = vi.fn(() => {
   return <div data-testid="jsonforms-sentinel" />;

@@ -78,7 +78,7 @@ export function TopBar({ title, open, setOpen }: Props) {
             mt: 1.25,
           }}
         >
-          <InstrumentSessionView></InstrumentSessionView>
+          <InstrumentSessionView />
         </Box>
 
         <Box sx={{ ml: "auto" }}>
