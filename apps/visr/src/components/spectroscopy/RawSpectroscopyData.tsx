@@ -102,8 +102,10 @@ function RawSpectroscopyData({
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h },
     { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: expanded ? 0 : 2, y: expanded ? 1 : 0, w: w, h: h },
-    { i: "3", x: expanded ? 1 : 3, y: expanded ? 1 : 0, w: w, h: h },
+    { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h },
+    //{ i: "2", x: expanded ? 1 : 2, y: expanded ? 1 : 0, w: w, h: h },
+    { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h },
+    //{ i: "3", x: expanded ? 2 : 3, y: expanded ? 1 : 0, w: w, h: h },
   ];
 
   const plots = useMemo(
@@ -113,9 +115,10 @@ function RawSpectroscopyData({
           <ImagePlot
             key={i}
             aspect={plotAspectRatio}
-            plotConfig={{}}
+            plotConfig={{ title: key + " channel" }}
             customToolbarChildren={null}
             values={channels[key] ?? EMPTY_NDT}
+            //tightAxes
           />
         </div>
       )),
@@ -123,7 +126,7 @@ function RawSpectroscopyData({
   );
   console.log("key", plots[0].key);
   console.log("containerRef", containerRef);
-
+  console.log(expanded);
   return (
     <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
@@ -132,7 +135,7 @@ function RawSpectroscopyData({
           width={width}
           gridConfig={{
             cols: !expanded ? plots.length : plots.length / 2,
-            rowHeight: 20,
+            rowHeight: !expanded ? 20 : 25,
           }}
         >
           {plots}
