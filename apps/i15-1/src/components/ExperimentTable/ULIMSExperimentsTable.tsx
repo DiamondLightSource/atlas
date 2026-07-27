@@ -9,15 +9,16 @@ import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
-import { useSumbitTask } from "../../queue/queueService";
+import { useSumbitQueueTask } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
 import type {
   GetSessionPlaylistQueryVariables,
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
+import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 
-type ExperimentDefinitionData = {
+export type ExperimentDefinitionData = {
   q_max: number;
   frames: number;
   beam_energy: number;
@@ -25,7 +26,7 @@ type ExperimentDefinitionData = {
   focused_beam_size: number;
 };
 
-type SampleData = {
+export type SampleData = {
   density: number;
   capillary: string;
   composition: string;
@@ -35,6 +36,7 @@ type SampleData = {
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
 ): ExperimentTableData => ({
+  experiment: node,
   experimentName: node.name,
   sampleName: node.sample.name,
   density: node.sample.data.density,
@@ -51,14 +53,21 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 
 export function ExperimentList() {
   const location = useLocation();
-  const { mutateAsync: submitTaskAsync } = useSumbitTask();
+  const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
 
-  async function submitTasks(selected: ExperimentTableData[]) {
+  async function submitQueueTasks(selected: ExperimentTableData[]) {
     await Promise.all(
-      selected.map((exp, index) =>
+      selected.map((exp) =>
         submitTaskAsync({
-          taskPosition: index,
-          taskParams: exp,
+          experiment: {
+            name: exp.experiment.name,
+            experiment_definition: exp.experiment
+              .experimentDefinition as ExperimentDefinition,
+            sample: exp.experiment.sample as Sample,
+            instrument_session:
+              exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
+              "",
+          },
         }),
       ),
     );
@@ -118,7 +127,7 @@ export function ExperimentList() {
                 const selected = table
                   .getSelectedRowModel()
                   .rows.map((row) => row.original);
-                await submitTasks(selected);
+                await submitQueueTasks(selected);
               }}
             >
               Add selected {selectedCount} to queue
@@ -134,7 +143,7 @@ export function ExperimentList() {
                   .getPrePaginationRowModel()
                   .rows.map((row) => row.original);
 
-                await submitTasks(allRows);
+                await submitQueueTasks(allRows);
               }}
             >
               Add all to queue

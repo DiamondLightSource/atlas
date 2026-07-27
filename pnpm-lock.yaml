@@ -414,6 +414,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.90.21
         version: 5.90.21(react@18.3.1)
+      lucide-react:
+        specifier: ^1.24.0
+        version: 1.24.0(react@18.3.1)
       react-error-boundary:
         specifier: ^6.0.0
         version: 6.1.1(react@18.3.1)
@@ -4362,6 +4365,11 @@ packages:
 
   lucide-react@1.17.0:
     resolution: {integrity: sha512-9FA9evdox/JQL5PT57fdA1x/yg8T7knJ98+zjTL3UfKza6pflQUUh3XtaQIHKvnsJw1lmsEyHVlt5jchYxOQ5w==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-react@1.24.0:
+    resolution: {integrity: sha512-YT6mBD8lGKkg4nM39enlm94/sfJIiW0YKUT60fBy4YK8tai31ylg1VhGNWxkpSKHo9UagfnZqwIff3HTDQwXeA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -10507,6 +10515,10 @@ snapshots:
       yallist: 3.1.1
 
   lucide-react@1.17.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  lucide-react@1.24.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

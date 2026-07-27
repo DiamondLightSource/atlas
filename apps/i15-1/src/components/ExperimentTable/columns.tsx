@@ -1,6 +1,12 @@
 import type { MRT_ColumnDef } from "material-react-table";
+import type { ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
+import type {
+  ExperimentDefinitionData,
+  SampleData,
+} from "./ULIMSExperimentsTable";
 
 export type ExperimentTableData = {
+  experiment: ExperimentNode<SampleData, ExperimentDefinitionData>;
   experimentName: string;
   sampleName: string;
   composition: string;

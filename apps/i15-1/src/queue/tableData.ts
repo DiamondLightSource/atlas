@@ -1,12 +1,15 @@
-import type { BlueapiCallResponse, Status } from "../../generated/queue";
+import type { Status, TaskWithPosition } from "../../generated/queue";
 
 export type QueueTableData = {
+  task: TaskWithPosition;
   position: number | null;
+  name: string;
   id: string;
   instrumentSession: string;
   sampleId: string;
-  planRunning: string;
-  parameters: string;
+  samplePosition: string;
+  density: number | null;
+  beamSize: number | null;
+  timePerPDF: number | null;
   status: Status;
-  blueapTasks: BlueapiCallResponse[];
 };

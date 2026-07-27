@@ -1,25 +1,42 @@
-const shouldJustBeStrings = [
-  "bluesky.protocols.Readable",
-  "bluesky.protocols.Movable",
+import type { Plan } from "@atlas/blueapi";
+import {
+  collapseAnyOfEnumBranches,
+  replaceUnknownEnumTypes,
+  skipRecursiveSchemas,
+} from "./sanitisers";
+
+export type SchemaNode = Record<string, unknown>;
+
+/** Mutating sanitising operation */
+export type Sanitiser = (node: SchemaNode) => void;
+
+const SANITISERS: Sanitiser[] = [
+  skipRecursiveSchemas,
+  collapseAnyOfEnumBranches,
+  replaceUnknownEnumTypes,
 ];
 
-const sanitizeSchema = (schema: object): object => {
-  const entries = Object.entries(schema);
+function sanitiseNode(node: unknown): unknown {
+  if (Array.isArray(node)) {
+    return node.map(sanitiseNode);
+  }
 
-  const processed = entries.map(([key, value]) => {
-    if (key == "type" && shouldJustBeStrings.includes(value)) {
-      return [key, "string"];
-    } else if (
-      typeof value === "object" &&
-      !Array.isArray(value) &&
-      value !== null
-    ) {
-      return [key, sanitizeSchema(value)];
-    } else {
-      return [key, value];
-    }
-  });
-  return Object.fromEntries(processed);
-};
+  if (node && typeof node === "object") {
+    const record = Object.fromEntries(
+      Object.entries(node).map(([key, value]) => [key, sanitiseNode(value)]),
+    );
 
-export default sanitizeSchema;
+    SANITISERS.forEach((sanitiser) => sanitiser(record));
+
+    return record;
+  }
+
+  return node;
+}
+
+export function sanitisePlan(plan: Plan): Plan {
+  return {
+    ...plan,
+    schema: sanitiseNode(plan.schema) as object,
+  };
+}
