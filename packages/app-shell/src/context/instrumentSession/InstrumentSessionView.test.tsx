@@ -1,4 +1,4 @@
-import { render, screen, userEvent } from "@atlas/vitest-conf";
+import { render, screen, userEvent, within } from "@atlas/vitest-conf";
 import { InstrumentSessionView } from "./InstrumentSessionView";
 import { InstrumentSessionProvider } from "./InstrumentSessionProvider";
 import { describe, it, expect, vi } from "vitest";
@@ -29,18 +29,60 @@ describe("InstrumentSessionView", () => {
     localStorage.clear();
   });
 
-  it("shows current instrument session", () => {
+  it("shows only the current instrument session", () => {
     renderComponentWithProvider();
-    expect(screen.getByText("cm54321-1")).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-button")).toBeInTheDocument();
+    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
   });
 
   it("shows sessions from the provided sessions list when clicked", async () => {
     renderComponentWithProvider();
 
     const user = userEvent.setup();
-    await user.click(screen.getByText("cm54321-1"));
+    await user.click(screen.getByTestId("session-input-button"));
     expect(screen.getByTestId("visit-field")).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
     expect(screen.getByText("cm123-4")).toBeInTheDocument();
     expect(screen.getByText("cm567-8")).toBeInTheDocument();
+  });
+
+  it("closes menu when a menu item has been clicked", async () => {
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+
+    await user.click(screen.getByText("cm123-4"));
+    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+  });
+
+  it("closes menu when button has been clicked again", async () => {
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+
+    const backdrop = screen.getByRole("presentation").firstChild;
+    if (backdrop instanceof Element) {
+      await user.click(backdrop);
+    }
+    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+  });
+
+  it("lets you input a valid session", async () => {
+    const onSubmit = vi.fn();
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+
+    const visitInput = screen.getByTestId("session-input-menu");
+    const visitTextBox = within(visitInput).getByRole("textbox");
+    await user.click(visitTextBox);
+    await user.clear(visitTextBox);
+    await user.type(visitTextBox, "cm1-1");
+    await user.keyboard("{Enter}");
   });
 });

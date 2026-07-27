@@ -13,7 +13,7 @@ export function InstrumentSessionView() {
     useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState(1);
 
-  const id = React.useId();
+  const id = "session-input";
   const buttonId = `${id}-button`;
   const menuId = `${id}-menu`;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -36,7 +36,7 @@ export function InstrumentSessionView() {
   return (
     <div>
       <Button
-        id={buttonId}
+        data-testid={buttonId}
         aria-controls={open ? menuId : undefined}
         aria-haspopup="true"
         aria-expanded={open}
@@ -47,7 +47,7 @@ export function InstrumentSessionView() {
         {instrumentSession}
       </Button>
       <Menu
-        id={menuId}
+        data-testid={menuId}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
