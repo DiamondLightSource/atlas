@@ -6,14 +6,6 @@ import type { RouterProps } from "./Router";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { Toolbar } from "@mui/material";
 
-// mock instrument session view which is out of scope of this test
-export function InstrumentSessionView() {
-  return <button>cm12345-1</button>;
-}
-vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
-  InstrumentSessionView: InstrumentSessionView,
-}));
-
 export function Layout(props: RouterProps) {
   const { open, setOpen } = usePersistentDrawerState();
 
