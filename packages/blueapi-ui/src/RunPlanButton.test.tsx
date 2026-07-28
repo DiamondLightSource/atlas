@@ -87,7 +87,6 @@ describe("RunPlanButton", () => {
   });
 
   it("success message appears when button is pressed with successful response", () => {
-    // workerStateMock.mockReturnValue({ data: "IDLE" } as any);
     submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     setActiveTaskMock.mutateAsync.mockReturnValue({
       data: mockTask,
