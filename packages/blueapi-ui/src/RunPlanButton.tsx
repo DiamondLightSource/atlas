@@ -99,7 +99,7 @@ export function RunPlanButton({
       setMsg(
         `Failed to run plan ${name}, see console and blueapi logs for full error.`,
       );
-      console.log(`${msg}.\n Reason: ${error}`);
+      console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
     });
     setLoading(false);
   };
