@@ -79,6 +79,10 @@ const fakeExperiments = {
   },
 };
 
+function setWorkerState(new_state: string) {
+  workerStatus.status = new_state;
+}
+
 const fakePvws = ws.link("wss://pvws.diamond.ac.uk/pvws/pv");
 
 const fakeHistory = [
@@ -522,7 +526,7 @@ export const handlers = [
     : []),
 
   http.put("/api/blueapi/worker/task", () => {
-    workerStatus.status = "RUNNING";
+    setWorkerState("RUNNING");
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
@@ -534,8 +538,24 @@ export const handlers = [
     });
   }),
 
-  http.put("/api/blueapi/worker/state", () => {
-    return HttpResponse.json("IDLE");
+  http.get("/api/blueapi/tasks/:task_id", () => {
+    return HttpResponse.json({
+      task_id: fakeTaskId,
+      task: { name: "fake-task", params: {}, metadata: {} },
+      request_id: "00",
+      is_complete: true,
+      is_pending: false,
+      errors: [],
+      outcome: { outcome: "success", type: "str", result: null },
+    });
+  }),
+
+  http.put("/api/blueapi/worker/state", async ({ request }) => {
+    const { new_state } = (await request.json()) as { new_state: string };
+    if (new_state === "ABORTING") {
+      setWorkerState(new_state);
+    }
+    return HttpResponse.json(workerStatus.status);
   }),
 
   http.get("/oauth2/userinfo", () => {
