@@ -108,11 +108,11 @@ function RawSpectroscopyData({
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
-        <Box
+        <div
           key={i}
-          sx={{
-            display: "flex",
-            width: "100%",
+          style={{
+            flex: 1,
+            // backgroundColor: "blue",
             justifyContent: "center",
           }}
         >
@@ -124,7 +124,7 @@ function RawSpectroscopyData({
             values={channels[key] ?? EMPTY_NDT}
             //tightAxes
           />
-        </Box>
+        </div>
       )),
     [channels],
   );
