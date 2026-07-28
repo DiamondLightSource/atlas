@@ -92,14 +92,14 @@ describe("RunPlanButton", () => {
     setActiveTaskMock.mutateAsync.mockReturnValue({
       data: mockTask,
     } as any);
-    (render(
+    render(
       <RunPlanButton
         name="test_plan"
         params={[]}
         instrumentSession="cm12345-1"
       />,
-    ),
-      screen.getByText("Run").click());
+    );
+    screen.getByText("Run").click();
     expect(screen.findByTestId("Plan submission successful!"));
     expect(screen.findByTestId("Plan succeeded"));
   });
