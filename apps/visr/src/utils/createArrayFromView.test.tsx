@@ -1,4 +1,4 @@
-import ndarray, { type NdArray } from "ndarray";
+import ndarray from "ndarray";
 import createArrayFromView from "./createArrayFromView";
 
 describe("createArrayFromView", () => {
