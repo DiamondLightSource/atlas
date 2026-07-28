@@ -1,23 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
-import ndarray, { type NdArray } from "ndarray";
-import { assign } from "ndarray-ops";
-// import { createArrayFromView } from "@h5web/lib/";
+import ndarray from "ndarray";
+import createArrayFromView from "../../utils/createArrayFromView";
 
-function createArrayFromView<T extends Uint8Array>(
-  view: NdArray<T>,
-): NdArray<T> {
-  const { data, size, shape } = view;
-  const array = ndarray(
-    (Array.isArray(data)
-      ? []
-      : new (data.constructor as Uint8ArrayConstructor)(size)) as T,
-    shape,
-  );
-  assign(array, view);
-  return array;
-}
 interface Props {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
