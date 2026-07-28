@@ -86,23 +86,23 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("Run")).toBeDisabled();
   });
 
-  // it("success message appears when button is pressed with successful response", () => {
-  //   workerStateMock.mockReturnValue({ data: "IDLE" } as any);
-  //   submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
-  //   setActiveTaskMock.mutateAsync.mockReturnValue({
-  //     data: mockTask,
-  //   } as any);
-  //   render(
-  //     <RunPlanButton
-  //       name="test_plan"
-  //       params={[]}
-  //       instrumentSession="cm12345-1"
-  //     />,
-  //   );
-  //   screen.getByText("Run").click();
-  //   expect(screen.findByTestId("Plan submission successful!"));
-  //   expect(screen.findByTestId("Plan succeeded"));
-  // });
+  it("success message appears when button is pressed with successful response", () => {
+    // workerStateMock.mockReturnValue({ data: "IDLE" } as any);
+    submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
+    setActiveTaskMock.mutateAsync.mockReturnValue({
+      data: mockTask,
+    } as any);
+    render(
+      <RunPlanButton
+        name="test_plan"
+        params={[]}
+        instrumentSession="cm12345-1"
+      />,
+    );
+    screen.getByText("Run").click();
+    expect(screen.findByTestId("Plan submission successful!"));
+    expect(screen.findByTestId("Plan succeeded"));
+  });
 
   it("failure message appears when button is pressed with failed response", async () => {
     submitTaskMock.mutateAsync.mockReturnValue({ data: null } as any);
