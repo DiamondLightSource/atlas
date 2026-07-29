@@ -6,13 +6,17 @@ import type { InstrumentSessionQuery as InstrumentSessionQueryType } from "./__g
 // https://github.com/DiamondLightSource/atlas/issues/81
 const instrumentSessionQuery = graphql`
   query InstrumentSessionQuery($instrumentName: String!) {
-    instrumentByName(name: $instrumentName) {
-      instrumentSessions {
-        instrumentSessionReference
-        state
+  instrumentByName(name: $instrumentName) {
+    instrumentSessions(filterBy: {state: {eq: IN_PROGRESS}}) {
+      edges {
+        node {
+          instrumentSessionReference
+          state
+        }
       }
     }
   }
+}
 `;
 
 function GetInstrumentSessions() {
@@ -25,16 +29,11 @@ function GetInstrumentSessions() {
   const sessionsList = [];
 
   for (let i = 0; i < sessionListLen; i++) {
-    if (
-      data.instrumentByName?.instrumentSessions[i].state === "In Progress" ||
-      data.instrumentByName?.instrumentSessions[i].state === "Future"
-    ) {
-      sessionsList.push(
-        data.instrumentByName?.instrumentSessions[
-          i
-        ].instrumentSessionReference?.toLowerCase(),
-      );
-    }
+    sessionsList.push(
+      data.instrumentByName?.instrumentSessions[
+        i
+      ].instrumentSessionReference?.toLowerCase(),
+    );
   }
   return sessionsList;
 }

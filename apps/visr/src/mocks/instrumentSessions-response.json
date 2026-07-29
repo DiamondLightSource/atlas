@@ -1,22 +1,16 @@
 {
   "data": {
     "instrumentByName": {
-      "instrumentSessions": [
-        { "instrumentSessionReference": "CM39125-1", "state": "Completed" },
-        { "instrumentSessionReference": "CM39125-2", "state": "Completed" },
-        { "instrumentSessionReference": "CM39125-3", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-1", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-2", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-3", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-4", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-5", "state": "Completed" },
-        { "instrumentSessionReference": "CM40661-6", "state": "Completed" },
-        { "instrumentSessionReference": "CM44191-1", "state": "Completed" },
-        { "instrumentSessionReference": "CM44191-2", "state": "Completed" },
-        { "instrumentSessionReference": "CM44191-3", "state": "In Progress" },
-        { "instrumentSessionReference": "CM44191-4", "state": "Future" },
-        { "instrumentSessionReference": "CM44191-5", "state": "Future" }
-      ]
+      "instrumentSessions": {
+        "edges": [
+          {
+            "node": {
+              "instrumentSessionReference": "CM44191-3",
+              "state": "In Progress"
+            }
+          }
+        ]
+      }
     }
   }
 }
