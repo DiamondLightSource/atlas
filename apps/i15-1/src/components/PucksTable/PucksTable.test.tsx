@@ -1,4 +1,4 @@
-import { render, screen } from "@atlas/vitest-conf";
+import { render, screen, waitFor } from "@atlas/vitest-conf";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { PucksTable } from "./PucksTable";
@@ -12,8 +12,17 @@ type MockRow = {
   status: "Mounted" | "Unmounted";
 };
 
+type MockColumn = {
+  accessorKey?: string;
+  Cell?: (props: {
+    cell: { getValue: <T>() => T };
+    row: { original: MockRow };
+  }) => React.ReactNode;
+};
+
 type MockTableOptions = {
   data: MockRow[];
+  columns?: MockColumn[];
   state?: {
     isLoading?: boolean;
   };
@@ -44,6 +53,24 @@ vi.mock("material-react-table", () => ({
             <span>{row.barcode}</span>
             <span>{row.session}</span>
             <span>{row.status}</span>
+            {row.parentPosition != null && (
+              <span data-testid={`position-${row.id}`}>
+                {row.parentPosition}
+              </span>
+            )}
+            {table.options.columns?.map((column, colIdx) =>
+              column.Cell ? (
+                <div key={colIdx}>
+                  {column.Cell({
+                    cell: {
+                      getValue: <T,>() =>
+                        row[column.accessorKey as keyof MockRow] as T,
+                    },
+                    row: { original: row },
+                  })}
+                </div>
+              ) : null,
+            )}
           </div>
         ))}
       </div>
@@ -143,6 +170,23 @@ describe("PucksTable", () => {
     vi.clearAllMocks();
   });
 
+  it("initialises position dropdown from parentPosition in data", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    // Puck 1234 has positionInParent.position = 1 in the mock data
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("position-019fae86-1551-74f2-b876-f2b5dd4dbb43"),
+      ).toHaveTextContent("1");
+    });
+  });
+
   it("renders only puck rows", () => {
     mockedUseQuery.mockReturnValue({
       data: mockContainersData,
@@ -194,5 +238,68 @@ describe("PucksTable", () => {
     renderComponent();
 
     expect(screen.getByText(/Failed to fetch containers/i)).toBeInTheDocument();
+  });
+
+  it("shows Unmount button for a mounted puck that has a position", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    // Puck 1234 is Mounted (parent = robot table) with positionInParent.position = 1
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /unmount/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("does not show button for an unmounted puck with no position assigned", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    // Puck 56789 has no positionInParent so its button should not appear
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: /mark as mounted/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows Mark as mounted button for an unmounted puck that has a position", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: {
+        containers: {
+          edges: [
+            ...mockContainersData.containers.edges.slice(0, 3),
+            {
+              node: {
+                ...mockContainersData.containers.edges[3].node,
+                positionInParent: { position: 3 },
+              },
+            },
+          ],
+        },
+      },
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    // Puck 56789 is Unmounted (no robot table parent) and now has position 3
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /mark as mounted/i }),
+      ).toBeInTheDocument();
+    });
   });
 });

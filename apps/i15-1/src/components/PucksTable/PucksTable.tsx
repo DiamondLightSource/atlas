@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import type { TypedDocumentNode } from "@apollo/client";
 import {
+  Button,
   Chip,
   FormControl,
   MenuItem,
@@ -9,7 +10,7 @@ import {
   Typography,
   type ChipProps,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   MaterialReactTable,
@@ -76,6 +77,20 @@ export function PucksTable() {
       }));
   }, [data]);
 
+  useEffect(() => {
+    setSelectedPositions((current) => {
+      const seeded: Record<string, number | null> = {};
+      for (const row of tableData) {
+        if (!Object.prototype.hasOwnProperty.call(current, row.id)) {
+          seeded[row.id] = row.parentPosition;
+        }
+      }
+      return Object.keys(seeded).length > 0
+        ? { ...seeded, ...current }
+        : current;
+    });
+  }, [tableData]);
+
   const columns = useMemo<MRT_ColumnDef<PuckTableData>[]>(
     () => [
       { accessorKey: "barcode", header: "Puck ID" },
@@ -84,18 +99,11 @@ export function PucksTable() {
         header: "Puck Position",
         Cell: ({ row }) => {
           const rowId = row.original.id;
-          const hasUserSelection = Object.prototype.hasOwnProperty.call(
-            selectedPositions,
-            rowId,
-          );
-          const value = hasUserSelection
-            ? selectedPositions[rowId]
-            : row.original.parentPosition;
 
           return (
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
-                value={value ?? ""}
+                value={selectedPositions[rowId] ?? ""}
                 displayEmpty
                 onChange={(event) => {
                   const nextValue = event.target.value;
@@ -134,6 +142,27 @@ export function PucksTable() {
             color={CHIP_COLOR_MAP[cell.getValue<PuckMountStatus>()]}
           ></Chip>
         ),
+      },
+      {
+        accessorKey: "status",
+        header: "",
+        size: 200,
+        enableColumnActions: false,
+        Cell: ({ row }) => {
+          const rowId = row.original.id;
+          const isVisible = selectedPositions[rowId] != null;
+          const isMounted = row.original.status === "Mounted";
+          return isVisible ? (
+            <Button
+              variant="contained"
+              color={isMounted ? "success" : "info"}
+              size="small"
+              onClick={() => {}}
+            >
+              {isMounted ? "Unmount" : "Mark as mounted"}
+            </Button>
+          ) : null;
+        },
       },
     ],
     [selectedPositions],
