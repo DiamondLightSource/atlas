@@ -1,4 +1,4 @@
-import { render, screen } from "@atlas/vitest-conf";
+import { render, screen, waitFor } from "@atlas/vitest-conf";
 import { RunPlanButton } from "./RunPlanButton";
 import type { Api, TaskResponse, TrackableTask } from "@atlas/blueapi";
 
@@ -86,7 +86,7 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("Run")).toBeDisabled();
   });
 
-  it("success message appears when button is pressed with successful response", () => {
+  it("success message appears when button is pressed with successful response", async () => {
     submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     setActiveTaskMock.mutateAsync.mockReturnValue({
       data: mockTask,
@@ -99,8 +99,10 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission successful!"));
-    expect(screen.findByTestId("Plan succeeded"));
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission successful!"));
+      expect(screen.findByTestId("Plan succeeded"));
+    });
   });
 
   it("failure message appears when button is pressed with failed response", async () => {
@@ -114,12 +116,14 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission failed!"));
-    expect(
-      screen.findByTestId(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
-      ),
-    );
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission failed!"));
+      expect(
+        screen.findByTestId(
+          "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        ),
+      );
+    });
     const alert = await screen.findByRole("alert");
     expect(alert).toBeVisible();
   });
@@ -147,12 +151,14 @@ describe("RunPlanButton", () => {
       />,
     );
     screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission successful!"));
-    expect(
-      screen.findByTestId(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
-      ),
-    );
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission successful!"));
+      expect(
+        screen.findByTestId(
+          "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        ),
+      );
+    });
     const alert = await screen.findByRole("alert");
     expect(alert).toBeVisible();
   });
