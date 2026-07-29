@@ -107,8 +107,6 @@ describe("RunPlanButton", () => {
 
     const user = userEvent.setup();
     await user.click(screen.getByText("Run"));
-    // fireEvent.click(screen.getByText("Run"));
-    // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission successful!"));
       expect(screen.findByTestId("Plan succeeded"));
@@ -127,8 +125,6 @@ describe("RunPlanButton", () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByText("Run"));
-    // fireEvent.click(screen.getByText("Run"));
-    // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission failed!"));
       expect(
@@ -165,8 +161,6 @@ describe("RunPlanButton", () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByText("Run"));
-    // fireEvent.click(screen.getByText("Run"));
-    // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission successful!"));
       expect(
