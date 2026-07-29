@@ -9,6 +9,7 @@ import {
 import Robot from "./routes/Robot";
 import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
+import Pucks from "./routes/Pucks";
 import { QueueView } from "./routes/QueueView";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
@@ -41,7 +42,7 @@ const navigation: SectionGroup[] = [
           },
           {
             name: "Pucks",
-            element: <div />,
+            element: <Pucks />,
           },
         ],
       },

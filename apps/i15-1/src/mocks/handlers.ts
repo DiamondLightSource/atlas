@@ -79,6 +79,76 @@ const fakeExperiments = {
   },
 };
 
+const fakeContainersForInstrument = {
+  data: {
+    containers: {
+      edges: [
+        {
+          node: {
+            id: "019fae86-1551-74f2-b876-f2b5dd4dbb43",
+            name: "i15-1 Puck 1234",
+            barcode: "i15-1_1234",
+            type: {
+              name: "i15-1 puck",
+            },
+            instrumentSessions: [
+              {
+                instrumentSessionReference: "CM44163-3",
+              },
+            ],
+            parent: {
+              name: "i15-1 robot table",
+              id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+            },
+            positionInParent: {
+              position: 1,
+            },
+          },
+        },
+        {
+          node: {
+            id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+            name: "i15-1 robot table",
+            barcode: "i15-1_robot_table",
+            type: {
+              name: "i15-1 robot table",
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+        {
+          node: {
+            id: "019fae9b-18b2-7430-ae82-7f6ee0acbf8f",
+            name: "i15-1 cupboard 1",
+            barcode: "i15-1_cupboard_1",
+            type: {
+              name: "i15-1 storage cupboard",
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+        {
+          node: {
+            id: "019faee9-628d-7161-afe4-598a9c60534d",
+            name: "i15-1 Puck 56789",
+            barcode: "i15-1_56789",
+            type: {
+              name: "i15-1 puck",
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+      ],
+    },
+  },
+};
+
 function setWorkerState(new_state: string) {
   workerStatus.status = new_state;
 }
@@ -570,7 +640,24 @@ export const handlers = [
     return HttpResponse.json(workerStatus.status);
   }),
 
-  http.post("/api/graphql", async () => {
+  http.post("/api/graphql", async ({ request }) => {
+    const body = (await request.json()) as {
+      operationName?: string;
+      query?: string;
+    };
+
+    if (body.operationName === "GetContainersForInstrument") {
+      return HttpResponse.json(fakeContainersForInstrument);
+    }
+
+    if (body.operationName === "GetSessionPlaylist") {
+      return HttpResponse.json(fakeExperiments);
+    }
+
+    if (body.query?.includes("GetContainersForInstrument")) {
+      return HttpResponse.json(fakeContainersForInstrument);
+    }
+
     return HttpResponse.json(fakeExperiments);
   }),
 
