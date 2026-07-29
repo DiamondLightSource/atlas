@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@atlas/vitest-conf";
+import {
+  fireEvent,
+  render,
+  screen,
+  userEvent,
+  waitFor,
+} from "@atlas/vitest-conf";
 import { RunPlanButton } from "./RunPlanButton";
 import type { Api, TaskResponse, TrackableTask } from "@atlas/blueapi";
 
@@ -99,7 +105,9 @@ describe("RunPlanButton", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Run"));
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    // fireEvent.click(screen.getByText("Run"));
     // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission successful!"));
@@ -117,7 +125,9 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
-    fireEvent.click(screen.getByText("Run"));
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    // fireEvent.click(screen.getByText("Run"));
     // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission failed!"));
@@ -153,7 +163,9 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
-    fireEvent.click(screen.getByText("Run"));
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    // fireEvent.click(screen.getByText("Run"));
     // screen.getByText("Run").click();
     await waitFor(() => {
       expect(screen.findByTestId("Plan submission successful!"));
