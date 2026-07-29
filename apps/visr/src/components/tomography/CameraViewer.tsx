@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
-export default function CameraViewer() {
 
+export default function CameraViewer() {
   // static image showing camera view/projection feed
   return (
     <Box
@@ -27,7 +27,6 @@ export default function CameraViewer() {
         <Typography variant="overline" color="primary">
           Camera View
         </Typography>
-        
       </Box>
 
       <Box

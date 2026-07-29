@@ -17,7 +17,7 @@
  *   Default scheme: dark blue → cyan → white
  */
 
-export const vertexShader = /* glsl */`
+export const vertexShader = /* glsl */ `
 varying vec3 vOrigin;
 varying vec3 vDirection;
 
@@ -27,9 +27,9 @@ void main() {
   vDirection = position - vOrigin;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
-`
+`;
 
-export const fragmentShader = /* glsl */`
+export const fragmentShader = /* glsl */ `
 precision highp float;
 precision highp sampler3D;
 
@@ -90,4 +90,4 @@ void main() {
   if (color.a < 0.01) discard;
   gl_FragColor = color;
 }
-`
+`;
