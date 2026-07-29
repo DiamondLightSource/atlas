@@ -128,6 +128,7 @@ function TomographyView() {
       <Stack direction="row" divider={<Divider orientation="vertical" />}>
         <Box
           sx={{
+            flex: 1,
             width: "30%",
             minWidth: 260,
             display: "flex",
@@ -141,6 +142,7 @@ function TomographyView() {
           sx={{
             flex: 1,
             width: "30%",
+            minWidth: 260,
             display: "flex",
             flexDirection: "column",
           }}
@@ -155,9 +157,9 @@ function TomographyView() {
           sx={{
             flex: 1,
             width: "30%",
+            minWidth: 260,
             display: "flex",
             flexDirection: "column",
-            bgcolor: "red",
           }}
         >
           <SliceViewer

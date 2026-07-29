@@ -36,7 +36,7 @@ export default function VolumeViewer({
         </Typography>
       </Box>
 
-      {visible && volumeData ? (
+      {visible && volumeData && volumeShape ? (
         <Box sx={{ flex: 1 }}>
           <VolumeRenderer
             volumeData={volumeData}
