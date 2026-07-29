@@ -654,10 +654,6 @@ export const handlers = [
       return HttpResponse.json(fakeExperiments);
     }
 
-    if (body.query?.includes("GetContainersForInstrument")) {
-      return HttpResponse.json(fakeContainersForInstrument);
-    }
-
     return HttpResponse.json(fakeExperiments);
   }),
 
