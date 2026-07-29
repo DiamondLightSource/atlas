@@ -1,4 +1,7 @@
-import { DiamondTheme, ThemeProvider } from "@diamondlightsource/sci-react-ui";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import Dashboard from "./routes/Dashboard.tsx";
@@ -68,7 +71,7 @@ enableMocking().then(() => {
     <RelayEnvironmentProvider environment={RelayEnvironment}>
       <InstrumentSessionProvider>
         <StrictMode>
-          <ThemeProvider theme={DiamondTheme} defaultMode="light">
+          <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
             <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={api}>
                 <RouterProvider router={router} />

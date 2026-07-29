@@ -4,7 +4,7 @@ import {
   Box,
   Button,
   Drawer,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Stack,
   Toolbar,
