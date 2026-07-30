@@ -26,17 +26,16 @@ function TomographyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const DRAWER_COLLAPSED_HEIGHT = 64;
   const NAVBAR_HEIGHT = 32;
-  const PLOT_ASPECT_RATIO = 0.75;
+  // const PLOT_ASPECT_RATIO = 0.75;
 
   const { width, containerRef, mounted } = useContainerWidth();
-  const h = 10;
+  const h = 11;
   const w = 1;
 
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h },
     { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: drawerOpen ? 2 : 0, y: 0, w: w, h: h },
-    { i: "3", x: drawerOpen ? 3 : 1, y: 0, w: w, h: h },
+    { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h },
   ];
 
   useEffect(() => {
@@ -152,10 +151,11 @@ function TomographyView() {
       key={i}
       style={{
         flex: 1,
-        width: "30%",
+        // width: "30%",
         minWidth: 260,
         display: "flex",
         flexDirection: "column",
+        background: "red",
       }}
     >
       {views[i]}
@@ -167,20 +167,19 @@ function TomographyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "100%",
-        height: "92dvh",
-        color: "text.primary",
-        bgcolor: "background.default",
+        flexGrow: 1,
+        minWidth: 0,
+        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
+      <div ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
         {mounted && (
           <ReactGridLayout
             layout={layout}
             width={width}
             gridConfig={{
-              cols: !!drawerOpen ? plots.length : plots.length / 2,
-              rowHeight: 25,
+              cols: drawerOpen ? 3 : 3,
+              rowHeight: drawerOpen ? 25 : 50,
             }}
           >
             {plots}
