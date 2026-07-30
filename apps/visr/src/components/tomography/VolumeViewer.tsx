@@ -20,13 +20,18 @@ export default function VolumeViewer({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        bgcolor: "background.paper",
+        backgroundClipcolor: "background.paper",
+        borderRight: 1,
+        borderColor: "divider",
       }}
     >
       <Box
         sx={{
           px: 2,
           py: 1.25,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           borderBottom: 1,
           borderColor: "divider",
         }}
@@ -37,13 +42,13 @@ export default function VolumeViewer({
       </Box>
 
       {visible && volumeData && volumeShape ? (
-        <Box sx={{ flex: 1 }}>
+        <div style={{ flex: 1 }}>
           <VolumeRenderer
             volumeData={volumeData}
             volumeShape={volumeShape}
             // revolve={revolve}
           />
-        </Box>
+        </div>
       ) : (
         <Box
           sx={{

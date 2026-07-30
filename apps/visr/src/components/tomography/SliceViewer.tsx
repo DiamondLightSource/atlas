@@ -3,6 +3,7 @@ import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
+import { Box3Helper } from "three";
 
 interface Props {
   volumeData: Uint8Array;
@@ -45,22 +46,31 @@ export default function SliceViewer({
         flexDirection: "column",
         height: "100%",
         bgcolor: "background.paper",
+        borderRight: 1,
+        borderColor: "divider",
       }}
     >
       <Box
         sx={{
           px: 2,
           py: 1.25,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           borderBottom: 1,
           borderColor: "divider",
-          // height: "100%",
         }}
       >
         <Typography variant="overline" color="primary">
           Slice View
         </Typography>
       </Box>
-      <div style={{ display: "grid", height: "100%" }}>
+      <div
+        style={{
+          flex: 1,
+          justifyContent: "center",
+        }}
+      >
         <HeatmapPlot
           aspect="auto"
           plotConfig={{}}

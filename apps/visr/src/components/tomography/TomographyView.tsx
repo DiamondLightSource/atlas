@@ -1,12 +1,9 @@
-import { Box, Divider, Stack } from "@mui/material";
-import { useEffect, useMemo, useRef, useState } from "react";
-import CameraViewer from "./CameraViewer";
-import VolumeViewer from "./VolumeViewer";
+import { Box } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import Controls from "./Controls";
-import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
-import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
+import GridViews from "./GridViews";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -28,8 +25,7 @@ function TomographyView() {
   const NAVBAR_HEIGHT = 32;
   // const PLOT_ASPECT_RATIO = 0.75;
 
-  const { width, containerRef, mounted } = useContainerWidth();
-  const h = 11;
+  const h = 10;
   const w = 1;
 
   const layout = [
@@ -132,36 +128,6 @@ function TomographyView() {
 
   if (!volume) return <Box />;
 
-  const views = [
-    <CameraViewer />,
-    <VolumeViewer
-      volumeData={volume.volumeData}
-      volumeShape={volume.volumeShape}
-      visible={volumeVisible}
-    />,
-    <SliceViewer
-      volumeData={volume.volumeData}
-      volumeShape={volume.volumeShape}
-      slice={slice}
-      plane={plane}
-    />,
-  ];
-  const plots = views.map(({ key }, i) => (
-    <div
-      key={i}
-      style={{
-        flex: 1,
-        // width: "30%",
-        minWidth: 260,
-        display: "flex",
-        flexDirection: "column",
-        background: "red",
-      }}
-    >
-      {views[i]}
-    </div>
-  ));
-  console.log(plots[0]);
   return (
     <Box
       sx={{
@@ -172,20 +138,14 @@ function TomographyView() {
         height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <div ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
-        {mounted && (
-          <ReactGridLayout
-            layout={layout}
-            width={width}
-            gridConfig={{
-              cols: drawerOpen ? 3 : 3,
-              rowHeight: drawerOpen ? 25 : 50,
-            }}
-          >
-            {plots}
-          </ReactGridLayout>
-        )}
-      </div>
+      <GridViews
+        volumeData={volume.volumeData}
+        volumeVisible={volumeVisible}
+        plane={plane}
+        slice={slice}
+        volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+        drawerOpen={drawerOpen}
+      />
       <ControlsDrawer
         open={drawerOpen}
         collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
