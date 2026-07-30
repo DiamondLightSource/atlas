@@ -5,6 +5,7 @@ import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
+import ControlsDrawer from "../ControlsDrawer";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -21,6 +22,10 @@ function TomographyView() {
   // const [revolve, setRevolve] = useState(false);
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const DRAWER_COLLAPSED_HEIGHT = 64;
+  const NAVBAR_HEIGHT = 32;
+  const PLOT_ASPECT_RATIO = 0.75;
 
   useEffect(() => {
     async function loadTestVolume() {
@@ -170,15 +175,22 @@ function TomographyView() {
           />
         </Box>
       </Stack>
-      <Controls
-        onRun={handleRun}
-        onReset={handleReset}
-        onSlide={handleSlider}
-        onSetDirection={handlePlane}
-        plane={plane}
-        progress={progress}
-        slice={slice}
-        volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+      <ControlsDrawer
+        open={drawerOpen}
+        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
+        onToggle={() => setDrawerOpen(prev => !prev)}
+        controls={
+          <Controls
+            onRun={handleRun}
+            onReset={handleReset}
+            onSlide={handleSlider}
+            onSetDirection={handlePlane}
+            plane={plane}
+            progress={progress}
+            slice={slice}
+            volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+          />
+        }
       />
     </Box>
   );

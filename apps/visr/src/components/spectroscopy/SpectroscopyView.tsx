@@ -5,7 +5,8 @@ import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
 import { visitTextToVisit } from "../../utils/common";
-import ControlsDrawer from "./ControlsDrawer";
+import ControlsDrawer from "../ControlsDrawer";
+import { SpectroscopyForm } from "./SpectroscopyForm";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -60,6 +61,7 @@ function SpectroscopyView() {
         open={drawerOpen}
         collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
         onToggle={() => setDrawerOpen(prev => !prev)}
+        controls={<SpectroscopyForm />}
       />
     </Box>
   );

@@ -1,18 +1,20 @@
 import { Drawer, Box, IconButton, Typography } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import { SpectroscopyForm } from "./SpectroscopyForm";
+import { SpectroscopyForm } from "./spectroscopy/SpectroscopyForm";
 
 interface ControlsDrawerProps {
   open: boolean;
   collapsedHeight: number;
   onToggle: () => void;
+  controls: JSX.Element;
 }
 
 function ControlsDrawer({
   open,
   collapsedHeight,
   onToggle,
+  controls,
 }: ControlsDrawerProps) {
   return (
     <Drawer
@@ -46,7 +48,7 @@ function ControlsDrawer({
           px: 10,
         }}
       >
-        {open ? <SpectroscopyForm /> : <Box />}
+        {open ? controls : <Box />}
       </Box>
     </Drawer>
   );
