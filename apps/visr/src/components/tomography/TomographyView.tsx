@@ -1,11 +1,12 @@
 import { Box, Divider, Stack } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import Controls from "./Controls";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
+import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -26,6 +27,17 @@ function TomographyView() {
   const DRAWER_COLLAPSED_HEIGHT = 64;
   const NAVBAR_HEIGHT = 32;
   const PLOT_ASPECT_RATIO = 0.75;
+
+  const { width, containerRef, mounted } = useContainerWidth();
+  const h = 10;
+  const w = 1;
+
+  const layout = [
+    { i: "0", x: 0, y: 0, w: w, h: h },
+    { i: "1", x: 1, y: 0, w: w, h: h },
+    { i: "2", x: drawerOpen ? 2 : 0, y: 0, w: w, h: h },
+    { i: "3", x: drawerOpen ? 3 : 1, y: 0, w: w, h: h },
+  ];
 
   useEffect(() => {
     async function loadTestVolume() {
@@ -117,8 +129,39 @@ function TomographyView() {
     setPlane(radioValue);
   };
 
-  if (!volume) return <Box />;
   // revolve to be implemented
+
+  if (!volume) return <Box />;
+
+  const views = [
+    <CameraViewer />,
+    <VolumeViewer
+      volumeData={volume.volumeData}
+      volumeShape={volume.volumeShape}
+      visible={volumeVisible}
+    />,
+    <SliceViewer
+      volumeData={volume.volumeData}
+      volumeShape={volume.volumeShape}
+      slice={slice}
+      plane={plane}
+    />,
+  ];
+  const plots = views.map(({ key }, i) => (
+    <div
+      key={i}
+      style={{
+        flex: 1,
+        width: "30%",
+        minWidth: 260,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {views[i]}
+    </div>
+  ));
+  console.log(plots[0]);
   return (
     <Box
       sx={{
@@ -130,51 +173,20 @@ function TomographyView() {
         bgcolor: "background.default",
       }}
     >
-      <Stack direction="row" divider={<Divider orientation="vertical" />}>
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <CameraViewer />
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <VolumeViewer
-            volumeData={volume.volumeData}
-            volumeShape={volume.volumeShape}
-            visible={volumeVisible}
-          />
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <SliceViewer
-            volumeData={volume.volumeData}
-            volumeShape={volume.volumeShape}
-            slice={slice}
-            plane={plane}
-          />
-        </Box>
-      </Stack>
+      <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
+        {mounted && (
+          <ReactGridLayout
+            layout={layout}
+            width={width}
+            gridConfig={{
+              cols: !!drawerOpen ? plots.length : plots.length / 2,
+              rowHeight: 25,
+            }}
+          >
+            {plots}
+          </ReactGridLayout>
+        )}
+      </div>
       <ControlsDrawer
         open={drawerOpen}
         collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
