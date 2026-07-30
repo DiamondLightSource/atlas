@@ -1,4 +1,10 @@
-import { render, screen } from "@atlas/vitest-conf";
+import {
+  fireEvent,
+  render,
+  screen,
+  userEvent,
+  waitFor,
+} from "@atlas/vitest-conf";
 import { RunPlanButton } from "./RunPlanButton";
 import type { Api, TaskResponse, TrackableTask } from "@atlas/blueapi";
 
@@ -86,7 +92,7 @@ describe("RunPlanButton", () => {
     expect(screen.getByText("Run")).toBeDisabled();
   });
 
-  it("success message appears when button is pressed with successful response", () => {
+  it("success message appears when button is pressed with successful response", async () => {
     submitTaskMock.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     setActiveTaskMock.mutateAsync.mockReturnValue({
       data: mockTask,
@@ -98,9 +104,13 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
-    screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission successful!"));
-    expect(screen.findByTestId("Plan succeeded"));
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission successful!"));
+      expect(screen.findByTestId("Plan succeeded"));
+    });
   });
 
   it("failure message appears when button is pressed with failed response", async () => {
@@ -113,13 +123,16 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
-    screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission failed!"));
-    expect(
-      screen.findByTestId(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
-      ),
-    );
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission failed!"));
+      expect(
+        screen.findByTestId(
+          "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        ),
+      );
+    });
     const alert = await screen.findByRole("alert");
     expect(alert).toBeVisible();
   });
@@ -146,13 +159,16 @@ describe("RunPlanButton", () => {
         instrumentSession="cm12345-1"
       />,
     );
-    screen.getByText("Run").click();
-    expect(screen.findByTestId("Plan submission successful!"));
-    expect(
-      screen.findByTestId(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
-      ),
-    );
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Run"));
+    await waitFor(() => {
+      expect(screen.findByTestId("Plan submission successful!"));
+      expect(
+        screen.findByTestId(
+          "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        ),
+      );
+    });
     const alert = await screen.findByRole("alert");
     expect(alert).toBeVisible();
   });
