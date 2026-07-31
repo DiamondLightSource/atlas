@@ -1,9 +1,13 @@
-import { Button } from "@mui/material";
+import { Button, type SxProps, type Theme } from "@mui/material";
 import { usePauseQueue } from "../queue/queueService";
-import DangerousIcon from "@mui/icons-material/Dangerous";
+import DangerousOutlinedIcon from "@mui/icons-material/DangerousOutlined";
 import { useBlueapi } from "@atlas/blueapi-query";
 
-export function StopAllButton() {
+export interface StopAllButtonProps {
+  compact?: boolean;
+}
+
+export function StopAllButton({ compact }: StopAllButtonProps) {
   const blueapi = useBlueapi();
   const pause_queue = usePauseQueue();
 
@@ -19,7 +23,8 @@ export function StopAllButton() {
     <Button
       sx={{
         height: 40,
-        width: 150,
+        width: "100%",
+        gap: 1,
         fontSize: 16,
         fontWeight: "bold",
         alignItems: "center",
@@ -33,9 +38,8 @@ export function StopAllButton() {
       variant="contained"
       color="error"
       onClick={abort}
-      startIcon={<DangerousIcon />}
     >
-      STOP ALL
+      <DangerousOutlinedIcon /> {compact ? "" : "STOP ALL"}
     </Button>
   );
 }

@@ -105,5 +105,5 @@ const navigation: SectionGroup[] = [
 export const router = createRouter({
   title: "i15-1",
   navigation,
-  actions: <StopAllButton />,
+  systemControls: ({ open }) => <StopAllButton compact={!open} />,
 });

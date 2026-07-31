@@ -14,10 +14,9 @@ type Props = {
   title: string;
   open: boolean;
   setOpen: (open: boolean) => void;
-  actions?: React.ReactNode;
 };
 
-export function TopBar({ title, open, setOpen, actions }: Props) {
+export function TopBar({ title, open, setOpen }: Props) {
   return (
     <AppBar
       position="fixed"
@@ -68,8 +67,8 @@ export function TopBar({ title, open, setOpen, actions }: Props) {
           {title}
         </Typography>
 
-        <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
-          {actions} <ColourSchemeButton />
+        <Box sx={{ ml: "auto" }}>
+          <ColourSchemeButton />
         </Box>
       </Toolbar>
     </AppBar>
