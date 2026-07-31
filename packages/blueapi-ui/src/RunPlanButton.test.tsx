@@ -22,19 +22,6 @@ const mockTask: TrackableTask = {
   outcome: { outcome: "success" },
 };
 
-// const mockWorkerState = vi.fn(() => ({ data: "IDLE" }));
-// const mockSubmitTask = {
-//   mutateAsync: vi.fn(() => Promise.resolve(mockResponse)),
-// };
-// const mockSetActiveTask = {
-//   mutateAsync: vi.fn(() => Promise.resolve(mockResponse)),
-// };
-
-// const mockApi = {
-//   worker: { getState: vi.fn(() => Promise.resolve("IDLE")) },
-//   tasks: { get: vi.fn(() => Promise.resolve(mockTask)) },
-// } as unknown as Api;
-
 const {
   mockWorkerState,
   mockSubmitTask,
@@ -51,13 +38,6 @@ const {
   };
 });
 
-// vi.mock("@atlas/blueapi-query", () => ({
-//   useGetWorkerState: () => mockWorkerState(),
-//   useSubmitTask: () => mockSubmitTask,
-//   useSetActiveTask: () => mockSetActiveTask,
-//   useBlueapi: () => mockApi,
-// }));
-
 vi.mock("@atlas/blueapi-query", () => ({
   useGetWorkerState: () => mockWorkerState(),
   useSubmitTask: () => ({ mutateAsync: mockSubmitTask }),
@@ -71,10 +51,6 @@ vi.mock("@atlas/blueapi-query", () => ({
 describe("RunPlanButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // mockWorkerState.mockReset();
-    // mockWorkerState.mockReturnValue({ data: "IDLE" });
-    // mockSubmitTask.mutateAsync.mockClear();
-    // mockSetActiveTask.mutateAsync.mockClear();
     mockWorkerState.mockReturnValue({ data: "IDLE" });
     mockGetState.mockResolvedValue("IDLE");
     mockGetTask.mockResolvedValue(mockTask);
@@ -83,9 +59,7 @@ describe("RunPlanButton", () => {
   });
 
   it("renders default button with Run", () => {
-    // mockWorkerState.mockReturnValue({ data: "IDLE" } as any);
     mockWorkerState.mockReturnValue({ data: "IDLE" });
-    // mockSubmitTask.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     mockSubmitTask.mockReturnValue({ data: mockResponse });
 
     render(
@@ -101,7 +75,6 @@ describe("RunPlanButton", () => {
 
   it("renders button with custom text", () => {
     mockWorkerState.mockReturnValue({ data: "IDLE" } as any);
-    // mockSubmitTask.mutateAsync.mockReturnValue({ data: mockResponse } as any);
     mockSubmitTask.mockReturnValue({ data: mockResponse });
     render(
       <RunPlanButton
@@ -115,7 +88,6 @@ describe("RunPlanButton", () => {
   });
 
   it("renders button as diabled when worker is busy", () => {
-    // mockWorkerState.mockReturnValue({ data: "RUNNING" } as any);
     mockWorkerState.mockReturnValue({ data: "RUNNING" });
     render(
       <RunPlanButton
@@ -128,10 +100,6 @@ describe("RunPlanButton", () => {
   });
 
   it("shows plan submission successful message then plan succeeded message when button is pressed with successful response", async () => {
-    // mockSubmitTask.mutateAsync.mockResolvedValue({ data: mockResponse } as any);
-    // mockSetActiveTask.mutateAsync.mockResolvedValue({
-    //   data: mockTask,
-    // } as any);
     mockSubmitTask.mockResolvedValue(mockResponse);
     mockSetActiveTask.mockResolvedValue(mockResponse);
     mockGetTask.mockResolvedValue(mockTask);
@@ -157,7 +125,6 @@ describe("RunPlanButton", () => {
   });
 
   it("shows submission failed message when button is pressed with failed response", async () => {
-    // mockSubmitTask.mutateAsync.mockResolvedValue(null as any);
     mockSubmitTask.mockResolvedValue(null);
 
     const user = userEvent.setup();
@@ -187,10 +154,6 @@ describe("RunPlanButton", () => {
       outcome: { outcome: "error" },
     };
 
-    // mockSubmitTask.mutateAsync.mockResolvedValue({ data: mockResponse } as any);
-    // mockSetActiveTask.mutateAsync.mockResolvedValue({
-    //   data: mockFailedTask,
-    // } as any);
     mockSubmitTask.mockResolvedValue(mockResponse);
     mockSetActiveTask.mockResolvedValue(mockResponse);
     mockGetTask.mockResolvedValue(mockFailedTask);
