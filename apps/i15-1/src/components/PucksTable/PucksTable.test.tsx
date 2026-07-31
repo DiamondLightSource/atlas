@@ -142,6 +142,7 @@ const mockContainersData = {
           barcode: "i15-1_1234",
           type: {
             name: "i15-1 puck",
+            numberOfContainerPositions: 0,
           },
           instrumentSessions: [
             {
@@ -164,6 +165,7 @@ const mockContainersData = {
           barcode: "i15-1_robot_table",
           type: {
             name: "i15-1 robot table",
+            numberOfContainerPositions: 20,
           },
           instrumentSessions: [],
           parent: null,
@@ -177,6 +179,7 @@ const mockContainersData = {
           barcode: "i15-1_cupboard_1",
           type: {
             name: "i15-1 storage cupboard",
+            numberOfContainerPositions: null,
           },
           instrumentSessions: [],
           parent: null,
@@ -190,6 +193,7 @@ const mockContainersData = {
           barcode: "i15-1_56789",
           type: {
             name: "i15-1 puck",
+            numberOfContainerPositions: 0,
           },
           instrumentSessions: [],
           parent: null,

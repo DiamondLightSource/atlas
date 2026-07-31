@@ -66,8 +66,6 @@ const REMOVE_PUCK_FROM_TABLE: TypedDocumentNode<
 // Probably don't want to use an ID here, name would be more readable but can't add puck to parent based on name
 const ROBOT_TABLE_ID = "019fae86-9deb-7c71-ac6b-2a846f4f2bee";
 const INSTRUMENT_KEY = "I15-1";
-// Shouldn't hardcode this, instead look at the size of the table container type in GQL
-const POSITION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
 const PUCK_CONTAINER_TYPE = "i15-1 puck";
 
 export function PucksTable() {
@@ -108,6 +106,17 @@ export function PucksTable() {
         status:
           edge.node.parent?.id === ROBOT_TABLE_ID ? "Mounted" : "Unmounted",
       }));
+  }, [data]);
+
+  const positionOptions = useMemo<number[]>(() => {
+    const edges = data?.containers.edges ?? [];
+    const robotTableNode = edges.find(
+      (edge) => edge.node.id === ROBOT_TABLE_ID,
+    );
+    const numberOfPositions =
+      robotTableNode?.node.type.numberOfContainerPositions ?? 0;
+
+    return Array.from({ length: numberOfPositions }, (_, index) => index + 1);
   }, [data]);
 
   useEffect(() => {
@@ -152,7 +161,7 @@ export function PucksTable() {
                 <MenuItem value="" disabled>
                   <em>Assign</em>
                 </MenuItem>
-                {POSITION_OPTIONS.map((position) => (
+                {positionOptions.map((position) => (
                   <MenuItem key={position} value={position}>
                     {position}
                   </MenuItem>
@@ -215,7 +224,7 @@ export function PucksTable() {
         },
       },
     ],
-    [selectedPositions],
+    [selectedPositions, positionOptions, mountPuck, unmountPuck],
   );
 
   const table = useMaterialReactTable({

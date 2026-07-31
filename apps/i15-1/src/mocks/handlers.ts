@@ -87,7 +87,7 @@ const fakeContainersForInstrument: {
           id: string;
           name: string;
           barcode: string;
-          type: { name: string };
+          type: { name: string; numberOfContainerPositions: number | null };
           instrumentSessions: Array<{ instrumentSessionReference: string }>;
           parent: { name: string; id: string } | null;
           positionInParent: { position: number } | null;
@@ -106,6 +106,7 @@ const fakeContainersForInstrument: {
             barcode: "i15-1_1234",
             type: {
               name: "i15-1 puck",
+              numberOfContainerPositions: 0,
             },
             instrumentSessions: [
               {
@@ -128,6 +129,7 @@ const fakeContainersForInstrument: {
             barcode: "i15-1_robot_table",
             type: {
               name: "i15-1 robot table",
+              numberOfContainerPositions: 20,
             },
             instrumentSessions: [],
             parent: null,
@@ -141,6 +143,7 @@ const fakeContainersForInstrument: {
             barcode: "i15-1_cupboard_1",
             type: {
               name: "i15-1 storage cupboard",
+              numberOfContainerPositions: null,
             },
             instrumentSessions: [],
             parent: null,
@@ -154,6 +157,7 @@ const fakeContainersForInstrument: {
             barcode: "i15-1_56789",
             type: {
               name: "i15-1 puck",
+              numberOfContainerPositions: 0,
             },
             instrumentSessions: [],
             parent: null,

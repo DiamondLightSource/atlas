@@ -10,6 +10,7 @@ export const getContainersForInstrumentQuery = gql`
           barcode
           type {
             name
+            numberOfContainerPositions
           }
           instrumentSessions {
             instrumentSessionReference
