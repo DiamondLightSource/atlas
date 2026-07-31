@@ -25,15 +25,6 @@ function TomographyView() {
   const NAVBAR_HEIGHT = 32;
   // const PLOT_ASPECT_RATIO = 0.75;
 
-  const h = 10;
-  const w = 1;
-
-  const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: h },
-    { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h },
-  ];
-
   useEffect(() => {
     async function loadTestVolume() {
       const [metaRes, rawRes] = await Promise.all([
@@ -134,7 +125,7 @@ function TomographyView() {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        minWidth: 0,
+        minWidth: 260 * 3,
         height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >

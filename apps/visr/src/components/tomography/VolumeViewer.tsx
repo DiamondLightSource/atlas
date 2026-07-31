@@ -42,13 +42,11 @@ export default function VolumeViewer({
       </Box>
 
       {visible && volumeData && volumeShape ? (
-        <div style={{ flex: 1 }}>
-          <VolumeRenderer
-            volumeData={volumeData}
-            volumeShape={volumeShape}
-            // revolve={revolve}
-          />
-        </div>
+        <VolumeRenderer
+          volumeData={volumeData}
+          volumeShape={volumeShape}
+          // revolve={revolve}
+        />
       ) : (
         <Box
           sx={{

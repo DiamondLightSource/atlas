@@ -38,42 +38,46 @@ export default function Controls({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 1,
-        px: 2,
-        py: 1.25,
+        // gap: 1,
+        // px: 2,
+        // py: 1.25,
         bgcolor: "background.paper",
-        borderTop: 1,
+        // borderTop: 1,
         borderColor: "divider",
       }}
     >
       <Stack direction="row" spacing={1} alignItems="center">
-        <TextField
-          label="angles"
-          type="number"
-          size="small"
-          defaultValue={360}
-          sx={{ width: 100 }}
-        />
-        <Button variant="contained" size="small" onClick={onRun}>
-          Run
-        </Button>
-        <Button variant="contained" size="small" onClick={onReset}>
-          Reset
-        </Button>
-
         <Box sx={{ flex: 1 }} />
-
-        {/* <ToggleButton
-          value="revolve"
-          selected={revolve}
-          size="small"
-          onChange={() => onRevolveChange(!revolve)}
-          color="secondary"
-          sx={{ textTransform: "none" }}
-        >
-          Revolve
-        </ToggleButton> */}
         <Box sx={{ flex: 1 }}>
+          <Typography variant="overline" color="primary" padding={1}>
+            Reconstruction
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <TextField
+              label="angles"
+              type="number"
+              size="small"
+              defaultValue={360}
+              sx={{ width: 100, padding: 1 }}
+            />
+            <Button variant="contained" size="small" onClick={onRun}>
+              Run
+            </Button>
+            <Button variant="contained" size="small" onClick={onReset}>
+              Reset
+            </Button>
+          </Stack>
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{ height: 8, borderRadius: 100 }}
+          />
+        </Box>
+        <Box sx={{ flex: 0.2 }} />
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="overline" color="primary">
+            Slice View
+          </Typography>
           <Typography variant="body1" color="primary">
             Slice
           </Typography>
@@ -91,7 +95,7 @@ export default function Controls({
             marks
             onChange={onSlide}
             value={slice}
-          ></Slider>{" "}
+          ></Slider>
           <Typography variant="body1" color="primary">
             Axis
           </Typography>
@@ -102,12 +106,18 @@ export default function Controls({
           </RadioGroup>
         </Box>
       </Stack>
+      {/* <Box sx={{ flex: 1 }} /> */}
 
-      <LinearProgress
-        variant="determinate"
-        value={progress}
-        sx={{ height: 8, borderRadius: 1 }}
-      />
+      {/* <ToggleButton
+          value="revolve"
+          selected={revolve}
+          size="small"
+          onChange={() => onRevolveChange(!revolve)}
+          color="secondary"
+          sx={{ textTransform: "none" }}
+        >
+          Revolve
+        </ToggleButton> */}
     </Box>
   );
 }
