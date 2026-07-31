@@ -1,6 +1,7 @@
-import type { Status } from "../../generated/queue";
+import type { Status, TaskWithPosition } from "../../generated/queue";
 
 export type QueueTableData = {
+  task: TaskWithPosition;
   position: number | null;
   name: string;
   id: string;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Container, Alert, Grid2 } from "@mui/material";
+import { Box, Container, Alert, Grid } from "@mui/material";
 import {
   usePlans,
   useDevices,
@@ -73,12 +73,12 @@ function Dashboard() {
           </Alert>
         )}
 
-        <Grid2 container spacing={3} alignItems="flex-start">
+        <Grid container spacing={3} alignItems="flex-start">
           {/* LEFT COLUMN: Scrollable Plans Library */}
-          <Grid2 size={{ xs: 12, md: 8, lg: 9 }}>
-            <Grid2 container spacing={3}>
+          <Grid size={{ xs: 12, md: 8, lg: 9 }}>
+            <Grid container spacing={3}>
               {(plansData?.plans || []).map((plan: Plan) => (
-                <Grid2
+                <Grid
                   size={{ xs: 12, lg: 6 }}
                   key={plan.name || "unknown-plan"}
                 >
@@ -92,13 +92,13 @@ function Dashboard() {
                       setFeedback({ type: "error", msg })
                     }
                   />
-                </Grid2>
+                </Grid>
               ))}
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
 
           {/* RIGHT COLUMN: Persistent Device Panel */}
-          <Grid2
+          <Grid
             size={{ xs: 12, md: 4, lg: 3 }}
             sx={{
               position: "sticky",
@@ -108,8 +108,8 @@ function Dashboard() {
             }}
           >
             <DevicePanel devices={devicesData?.devices || []} />
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );

@@ -1,4 +1,7 @@
-import { DiamondTheme, ThemeProvider } from "@diamondlightsource/sci-react-ui";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -34,7 +37,7 @@ export const api = createApi("/api/blueapi");
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <ThemeProvider theme={DiamondTheme} defaultMode="system">
+      <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
         <QueryClientProvider client={queryClient}>
           <BlueapiProvider api={api}>
             <RouterProvider router={router} />

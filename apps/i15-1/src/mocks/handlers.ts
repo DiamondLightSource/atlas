@@ -8,76 +8,78 @@ const workerStatus = { status: "IDLE", duration: 0 };
 
 const fakeExperiments = {
   data: {
-    instrumentSession: {
-      experiments: {
-        edges: [
-          {
-            node: {
-              name: "Test experiment",
-              sample: {
-                name: "Test_8_1",
-                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+    experiments: {
+      edges: [
+        {
+          node: {
+            name: "Test experiment",
+            sample: {
+              name: "Test_8_1",
+              id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
-                data: {
-                  q_max: 67,
-                  frames: 90,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 10,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+              data: {
+                q_max: 67,
+                frames: 90,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 10,
               },
             },
           },
-          {
-            node: {
-              name: "Test experiment 2",
-              sample: {
-                name: "Test_8_2",
-                id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+        },
+        {
+          node: {
+            name: "Test experiment 2",
+            sample: {
+              name: "Test_8_2",
+              id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "b645e887-85b4-40d6-a8f0-500a436bc395",
-                data: {
-                  q_max: 67,
-                  frames: 100,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 3,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "b645e887-85b4-40d6-a8f0-500a436bc395",
+              data: {
+                q_max: 67,
+                frames: 100,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 3,
               },
             },
           },
-        ],
-      },
+        },
+      ],
     },
   },
 };
+
+function setWorkerState(new_state: string) {
+  workerStatus.status = new_state;
+}
 
 const fakePvws = ws.link("wss://pvws.diamond.ac.uk/pvws/pv");
 
@@ -110,7 +112,85 @@ const fakeHistory = [
     },
     id: "b715f350-401a-48b9-929f-d6bcad064264",
     status: "Complete",
-    blueapi_calls: [],
+    blueapi_calls: [
+      {
+        task_request: {
+          name: "robot_load",
+          params: {
+            puck: "1",
+            position: "8",
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Success",
+        time_started: "2026-07-14T10:40:11.224558",
+        time_completed: "2026-07-14T10:40:11.586504",
+        result: {
+          outcome: "success",
+          result: null,
+          type: "NoneType",
+        },
+        errors: [],
+        blueapi_id: "445773b4-b318-473d-9a60-83f2e38d54ba",
+      },
+      {
+        task_request: {
+          name: "centre_sample",
+          params: {
+            start_z: -20,
+            end_z: 0,
+            steps: 20,
+            exposure_time: 0.01,
+            metadata: {
+              sample: {
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                data: {
+                  density: 56,
+                  capillary: "bs1.5",
+                  composition: "Stuff",
+                  packing_fraction: 0.5,
+                },
+              },
+              experiment_definition: {
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+                data: {
+                  q_max: 67,
+                  frames: 90,
+                  beam_energy: 40,
+                  time_per_pdf: 2,
+                  focused_beam_size: 10,
+                },
+              },
+            },
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Success",
+        time_started: "2026-07-14T10:40:11.605521",
+        time_completed: "2026-07-14T10:40:11.911974",
+        result: "success",
+        errors: [],
+        blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
+      },
+      {
+        task_request: {
+          name: "robot_unload",
+          params: {},
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Success",
+        time_started: null,
+        time_completed: null,
+        result: "success",
+        errors: [],
+        blueapi_id: null,
+      },
+    ],
     position: null,
     kind: "Experiment",
   },
@@ -140,15 +220,183 @@ const fakeHistory = [
         },
       },
     },
-    id: "b715f350-401a-48b9-929f-d6bcad064264",
+    id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
     status: "Error",
-    blueapi_calls: [],
+    blueapi_calls: [
+      {
+        task_request: {
+          name: "robot_load",
+          params: {
+            puck: "1",
+            position: "8",
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Success",
+        time_started: "2026-07-14T10:40:11.224558",
+        time_completed: "2026-07-14T10:40:11.586504",
+        result: {
+          outcome: "success",
+          result: null,
+          type: "NoneType",
+        },
+        errors: [],
+        blueapi_id: "445773b4-b318-473d-9a60-83f2e38d54ba",
+      },
+      {
+        task_request: {
+          name: "centre_sample",
+          params: {
+            start_z: -20,
+            end_z: 0,
+            steps: 20,
+            exposure_time: 0.01,
+            metadata: {
+              sample: {
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                data: {
+                  density: 56,
+                  capillary: "bs1.5",
+                  composition: "Stuff",
+                  packing_fraction: 0.5,
+                },
+              },
+              experiment_definition: {
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+                data: {
+                  q_max: 67,
+                  frames: 90,
+                  beam_energy: 40,
+                  time_per_pdf: 2,
+                  focused_beam_size: 10,
+                },
+              },
+            },
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Error",
+        time_started: "2026-07-14T10:40:11.605521",
+        time_completed: "2026-07-14T10:40:11.911974",
+        result: null,
+        errors: [
+          {
+            outcome: "error",
+            type: "FailedStatus",
+            message:
+              "<AsyncStatus, device: zebra-inputs-soft_in_1, task: <coroutine object AsyncStatusBase.__init__.<locals>.wait_with_error_message at 0x7f675513d640>, errored: ValueError('0 is not a valid SoftInState')>",
+          },
+        ],
+        blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
+      },
+      {
+        task_request: {
+          name: "robot_unload",
+          params: {},
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Skipped",
+        time_started: null,
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: null,
+      },
+    ],
     position: null,
     kind: "Experiment",
   },
 ];
 
 const fakeQueue = [
+  {
+    experiment: {
+      name: "Test experiment",
+      instrument_session: "cm44163-3",
+      sample: {
+        name: "Test_8_1",
+        id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+        data: {
+          density: 56,
+          capillary: "bs1.5",
+          composition: "Stuff",
+          packing_fraction: 0.5,
+        },
+      },
+      experiment_definition: {
+        name: "run_full_collection",
+        id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+        data: {
+          q_max: 67,
+          frames: 90,
+          beam_energy: 40,
+          time_per_pdf: 2,
+          focused_beam_size: 10,
+        },
+      },
+    },
+    id: "61e500d6-33ce-432e-9ae2-42ba1d5214a0",
+    status: "In progress",
+    blueapi_calls: [
+      {
+        task_request: {
+          name: "robot_load",
+          params: {
+            puck: "1",
+            position: "8",
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "61e500d6-33ce-432e-9ae2-42ba1d5214a0",
+        status: "Success",
+        time_started: "2026-07-14T10:40:30.605521",
+        time_completed: "2026-07-14T10:40:44.911974",
+        result: null,
+        errors: [],
+        blueapi_id: "9363680a-2129-4012-9a87-58af7f963c55",
+      },
+      {
+        task_request: {
+          name: "centre_sample",
+          params: {
+            start_z: -5,
+            end_z: 5,
+            steps: 20,
+            exposure_time: 0.01,
+          },
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "61e500d6-33ce-432e-9ae2-42ba1d5214a0",
+        status: "In progress",
+        time_started: "2026-07-14T10:40:45.605521",
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: "3edfdaf9-71f5-4a9b-87e7-170bb97e3eab",
+      },
+      {
+        task_request: {
+          name: "robot_unload",
+          params: {},
+          instrument_session: "cm44163-3",
+        },
+        parent_task_id: "61e500d6-33ce-432e-9ae2-42ba1d5214a0",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: null,
+      },
+    ],
+    position: 1,
+    kind: "Experiment",
+  },
   {
     experiment: {
       name: "sleep",
@@ -276,7 +524,7 @@ export const handlers = [
     : []),
 
   http.put("/api/blueapi/worker/task", () => {
-    workerStatus.status = "RUNNING";
+    setWorkerState("RUNNING");
     return HttpResponse.json({
       task_id: fakeTaskId,
     });
@@ -288,8 +536,24 @@ export const handlers = [
     });
   }),
 
-  http.put("/api/blueapi/worker/state", () => {
-    return HttpResponse.json("IDLE");
+  http.get("/api/blueapi/tasks/:task_id", () => {
+    return HttpResponse.json({
+      task_id: fakeTaskId,
+      task: { name: "fake-task", params: {}, metadata: {} },
+      request_id: "00",
+      is_complete: true,
+      is_pending: false,
+      errors: [],
+      outcome: { outcome: "success", type: "str", result: null },
+    });
+  }),
+
+  http.put("/api/blueapi/worker/state", async ({ request }) => {
+    const { new_state } = (await request.json()) as { new_state: string };
+    if (new_state === "ABORTING") {
+      setWorkerState(new_state);
+    }
+    return HttpResponse.json(workerStatus.status);
   }),
 
   http.get("/oauth2/userinfo", () => {

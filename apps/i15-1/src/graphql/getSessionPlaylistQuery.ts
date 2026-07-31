@@ -1,31 +1,31 @@
 import { gql } from "@apollo/client";
 
 export const getSessionPlaylistQuery = gql`
-  query GetSessionPlaylist($proposal: Int!, $session: Int!) {
-    instrumentSession(
+query GetSessionPlaylist($proposal: Int!, $session: Int!) {
+  experiments(
+    instrumentSessions: {
       proposalNumber: $proposal
       instrumentSessionNumber: $session
-    ) {
-      experiments {
-        edges {
-          node {
-            name
-            sample {
-              name
-              id
-              instrumentSessions {
-                instrumentSessionReference
-              }
-              data
-            }
-            experimentDefinition {
-              name
-              id
-              data
-            }
+    }
+  ) {
+    edges {
+      node {
+        name
+        sample {
+          name
+          id
+          data
+          instrumentSessions {
+            instrumentSessionReference
           }
+        }
+        experimentDefinition {
+          name
+          id
+          data
         }
       }
     }
   }
+}
 `;
