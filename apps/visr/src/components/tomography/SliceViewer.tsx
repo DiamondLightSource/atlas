@@ -3,7 +3,6 @@ import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
-import { Box3Helper } from "three";
 
 interface Props {
   volumeData: Uint8Array;

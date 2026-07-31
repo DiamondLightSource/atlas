@@ -48,7 +48,7 @@ function GridViews({
       plane={plane}
     />,
   ];
-  const plots = views.map(({ key }, i) => (
+  const plots = views.map((view, i) => (
     <div
       key={i}
       style={{
@@ -56,7 +56,7 @@ function GridViews({
         minWidth: 260,
       }}
     >
-      {views[i]}
+      {view}
     </div>
   ));
   console.log(plots[0]);

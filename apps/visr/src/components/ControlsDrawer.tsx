@@ -1,7 +1,6 @@
 import { Drawer, Box, IconButton, Typography } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import { SpectroscopyForm } from "./spectroscopy/SpectroscopyForm";
 
 interface ControlsDrawerProps {
   open: boolean;
