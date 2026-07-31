@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
 import type { TypedDocumentNode } from "@apollo/client";
 import {
   Button,
@@ -18,10 +18,15 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { getContainersForInstrumentQuery } from "../../graphql/getContainersForInstrumentQuery";
+import { addPuckToTableMutation } from "../../graphql/addPuckToTableMutation";
 import type {
   GetContainersForInstrumentQuery,
   GetContainersForInstrumentQueryVariables,
 } from "../../graphql/getContainersForInstrumentQuery.generated";
+import type {
+  AddPuckToTableMutation,
+  AddPuckToTableMutationVariables,
+} from "../../graphql/addPuckToTableMutation.generated";
 
 type PuckTableData = {
   id: string;
@@ -43,7 +48,17 @@ const GET_CONTAINERS: TypedDocumentNode<
   GetContainersForInstrumentQueryVariables
 > = getContainersForInstrumentQuery;
 
+const ADD_PUCK_TO_TABLE: TypedDocumentNode<
+  AddPuckToTableMutation,
+  AddPuckToTableMutationVariables
+> = addPuckToTableMutation;
+
+// Probably don't want to use an ID here, name would be more readable but can't add puck to parent based on name
+const ROBOT_TABLE_ID = "019fae86-9deb-7c71-ac6b-2a846f4f2bee";
+const INSTRUMENT_KEY = "I15-1";
+// Shouldn't hardcode this, instead look at the size of the table container type in GQL
 const POSITION_OPTIONS = Array.from({ length: 20 }, (_, index) => index + 1);
+const PUCK_CONTAINER_TYPE = "i15-1 puck";
 
 export function PucksTable() {
   const location = useLocation();
@@ -53,9 +68,14 @@ export function PucksTable() {
 
   const { data, loading, error } = useQuery(GET_CONTAINERS, {
     variables: {
-      instrumentKeys: ["I15-1"],
+      instrumentKeys: [INSTRUMENT_KEY],
     },
     fetchPolicy: "cache-and-network",
+    context: { pathname: location.pathname },
+  });
+
+  const [mountPuck] = useMutation(ADD_PUCK_TO_TABLE, {
+    refetchQueries: [GET_CONTAINERS],
     context: { pathname: location.pathname },
   });
 
@@ -63,7 +83,7 @@ export function PucksTable() {
     const edges = data?.containers.edges ?? [];
 
     return edges
-      .filter((edge) => edge.node.type.name === "i15-1 puck")
+      .filter((edge) => edge.node.type.name === PUCK_CONTAINER_TYPE)
       .map((edge) => ({
         id: String(edge.node.id),
         barcode: edge.node.barcode ?? "",
@@ -71,9 +91,7 @@ export function PucksTable() {
           edge.node.instrumentSessions[0]?.instrumentSessionReference ?? "",
         parentPosition: edge.node.positionInParent?.position ?? null,
         status:
-          edge.node.parent?.name === "i15-1 robot table"
-            ? "Mounted"
-            : "Unmounted",
+          edge.node.parent?.id === ROBOT_TABLE_ID ? "Mounted" : "Unmounted",
       }));
   }, [data]);
 
@@ -157,7 +175,17 @@ export function PucksTable() {
               variant="contained"
               color={isMounted ? "success" : "info"}
               size="small"
-              onClick={() => {}}
+              onClick={() => {
+                if (!isMounted) {
+                  void mountPuck({
+                    variables: {
+                      barcode: row.original.barcode,
+                      tableId: ROBOT_TABLE_ID,
+                      position: selectedPositions[rowId]!,
+                    },
+                  });
+                }
+              }}
             >
               {isMounted ? "Unmount" : "Mark as mounted"}
             </Button>
@@ -190,7 +218,7 @@ export function PucksTable() {
       </Stack>
     ),
     state: {
-      isLoading: loading,
+      isLoading: loading && !data,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error

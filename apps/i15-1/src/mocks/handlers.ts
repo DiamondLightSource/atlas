@@ -79,7 +79,23 @@ const fakeExperiments = {
   },
 };
 
-const fakeContainersForInstrument = {
+const fakeContainersForInstrument: {
+  data: {
+    containers: {
+      edges: Array<{
+        node: {
+          id: string;
+          name: string;
+          barcode: string;
+          type: { name: string };
+          instrumentSessions: Array<{ instrumentSessionReference: string }>;
+          parent: { name: string; id: string } | null;
+          positionInParent: { position: number } | null;
+        };
+      }>;
+    };
+  };
+} = {
   data: {
     containers: {
       edges: [
@@ -648,6 +664,41 @@ export const handlers = [
 
     if (body.operationName === "GetContainersForInstrument") {
       return HttpResponse.json(fakeContainersForInstrument);
+    }
+
+    if (body.operationName === "AddPuckToTable") {
+      const { barcode, tableId, position } = (
+        body as {
+          variables: { barcode: string; tableId: string; position: number };
+        }
+      ).variables;
+
+      const tableEdge = fakeContainersForInstrument.data.containers.edges.find(
+        (e) => e.node.id === tableId,
+      );
+      const puckEdge = fakeContainersForInstrument.data.containers.edges.find(
+        (e) => e.node.barcode === barcode,
+      );
+
+      if (puckEdge && tableEdge) {
+        puckEdge.node.parent = {
+          name: tableEdge.node.name,
+          id: tableEdge.node.id,
+        };
+        puckEdge.node.positionInParent = { position };
+      }
+
+      return HttpResponse.json({
+        data: {
+          container: {
+            __typename: "ContainerMutations",
+            setParentContainer: {
+              __typename: "SetParentContainerResponse",
+              success: true,
+            },
+          },
+        },
+      });
     }
 
     if (body.operationName === "GetSessionPlaylist") {

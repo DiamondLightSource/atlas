@@ -41,6 +41,7 @@ vi.mock("@apollo/client/react", async (importOriginal) => {
   return {
     ...actual,
     useQuery: vi.fn(),
+    useMutation: vi.fn(),
   };
 });
 
@@ -89,6 +90,7 @@ vi.mock("material-react-table", () => ({
 }));
 
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
+const mockedUseMutation = apollo.useMutation as unknown as Mock;
 
 const mockContainersData = {
   containers: {
@@ -168,6 +170,7 @@ const renderComponent = () =>
 describe("PucksTable", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseMutation.mockReturnValue([vi.fn(), { loading: false }]);
   });
 
   it("initialises position dropdown from parentPosition in data", async () => {
@@ -326,5 +329,44 @@ describe("PucksTable", () => {
     // The "Assign" option must be present but disabled so it cannot be chosen
     const assignOption = screen.getByRole("option", { name: /assign/i });
     expect(assignOption).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("calls addPuckToTable mutation with correct variables when Mark as mounted is clicked", async () => {
+    const mockMutate = vi.fn();
+    mockedUseMutation.mockReturnValue([mockMutate, { loading: false }]);
+
+    mockedUseQuery.mockReturnValue({
+      data: {
+        containers: {
+          edges: [
+            ...mockContainersData.containers.edges.slice(0, 3),
+            {
+              node: {
+                ...mockContainersData.containers.edges[3].node,
+                positionInParent: { position: 5 },
+              },
+            },
+          ],
+        },
+      },
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    const button = await screen.findByRole("button", {
+      name: /mark as mounted/i,
+    });
+    await user.click(button);
+
+    expect(mockMutate).toHaveBeenCalledWith({
+      variables: {
+        barcode: "i15-1_56789",
+        tableId: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+        position: 5,
+      },
+    });
   });
 });
