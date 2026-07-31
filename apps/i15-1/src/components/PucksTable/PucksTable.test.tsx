@@ -323,26 +323,25 @@ describe("PucksTable", () => {
 
   it("shows Mark as mounted button for an unmounted puck that has a position", async () => {
     mockedUseQuery.mockReturnValue({
-      data: {
-        containers: {
-          edges: [
-            ...mockContainersData.containers.edges.slice(0, 3),
-            {
-              node: {
-                ...mockContainersData.containers.edges[3].node,
-                positionInParent: { position: 3 },
-              },
-            },
-          ],
-        },
-      },
+      data: mockContainersData,
       loading: false,
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
+    const user = userEvent.setup();
     renderComponent();
 
-    // Puck 56789 is Unmounted (no robot table parent) and now has position 3
+    // Set the position for puck 56789 to 3 in the dropdown
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+    await user.click(screen.getByRole("option", { name: "3" }));
+
+    // Puck 56789 is Unmounted and now has a selected position
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /mark as mounted/i }),
@@ -384,25 +383,23 @@ describe("PucksTable", () => {
     const unmountMutate = byOperation.RemovePuckFromTable;
 
     mockedUseQuery.mockReturnValue({
-      data: {
-        containers: {
-          edges: [
-            ...mockContainersData.containers.edges.slice(0, 3),
-            {
-              node: {
-                ...mockContainersData.containers.edges[3].node,
-                positionInParent: { position: 5 },
-              },
-            },
-          ],
-        },
-      },
+      data: mockContainersData,
       loading: false,
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
     const user = userEvent.setup();
     renderComponent();
+
+    // Set the position for puck 56789 to 3 in the dropdown
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+    await user.click(screen.getByRole("option", { name: "3" }));
 
     const button = await screen.findByRole("button", {
       name: /mark as mounted/i,
@@ -413,7 +410,7 @@ describe("PucksTable", () => {
       variables: {
         barcode: "i15-1_56789",
         tableId: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
-        position: 5,
+        position: 3,
       },
     });
     expect(unmountMutate).not.toHaveBeenCalled();
