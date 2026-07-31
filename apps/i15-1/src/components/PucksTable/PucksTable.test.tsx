@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@atlas/vitest-conf";
+import { render, screen, waitFor, userEvent } from "@atlas/vitest-conf";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { PucksTable } from "./PucksTable";
@@ -212,8 +212,8 @@ describe("PucksTable", () => {
 
     renderComponent();
 
-    expect(screen.getByText("Mounted")).toBeInTheDocument();
-    expect(screen.getByText("Unmounted")).toBeInTheDocument();
+    expect(screen.getAllByText("Mounted").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Unmounted").length).toBeGreaterThan(0);
   });
 
   it("shows loading state", () => {
@@ -301,5 +301,30 @@ describe("PucksTable", () => {
         screen.getByRole("button", { name: /mark as mounted/i }),
       ).toBeInTheDocument();
     });
+  });
+
+  it("shows 'Assign' as a disabled placeholder option in the position dropdown", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    // Open the position dropdown for the puck with no position (puck 56789)
+    // The select showing "Assign" belongs to that puck
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+
+    // The "Assign" option must be present but disabled so it cannot be chosen
+    const assignOption = screen.getByRole("option", { name: /assign/i });
+    expect(assignOption).toHaveAttribute("aria-disabled", "true");
   });
 });

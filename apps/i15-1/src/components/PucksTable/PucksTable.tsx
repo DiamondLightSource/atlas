@@ -116,7 +116,7 @@ export function PucksTable() {
                   }));
                 }}
               >
-                <MenuItem value="">
+                <MenuItem value="" disabled>
                   <em>Assign</em>
                 </MenuItem>
                 {POSITION_OPTIONS.map((position) => (
