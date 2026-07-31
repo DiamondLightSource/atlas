@@ -120,6 +120,7 @@ export function PucksTable() {
   }, [data]);
 
   useEffect(() => {
+    // Use the initial values grabbed from the server to seed the selectedPositions state, but don't overwrite any user changes
     setSelectedPositions((current) => {
       const seeded: Record<string, number | null> = {};
       for (const row of tableData) {
