@@ -9,9 +9,9 @@ import {
 import Robot from "./routes/Robot";
 import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
-import Plans from "./routes/Plans";
 import { QueueView } from "./routes/QueueView";
 import { StopAllButton } from "./components/StopAllButton";
+import { PlanBrowser } from "@atlas/blueapi-ui";
 
 const navigation: SectionGroup[] = [
   {
@@ -65,7 +65,7 @@ const navigation: SectionGroup[] = [
           },
           {
             name: "Plans",
-            element: <Plans />,
+            element: <PlanBrowser />,
           },
         ],
       },

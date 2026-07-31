@@ -17,11 +17,12 @@
     "@jsonforms/material-renderers": "3.6.0",
     "@jsonforms/react": "3.6.0",
     "@tanstack/react-query": "^5.90.21",
+    "lucide-react": "^1.24.0",
     "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
-    "@mui/material": "^6.5.0",
+    "@mui/material": "^7.0.0",
     "vitest": "*"
   }
 }

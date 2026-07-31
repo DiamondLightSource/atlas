@@ -26,7 +26,6 @@ function Dashboard() {
                 ? null
                 : { fedid: user.person }
             }
-            colour="white"
           />
           <InstrumentSessionView
             sessionsList={[

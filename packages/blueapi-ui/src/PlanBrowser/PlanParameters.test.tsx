@@ -17,7 +17,7 @@ vi.mock("@jsonforms/react", () => {
 export function RunPlanButton() {
   return <button>Run</button>;
 }
-vi.mock("./RunPlanButton", () => ({
+vi.mock("../RunPlanButton", () => ({
   RunPlanButton: RunPlanButton,
 }));
 

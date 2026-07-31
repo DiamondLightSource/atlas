@@ -7,10 +7,10 @@ import type {
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
   Experiment,
+  TaskWithPosition,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
-import type { QueuedTasks } from "./tasks";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
@@ -157,8 +157,8 @@ export function useToggleQueueState() {
   };
 }
 
-const getQueuedTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/queue");
+const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/queue");
   return response.data;
 };
 
@@ -173,8 +173,8 @@ export function useGetQueuedTasks() {
   });
 }
 
-const getAllTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/tasks");
+const getAllTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/tasks");
   return response.data;
 };
 
@@ -189,8 +189,10 @@ export function useGetAllTasks() {
   });
 }
 
-const getHistoricTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/history");
+const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(
+    QUEUE_SOCKET + "/history",
+  );
   return response.data;
 };
 
@@ -205,8 +207,10 @@ export function useGetHistoricTasks() {
   });
 }
 
-export const cancelTasks = async (taskIds: string[]): Promise<QueuedTasks> => {
-  const response = await axios.delete<QueuedTasks>(
+export const cancelTasks = async (
+  taskIds: string[],
+): Promise<TaskWithPosition[]> => {
+  const response = await axios.delete<TaskWithPosition[]>(
     QUEUE_SOCKET + "/queue/tasks",
     {
       data: {
