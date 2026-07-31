@@ -19,6 +19,7 @@ import {
 } from "material-react-table";
 import { getContainersForInstrumentQuery } from "../../graphql/getContainersForInstrumentQuery";
 import { addPuckToTableMutation } from "../../graphql/addPuckToTableMutation";
+import { removePuckFromTableMutation } from "../../graphql/removePuckFromTableMutation";
 import type {
   GetContainersForInstrumentQuery,
   GetContainersForInstrumentQueryVariables,
@@ -27,6 +28,10 @@ import type {
   AddPuckToTableMutation,
   AddPuckToTableMutationVariables,
 } from "../../graphql/addPuckToTableMutation.generated";
+import type {
+  RemovePuckFromTableMutation,
+  RemovePuckFromTableMutationVariables,
+} from "../../graphql/removePuckFromTableMutation.generated";
 
 type PuckTableData = {
   id: string;
@@ -53,6 +58,11 @@ const ADD_PUCK_TO_TABLE: TypedDocumentNode<
   AddPuckToTableMutationVariables
 > = addPuckToTableMutation;
 
+const REMOVE_PUCK_FROM_TABLE: TypedDocumentNode<
+  RemovePuckFromTableMutation,
+  RemovePuckFromTableMutationVariables
+> = removePuckFromTableMutation;
+
 // Probably don't want to use an ID here, name would be more readable but can't add puck to parent based on name
 const ROBOT_TABLE_ID = "019fae86-9deb-7c71-ac6b-2a846f4f2bee";
 const INSTRUMENT_KEY = "I15-1";
@@ -75,6 +85,11 @@ export function PucksTable() {
   });
 
   const [mountPuck] = useMutation(ADD_PUCK_TO_TABLE, {
+    refetchQueries: [GET_CONTAINERS],
+    context: { pathname: location.pathname },
+  });
+
+  const [unmountPuck] = useMutation(REMOVE_PUCK_FROM_TABLE, {
     refetchQueries: [GET_CONTAINERS],
     context: { pathname: location.pathname },
   });
@@ -176,7 +191,14 @@ export function PucksTable() {
               color={isMounted ? "success" : "info"}
               size="small"
               onClick={() => {
-                if (!isMounted) {
+                if (isMounted) {
+                  void unmountPuck({
+                    variables: {
+                      tableId: ROBOT_TABLE_ID,
+                      puckId: [row.original.id],
+                    },
+                  });
+                } else {
                   void mountPuck({
                     variables: {
                       barcode: row.original.barcode,

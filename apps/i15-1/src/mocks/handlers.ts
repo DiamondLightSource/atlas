@@ -701,6 +701,37 @@ export const handlers = [
       });
     }
 
+    if (body.operationName === "RemovePuckFromTable") {
+      const { puckId } = (
+        body as {
+          variables: { tableId: string; puckId: string[] };
+        }
+      ).variables;
+
+      for (const id of puckId) {
+        const puckEdge = fakeContainersForInstrument.data.containers.edges.find(
+          (e) => e.node.id === id,
+        );
+
+        if (puckEdge) {
+          puckEdge.node.parent = null;
+          puckEdge.node.positionInParent = null;
+        }
+      }
+
+      return HttpResponse.json({
+        data: {
+          container: {
+            __typename: "ContainerMutations",
+            removeContainersFromContainer: {
+              __typename: "RemoveContainersFromContainerResponse",
+              success: true,
+            },
+          },
+        },
+      });
+    }
+
     if (body.operationName === "GetSessionPlaylist") {
       return HttpResponse.json(fakeExperiments);
     }

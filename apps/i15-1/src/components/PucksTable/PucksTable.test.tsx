@@ -92,6 +92,46 @@ vi.mock("material-react-table", () => ({
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
 const mockedUseMutation = apollo.useMutation as unknown as Mock;
 
+function getOperationName(document: unknown): string | undefined {
+  if (!document || typeof document !== "object") {
+    return undefined;
+  }
+
+  const definitions = (
+    document as {
+      definitions?: Array<{
+        kind?: string;
+        name?: { value?: string };
+      }>;
+    }
+  ).definitions;
+
+  const operationDefinition = definitions?.find(
+    (definition) => definition.kind === "OperationDefinition",
+  );
+
+  return operationDefinition?.name?.value;
+}
+
+function setupMutationFixture(operationNames: string[]) {
+  const byOperation = Object.fromEntries(
+    operationNames.map((name) => [name, vi.fn()]),
+  ) as Record<string, Mock>;
+  const fallbackMutate = vi.fn();
+
+  mockedUseMutation.mockImplementation((document: unknown) => {
+    const operationName = getOperationName(document);
+
+    if (operationName && byOperation[operationName]) {
+      return [byOperation[operationName], { loading: false }];
+    }
+
+    return [fallbackMutate, { loading: false }];
+  });
+
+  return { byOperation, fallbackMutate };
+}
+
 const mockContainersData = {
   containers: {
     edges: [
@@ -332,8 +372,12 @@ describe("PucksTable", () => {
   });
 
   it("calls addPuckToTable mutation with correct variables when Mark as mounted is clicked", async () => {
-    const mockMutate = vi.fn();
-    mockedUseMutation.mockReturnValue([mockMutate, { loading: false }]);
+    const { byOperation } = setupMutationFixture([
+      "AddPuckToTable",
+      "RemovePuckFromTable",
+    ]);
+    const mockMutate = byOperation.AddPuckToTable;
+    const unmountMutate = byOperation.RemovePuckFromTable;
 
     mockedUseQuery.mockReturnValue({
       data: {
@@ -368,5 +412,35 @@ describe("PucksTable", () => {
         position: 5,
       },
     });
+    expect(unmountMutate).not.toHaveBeenCalled();
+  });
+
+  it("calls removePuckFromTable mutation with correct variables when Unmount is clicked", async () => {
+    const { byOperation } = setupMutationFixture([
+      "AddPuckToTable",
+      "RemovePuckFromTable",
+    ]);
+    const mountMutate = byOperation.AddPuckToTable;
+    const unmountMutate = byOperation.RemovePuckFromTable;
+
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    const button = await screen.findByRole("button", { name: /unmount/i });
+    await user.click(button);
+
+    expect(unmountMutate).toHaveBeenCalledWith({
+      variables: {
+        tableId: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+        puckId: ["019fae86-1551-74f2-b876-f2b5dd4dbb43"],
+      },
+    });
+    expect(mountMutate).not.toHaveBeenCalled();
   });
 });
