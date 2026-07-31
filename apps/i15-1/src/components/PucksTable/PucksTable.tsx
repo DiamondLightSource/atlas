@@ -63,8 +63,7 @@ const REMOVE_PUCK_FROM_TABLE: TypedDocumentNode<
   RemovePuckFromTableMutationVariables
 > = removePuckFromTableMutation;
 
-// Probably don't want to use an ID here, name would be more readable but can't add puck to parent based on name
-const ROBOT_TABLE_ID = "019fae86-9deb-7c71-ac6b-2a846f4f2bee";
+const ROBOT_TABLE_NAME = "i15-1 robot table";
 const INSTRUMENT_KEY = "I15-1";
 const PUCK_CONTAINER_TYPE = "i15-1 puck";
 
@@ -104,19 +103,25 @@ export function PucksTable() {
           edge.node.instrumentSessions[0]?.instrumentSessionReference ?? "",
         parentPosition: edge.node.positionInParent?.position ?? null,
         status:
-          edge.node.parent?.id === ROBOT_TABLE_ID ? "Mounted" : "Unmounted",
+          edge.node.parent?.name === ROBOT_TABLE_NAME ? "Mounted" : "Unmounted",
       }));
   }, [data]);
 
-  const positionOptions = useMemo<number[]>(() => {
+  const { robotTableId, positionOptions } = useMemo(() => {
     const edges = data?.containers.edges ?? [];
     const robotTableNode = edges.find(
-      (edge) => edge.node.id === ROBOT_TABLE_ID,
+      (edge) => edge.node.name === ROBOT_TABLE_NAME,
     );
     const numberOfPositions =
       robotTableNode?.node.type.numberOfContainerPositions ?? 0;
 
-    return Array.from({ length: numberOfPositions }, (_, index) => index + 1);
+    return {
+      robotTableId: robotTableNode?.node.id ?? null,
+      positionOptions: Array.from(
+        { length: numberOfPositions },
+        (_, index) => index + 1,
+      ),
+    };
   }, [data]);
 
   useEffect(() => {
@@ -204,7 +209,7 @@ export function PucksTable() {
                 if (isMounted) {
                   void unmountPuck({
                     variables: {
-                      tableId: ROBOT_TABLE_ID,
+                      tableId: robotTableId,
                       puckId: [row.original.id],
                     },
                   });
@@ -212,7 +217,7 @@ export function PucksTable() {
                   void mountPuck({
                     variables: {
                       barcode: row.original.barcode,
-                      tableId: ROBOT_TABLE_ID,
+                      tableId: robotTableId,
                       position: selectedPositions[rowId]!,
                     },
                   });
@@ -225,7 +230,7 @@ export function PucksTable() {
         },
       },
     ],
-    [selectedPositions, positionOptions, mountPuck, unmountPuck],
+    [selectedPositions, positionOptions, robotTableId, mountPuck, unmountPuck],
   );
 
   const table = useMaterialReactTable({
