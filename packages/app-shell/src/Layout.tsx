@@ -39,7 +39,7 @@ export function Layout(props: RouterProps) {
         sx={{ display: "flex", flex: 1, flexDirection: "column" }}
       >
         {/* The Toolbar acts as a spacer,
-            same size as the toolbar used inside the TopBar's AppBar*/}
+            same height as the fixed TopBar's Navbar */}
         <Toolbar />
         <Outlet />
       </Box>
