@@ -14,7 +14,7 @@ export function Layout(props: RouterProps) {
       <SideNav
         navigation={props.navigation}
         open={open}
-        systemControls={props.systemControls}
+        footer={props.footer}
       />
       <Box
         component="main"

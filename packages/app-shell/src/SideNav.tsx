@@ -14,15 +14,14 @@ import { NavLink } from "react-router-dom";
 import type { Section, SectionGroup } from "./Router";
 import type React from "react";
 import { Fragment } from "react";
-import { SystemControls } from "./SystemControls";
 
 interface SideNavProps {
   navigation: SectionGroup[];
   open: boolean;
-  systemControls?: (props: { open: boolean }) => React.ReactNode;
+  footer?: (props: { open: boolean }) => React.ReactNode;
 }
 
-export function SideNav({ navigation, open, systemControls }: SideNavProps) {
+export function SideNav({ navigation, open, footer }: SideNavProps) {
   const width = open ? 256 : 72;
 
   return (
@@ -55,10 +54,7 @@ export function SideNav({ navigation, open, systemControls }: SideNavProps) {
           ))}
         </List>
       </Box>
-      <SystemControls
-        open={open}
-        systemControls={systemControls}
-      ></SystemControls>
+      {footer?.({ open })}
     </Drawer>
   );
 }

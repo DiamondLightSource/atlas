@@ -17,8 +17,8 @@ export interface RouterProps {
   /** a router will be derived to express this */
   navigation: SectionGroup[];
 
-  /** Add controls to the bottom of the navigation panel */
-  systemControls?: (props: { open: boolean }) => React.ReactNode;
+  /** Add a footer to the bottom of the navigation panel */
+  footer?: (props: { open: boolean }) => React.ReactNode;
 }
 
 /** A group within the main navigation tree */
