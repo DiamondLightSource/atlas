@@ -8,8 +8,8 @@ You can use the `ExperimentNode` type to enforce this.
 */
 
 type GeneratedNode = NonNullable<
-  GetSessionPlaylistQuery["instrumentSession"]
->["experiments"]["edges"][number]["node"];
+  GetSessionPlaylistQuery["experiments"]
+>["edges"][number]["node"];
 
 type WithTypedData<
   TNode extends {
