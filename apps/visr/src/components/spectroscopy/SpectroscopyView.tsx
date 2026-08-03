@@ -49,7 +49,7 @@ function SpectroscopyView() {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        minWidth: 0,
+        minWidth: drawerOpen ? 600 : 400,
         height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
