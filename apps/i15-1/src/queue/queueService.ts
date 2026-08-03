@@ -7,6 +7,7 @@ import type {
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
   Experiment,
+  TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
@@ -260,7 +261,7 @@ export const submitQueueTask = async ({
   experiment,
   taskPosition,
 }: {
-  experiment: Experiment;
+  experiment: Experiment | TaskRequest;
   taskPosition?: number;
 }) => {
   const data: AddTasksToQueueQueuePostData = {

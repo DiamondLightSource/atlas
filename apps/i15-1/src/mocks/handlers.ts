@@ -8,73 +8,71 @@ const workerStatus = { status: "IDLE", duration: 0 };
 
 const fakeExperiments = {
   data: {
-    instrumentSession: {
-      experiments: {
-        edges: [
-          {
-            node: {
-              name: "Test experiment",
-              sample: {
-                name: "Test_8_1",
-                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+    experiments: {
+      edges: [
+        {
+          node: {
+            name: "Test experiment",
+            sample: {
+              name: "Test_8_1",
+              id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
-                data: {
-                  q_max: 67,
-                  frames: 90,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 10,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+              data: {
+                q_max: 67,
+                frames: 90,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 10,
               },
             },
           },
-          {
-            node: {
-              name: "Test experiment 2",
-              sample: {
-                name: "Test_8_2",
-                id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+        },
+        {
+          node: {
+            name: "Test experiment 2",
+            sample: {
+              name: "Test_8_2",
+              id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "b645e887-85b4-40d6-a8f0-500a436bc395",
-                data: {
-                  q_max: 67,
-                  frames: 100,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 3,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "b645e887-85b4-40d6-a8f0-500a436bc395",
+              data: {
+                q_max: 67,
+                frames: 100,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 3,
               },
             },
           },
-        ],
-      },
+        },
+      ],
     },
   },
 };
