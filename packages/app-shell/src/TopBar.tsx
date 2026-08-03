@@ -12,6 +12,8 @@ import {
   Navbar,
 } from "@diamondlightsource/sci-react-ui";
 
+import { topBarHeight } from "./layoutConstants";
+
 type Props = {
   title: string;
   open: boolean;
@@ -29,7 +31,7 @@ export function TopBar({ title, open, setOpen }: Props) {
         top: 0,
         left: 0,
         right: 0,
-        height: 64,
+        height: topBarHeight,
         zIndex: (theme: Theme) => theme.zIndex.drawer + 1,
         borderBottom: (theme: Theme) =>
           `1px solid ${theme.palette.border.subtle}`,

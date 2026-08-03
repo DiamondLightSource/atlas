@@ -5,6 +5,7 @@ import { routePath, type RouterProps } from "./Router";
 import { SidebarNav, type Navigation } from "./SidebarNav";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
+import { topBarHeight } from "./layoutConstants";
 
 export function toNavItemGroups(routerProps: RouterProps): Navigation {
   return routerProps.navigation.map((group) => ({
@@ -38,9 +39,8 @@ export function Layout(props: RouterProps) {
         component="main"
         sx={{ display: "flex", flex: 1, flexDirection: "column" }}
       >
-        {/* The Toolbar acts as a spacer,
-            same height as the fixed TopBar's Navbar */}
-        <Toolbar />
+        {/* Spacer, same height as the fixed TopBar's Navbar */}
+        <Box sx={{ height: topBarHeight }} />
         <Outlet />
       </Box>
     </Box>

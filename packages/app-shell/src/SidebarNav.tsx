@@ -13,6 +13,7 @@ import {
 import { useTheme, type Theme } from "@mui/material/styles";
 import { Fragment, type ElementType, type ReactNode } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { topBarHeight } from "./layoutConstants";
 
 export type Navigation = NavItemGroup[];
 
@@ -127,7 +128,8 @@ function TemporaryDrawer(props: NavProps) {
         },
       }}
     >
-      <Toolbar />
+      {/* Spacer, same height as the fixed TopBar's Navbar */}
+      <Box sx={{ height: topBarHeight }} />
       <NavigationItems {...props} />
       {props.footer?.({ open })}
     </Drawer>
