@@ -1,4 +1,4 @@
-import { Button, type SxProps, type Theme } from "@mui/material";
+import { Button } from "@mui/material";
 import { usePauseQueue } from "../queue/queueService";
 import DangerousOutlinedIcon from "@mui/icons-material/DangerousOutlined";
 import { useBlueapi } from "@atlas/blueapi-query";
