@@ -236,8 +236,8 @@ importers:
         specifier: ^2.10.4
         version: 2.14.6(@types/node@25.9.2)(typescript@5.9.3)
       react-router-dom:
-        specifier: ^7.17.0
-        version: 7.17.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 7.13.1
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       relay-compiler:
         specifier: ^20.1.1
         version: 20.1.1
