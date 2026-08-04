@@ -10,7 +10,9 @@ import Robot from "./routes/Robot";
 import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
 import { QueueView } from "./routes/QueueView";
+import { StopAllButton } from "./components/StopAllButton";
 import { PlanBrowser } from "@atlas/blueapi-ui";
+import { SystemControls } from "../../../packages/app-shell/src/SystemControls";
 
 const navigation: SectionGroup[] = [
   {
@@ -101,4 +103,12 @@ const navigation: SectionGroup[] = [
   },
 ];
 
-export const router = createRouter({ title: "i15-1", navigation });
+export const router = createRouter({
+  title: "i15-1",
+  navigation,
+  footer: ({ open }) => (
+    <SystemControls open={open}>
+      <StopAllButton compact={!open} />
+    </SystemControls>
+  ),
+});

@@ -18,9 +18,10 @@ import { Fragment } from "react";
 interface SideNavProps {
   navigation: SectionGroup[];
   open: boolean;
+  footer?: (props: { open: boolean }) => React.ReactNode;
 }
 
-export function SideNav({ navigation, open }: SideNavProps) {
+export function SideNav({ navigation, open, footer }: SideNavProps) {
   const width = open ? 256 : 72;
 
   return (
@@ -53,6 +54,7 @@ export function SideNav({ navigation, open }: SideNavProps) {
           ))}
         </List>
       </Box>
+      {footer?.({ open })}
     </Drawer>
   );
 }

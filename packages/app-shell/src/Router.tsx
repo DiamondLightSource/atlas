@@ -7,6 +7,7 @@ import {
 import { TabbedPanel, type TabDescription } from "./TabbedRoute";
 
 import type { ReactNode } from "react";
+import type React from "react";
 
 /** App title and navigational intent */
 export interface RouterProps {
@@ -15,6 +16,9 @@ export interface RouterProps {
 
   /** a router will be derived to express this */
   navigation: SectionGroup[];
+
+  /** Add a footer to the bottom of the navigation panel */
+  footer?: (props: { open: boolean }) => React.ReactNode;
 }
 
 /** A group within the main navigation tree */
