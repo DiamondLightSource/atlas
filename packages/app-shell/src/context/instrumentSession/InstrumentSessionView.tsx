@@ -23,6 +23,9 @@ export function InstrumentSessionView() {
   const menuId = `${id}-menu`;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [buttonText, setButtonText] = React.useState<string>(
+    instrumentSession[0],
+  );
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -33,10 +36,12 @@ export function InstrumentSessionView() {
     setSelectedIndex(index);
     setAnchorEl(null);
     setInstrumentSession([event.currentTarget.textContent ?? ""]);
+    setButtonText(event.currentTarget.textContent ?? "");
   };
   const handleAllSessionsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(null);
     setInstrumentSession(sessionsList);
+    setButtonText("All Active Sessions");
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -53,7 +58,7 @@ export function InstrumentSessionView() {
         color="inherit" // to let you actually see it
         variant="text"
       >
-        {instrumentSession}
+        {buttonText}
       </Button>
       <Menu
         data-testid={menuId}
@@ -68,7 +73,7 @@ export function InstrumentSessionView() {
       >
         <StyledListHeader>Session Selection</StyledListHeader>
         <MenuItem
-          key="AllSessions"
+          key="All Active Sessions"
           selected={true}
           onClick={(event) => handleAllSessionsClick(event)}
         >
