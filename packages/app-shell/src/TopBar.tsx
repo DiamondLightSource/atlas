@@ -20,22 +20,27 @@ export function TopBar({ title, open, setOpen }: Props) {
   return (
     <AppBar
       position="fixed"
-      sx={{ zIndex: (theme: Theme) => theme.zIndex.drawer + 1 }}
+      color="inherit"
+      sx={{
+        zIndex: (theme: Theme) => theme.zIndex.drawer + 1,
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      }}
+      elevation={0}
     >
       <Toolbar>
         <IconButton
           size="large"
           edge="start"
-          color="inherit"
           aria-label="menu"
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, color: "brand.onContainer" }}
           onClick={() => setOpen(!open)}
         >
           <Menu />
         </IconButton>
 
         <Box sx={{ mr: 2, width: 100 }}>
-          <Logo />
+          <Logo interchange />
         </Box>
 
         <Divider orientation="vertical" variant="middle" flexItem />
@@ -48,6 +53,7 @@ export function TopBar({ title, open, setOpen }: Props) {
             ml: 1.5,
             mt: 1.25,
             mr: 1.25,
+            color: "brand.onContainer",
           }}
         >
           Data Acquisition
@@ -62,6 +68,7 @@ export function TopBar({ title, open, setOpen }: Props) {
           sx={{
             ml: 1.5,
             mt: 1.25,
+            color: "brand.onContainer",
           }}
         >
           {title}
