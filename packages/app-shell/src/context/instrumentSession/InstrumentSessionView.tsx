@@ -27,7 +27,7 @@ export function InstrumentSessionView() {
   ) => {
     setSelectedIndex(index);
     setAnchorEl(null);
-    setInstrumentSession(event.currentTarget.textContent ?? "");
+    setInstrumentSession([event.currentTarget.textContent ?? ""]);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -66,7 +66,7 @@ export function InstrumentSessionView() {
             {option}
           </MenuItem>
         ))}
-        <Divider />
+        {/* <Divider />
         <MenuItem selected={true} onKeyDown={(e) => e.stopPropagation()}>
           <VisitInput
             visit={
@@ -81,7 +81,7 @@ export function InstrumentSessionView() {
               setAnchorEl(null);
             }}
           />
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </div>
   );

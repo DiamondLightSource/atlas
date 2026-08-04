@@ -23,7 +23,7 @@ export function AppProviders({ api, theme, children }: Props) {
   return (
     <ThemeProvider theme={theme}>
       <InstrumentSessionProvider
-        defaultSessionId="cm44163-3"
+        defaultSessionId={["cm44163-3"]}
         sessionsList={["cm44163-3", "cm44163-4"]}
       >
         <ReduxProvider store={store(config)}>

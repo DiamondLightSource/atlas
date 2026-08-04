@@ -4,8 +4,8 @@ import { createContext } from "react";
 export const ID_STORAGE_KEY = "instrument-session-id";
 
 export type InstrumentSessionContextType = {
-  instrumentSession: string;
-  setInstrumentSession: (session: string) => void;
+  instrumentSession: string[];
+  setInstrumentSession: (session: string[]) => void;
   sessionsList: string[];
 };
 
@@ -15,19 +15,31 @@ export const InstrumentSessionContext = createContext<
 
 export const InstrumentSessionProvider = ({
   children,
-  defaultSessionId = "cm12345-1",
-  sessionsList = ["cm12345-2", "cm12345-2"],
+  defaultSessionId = ["cm12345-1"],
+  sessionsList = ["cm123-4", "cm567-8"],
 }: {
   children: ReactNode;
-  defaultSessionId?: string;
+  defaultSessionId?: string[];
   sessionsList?: string[];
 }) => {
-  const [instrumentSession, setInstrumentSession] = useState<string>(() => {
-    return localStorage.getItem(ID_STORAGE_KEY) ?? defaultSessionId;
+  const [instrumentSession, setInstrumentSession] = useState<string[]>(() => {
+    try {
+      const rawItem = localStorage.getItem(ID_STORAGE_KEY);
+      if (!rawItem) {
+        return defaultSessionId;
+      }
+      return JSON.parse(rawItem);
+    } catch (error) {
+      console.error(
+        "Failed to load instrument session from localStorage:",
+        error,
+      );
+      return defaultSessionId;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem(ID_STORAGE_KEY, instrumentSession);
+    localStorage.setItem(ID_STORAGE_KEY, JSON.stringify(instrumentSession));
   }, [instrumentSession]);
 
   return (
