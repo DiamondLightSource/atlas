@@ -9,10 +9,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import { ListSubheader, styled } from "@mui/material";
 
-const StyledListHeader = styled(ListSubheader)({
-  backgroundImage: "var(--Paper-overlay)",
-});
-
 export function InstrumentSessionView() {
   const { instrumentSession, setInstrumentSession, sessionsList } =
     useInstrumentSession();
@@ -71,7 +67,7 @@ export function InstrumentSessionView() {
           },
         }}
       >
-        <StyledListHeader>Session Selection</StyledListHeader>
+        <ListSubheader>Session Selection</ListSubheader>
         <MenuItem
           key="All Active Sessions"
           selected={true}
@@ -80,7 +76,7 @@ export function InstrumentSessionView() {
           All Active Sessions
         </MenuItem>
         <Divider />
-        <StyledListHeader> Available Sessions </StyledListHeader>
+        <ListSubheader> Available Sessions </ListSubheader>
         {sessionsList.map((option, index) => (
           <MenuItem
             key={option}
@@ -90,22 +86,6 @@ export function InstrumentSessionView() {
             {option}
           </MenuItem>
         ))}
-        {/* <Divider />
-        <MenuItem selected={true} onKeyDown={(e) => e.stopPropagation()}>
-          <VisitInput
-            visit={
-              visitTextToVisit(instrumentSession) ?? {
-                number: 6,
-                proposalCode: "cm",
-                proposalNumber: 12345,
-              }
-            }
-            onSubmit={(visit) => {
-              setInstrumentSession(visitToText(visit));
-              setAnchorEl(null);
-            }}
-          />
-        </MenuItem> */}
       </Menu>
     </div>
   );
