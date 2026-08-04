@@ -129,7 +129,7 @@ function TemporaryDrawer(props: NavProps) {
       }}
     >
       {/* Spacer, same height as the fixed TopBar's Navbar */}
-      <Box sx={{ height: topBarHeight }} />
+      <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
       <NavigationItems {...props} />
       {props.footer?.({ open })}
     </Drawer>

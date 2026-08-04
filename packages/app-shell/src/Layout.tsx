@@ -40,7 +40,7 @@ export function Layout(props: RouterProps) {
         sx={{ display: "flex", flex: 1, flexDirection: "column" }}
       >
         {/* Spacer, same height as the fixed TopBar's Navbar */}
-        <Box sx={{ height: topBarHeight }} />
+        <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
         <Outlet />
       </Box>
     </Box>
