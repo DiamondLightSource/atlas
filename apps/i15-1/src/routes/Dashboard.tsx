@@ -13,7 +13,7 @@ function Dashboard() {
   const handleLogOut = () => window.location.assign("/oauth2/sign_out");
   return (
     <>
-      <Container maxWidth="sm" sx={{ mt: 5, mb: 4 }}>
+      <Container maxWidth="sm" sx={{ mb: 4 }}>
         <Stack direction={"column"} alignItems={"center"} spacing={3}>
           <Typography variant="h4" component="h1" textAlign={"center"}>
             Welcome to I15-1
