@@ -17,7 +17,7 @@ vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
   return {
     ...actual,
     useInstrumentSession: () => ({
-      instrumentSession: "cm54321-1",
+      instrumentSession: ["cm54321-1"],
       setInstrumentSession: vi.fn(),
       sessionsList: ["cm123-4", "cm567-8"],
     }),
@@ -40,7 +40,6 @@ describe("InstrumentSessionView", () => {
 
     const user = userEvent.setup();
     await user.click(screen.getByTestId("session-input-button"));
-    expect(screen.getByTestId("visit-field")).toBeInTheDocument();
     expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
     expect(screen.getByText("cm123-4")).toBeInTheDocument();
     expect(screen.getByText("cm567-8")).toBeInTheDocument();
@@ -57,6 +56,19 @@ describe("InstrumentSessionView", () => {
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
   });
 
+  it("shows all active sessions when all active sessions item has been clicked", async () => {
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+
+    await user.click(screen.getByText("All Active Sessions"));
+    expect(screen.queryByTestId("session-input-button")).toHaveTextContent(
+      "All Active Sessions",
+    );
+  });
+
   it("closes menu when button has been clicked again", async () => {
     renderComponentWithProvider();
 
@@ -69,20 +81,5 @@ describe("InstrumentSessionView", () => {
       await user.click(backdrop);
     }
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
-  });
-
-  it("lets you input a valid session", async () => {
-    const onSubmit = vi.fn();
-    renderComponentWithProvider();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByTestId("session-input-button"));
-
-    const visitInput = screen.getByTestId("session-input-menu");
-    const visitTextBox = within(visitInput).getByRole("textbox");
-    await user.click(visitTextBox);
-    await user.clear(visitTextBox);
-    await user.type(visitTextBox, "cm1-1");
-    await user.keyboard("{Enter}");
   });
 });
