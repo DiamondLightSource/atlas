@@ -40,7 +40,7 @@ export function TopBar({ title, open, setOpen }: Props) {
         </IconButton>
 
         <Box sx={{ mr: 2, width: 100 }}>
-          <Logo />
+          <Logo interchange />
         </Box>
 
         <Divider orientation="vertical" variant="middle" flexItem />
