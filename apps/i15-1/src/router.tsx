@@ -1,4 +1,8 @@
-import { type SectionGroup, createRouter } from "@atlas/app-shell";
+import {
+  type SectionGroup,
+  createRouter,
+  SystemControls,
+} from "@atlas/app-shell";
 import {
   ClipboardClock,
   ListTodo,
@@ -12,7 +16,6 @@ import Playlist from "./routes/Playlist";
 import { QueueView } from "./routes/QueueView";
 import { StopAllButton } from "./components/StopAllButton";
 import { PlanBrowser } from "@atlas/blueapi-ui";
-import { SystemControls } from "../../../packages/app-shell/src/SystemControls";
 
 const navigation: SectionGroup[] = [
   {
