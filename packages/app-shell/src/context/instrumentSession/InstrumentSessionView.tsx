@@ -7,6 +7,11 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
+import { ListSubheader, styled } from "@mui/material";
+
+const StyledListHeader = styled(ListSubheader)({
+  backgroundImage: "var(--Paper-overlay)",
+});
 
 export function InstrumentSessionView() {
   const { instrumentSession, setInstrumentSession, sessionsList } =
@@ -28,6 +33,10 @@ export function InstrumentSessionView() {
     setSelectedIndex(index);
     setAnchorEl(null);
     setInstrumentSession([event.currentTarget.textContent ?? ""]);
+  };
+  const handleAllSessionsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(null);
+    setInstrumentSession(sessionsList);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -57,6 +66,16 @@ export function InstrumentSessionView() {
           },
         }}
       >
+        <StyledListHeader>Session Selection</StyledListHeader>
+        <MenuItem
+          key="AllSessions"
+          selected={true}
+          onClick={(event) => handleAllSessionsClick(event)}
+        >
+          All Active Sessions
+        </MenuItem>
+        <Divider />
+        <StyledListHeader> Available Sessions </StyledListHeader>
         {sessionsList.map((option, index) => (
           <MenuItem
             key={option}
