@@ -54,6 +54,9 @@ describe("InstrumentSessionView", () => {
 
     await user.click(screen.getByText("cm123-4"));
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("session-input-button")).toHaveTextContent(
+      "cm123-4",
+    );
   });
 
   it("shows all active sessions when all active sessions item has been clicked", async () => {
