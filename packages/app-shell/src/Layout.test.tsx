@@ -1,4 +1,8 @@
 import { render, screen } from "@atlas/vitest-conf";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import type { RouterProps } from "./Router";
 import { Layout } from "./Layout";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
@@ -32,7 +36,11 @@ describe("Layout", () => {
         ],
       },
     ]);
-    render(<RouterProvider router={router} />);
+    render(
+      <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
+        <RouterProvider router={router} />
+      </ThemeProvider>,
+    );
 
     // title
     expect(screen.getByText(props.title)).toBeInTheDocument();
