@@ -1,5 +1,6 @@
 import { render, screen, userEvent } from "@atlas/vitest-conf";
 import { SideNav } from "./SideNav";
+import { SystemControls } from "./SystemControls";
 import type { Section, SectionGroup } from "./Router";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
@@ -26,11 +27,14 @@ describe("SideNav", () => {
     },
   ];
 
-  function renderSidenav(open: boolean) {
+  function renderSidenav(
+    open: boolean,
+    footer?: (props: { open: boolean }) => React.ReactNode,
+  ) {
     const router = createMemoryRouter([
       {
         path: "/",
-        element: <SideNav navigation={groups} open={open} />,
+        element: <SideNav navigation={groups} open={open} footer={footer} />,
       },
     ]);
     render(<RouterProvider router={router} />);
@@ -90,5 +94,17 @@ describe("SideNav", () => {
       name: "Acquisition",
     });
     expect(tooltip).not.toBeInTheDocument();
+  });
+
+  it("renders the footer when provided", () => {
+    renderSidenav(true, SystemControls);
+
+    expect(screen.getByText("SYSTEM CONTROLS")).toBeVisible();
+  });
+
+  it("passes the open state through to the footer", () => {
+    renderSidenav(false, SystemControls);
+
+    expect(screen.queryByText("SYSTEM CONTROLS")).not.toBeInTheDocument();
   });
 });
