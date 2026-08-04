@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from "@atlas/vitest-conf";
 import { SideNav } from "./SideNav";
 import { SystemControls } from "./SystemControls";
-import type { Section, SectionGroup } from "./Router";
+import type { SectionGroup } from "./Router";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 describe("SideNav", () => {
