@@ -1,7 +1,6 @@
 import { useInstrumentSession } from "../context/instrumentSession/useInstrumentSession";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
-// import { NumberInput } from "../components/NumberInput";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
