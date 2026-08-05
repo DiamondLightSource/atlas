@@ -180,6 +180,7 @@ export function PucksTable() {
       { accessorKey: "session", header: "Session" },
       {
         accessorKey: "status",
+        id: "mountStatus",
         header: "Status",
         size: 150,
         Cell: ({ cell }) => (
@@ -193,6 +194,7 @@ export function PucksTable() {
       },
       {
         accessorKey: "status",
+        id: "setMount",
         header: "",
         size: 200,
         enableColumnActions: false,
@@ -216,7 +218,7 @@ export function PucksTable() {
                 } else {
                   void mountPuck({
                     variables: {
-                      barcode: row.original.barcode,
+                      puckId: row.original.id,
                       tableId: robotTableId,
                       position: selectedPositions[rowId]!,
                     },

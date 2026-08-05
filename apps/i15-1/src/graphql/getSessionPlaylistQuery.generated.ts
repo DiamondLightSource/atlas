@@ -7,4 +7,5 @@ export type GetSessionPlaylistQueryVariables = Exact<{
   session: number;
 }>;
 
-export type GetSessionPlaylistQuery = { instrumentSession: { __typename: 'InstrumentSession', experiments: { __typename: 'ExperimentConnection', edges: Array<{ __typename: 'ExperimentEdge', node: { __typename: 'Experiment', name: string, sample: { __typename: 'Sample', name: string, id: unknown, data: unknown, instrumentSessions: Array<{ __typename: 'InstrumentSession', instrumentSessionReference: string | null }> }, experimentDefinition: { __typename: 'ExperimentDefinition', name: string, id: unknown, data: unknown } } }> } } | null };
+
+export type GetSessionPlaylistQuery = { experiments: { __typename: 'ExperimentConnection', edges: Array<{ __typename: 'ExperimentEdge', node: { __typename: 'Experiment', name: string, sample: { __typename: 'Sample', name: string, id: unknown, data: unknown, instrumentSessions: Array<{ __typename: 'InstrumentSession', instrumentSessionReference: string | null }> }, experimentDefinition: { __typename: 'ExperimentDefinition', name: string, id: unknown, data: unknown } } }> } | null };

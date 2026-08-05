@@ -408,7 +408,7 @@ describe("PucksTable", () => {
 
     expect(mockMutate).toHaveBeenCalledWith({
       variables: {
-        barcode: "i15-1_56789",
+        puckId: "019faee9-628d-7161-afe4-598a9c60534d",
         tableId: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
         position: 3,
       },

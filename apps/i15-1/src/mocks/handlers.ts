@@ -669,9 +669,9 @@ export const handlers = [
     }
 
     if (body.operationName === "AddPuckToTable") {
-      const { barcode, tableId, position } = (
+      const { puckId, tableId, position } = (
         body as {
-          variables: { barcode: string; tableId: string; position: number };
+          variables: { puckId: string; tableId: string; position: number };
         }
       ).variables;
 
@@ -679,7 +679,7 @@ export const handlers = [
         (e) => e.node.id === tableId,
       );
       const puckEdge = fakeContainersForInstrument.data.containers.edges.find(
-        (e) => e.node.barcode === barcode,
+        (e) => e.node.id === puckId,
       );
 
       if (puckEdge && tableEdge) {
