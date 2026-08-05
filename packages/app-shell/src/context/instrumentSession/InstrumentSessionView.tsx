@@ -6,12 +6,13 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import { Science, ExpandMore } from "@mui/icons-material";
-import { ListSubheader, styled } from "@mui/material";
+import { ListSubheader } from "@mui/material";
 
 export function InstrumentSessionView() {
   const { instrumentSession, setInstrumentSession, sessionsList } =
     useInstrumentSession();
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [allSelected, setAllSelected] = useState<boolean>(false);
 
   const id = "session-input";
   const buttonId = `${id}-button`;
@@ -29,11 +30,14 @@ export function InstrumentSessionView() {
     index: number,
   ) => {
     setSelectedIndex(index);
+    setAllSelected(false);
     setAnchorEl(null);
     setInstrumentSession([event.currentTarget.textContent ?? ""]);
     setButtonText(event.currentTarget.textContent ?? "");
   };
   const handleAllSessionsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setSelectedIndex(null);
+    setAllSelected(true);
     setAnchorEl(null);
     setInstrumentSession(sessionsList);
     setButtonText("All Active Sessions");
@@ -71,7 +75,7 @@ export function InstrumentSessionView() {
         <ListSubheader>Session Selection</ListSubheader>
         <MenuItem
           key="All Active Sessions"
-          selected={true}
+          selected={allSelected}
           onClick={(event) => handleAllSessionsClick(event)}
         >
           All Active Sessions

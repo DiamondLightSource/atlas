@@ -15,18 +15,16 @@ export const InstrumentSessionContext = createContext<
 
 export const InstrumentSessionProvider = ({
   children,
-  defaultSessionId = ["cm12345-1"],
   sessionsList = ["cm123-4", "cm567-8"],
 }: {
   children: ReactNode;
-  defaultSessionId?: string[];
   sessionsList?: string[];
 }) => {
   const [instrumentSession, setInstrumentSession] = useState<string[]>(() => {
     try {
       const rawItem = localStorage.getItem(ID_STORAGE_KEY);
       if (!rawItem) {
-        return defaultSessionId;
+        return sessionsList[0];
       }
       return JSON.parse(rawItem);
     } catch (error) {
@@ -34,7 +32,7 @@ export const InstrumentSessionProvider = ({
         "Failed to load instrument session from localStorage:",
         error,
       );
-      return defaultSessionId;
+      return sessionsList[0];
     }
   });
 

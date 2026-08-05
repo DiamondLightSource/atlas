@@ -22,10 +22,7 @@ export function AppProviders({ api, theme, children }: Props) {
   const config = useLoadPvwsConfig();
   return (
     <ThemeProvider theme={theme}>
-      <InstrumentSessionProvider
-        defaultSessionId={["cm44163-3"]}
-        sessionsList={["cm44163-3", "cm44163-4"]}
-      >
+      <InstrumentSessionProvider sessionsList={["cm44163-3", "cm44163-4"]}>
         <ReduxProvider store={store(config)}>
           <QueryClientProvider client={new QueryClient()}>
             <UserAuthProvider>
