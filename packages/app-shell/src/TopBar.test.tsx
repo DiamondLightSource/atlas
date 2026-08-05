@@ -1,4 +1,8 @@
 import { render, screen, userEvent } from "@atlas/vitest-conf";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import { TopBar } from "./TopBar";
 
 vi.mock("@diamondlightsource/sci-react-ui", async () => {
@@ -18,6 +22,18 @@ vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
   InstrumentSessionView: InstrumentSessionView,
 }));
 
+function renderTopBar(barProps: {
+  title: string;
+  open: boolean;
+  setOpen: () => void;
+}) {
+  return render(
+    <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
+      <TopBar {...barProps} />
+    </ThemeProvider>,
+  );
+}
+
 describe("TopBar", () => {
   const barProps = {
     title: "Test application",
@@ -26,12 +42,12 @@ describe("TopBar", () => {
   };
 
   it("Shows menu icon", () => {
-    render(<TopBar {...barProps} />);
+    renderTopBar(barProps);
     expect(screen.getByRole("button", { name: /menu/i })).toBeInTheDocument();
   });
 
   it("Menu button calls setOpen function when clicked", async () => {
-    render(<TopBar {...barProps} />);
+    renderTopBar(barProps);
     const menu = screen.getByRole("button", { name: /menu/i });
 
     const user = userEvent.setup();
@@ -41,12 +57,12 @@ describe("TopBar", () => {
   });
 
   it("Shows title", () => {
-    render(<TopBar {...barProps} />);
+    renderTopBar(barProps);
     expect(screen.getByText(barProps.title)).toBeVisible();
   });
 
   it("Includes colour scheme switcher", () => {
-    render(<TopBar {...barProps} />);
+    renderTopBar(barProps);
     expect(
       screen.getByRole("button", { name: /Colour scheme switcher/i }),
     ).toBeVisible();
