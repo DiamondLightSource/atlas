@@ -43,7 +43,7 @@ type PuckTableData = {
 
 type PuckMountStatus = "Mounted" | "Unmounted";
 
-export const CHIP_COLOR_MAP = {
+const CHIP_COLOR_MAP = {
   Mounted: "success",
   Unmounted: "info",
 } satisfies Record<PuckMountStatus, ChipProps["color"]>;
