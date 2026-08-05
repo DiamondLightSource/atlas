@@ -423,6 +423,7 @@ describe("PucksTable", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
+    const user = userEvent.setup();
     renderComponent();
 
     // The mounted puck (1234) shows its current position "1" in the dropdown
@@ -430,12 +431,11 @@ describe("PucksTable", () => {
     const mountedCombobox = comboboxes.find((el) =>
       el.textContent?.includes("1"),
     );
-    const unmountedCombobox = comboboxes.find((el) =>
-      el.textContent?.includes("Assign"),
-    );
+    expect(mountedCombobox).toBeDefined();
 
-    expect(mountedCombobox).toHaveAttribute("aria-disabled", "true");
-    expect(unmountedCombobox).not.toHaveAttribute("aria-disabled", "true");
+    // Clicking the mounted puck's dropdown should not open it
+    await user.click(mountedCombobox!);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
   it("calls removePuckFromTable mutation with correct variables when Unmount is clicked", async () => {

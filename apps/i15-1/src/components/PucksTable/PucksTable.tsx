@@ -152,7 +152,9 @@ export function PucksTable() {
           return (
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
-                disabled={isMounted}
+                inputProps={{
+                  readOnly: isMounted,
+                }}
                 value={selectedPositions[rowId] ?? ""}
                 displayEmpty
                 onChange={(event) => {
