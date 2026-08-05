@@ -147,10 +147,12 @@ export function PucksTable() {
         header: "Puck Position",
         Cell: ({ row }) => {
           const rowId = row.original.id;
+          const isMounted = row.original.status === "Mounted";
 
           return (
             <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
+                disabled={isMounted}
                 value={selectedPositions[rowId] ?? ""}
                 displayEmpty
                 onChange={(event) => {

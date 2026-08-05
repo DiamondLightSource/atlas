@@ -416,6 +416,28 @@ describe("PucksTable", () => {
     expect(unmountMutate).not.toHaveBeenCalled();
   });
 
+  it("disables the position dropdown for a mounted puck", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    // The mounted puck (1234) shows its current position "1" in the dropdown
+    const comboboxes = await screen.findAllByRole("combobox");
+    const mountedCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("1"),
+    );
+    const unmountedCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+
+    expect(mountedCombobox).toHaveAttribute("aria-disabled", "true");
+    expect(unmountedCombobox).not.toHaveAttribute("aria-disabled", "true");
+  });
+
   it("calls removePuckFromTable mutation with correct variables when Unmount is clicked", async () => {
     const { byOperation } = setupMutationFixture([
       "AddPuckToTable",
