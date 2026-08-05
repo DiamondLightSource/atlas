@@ -4,7 +4,7 @@ import { ExperimentList } from "../components/ExperimentTable/ULIMSExperimentsTa
 
 function Playlist() {
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack direction={"column"} alignItems={"center"} spacing={3}>
         <Typography variant="h4" component="h1" textAlign={"center"}>
           Here are some experiments for cm44163-3

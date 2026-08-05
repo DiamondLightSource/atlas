@@ -5,7 +5,9 @@ import { NumberInput } from "../components/NumberInput";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
+import { AbortPlanButton } from "../components/AbortPlanButton";
 import { WebcamStreamFromPv } from "../components/Webcam";
+import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
 
 type RobotSampleFormData = {
   puck: number;
@@ -53,6 +55,7 @@ function StatusSidebar() {
             pv="ca://BL15J-EA-LOC-01:SAMPLE:INDEX"
           />
         </StatusCard>
+        <BlueapiWorkerState />
       </Stack>
     </Box>
   );
@@ -96,17 +99,20 @@ function RobotControl() {
             }}
           />
         </Stack>
-        <RunPlanButton
-          name="robot_load"
-          params={formData}
-          instrumentSession={instrumentSession}
-          buttonText="Load Sample"
-        />
-        <RunPlanButton
-          name="robot_unload"
-          instrumentSession={instrumentSession}
-          buttonText="Unload Sample"
-        />
+        <Stack direction={"row"} spacing={3} alignItems={"center"}>
+          <RunPlanButton
+            name="robot_load"
+            params={formData}
+            instrumentSession={instrumentSession}
+            buttonText="Load Sample"
+          />
+          <RunPlanButton
+            name="robot_unload"
+            instrumentSession={instrumentSession}
+            buttonText="Unload Sample"
+          />
+        </Stack>
+        <AbortPlanButton />
       </Stack>
     </Box>
   );
@@ -123,7 +129,6 @@ function Robot() {
       sx={{
         display: "flex",
         justifyContent: "left",
-        mt: 3,
         mr: 5,
         ml: 5,
       }}

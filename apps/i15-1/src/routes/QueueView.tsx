@@ -5,7 +5,6 @@ import {
   FormControlLabel,
   Stack,
   Switch,
-  type ChipProps,
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import {
@@ -24,19 +23,11 @@ import {
 } from "../queue/queueService";
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
-import type { QueuedTasks } from "../queue/tasks";
-import { calculateNewPosition, positionFromName } from "../queue/queueUtils";
-import type { Experiment, Status, TaskRequest } from "../../generated/queue";
-
-function getChipColorMap(): Record<Status, ChipProps["color"]> {
-  return {
-    Queued: "default",
-    "In progress": "info",
-    Complete: "success",
-    Cancelled: "warning",
-    Error: "error",
-  };
-}
+import { calculateNewPosition, getTableData } from "../queue/queueUtils";
+import type { Status, TaskWithPosition } from "../../generated/queue";
+import { CHIP_COLOR_MAP } from "../queue/queueConstants";
+import { PlanStatusPanel } from "../queue/PlanStatusPanel";
+import { JsonView } from "../components/JsonView";
 
 export function QueueView() {
   useQueueEvents();
@@ -47,7 +38,7 @@ export function QueueView() {
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
-  const tasksToDisplay = useMemo<QueuedTasks>(() => {
+  const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
     if (showHistoric) return allTasks.data ?? [];
 
     const queued = queuedTasks.data ?? [];
@@ -60,46 +51,9 @@ export function QueueView() {
     return [latestHistoricTask, ...queued];
   }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
 
-  const data = useMemo<QueueTableData[]>(() => {
-    return (
-      tasksToDisplay.map((task) => {
-        if (task.kind === "Experiment") {
-          const exp = task.experiment as Experiment;
-
-          return {
-            position: task.position,
-            name: exp.name,
-            id: task.id,
-            instrumentSession: task.experiment.instrument_session,
-            sampleId: exp.sample.id,
-            samplePosition: positionFromName(exp.sample.name),
-            density: exp.sample.data.density as number,
-            beamSize: exp.experiment_definition.data
-              .focused_beam_size as number,
-            timePerPDF: exp.experiment_definition.data.time_per_pdf as number,
-            status: task.status,
-          };
-        } else {
-          const plan = task.experiment as TaskRequest;
-
-          return {
-            position: task.position,
-            name: plan.name,
-            id: task.id,
-            instrumentSession: task.experiment.instrument_session,
-            sampleId: "",
-            samplePosition: "",
-            density: null,
-            beamSize: null,
-            timePerPDF: null,
-            status: task.status,
-          };
-        }
-      }) ?? []
-    );
+  const tableData = useMemo<QueueTableData[]>(() => {
+    return getTableData(tasksToDisplay ?? []);
   }, [tasksToDisplay]);
-
-  const colorMap = useMemo(() => getChipColorMap(), []);
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
@@ -123,7 +77,7 @@ export function QueueView() {
             size="small"
             label={cell.getValue<string>()}
             variant="outlined"
-            color={colorMap[cell.getValue<Status>()]}
+            color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
           ></Chip>
         ),
       },
@@ -149,17 +103,19 @@ export function QueueView() {
         },
       },
     ],
-    [colorMap],
+    [],
   );
 
   const table = useMaterialReactTable({
-    columns,
-    data,
+    columns: columns,
+    data: tableData,
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    enableExpanding: true,
+    muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
       const isDraggable = row.original.status === "Queued";
       return {
@@ -220,10 +176,24 @@ export function QueueView() {
         <QueueStatusPanel />
       </Stack>
     ),
+
+    renderDetailPanel: ({ row }) => {
+      const blueapi_calls = row.original.task.blueapi_calls;
+
+      return (
+        <Box sx={{ p: 2 }}>
+          {row.original.task.kind == "Experiment" ? (
+            <PlanStatusPanel data={blueapi_calls} />
+          ) : (
+            <JsonView data={blueapi_calls[0].task_request} />
+          )}
+        </Box>
+      );
+    },
   });
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack direction={"column"} spacing={4} alignItems={"center"}>
         <MaterialReactTable table={table} />
       </Stack>

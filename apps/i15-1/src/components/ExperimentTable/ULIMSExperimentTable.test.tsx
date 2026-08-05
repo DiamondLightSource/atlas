@@ -36,51 +36,49 @@ beforeEach(() => {
 });
 
 const mockExperiments = {
-  instrumentSession: {
-    experiments: {
-      edges: [
-        {
-          node: {
-            name: "Exp 1",
-            sample: {
-              name: "Sample A",
-              data: {
-                density: 1.2,
-                composition: "H2O",
-              },
+  experiments: {
+    edges: [
+      {
+        node: {
+          name: "Exp 1",
+          sample: {
+            name: "Sample A",
+            data: {
+              density: 1.2,
+              composition: "H2O",
             },
-            experimentDefinition: {
-              name: "Def 1",
-              data: {
-                beam_energy: 20,
-                time_per_pdf: 10,
-                focused_beam_size: 5,
-              },
+          },
+          experimentDefinition: {
+            name: "Def 1",
+            data: {
+              beam_energy: 20,
+              time_per_pdf: 10,
+              focused_beam_size: 5,
             },
           },
         },
-        {
-          node: {
-            name: "Exp 2",
-            sample: {
-              name: "Sample B",
-              data: {
-                density: 1.2,
-                composition: "CO2",
-              },
+      },
+      {
+        node: {
+          name: "Exp 2",
+          sample: {
+            name: "Sample B",
+            data: {
+              density: 1.2,
+              composition: "CO2",
             },
-            experimentDefinition: {
-              name: "Def 2",
-              data: {
-                beam_energy: 20,
-                time_per_pdf: 10,
-                focused_beam_size: 5,
-              },
+          },
+          experimentDefinition: {
+            name: "Def 2",
+            data: {
+              beam_energy: 20,
+              time_per_pdf: 10,
+              focused_beam_size: 5,
             },
           },
         },
-      ],
-    },
+      },
+    ],
   },
 };
 

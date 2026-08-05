@@ -7,10 +7,11 @@ import type {
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
   Experiment,
+  TaskRequest,
+  TaskWithPosition,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
-import type { QueuedTasks } from "./tasks";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
@@ -112,6 +113,8 @@ export function useGetQueueState() {
     queryFn: getQueueState,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -133,6 +136,11 @@ export function usePatchQueueState() {
   });
 }
 
+export function usePauseQueue() {
+  const mutation = usePatchQueueState();
+  return () => mutation.mutateAsync(true);
+}
+
 export function useToggleQueueState() {
   const { data } = useGetQueueState();
   const mutation = usePatchQueueState();
@@ -150,8 +158,8 @@ export function useToggleQueueState() {
   };
 }
 
-const getQueuedTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/queue");
+const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/queue");
   return response.data;
 };
 
@@ -161,11 +169,13 @@ export function useGetQueuedTasks() {
     queryFn: getQueuedTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
-const getAllTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/tasks");
+const getAllTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/tasks");
   return response.data;
 };
 
@@ -175,11 +185,15 @@ export function useGetAllTasks() {
     queryFn: getAllTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
-const getHistoricTasks = async (): Promise<QueuedTasks> => {
-  const response = await axios.get<QueuedTasks>(QUEUE_SOCKET + "/history");
+const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await axios.get<TaskWithPosition[]>(
+    QUEUE_SOCKET + "/history",
+  );
   return response.data;
 };
 
@@ -189,11 +203,15 @@ export function useGetHistoricTasks() {
     queryFn: getHistoricTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
-export const cancelTasks = async (taskIds: string[]): Promise<QueuedTasks> => {
-  const response = await axios.delete<QueuedTasks>(
+export const cancelTasks = async (
+  taskIds: string[],
+): Promise<TaskWithPosition[]> => {
+  const response = await axios.delete<TaskWithPosition[]>(
     QUEUE_SOCKET + "/queue/tasks",
     {
       data: {
@@ -256,7 +274,7 @@ export const submitQueueTask = async ({
   experiment,
   taskPosition,
 }: {
-  experiment: Experiment;
+  experiment: Experiment | TaskRequest;
   taskPosition?: number;
 }) => {
   const data: AddTasksToQueueQueuePostData = {

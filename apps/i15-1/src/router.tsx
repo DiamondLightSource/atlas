@@ -1,4 +1,8 @@
-import { type SectionGroup, createRouter } from "@atlas/app-shell";
+import {
+  type SectionGroup,
+  createRouter,
+  SystemControls,
+} from "@atlas/app-shell";
 import {
   ClipboardClock,
   ListTodo,
@@ -9,8 +13,9 @@ import {
 import Robot from "./routes/Robot";
 import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
-import Plans from "./routes/Plans";
 import { QueueView } from "./routes/QueueView";
+import { StopAllButton } from "./components/StopAllButton";
+import { PlanBrowser } from "@atlas/blueapi-ui";
 
 const navigation: SectionGroup[] = [
   {
@@ -64,7 +69,7 @@ const navigation: SectionGroup[] = [
           },
           {
             name: "Plans",
-            element: <Plans />,
+            element: <PlanBrowser />,
           },
         ],
       },
@@ -101,4 +106,12 @@ const navigation: SectionGroup[] = [
   },
 ];
 
-export const router = createRouter({ title: "i15-1", navigation });
+export const router = createRouter({
+  title: "i15-1",
+  navigation,
+  footer: ({ open }) => (
+    <SystemControls open={open}>
+      <StopAllButton compact={!open} />
+    </SystemControls>
+  ),
+});
