@@ -56,8 +56,8 @@ export function InstrumentSessionView() {
         startIcon={<Science />}
         endIcon={<ExpandMore />}
         onClick={handleClick}
-        color="inherit" // to let you actually see it
-        variant="text"
+        color="secondary"
+        variant="outlined"
       >
         {buttonText}
       </Button>
