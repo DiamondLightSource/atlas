@@ -83,7 +83,12 @@ export function TopBar({ title, open, setOpen }: Props) {
             sx={{ borderColor: "currentColor", opacity: 0.3 }}
           />
 
-          <Typography variant="h6" noWrap component="div" sx={{ ml: 1.5 }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ ml: 1.5, mr: 1.25 }}
+          >
             {title}
           </Typography>
 
@@ -97,7 +102,6 @@ export function TopBar({ title, open, setOpen }: Props) {
           <Box
             sx={{
               ml: 1.5,
-              mt: 1.25,
             }}
           >
             <InstrumentSessionView />
