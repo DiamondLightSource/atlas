@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { useInstrumentSession } from "./InstrumentSessionProvider";
-import { visitTextToVisit } from "../../utils/common";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
