@@ -206,8 +206,8 @@ export function PucksTable() {
           const isMounted = row.original.status === "Mounted";
           return isVisible ? (
             <Button
-              variant="contained"
-              color={isMounted ? "success" : "info"}
+              variant={isMounted ? "outlined" : "contained"}
+              color={isMounted ? "inherit" : "success"}
               size="small"
               onClick={() => {
                 if (isMounted) {
