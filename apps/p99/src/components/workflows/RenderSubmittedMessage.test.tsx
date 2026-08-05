@@ -6,6 +6,7 @@ import { RelayEnvironmentProvider, useFragment } from "react-relay";
 import { RelayEnvironment } from "../../context/workflows/RelayEnvironment";
 import type { renderSubmittedMessageFragment$data } from "../../graphql/__generated__/renderSubmittedMessageFragment.graphql";
 import type { PayloadError } from "relay-runtime";
+import { MemoryRouter } from "react-router-dom";
 
 vi.mock("react-relay", async () => {
   const actual = await vi.importActual("react-relay");
@@ -21,9 +22,11 @@ describe("RenderSubmittedMessage", () => {
 
   const renderComponent = async (props: RenderSubmittedMessageProps) => {
     render(
-      <RelayEnvironmentProvider environment={RelayEnvironment}>
-        <RenderSubmittedMessage {...props} />
-      </RelayEnvironmentProvider>,
+      <MemoryRouter initialEntries={["/"]} initialIndex={0}>
+        <RelayEnvironmentProvider environment={RelayEnvironment}>
+          <RenderSubmittedMessage {...props} />
+        </RelayEnvironmentProvider>
+      </MemoryRouter>,
     );
   };
 
