@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
-    "@diamondlightsource/sci-react-ui": "^0.4.1",
-    "@mui/material": "^6.5.0",
+    "@diamondlightsource/sci-react-ui": "0.6.2",
+    "@mui/material": "^7.0.0",
     "lucide-react": "^1.16.0",
     "vitest": "*"
   }

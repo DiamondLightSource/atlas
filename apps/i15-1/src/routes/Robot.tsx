@@ -129,7 +129,6 @@ function Robot() {
       sx={{
         display: "flex",
         justifyContent: "left",
-        mt: 3,
         mr: 5,
         ml: 5,
       }}

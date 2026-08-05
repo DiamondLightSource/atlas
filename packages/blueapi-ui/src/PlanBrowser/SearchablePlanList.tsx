@@ -28,8 +28,15 @@ export default function SearchablePlanList({
   }, [plans, query]);
 
   return (
-    <Box>
-      <Box sx={{ p: 1.5 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        minHeight: 0,
+      }}
+    >
+      <Box sx={{ p: 1.5, flexShrink: 0 }}>
         <TextField
           fullWidth
           size="small"
@@ -42,11 +49,15 @@ export default function SearchablePlanList({
         sx={{
           px: 1.5,
           pb: 1.5,
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
         }}
       >
         <Box
           sx={{
-            height: "85vh",
+            flex: 1,
+            minHeight: 0,
             overflowY: "auto",
             overscrollBehavior:
               "contain" /* don't scroll parent when you scroll beyond limit */,
