@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
+import { Science, ExpandMore } from "@mui/icons-material";
 import { ListSubheader, styled } from "@mui/material";
 
 export function InstrumentSessionView() {
@@ -50,6 +51,8 @@ export function InstrumentSessionView() {
         aria-controls={open ? menuId : undefined}
         aria-haspopup="true"
         aria-expanded={open}
+        startIcon={<Science />}
+        endIcon={<ExpandMore />}
         onClick={handleClick}
         color="inherit" // to let you actually see it
         variant="text"
