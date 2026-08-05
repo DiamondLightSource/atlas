@@ -51,6 +51,8 @@ const GET_EXPERIMENTS: TypedDocumentNode<
   GetSessionPlaylistQueryVariables
 > = getSessionPlaylistQuery;
 
+const ROBOT_TABLE_NAME = "i15-1 robot table";
+
 export function ExperimentList() {
   const location = useLocation();
   const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
@@ -103,6 +105,28 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    muiTableBodyRowProps: ({ row }) => {
+      if (!row.original) {
+        return {};
+      }
+
+      const parent = row.original?.experiment?.sample?.container?.parent;
+
+      console.log("Parent", parent);
+
+      const isOnRobotTable =
+        parent !== null && parent?.name === ROBOT_TABLE_NAME;
+
+      console.log("isOnRobotTable", isOnRobotTable);
+
+      return isOnRobotTable
+        ? {}
+        : {
+            sx: {
+              backgroundColor: "warning.light",
+            },
+          };
+    },
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 

@@ -143,6 +143,24 @@ describe("ExperimentList", () => {
     ).toBeInTheDocument();
   });
 
+  it("highlights rows red when container parent is not i15-1 robot table", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    const nonRobotRow = screen.getByText("Exp 2").closest("tr");
+    // sx with !important is injected as an Emotion class; the row should have a class applied
+    expect(nonRobotRow).not.toHaveStyle("background-color: rgb(255, 255, 255)");
+    expect(nonRobotRow?.className).toBeTruthy();
+
+    const robotRow = screen.getByText("Exp 1").closest("tr");
+    expect(robotRow).not.toHaveStyle("background-color: #ffebee");
+  });
+
   it("changes button text when a row is selected", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
