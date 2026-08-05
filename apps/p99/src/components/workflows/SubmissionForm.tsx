@@ -12,6 +12,7 @@ import { useState } from "react";
 import type { JSONObject } from "../../utils/types";
 import { VisitInput, type Visit } from "@diamondlightsource/sci-react-ui";
 import type { ErrorObject } from "ajv";
+import { Link } from "react-router-dom";
 
 const SubmissionForm = ({
   template,
@@ -50,7 +51,11 @@ const SubmissionForm = ({
       <Typography variant="body1" align="center">
         Maintainer: {data.maintainer}
       </Typography>
-      {data.repository && <Typography>{data.repository}</Typography>}
+      {data.repository && (
+        <Typography variant="body1" align="center">
+          <Link to={data.repository}>{data.repository}</Link>
+        </Typography>
+      )}
       <Divider />
       <JsonForms
         schema={data.arguments}
