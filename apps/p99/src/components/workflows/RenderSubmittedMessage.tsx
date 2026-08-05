@@ -17,18 +17,20 @@ import { useFragment } from "react-relay";
 import { renderSubmittedMessageFragment } from "../../graphql/renderSubmittedMessageFragment";
 import { getWorkflowStatusIcon } from "./StatusIcons";
 
-const RenderSubmittedMessage = ({
-  result,
-  index,
-  fragmentRef,
-}: {
+export interface RenderSubmittedMessageProps {
   result:
     | SubmissionGraphQLErrorMessage
     | SubmissionNetworkErrorMessage
     | SubmissionSuccessMessage;
   index: number;
   fragmentRef?: renderSubmittedMessageFragment$key | null;
-}) => {
+}
+
+const RenderSubmittedMessage = ({
+  result,
+  index,
+  fragmentRef,
+}: RenderSubmittedMessageProps) => {
   const data = useFragment(renderSubmittedMessageFragment, fragmentRef);
   switch (result.type) {
     case "success":
