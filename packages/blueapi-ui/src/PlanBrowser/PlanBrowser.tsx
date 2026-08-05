@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Drawer,
-  Grid,
   Paper,
   Stack,
   Toolbar,
@@ -84,34 +83,37 @@ function PlanParametersWrapper({ selected }: { selected: Plan | null }) {
 
 function FullLayout({ plans, selected, select }: Props) {
   return (
-    <Box>
-      <Grid container spacing={1}>
-        <Grid size={{ xs: 4 }}>
-          <Paper>
-            <SearchablePlanList
-              plans={plans.sort((a, b) =>
-                a.name.localeCompare(b.name, undefined, {
-                  sensitivity: "base",
-                }),
-              )}
-              selectedPlan={selected}
-              updateSelection={select}
-            />
-          </Paper>
-        </Grid>
-        <Grid size={{ xs: 8 }}>
-          <Paper
-            elevation={2}
-            sx={{
-              height: "100%",
-              p: 2,
-              display: "flex",
-            }}
-          >
-            <PlanParametersWrapper selected={selected} />
-          </Paper>
-        </Grid>
-      </Grid>
+    <Box sx={{ display: "flex", height: "100%", gap: 1 }}>
+      <Paper
+        sx={{
+          width: "33%",
+          height: "100%",
+          minHeight: 0,
+          overflow: "hidden",
+        }}
+      >
+        <SearchablePlanList
+          plans={plans.sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, {
+              sensitivity: "base",
+            }),
+          )}
+          selectedPlan={selected}
+          updateSelection={select}
+        />
+      </Paper>
+      <Paper
+        elevation={2}
+        sx={{
+          flex: 1,
+          height: "100%",
+          minHeight: 0,
+          p: 2,
+          display: "flex",
+        }}
+      >
+        <PlanParametersWrapper selected={selected} />
+      </Paper>
     </Box>
   );
 }
