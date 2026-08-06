@@ -2,7 +2,7 @@ import { useInstrumentSession } from "../../context/instrumentSession/useInstrum
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
 import { useState } from "react";
-import { NumberInput } from "../NumberInput";
+import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { Box } from "@mui/material";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { visitTextToVisit } from "../../utils/common";
