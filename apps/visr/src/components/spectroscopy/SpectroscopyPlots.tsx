@@ -84,15 +84,15 @@ type ChannelKey = (typeof CHANNELS)[number]["key"];
 type PlotValues = ComponentProps<typeof ImagePlot>["values"];
 export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
-interface RawSpectroscopyDataProps {
+interface SpectroscopyPlotsProps {
   expanded: boolean;
   plotAspectRatio: number;
 }
 
-function RawSpectroscopyData({
+function SpectroscopyPlots({
   expanded,
   plotAspectRatio,
-}: RawSpectroscopyDataProps) {
+}: SpectroscopyPlotsProps) {
   const { data: channels } = useSpectroscopyData(fetchMap);
   const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
@@ -146,4 +146,4 @@ function RawSpectroscopyData({
   );
 }
 
-export default RawSpectroscopyData;
+export default SpectroscopyPlots;

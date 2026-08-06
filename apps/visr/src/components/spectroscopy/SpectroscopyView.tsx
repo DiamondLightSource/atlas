@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import RawSpectroscopyData from "./SpectroscopyPlots";
+import SpectroscopyPlots from "./SpectroscopyPlots";
 import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
@@ -53,7 +53,7 @@ function SpectroscopyView() {
         height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <RawSpectroscopyData
+      <SpectroscopyPlots
         expanded={!drawerOpen}
         plotAspectRatio={PLOT_ASPECT_RATIO}
       />

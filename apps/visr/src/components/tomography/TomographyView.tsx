@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Controls from "./TomographyControls";
 import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
-import GridViews from "./TomographyPlots";
+import TomographyPlots from "./TomographyPlots";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -128,7 +128,7 @@ function TomographyView() {
         height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <GridViews
+      <TomographyPlots
         volumeData={volume.volumeData}
         volumeVisible={volumeVisible}
         plane={plane}

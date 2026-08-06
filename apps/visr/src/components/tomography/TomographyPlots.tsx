@@ -14,7 +14,7 @@ interface Props {
   plane: Plane;
   // revolve?: boolean
 }
-function GridViews({
+function TomographyPlots({
   volumeData,
   volumeShape,
   volumeVisible,
@@ -78,4 +78,4 @@ function GridViews({
   );
 }
 
-export default GridViews;
+export default TomographyPlots;
