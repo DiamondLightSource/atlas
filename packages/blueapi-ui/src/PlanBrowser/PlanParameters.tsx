@@ -69,7 +69,7 @@ export function PlanParameters({ plan }: { plan: Plan }) {
         <RunPlanButton
           name={plan.name}
           params={planParameters[plan.name]}
-          instrumentSession={instrumentSession[0]}
+          instrumentSession={instrumentSession}
         />
       </Box>
     </ErrorBoundary>

@@ -29,7 +29,7 @@ export function InstrumentSessionView() {
   ) => {
     setSelectedIndex(index);
     setAnchorEl(null);
-    setInstrumentSession([event.currentTarget.textContent ?? ""]);
+    setInstrumentSession(event.currentTarget.textContent ?? "");
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -44,7 +44,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession[0]}
+          {instrumentSession}
         </Button>
       </div>
     );
@@ -62,7 +62,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession[0]}
+          {instrumentSession}
         </Button>
         <Menu
           data-testid={menuId}

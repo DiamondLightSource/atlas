@@ -4,8 +4,8 @@ import { createContext } from "react";
 export const ID_STORAGE_KEY = "instrument-session-id";
 
 export type InstrumentSessionContextType = {
-  instrumentSession: string[];
-  setInstrumentSession: (session: string[]) => void;
+  instrumentSession: string;
+  setInstrumentSession: (session: string) => void;
   sessionsList: string[];
 };
 
@@ -20,7 +20,7 @@ export const InstrumentSessionProvider = ({
   children: ReactNode;
   sessionsList?: string[];
 }) => {
-  const [instrumentSession, setInstrumentSession] = useState<string[]>(() => {
+  const [instrumentSession, setInstrumentSession] = useState<string>(() => {
     try {
       const rawItem = localStorage.getItem(ID_STORAGE_KEY);
       if (!rawItem) {
@@ -37,7 +37,7 @@ export const InstrumentSessionProvider = ({
   });
 
   useEffect(() => {
-    localStorage.setItem(ID_STORAGE_KEY, JSON.stringify(instrumentSession));
+    localStorage.setItem(ID_STORAGE_KEY, instrumentSession);
   }, [instrumentSession]);
 
   return (
