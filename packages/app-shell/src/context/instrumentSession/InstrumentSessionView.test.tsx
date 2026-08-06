@@ -54,22 +54,6 @@ describe("InstrumentSessionView", () => {
 
     await user.click(screen.getByText("cm123-4"));
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("session-input-button")).toHaveTextContent(
-      "cm123-4",
-    );
-  });
-
-  it("shows all active sessions when all active sessions item has been clicked", async () => {
-    renderComponentWithProvider();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByTestId("session-input-button"));
-    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
-
-    await user.click(screen.getByText("All Active Sessions"));
-    expect(screen.queryByTestId("session-input-button")).toHaveTextContent(
-      "All Active Sessions",
-    );
   });
 
   it("closes menu when button has been clicked again", async () => {

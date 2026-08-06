@@ -12,7 +12,6 @@ export function InstrumentSessionView() {
   const { instrumentSession, setInstrumentSession, sessionsList } =
     useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [allSelected, setAllSelected] = useState<boolean>(false);
 
   const menuDisabled = sessionsList.length <= 1 ? true : false;
   const id = "session-input";
@@ -21,9 +20,6 @@ export function InstrumentSessionView() {
   const menuId = `${id}-menu`;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [buttonText, setButtonText] = React.useState<string>(
-    instrumentSession[0],
-  );
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -32,17 +28,8 @@ export function InstrumentSessionView() {
     index: number,
   ) => {
     setSelectedIndex(index);
-    setAllSelected(false);
     setAnchorEl(null);
     setInstrumentSession([event.currentTarget.textContent ?? ""]);
-    setButtonText(event.currentTarget.textContent ?? "");
-  };
-  const handleAllSessionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    setSelectedIndex(null);
-    setAllSelected(true);
-    setAnchorEl(null);
-    setInstrumentSession(sessionsList);
-    setButtonText("All Active Sessions");
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -75,7 +62,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {buttonText}
+          {instrumentSession[0]}
         </Button>
         <Menu
           data-testid={menuId}
@@ -88,14 +75,6 @@ export function InstrumentSessionView() {
             },
           }}
         >
-          <ListSubheader>Session Selection</ListSubheader>
-          <MenuItem
-            key="All Active Sessions"
-            selected={allSelected}
-            onClick={(event) => handleAllSessionsClick(event)}
-          >
-            All Active Sessions
-          </MenuItem>
           <Divider />
           <ListSubheader> Available Sessions </ListSubheader>
           {sessionsList.map((option, index) => (
