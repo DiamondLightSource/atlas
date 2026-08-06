@@ -14,7 +14,9 @@ export function InstrumentSessionView() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [allSelected, setAllSelected] = useState<boolean>(false);
 
+  const menuDisabled = sessionsList.length <= 1 ? true : false;
   const id = "session-input";
+  const staticButtonId = `${id}-staticButton`;
   const buttonId = `${id}-button`;
   const menuId = `${id}-menu`;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -46,52 +48,67 @@ export function InstrumentSessionView() {
     setAnchorEl(null);
   };
 
-  return (
-    <div>
-      <Button
-        data-testid={buttonId}
-        aria-controls={open ? menuId : undefined}
-        aria-haspopup="true"
-        aria-expanded={open}
-        startIcon={<Science />}
-        endIcon={<ExpandMore />}
-        onClick={handleClick}
-        color="secondary"
-        variant="outlined"
-      >
-        {buttonText}
-      </Button>
-      <Menu
-        data-testid={menuId}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        slotProps={{
-          list: {
-            "aria-labelledby": buttonId,
-          },
-        }}
-      >
-        <ListSubheader>Session Selection</ListSubheader>
-        <MenuItem
-          key="All Active Sessions"
-          selected={allSelected}
-          onClick={(event) => handleAllSessionsClick(event)}
+  if (menuDisabled) {
+    return (
+      <div>
+        <Button
+          data-testid={staticButtonId}
+          startIcon={<Science />}
+          color="secondary"
+          variant="outlined"
         >
-          All Active Sessions
-        </MenuItem>
-        <Divider />
-        <ListSubheader> Available Sessions </ListSubheader>
-        {sessionsList.map((option, index) => (
+          {instrumentSession[0]}
+        </Button>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <Button
+          data-testid={buttonId}
+          aria-controls={open ? menuId : undefined}
+          aria-haspopup="true"
+          aria-expanded={open}
+          startIcon={<Science />}
+          endIcon={<ExpandMore />}
+          onClick={handleClick}
+          color="secondary"
+          variant="outlined"
+        >
+          {buttonText}
+        </Button>
+        <Menu
+          data-testid={menuId}
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          slotProps={{
+            list: {
+              "aria-labelledby": buttonId,
+            },
+          }}
+        >
+          <ListSubheader>Session Selection</ListSubheader>
           <MenuItem
-            key={option}
-            selected={index === selectedIndex}
-            onClick={(event) => handleMenuItemClick(event, index)}
+            key="All Active Sessions"
+            selected={allSelected}
+            onClick={(event) => handleAllSessionsClick(event)}
           >
-            {option}
+            All Active Sessions
           </MenuItem>
-        ))}
-      </Menu>
-    </div>
-  );
+          <Divider />
+          <ListSubheader> Available Sessions </ListSubheader>
+          {sessionsList.map((option, index) => (
+            <MenuItem
+              key={option}
+              selected={index === selectedIndex}
+              onClick={(event) => handleMenuItemClick(event, index)}
+            >
+              {option}
+            </MenuItem>
+          ))}
+        </Menu>
+      </div>
+    );
+  }
 }
