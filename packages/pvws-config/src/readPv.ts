@@ -1,4 +1,10 @@
-import { useConnection, type DType } from "@diamondlightsource/cs-web-lib";
+import {
+  dTypeGetDoubleValue,
+  dTypeCoerceString,
+  useConnection,
+  dTypeByteArrToString,
+  dTypeGetArrayValue,
+} from "@diamondlightsource/cs-web-lib";
 import { type RawValue } from "./types";
 
 export function ReadPvRawValue({
@@ -16,20 +22,11 @@ export function ReadPvRawValue({
   return rawValue;
 }
 
-// TODO: Simplify PV parsing functions with newly exposed cs-web-lib utils
-// https://github.com/DiamondLightSource/atlas/issues/93
-
-export function parseStringPv(value: RawValue | string | number): string {
+export function parseStringPv(value: RawValue): string {
   let displayValue: string;
   if (value != "not connected" && value != undefined) {
-    if (typeof value === "string" || typeof value === "number") {
-      displayValue = value.toString();
-    } else {
-      const stringVal = (value as DType).value.stringValue
-        ? (value as DType).value.stringValue
-        : value;
-      displayValue = stringVal ? stringVal.toString() : "undefined";
-    }
+    const stringVal = dTypeCoerceString(value);
+    displayValue = stringVal ? stringVal.toString() : "undefined";
   } else if (value === "not connected") {
     displayValue = "not connected";
   } else {
@@ -47,7 +44,7 @@ function scaleAndApprox(
 }
 
 export function parseNumericPV(
-  value: RawValue | string | number,
+  value: RawValue,
   decimals?: number,
   scaleFactor?: number,
 ): string {
@@ -55,20 +52,11 @@ export function parseNumericPV(
   const decimalsToUse = decimals ? decimals : 2;
   const scaleToUse = scaleFactor ? scaleFactor : 1;
   if (value != "not connected" && value != undefined) {
-    if (typeof value === "number") {
-      displayValue = scaleAndApprox(Number(value), decimalsToUse, scaleToUse);
-    } else if (typeof value === "string") {
-      displayValue =
-        value === "undefined"
-          ? "undefined"
-          : scaleAndApprox(parseFloat(value), decimalsToUse, scaleToUse);
+    const numValue = dTypeGetDoubleValue(value);
+    if (!numValue) {
+      displayValue = "undefined";
     } else {
-      const numValue = (value as DType).value.doubleValue;
-      if (!numValue) {
-        displayValue = "undefined";
-      } else {
-        displayValue = scaleAndApprox(numValue, decimalsToUse, scaleToUse);
-      }
+      displayValue = scaleAndApprox(numValue, decimalsToUse, scaleToUse);
     }
   } else if (value === "not connected") {
     displayValue = "not connected";
@@ -78,22 +66,11 @@ export function parseNumericPV(
   return displayValue;
 }
 
-export function parseByteArrPV(value: RawValue | string | number): string {
+export function parseByteArrPV(value: RawValue): string {
   let displayValue: string;
   if (value != "not connected" && value != undefined) {
-    const arrValue = (value as DType).value.arrayValue;
-    if (!arrValue) {
-      displayValue = "undefined";
-    } else {
-      let result = "";
-      for (let i = 0; i < arrValue.length; i++) {
-        if (Number(arrValue[i]) === 0) {
-          break;
-        }
-        result += String.fromCharCode(Number(arrValue[i]));
-      }
-      displayValue = result;
-    }
+    const arrValue = dTypeGetArrayValue(value);
+    displayValue = arrValue ? dTypeByteArrToString(arrValue) : "undefined";
   } else if (value == "not connected") {
     displayValue = "not connected";
   } else {

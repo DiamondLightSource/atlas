@@ -14,6 +14,8 @@ import {
 
 import { topBarHeight } from "./layoutConstants";
 
+import { InstrumentSessionView } from "./context/instrumentSession/InstrumentSessionView";
+
 type Props = {
   title: string;
   open: boolean;
@@ -81,9 +83,29 @@ export function TopBar({ title, open, setOpen }: Props) {
             sx={{ borderColor: "currentColor", opacity: 0.3 }}
           />
 
-          <Typography variant="h6" noWrap component="div" sx={{ ml: 1.5 }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ ml: 1.5, mr: 1.25 }}
+          >
             {title}
           </Typography>
+
+          <Divider
+            orientation="vertical"
+            variant="middle"
+            flexItem
+            sx={{ borderColor: "currentColor", opacity: 0.3 }}
+          />
+
+          <Box
+            sx={{
+              ml: 1.5,
+            }}
+          >
+            <InstrumentSessionView />
+          </Box>
         </Box>
       }
       rightSlot={<ColourSchemeButton />}
