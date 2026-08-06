@@ -71,7 +71,7 @@ importers:
         version: link:../../packages/pvws-config
       '@diamondlightsource/cs-web-lib':
         specifier: 0.10.19
-        version: 0.10.19(2cb0cc11507056aa25cec4d86b745b23)
+        version: 0.10.19(9aa4212c9d13cf3f396875753b6613e7)
       '@diamondlightsource/sci-react-ui':
         specifier: 0.6.2
         version: 0.6.2(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@jsonforms/core@3.6.0)(@jsonforms/material-renderers@3.6.0(ee8816af86b6feb05ecf8a95d7a9decc))(@jsonforms/react@3.6.0(@jsonforms/core@3.6.0)(react@18.3.1))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
@@ -348,6 +348,9 @@ importers:
 
   packages/app-shell:
     dependencies:
+      '@mui/icons-material':
+        specifier: ^7.0.0
+        version: 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
       react-router-dom:
         specifier: ^7.13.1
         version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -399,6 +402,9 @@ importers:
 
   packages/blueapi-ui:
     dependencies:
+      '@atlas/app-shell':
+        specifier: workspace:*
+        version: link:../app-shell
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../blueapi
@@ -423,6 +429,9 @@ importers:
       react-error-boundary:
         specifier: ^6.0.0
         version: 6.1.1(react@18.3.1)
+      react-router-dom:
+        specifier: ^7.18.1
+        version: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@atlas/vitest-conf':
         specifier: workspace:*
@@ -438,7 +447,7 @@ importers:
     dependencies:
       '@diamondlightsource/cs-web-lib':
         specifier: 0.10.19
-        version: 0.10.19(4fbd602dc5ff46e19c5e41257b5d42d6)
+        version: 0.10.19(b24c5f51dba915ae6a679a7010c5c2b9)
       '@mui/material':
         specifier: ^7.0.0
         version: 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4302,8 +4311,25 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
+  react-router-dom@7.18.1:
+    resolution: {integrity: sha512-KaZh+X/6UtEp28x51AUYZDMg9NGoz2ja3dNHa+ta/tk40vCzKhQ/RypCWBMLbmDr6//E24Vv5uPsrqXFozdkAg==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+
   react-router@7.13.1:
     resolution: {integrity: sha512-td+xP4X2/6BJvZoX6xw++A2DdEi++YypA69bJUV5oVvqf6/9/9nNlD70YO1e9d3MyamJEBQFEzk6mbfDYbqrSA==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
+  react-router@7.18.1:
+    resolution: {integrity: sha512-GDLgg3i3uM0aeJO3Fm+TCS+sDQ7gu12T6x0qdTEzcwqEfleci7JwugVNIF3U//0FWKnJT7ptG+20B2jfDqnZAg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -5455,7 +5481,7 @@ snapshots:
     optionalDependencies:
       dayjs: 1.10.7
 
-  '@diamondlightsource/cs-web-lib@0.10.19(2cb0cc11507056aa25cec4d86b745b23)':
+  '@diamondlightsource/cs-web-lib@0.10.19(9aa4212c9d13cf3f396875753b6613e7)':
     dependencies:
       '@mui/icons-material': 6.5.0(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5471,14 +5497,14 @@ snapshots:
       react-gauge-component: 2.0.29(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-grid-layout: 2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-redux: 7.2.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-router: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-toastify: 11.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       safe-stable-stringify: 2.5.0
       utf-8-validate: 5.0.10
     transitivePeerDependencies:
       - graphql
 
-  '@diamondlightsource/cs-web-lib@0.10.19(4fbd602dc5ff46e19c5e41257b5d42d6)':
+  '@diamondlightsource/cs-web-lib@0.10.19(b24c5f51dba915ae6a679a7010c5c2b9)':
     dependencies:
       '@mui/icons-material': 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5494,7 +5520,7 @@ snapshots:
       react-gauge-component: 2.0.29(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-grid-layout: 2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-redux: 7.2.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-router: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-toastify: 11.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       safe-stable-stringify: 2.5.0
       utf-8-validate: 5.0.10
@@ -9450,7 +9476,21 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-router: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
+  react-router-dom@7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-router: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
   react-router@7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      cookie: 1.1.1
+      react: 18.3.1
+      set-cookie-parser: 2.7.2
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
+
+  react-router@7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.1.1
       react: 18.3.1
