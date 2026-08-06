@@ -91,6 +91,7 @@ function RobotControl() {
             onCommit={(parsedValue) => {
               setFormData({ ...formData, ["puck"]: parsedValue });
             }}
+            helperText={false}
           />
           <NumberInput
             label="Position"
@@ -101,6 +102,7 @@ function RobotControl() {
             onCommit={(parsedValue) => {
               setFormData({ ...formData, ["position"]: parsedValue });
             }}
+            helperText={false}
           />
         </Stack>
         <Stack direction={"row"} spacing={3} alignItems={"center"}>
