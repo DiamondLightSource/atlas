@@ -53,6 +53,14 @@ export const InstrumentSessionProvider = ({
   );
 };
 
+export function parseInstrumentSession(
+  session: string,
+): { proposal: number; session: number } | null {
+  const match = session.match(/(\d+)-(\d+)$/);
+  if (!match) return null;
+  return { proposal: Number(match[1]), session: Number(match[2]) };
+}
+
 export const useInstrumentSession = () => {
   const context = useContext(InstrumentSessionContext);
   if (!context) {

@@ -17,6 +17,7 @@ import type {
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
+import { useInstrumentSession, parseInstrumentSession } from "@atlas/app-shell";
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -53,6 +54,7 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 
 export function ExperimentList() {
   const location = useLocation();
+  const { instrumentSession } = useInstrumentSession();
   const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
@@ -73,11 +75,11 @@ export function ExperimentList() {
     );
   }
 
+  const parsedSession = parseInstrumentSession(instrumentSession);
+
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
-    variables: {
-      proposal: 44163,
-      session: 3,
-    },
+    skip: !parsedSession,
+    variables: parsedSession ?? { proposal: 0, session: 0 },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
   });

@@ -4,6 +4,7 @@ import { ExperimentList } from "./ULIMSExperimentsTable";
 import * as apollo from "@apollo/client/react";
 import { MemoryRouter } from "react-router-dom";
 import * as queueService from "../../queue/queueService";
+import * as appShell from "@atlas/app-shell";
 
 vi.mock("@apollo/client/react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@apollo/client/react")>();
@@ -22,8 +23,18 @@ vi.mock("../../queue/queueService", async (importOriginal) => {
   };
 });
 
+vi.mock("@atlas/app-shell", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@atlas/app-shell")>();
+  return {
+    ...actual,
+    useInstrumentSession: vi.fn(),
+  };
+});
+
 const mockedUseSubmitTask = queueService.useSumbitQueueTask as unknown as Mock;
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
+const mockedUseInstrumentSession =
+  appShell.useInstrumentSession as unknown as Mock;
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -32,6 +43,11 @@ afterEach(() => {
 beforeEach(() => {
   mockedUseSubmitTask.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
+  });
+  mockedUseInstrumentSession.mockReturnValue({
+    instrumentSession: "CM44163-3",
+    setInstrumentSession: vi.fn(),
+    sessionsList: ["CM44163-3"],
   });
 });
 
@@ -252,5 +268,44 @@ describe("ExperimentList", () => {
         },
       });
     });
+  });
+
+  it("re-queries with new proposal/session when the instrument session changes", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const { rerender } = render(
+      <MemoryRouter>
+        <ExperimentList />
+      </MemoryRouter>,
+    );
+
+    // Initial render uses CM44163-3 → proposal 44163, session 3
+    expect(mockedUseQuery).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ variables: { proposal: 44163, session: 3 } }),
+    );
+
+    // Switch to a different session
+    mockedUseInstrumentSession.mockReturnValue({
+      instrumentSession: "CM55555-1",
+      setInstrumentSession: vi.fn(),
+      sessionsList: ["CM55555-1"],
+    });
+
+    rerender(
+      <MemoryRouter>
+        <ExperimentList />
+      </MemoryRouter>,
+    );
+
+    // Query should now be called with the new session variables
+    expect(mockedUseQuery).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ variables: { proposal: 55555, session: 1 } }),
+    );
   });
 });
