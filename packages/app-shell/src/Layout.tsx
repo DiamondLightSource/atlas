@@ -1,4 +1,4 @@
-import { Toolbar } from "@mui/material";
+import { GlobalStyles } from "@mui/material";
 import Box from "@mui/material/Box";
 import { NavLink, Outlet } from "react-router-dom";
 import { routePath, type RouterProps } from "./Router";
@@ -27,7 +27,14 @@ export function Layout(props: RouterProps) {
   const navigation = toNavItemGroups(props);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100%" }}>
+      <GlobalStyles
+        styles={{
+          html: { height: "100%" },
+          body: { height: "100%" },
+          "#root": { height: "100%" },
+        }}
+      />
       <TopBar title={props.title} open={open} setOpen={setOpen} />
       <SidebarNav
         navigation={navigation}
@@ -37,7 +44,7 @@ export function Layout(props: RouterProps) {
       />
       <Box
         component="main"
-        sx={{ display: "flex", flex: 1, flexDirection: "column" }}
+        sx={{ display: "flex", flex: 1, flexDirection: "column", minWidth: 0 }}
       >
         {/* Spacer, same height as the fixed TopBar's Navbar */}
         <Box sx={{ height: topBarHeight, flexShrink: 0 }} />

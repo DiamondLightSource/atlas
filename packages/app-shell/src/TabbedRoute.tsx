@@ -1,5 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box, Tabs, Tab, Paper } from "@mui/material";
+import type { Theme } from "@mui/material/styles";
+import { topBarHeight } from "./layoutConstants";
 
 export interface TabDescription {
   label: string;
@@ -38,16 +40,14 @@ export function TabbedPanel({ tabs, basePath }: TabbedPanelProps) {
         square
         elevation={0}
         sx={{
+          position: "sticky",
+          top: topBarHeight,
+          zIndex: (theme: Theme) => theme.zIndex.appBar,
           borderBottom: 1,
           borderColor: "divider",
         }}
       >
-        <Tabs
-          value={currentTab}
-          onChange={handleChange}
-          variant="scrollable"
-          scrollButtons="auto"
-        >
+        <Tabs value={currentTab} onChange={handleChange} variant="standard">
           {tabs.map((tab) => (
             <Tab
               key={tab.path}
@@ -63,6 +63,7 @@ export function TabbedPanel({ tabs, basePath }: TabbedPanelProps) {
         sx={{
           flex: 1,
           minHeight: 0,
+          minWidth: 0,
           overflow: "auto",
           p: 3,
         }}
