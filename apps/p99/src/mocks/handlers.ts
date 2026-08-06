@@ -2,7 +2,6 @@ import { http, HttpResponse, graphql } from "msw";
 import plansResponse from "./plans-response.json";
 import devicesResponse from "./devices-response.json";
 import templateResponse from "./template-response.json";
-import { visitToText } from "@diamondlightsource/sci-react-ui";
 
 const fakeTaskId = "46709394";
 let workerState = "IDLE";
