@@ -2,6 +2,7 @@ import { http, HttpResponse, graphql } from "msw";
 import plansResponse from "./plans-response.json";
 import devicesResponse from "./devices-response.json";
 import templateResponse from "./template-response.json";
+import { visitToText } from "@diamondlightsource/sci-react-ui";
 
 const fakeTaskId = "46709394";
 let workerState = "IDLE";
@@ -46,13 +47,34 @@ export const handlers = [
     return HttpResponse.json(templateResponse);
   }),
 
-  graphql.mutation("submitWorkflowTemplateMutation", async () => {
-    return HttpResponse.json({
-      data: {
-        submitWorkflowTemplate: {
-          name: "ptypy-p99-from-config-1234",
+  graphql.mutation("submitWorkflowTemplateMutation", async ({ variables }) => {
+    if (
+      variables.visit.proposalCode === "ne" &&
+      variables.visit.proposalNumber === 11111 &&
+      variables.visit.number === 1
+    ) {
+      return HttpResponse.error();
+    } else if (
+      variables.visit.proposalCode === "ge" &&
+      variables.visit.proposalNumber === 22222 &&
+      variables.visit.number === 1
+    ) {
+      return HttpResponse.json({
+        data: {
+          submitWorkflowTemplate: {
+            name: variables.templateName,
+          },
         },
-      },
-    });
+        errors: [{ message: "GraphQL Error" }],
+      });
+    } else {
+      return HttpResponse.json({
+        data: {
+          submitWorkflowTemplate: {
+            name: variables.templateName,
+          },
+        },
+      });
+    }
   }),
 ];
