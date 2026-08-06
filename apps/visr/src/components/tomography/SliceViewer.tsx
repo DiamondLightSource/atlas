@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { Plane } from "./PlaneEnum";
-import { HeatmapPlot, ImagePlot } from "@diamondlightsource/davidia";
-import ndarray, { type NdArray } from "ndarray";
+import { HeatmapPlot } from "@diamondlightsource/davidia";
+import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
 
 interface Props {
@@ -22,13 +22,10 @@ export default function SliceViewer({
 
   const volume = ndarray(volumeData, volumeShape);
   let sliceNdarray: ndarray.NdArray<Uint8Array>;
-  let slice3Darray: ndarray.NdArray;
 
   switch (plane) {
     case Plane.Z: {
       sliceNdarray = createArrayFromView(volume.pick(slice, null, null));
-      slice3Darray = ndarray(sliceNdarray.data, [91, 91, 1]);
-      console.log(slice3Darray);
       break;
     }
     case Plane.Y: {
