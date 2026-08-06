@@ -5,6 +5,7 @@ import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
 // import "react-grid-layout/css/styles.css";
 
 import { useMemo, type ComponentProps } from "react";
+import { Box } from "@mui/material";
 
 function toNDT(matrix: (number | null)[][], colour: RGBColour): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
@@ -107,9 +108,9 @@ function RawSpectroscopyData({
   const plots = useMemo(
     () =>
       CHANNELS.map(({ key }, i) => (
-        <div
+        <Box
           key={i}
-          style={{
+          sx={{
             flex: 1,
             justifyContent: "center",
           }}
@@ -122,13 +123,13 @@ function RawSpectroscopyData({
             values={channels[key] ?? EMPTY_NDT}
             //tightAxes //requires Davidia 1.0.5
           />
-        </div>
+        </Box>
       )),
     [channels, plotAspectRatio],
   );
-
+  console.log("red channel", channels["gray"]);
   return (
-    <div ref={containerRef! as React.RefObject<HTMLDivElement>}>
+    <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
           layout={layout}
@@ -141,7 +142,7 @@ function RawSpectroscopyData({
           {plots}
         </ReactGridLayout>
       )}
-    </div>
+    </Box>
   );
 }
 

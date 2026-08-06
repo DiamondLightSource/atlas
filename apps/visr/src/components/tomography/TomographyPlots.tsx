@@ -49,19 +49,19 @@ function GridViews({
     />,
   ];
   const plots = views.map((view, i) => (
-    <div
+    <Box
       key={i}
-      style={{
+      sx={{
         flex: 1,
         minWidth: 260,
       }}
     >
       {view}
-    </div>
+    </Box>
   ));
   console.log(plots[0]);
   return (
-    <div ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
+    <Box ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
       {mounted && (
         <ReactGridLayout
           layout={layout}
@@ -74,7 +74,7 @@ function GridViews({
           {plots}
         </ReactGridLayout>
       )}
-    </div>
+    </Box>
   );
 }
 

@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import Controls from "./Controls";
+import Controls from "./TomographyControls";
 import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
-import GridViews from "./GridViews";
+import GridViews from "./TomographyPlots";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -23,7 +23,6 @@ function TomographyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const DRAWER_COLLAPSED_HEIGHT = 64;
   const NAVBAR_HEIGHT = 32;
-  // const PLOT_ASPECT_RATIO = 0.75;
 
   useEffect(() => {
     async function loadTestVolume() {

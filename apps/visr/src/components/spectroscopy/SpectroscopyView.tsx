@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import RawSpectroscopyData from "./RawSpectroscopyData";
+import RawSpectroscopyData from "./SpectroscopyPlots";
 import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
@@ -39,7 +39,7 @@ function SpectroscopyView() {
     }
   });
 
-  const DRAWER_COLLAPSED_HEIGHT = 64;
+  const DRAWER_COLLAPSED_HEIGHT = 80;
   const NAVBAR_HEIGHT = 32;
   const PLOT_ASPECT_RATIO = 0.75;
 
