@@ -137,6 +137,7 @@ function SpectroscopyPlots({
           gridConfig={{
             cols: !expanded ? plots.length : plots.length / 2,
             rowHeight: 25,
+            margin: [10, 10],
           }}
         >
           {plots}

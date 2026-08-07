@@ -69,6 +69,7 @@ function TomographyPlots({
           gridConfig={{
             cols: drawerOpen ? 3 : 3,
             rowHeight: drawerOpen ? 25 : 50,
+            margin: [20, 20], //twice the margin of Spectroscopy plots as half the number of rows
           }}
         >
           {plots}

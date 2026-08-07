@@ -21,7 +21,7 @@ function TomographyView() {
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const DRAWER_COLLAPSED_HEIGHT = 64;
+  const DRAWER_COLLAPSED_HEIGHT = 80;
   const NAVBAR_HEIGHT = 32;
 
   useEffect(() => {
