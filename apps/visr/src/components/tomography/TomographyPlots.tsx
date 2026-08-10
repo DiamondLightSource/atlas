@@ -27,9 +27,9 @@ function TomographyPlots({
   const w = 1;
 
   const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: h },
-    { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h },
+    { i: "0", x: 0, y: 0, w: w, h: h, static: true },
+    { i: "1", x: 1, y: 0, w: w, h: h, static: true },
+    { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h, static: true },
   ];
 
   if (!volumeData) return <Box />;

@@ -2,8 +2,6 @@ import { ImagePlot, type NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
 import ReactGridLayout, { useContainerWidth } from "react-grid-layout";
-// import "react-grid-layout/css/styles.css";
-
 import { useMemo, type ComponentProps } from "react";
 import { Box } from "@mui/material";
 
@@ -99,10 +97,10 @@ function SpectroscopyPlots({
   const w = 1;
 
   const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: h },
-    { i: "1", x: 1, y: 0, w: w, h: h },
-    { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h },
-    { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h },
+    { i: "0", x: 0, y: 0, w: w, h: h, static: true },
+    { i: "1", x: 1, y: 0, w: w, h: h, static: true },
+    { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h, static: true },
+    { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h, static: true },
   ];
 
   const plots = useMemo(
