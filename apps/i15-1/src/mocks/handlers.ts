@@ -8,73 +8,161 @@ const workerStatus = { status: "IDLE", duration: 0 };
 
 const fakeExperiments = {
   data: {
-    instrumentSession: {
-      experiments: {
-        edges: [
-          {
-            node: {
-              name: "Test experiment",
-              sample: {
-                name: "Test_8_1",
-                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+    experiments: {
+      edges: [
+        {
+          node: {
+            name: "Test experiment",
+            sample: {
+              name: "Test_8_1",
+              id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
-                data: {
-                  q_max: 67,
-                  frames: 90,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 10,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+              data: {
+                q_max: 67,
+                frames: 90,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 10,
               },
             },
           },
-          {
-            node: {
-              name: "Test experiment 2",
-              sample: {
-                name: "Test_8_2",
-                id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
-                instrumentSessions: [
-                  {
-                    instrumentSessionReference: "CM44163-3",
-                  },
-                ],
-                data: {
-                  density: 56,
-                  capillary: "bs1.5",
-                  composition: "Stuff",
-                  packing_fraction: 0.5,
+        },
+        {
+          node: {
+            name: "Test experiment 2",
+            sample: {
+              name: "Test_8_2",
+              id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
                 },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
               },
-              experimentDefinition: {
-                name: "run_full_collection",
-                id: "b645e887-85b4-40d6-a8f0-500a436bc395",
-                data: {
-                  q_max: 67,
-                  frames: 100,
-                  beam_energy: 40,
-                  time_per_pdf: 2,
-                  focused_beam_size: 3,
-                },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "b645e887-85b4-40d6-a8f0-500a436bc395",
+              data: {
+                q_max: 67,
+                frames: 100,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 3,
               },
             },
           },
-        ],
-      },
+        },
+      ],
+    },
+  },
+};
+
+const fakeContainersForInstrument: {
+  data: {
+    containers: {
+      edges: Array<{
+        node: {
+          id: string;
+          name: string;
+          barcode: string;
+          type: { name: string; numberOfContainerPositions: number | null };
+          instrumentSessions: Array<{ instrumentSessionReference: string }>;
+          parent: { name: string; id: string } | null;
+          positionInParent: { position: number } | null;
+        };
+      }>;
+    };
+  };
+} = {
+  data: {
+    containers: {
+      edges: [
+        {
+          node: {
+            id: "019fae86-1551-74f2-b876-f2b5dd4dbb43",
+            name: "i15-1 Puck 1234",
+            barcode: "i15-1_1234",
+            type: {
+              name: "i15-1 puck",
+              numberOfContainerPositions: 0,
+            },
+            instrumentSessions: [
+              {
+                instrumentSessionReference: "CM44163-3",
+              },
+            ],
+            parent: {
+              name: "i15-1 robot table",
+              id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+            },
+            positionInParent: {
+              position: 1,
+            },
+          },
+        },
+        {
+          node: {
+            id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+            name: "i15-1 robot table",
+            barcode: "i15-1_robot_table",
+            type: {
+              name: "i15-1 robot table",
+              numberOfContainerPositions: 20,
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+        {
+          node: {
+            id: "019fae9b-18b2-7430-ae82-7f6ee0acbf8f",
+            name: "i15-1 cupboard 1",
+            barcode: "i15-1_cupboard_1",
+            type: {
+              name: "i15-1 storage cupboard",
+              numberOfContainerPositions: null,
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+        {
+          node: {
+            id: "019faee9-628d-7161-afe4-598a9c60534d",
+            name: "i15-1 Puck 56789",
+            barcode: "i15-1_56789",
+            type: {
+              name: "i15-1 puck",
+              numberOfContainerPositions: 0,
+            },
+            instrumentSessions: [],
+            parent: null,
+            positionInParent: null,
+          },
+        },
+      ],
     },
   },
 };
@@ -570,7 +658,86 @@ export const handlers = [
     return HttpResponse.json(workerStatus.status);
   }),
 
-  http.post("/api/graphql", async () => {
+  http.post("/api/graphql", async ({ request }) => {
+    const body = (await request.json()) as {
+      operationName?: string;
+      query?: string;
+    };
+
+    if (body.operationName === "GetContainersForInstrument") {
+      return HttpResponse.json(fakeContainersForInstrument);
+    }
+
+    if (body.operationName === "AddPuckToTable") {
+      const { puckId, tableId, position } = (
+        body as {
+          variables: { puckId: string; tableId: string; position: number };
+        }
+      ).variables;
+
+      const tableEdge = fakeContainersForInstrument.data.containers.edges.find(
+        (e) => e.node.id === tableId,
+      );
+      const puckEdge = fakeContainersForInstrument.data.containers.edges.find(
+        (e) => e.node.id === puckId,
+      );
+
+      if (puckEdge && tableEdge) {
+        puckEdge.node.parent = {
+          name: tableEdge.node.name,
+          id: tableEdge.node.id,
+        };
+        puckEdge.node.positionInParent = { position };
+      }
+
+      return HttpResponse.json({
+        data: {
+          container: {
+            __typename: "ContainerMutations",
+            setParentContainer: {
+              __typename: "SetParentContainerResponse",
+              success: true,
+            },
+          },
+        },
+      });
+    }
+
+    if (body.operationName === "RemovePuckFromTable") {
+      const { puckId } = (
+        body as {
+          variables: { tableId: string; puckId: string[] };
+        }
+      ).variables;
+
+      for (const id of puckId) {
+        const puckEdge = fakeContainersForInstrument.data.containers.edges.find(
+          (e) => e.node.id === id,
+        );
+
+        if (puckEdge) {
+          puckEdge.node.parent = null;
+          puckEdge.node.positionInParent = null;
+        }
+      }
+
+      return HttpResponse.json({
+        data: {
+          container: {
+            __typename: "ContainerMutations",
+            removeContainersFromContainer: {
+              __typename: "RemoveContainersFromContainerResponse",
+              success: true,
+            },
+          },
+        },
+      });
+    }
+
+    if (body.operationName === "GetSessionPlaylist") {
+      return HttpResponse.json(fakeExperiments);
+    }
+
     return HttpResponse.json(fakeExperiments);
   }),
 

@@ -7,6 +7,7 @@ import type {
   TaskCancelRequest,
   AddTasksToQueueQueuePostData,
   Experiment,
+  TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
@@ -112,6 +113,8 @@ export function useGetQueueState() {
     queryFn: getQueueState,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -131,6 +134,11 @@ export function usePatchQueueState() {
       client.invalidateQueries({ queryKey: ["state"] });
     },
   });
+}
+
+export function usePauseQueue() {
+  const mutation = usePatchQueueState();
+  return () => mutation.mutateAsync(true);
 }
 
 export function useToggleQueueState() {
@@ -161,6 +169,8 @@ export function useGetQueuedTasks() {
     queryFn: getQueuedTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -175,6 +185,8 @@ export function useGetAllTasks() {
     queryFn: getAllTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -191,6 +203,8 @@ export function useGetHistoricTasks() {
     queryFn: getHistoricTasks,
     staleTime: Infinity,
     refetchInterval: false,
+    refetchOnWindowFocus: "always",
+    refetchOnMount: "always",
   });
 }
 
@@ -260,7 +274,7 @@ export const submitQueueTask = async ({
   experiment,
   taskPosition,
 }: {
-  experiment: Experiment;
+  experiment: Experiment | TaskRequest;
   taskPosition?: number;
 }) => {
   const data: AddTasksToQueueQueuePostData = {

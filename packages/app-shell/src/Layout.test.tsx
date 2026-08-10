@@ -1,7 +1,19 @@
 import { render, screen } from "@atlas/vitest-conf";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import type { RouterProps } from "./Router";
 import { Layout } from "./Layout";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
+
+// mock instrument session view which is out of scope of this test
+export function InstrumentSessionView() {
+  return <button>cm12345-1</button>;
+}
+vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
+  InstrumentSessionView: InstrumentSessionView,
+}));
 
 describe("Layout", () => {
   it("shows title, nav section titles, and main content", () => {
@@ -32,7 +44,11 @@ describe("Layout", () => {
         ],
       },
     ]);
-    render(<RouterProvider router={router} />);
+    render(
+      <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
+        <RouterProvider router={router} />
+      </ThemeProvider>,
+    );
 
     // title
     expect(screen.getByText(props.title)).toBeInTheDocument();

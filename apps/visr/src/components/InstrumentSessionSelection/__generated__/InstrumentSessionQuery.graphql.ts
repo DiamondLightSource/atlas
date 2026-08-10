@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9f36acc75fb37c686d8aef477c812c01>>
+ * @generated SignedSource<<884fd4b9106f6a2bb765d31609ddc5b7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -14,10 +14,14 @@ export type InstrumentSessionQuery$variables = {
 };
 export type InstrumentSessionQuery$data = {
   readonly instrumentByName: {
-    readonly instrumentSessions: ReadonlyArray<{
-      readonly instrumentSessionReference: string | null | undefined;
-      readonly state: string | null | undefined;
-    }>;
+    readonly instrumentSessions: {
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly instrumentSessionReference: string | null | undefined;
+          readonly state: string | null | undefined;
+        };
+      }>;
+    };
   } | null | undefined;
 };
 export type InstrumentSessionQuery = {
@@ -50,28 +54,60 @@ v1 = [
     "selections": [
       {
         "alias": null,
-        "args": null,
-        "concreteType": "InstrumentSession",
+        "args": [
+          {
+            "kind": "Literal",
+            "name": "filterBy",
+            "value": {
+              "state": {
+                "eq": "IN_PROGRESS"
+              }
+            }
+          }
+        ],
+        "concreteType": "InstrumentSessionConnection",
         "kind": "LinkedField",
         "name": "instrumentSessions",
-        "plural": true,
+        "plural": false,
         "selections": [
           {
             "alias": null,
             "args": null,
-            "kind": "ScalarField",
-            "name": "instrumentSessionReference",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "state",
+            "concreteType": "InstrumentSessionEdge",
+            "kind": "LinkedField",
+            "name": "edges",
+            "plural": true,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "InstrumentSession",
+                "kind": "LinkedField",
+                "name": "node",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "instrumentSessionReference",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "state",
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
             "storageKey": null
           }
         ],
-        "storageKey": null
+        "storageKey": "instrumentSessions(filterBy:{\"state\":{\"eq\":\"IN_PROGRESS\"}})"
       }
     ],
     "storageKey": null
@@ -95,16 +131,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "a04aa356857de97c58e11e861e1b53df",
+    "cacheID": "bab6e35bf24e1dc8d524a73fdc23c1c6",
     "id": null,
     "metadata": {},
     "name": "InstrumentSessionQuery",
     "operationKind": "query",
-    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrumentByName(name: $instrumentName) {\n    instrumentSessions {\n      instrumentSessionReference\n      state\n    }\n  }\n}\n"
+    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrumentByName(name: $instrumentName) {\n    instrumentSessions(filterBy: {state: {eq: IN_PROGRESS}}) {\n      edges {\n        node {\n          instrumentSessionReference\n          state\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "72ef04fa18d968be31c314c0aa6a7011";
+(node as any).hash = "f0e5cfab393260f9e9c4cd50d10a2f19";
 
 export default node;

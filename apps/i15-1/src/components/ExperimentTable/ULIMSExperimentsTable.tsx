@@ -82,7 +82,7 @@ export function ExperimentList() {
     context: { pathname: location.pathname },
   });
 
-  const experiments = data?.instrumentSession?.experiments.edges || [];
+  const experiments = data?.experiments?.edges || [];
 
   const typedExperiments = experiments as {
     node: ExperimentNode<SampleData, ExperimentDefinitionData>;

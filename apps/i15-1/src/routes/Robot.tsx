@@ -1,7 +1,7 @@
-import { useInstrumentSession } from "../context/instrumentSession/useInstrumentSession";
+import { useInstrumentSession } from "@atlas/app-shell";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
-import { NumberInput } from "../components/NumberInput";
+import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { ReadOnlyPv } from "@atlas/pvws-config";
 import { StatusCard } from "../components/StatusCard";
@@ -86,17 +86,23 @@ function RobotControl() {
             label="Puck"
             numberMode="natural"
             defaultValue={formData["puck"]}
+            minValue={1}
+            maxValue={20}
             onCommit={(parsedValue) => {
               setFormData({ ...formData, ["puck"]: parsedValue });
             }}
+            helperText={false}
           />
           <NumberInput
             label="Position"
             numberMode="natural"
             defaultValue={formData["position"]}
+            minValue={1}
+            maxValue={22}
             onCommit={(parsedValue) => {
               setFormData({ ...formData, ["position"]: parsedValue });
             }}
+            helperText={false}
           />
         </Stack>
         <Stack direction={"row"} spacing={3} alignItems={"center"}>
@@ -129,7 +135,6 @@ function Robot() {
       sx={{
         display: "flex",
         justifyContent: "left",
-        mt: 3,
         mr: 5,
         ml: 5,
       }}
