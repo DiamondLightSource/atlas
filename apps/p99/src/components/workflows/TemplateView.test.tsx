@@ -1,10 +1,29 @@
 import { render, screen } from "@testing-library/react";
-import { server } from "../../mocks/server";
 import { userEvent } from "@atlas/vitest-conf";
 import { MemoryRouter } from "react-router-dom";
-import { RelayEnvironmentProvider } from "react-relay";
+import {
+  RelayEnvironmentProvider,
+  useFragment,
+  useLazyLoadQuery,
+} from "react-relay";
 import { RelayEnvironment } from "../../context/workflows/RelayEnvironment";
 import TemplateView from "./TemplateView";
+import type { templateViewQuery$data } from "../../graphql/__generated__/templateViewQuery.graphql";
+import type { workflowTemplateFragment$data } from "../../graphql/__generated__/workflowTemplateFragment.graphql";
+import templateResponse from "../../mocks/template-response.json";
+import { server } from "../../mocks/server";
+
+vi.mock("react-relay", async () => {
+  const actual = await vi.importActual("react-relay");
+  return {
+    ...actual,
+    RelayEnvironmentProvider: actual.RelayEnvironmentProvider,
+    useFragment: vi.fn(),
+    useLazyLoadQuery: vi.fn(),
+    useMutation: actual.useMutation,
+    useSubscription: actual.useSubscription,
+  };
+});
 
 describe("TemplateView", () => {
   const user = userEvent.setup();
@@ -13,7 +32,21 @@ describe("TemplateView", () => {
     server.listen();
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
+     vi.mocked(useLazyLoadQuery as () => templateViewQuery$data).mockReturnValue(
+      {
+        workflowTemplate: {
+          " $fragmentSpreads": { workflowTemplateFragment: true },
+        },
+      },
+    );
+    vi.mocked(
+      useFragment as () => workflowTemplateFragment$data,
+    ).mockReturnValue({
+      ...templateResponse.data.workflowTemplate,
+      " $fragmentType": "workflowTemplateFragment",
+    });
+
     render(
       <MemoryRouter initialEntries={["/"]} initialIndex={0}>
         <RelayEnvironmentProvider environment={RelayEnvironment}>
@@ -21,9 +54,10 @@ describe("TemplateView", () => {
         </RelayEnvironmentProvider>
       </MemoryRouter>,
     );
-  });
+  })
 
   afterEach(() => {
+    vi.clearAllMocks();
     server.resetHandlers();
   });
 

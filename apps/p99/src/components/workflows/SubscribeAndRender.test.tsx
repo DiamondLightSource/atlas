@@ -10,10 +10,10 @@ describe("SubscribeAndRender", () => {
       <MemoryRouter initialEntries={["/"]} initialIndex={0}>
         <RelayEnvironmentProvider environment={RelayEnvironment}>
           <SubscribeAndRender
-          result={{type: "success", message: "test"}}
-          visit={{proposalCode: "ab", proposalNumber: 12345, number: 1}}
-          workflowName="ptypy-p99-from-config"
-          index={0}
+            result={{ type: "success", message: "test" }}
+            visit={{ proposalCode: "ab", proposalNumber: 12345, number: 1 }}
+            workflowName="ptypy-p99-from-config"
+            index={0}
           />
         </RelayEnvironmentProvider>
       </MemoryRouter>,
@@ -21,6 +21,5 @@ describe("SubscribeAndRender", () => {
 
     expect(screen.getByText("test")).toBeInTheDocument();
     expect(screen.getByTestId("status-icon-unknown")).toBeInTheDocument();
-  })
-  
-})
+  });
+});

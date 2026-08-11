@@ -1,43 +1,46 @@
 import { render, screen } from "@atlas/vitest-conf";
 import SubmissionForm from "./SubmissionForm";
-import { RelayEnvironmentProvider, useLazyLoadQuery } from "react-relay";
+import { RelayEnvironmentProvider, useFragment } from "react-relay";
 import { RelayEnvironment } from "../../context/workflows/RelayEnvironment";
 import type { Visit } from "@diamondlightsource/sci-react-ui";
-import type { templateViewQuery as TemplateViewQueryType } from "../../graphql/__generated__/templateViewQuery.graphql";
-import { templateViewQuery } from "../../graphql/templateViewQuery";
-import { server } from "../../mocks/server";
 import { MemoryRouter } from "react-router-dom";
+import type { workflowTemplateFragment$data } from "../../graphql/__generated__/workflowTemplateFragment.graphql";
+import templateResponse from "../../mocks/template-response.json";
+
+vi.mock("react-relay", async () => {
+  const actual = await vi.importActual("react-relay");
+  return {
+    ...actual,
+    RelayEnvironmentProvider: actual.RelayEnvironmentProvider,
+    useFragment: vi.fn(),
+  };
+});
 
 describe("SubmissionForm", () => {
-  const SubmissionFormWithQuery = () => {
-    const templateData = useLazyLoadQuery<TemplateViewQueryType>(
-      templateViewQuery,
-      { templateName: "ptypy-p99-from-config" },
-    );
-    return (
-      <SubmissionForm
-        template={templateData.workflowTemplate}
-        onSubmit={vi.fn()}
-        visit={
-          { proposalCode: "ab", proposalNumber: 12345, number: 1 } as Visit
-        }
-      />
-    );
-  };
-
-  beforeAll(() => {
-    server.listen();
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   it("renders the correct template information", async () => {
-    render(
+    vi.mocked(
+      useFragment as () => workflowTemplateFragment$data,
+    ).mockReturnValue({
+      ...templateResponse.data.workflowTemplate,
+      " $fragmentType": "workflowTemplateFragment",
+    });
+
+    const page = render(
       <MemoryRouter initialEntries={["/"]} initialIndex={0}>
         <RelayEnvironmentProvider environment={RelayEnvironment}>
-          <SubmissionFormWithQuery />
+          <SubmissionForm
+            template={{
+              " $data": {
+                ...templateResponse.data.workflowTemplate,
+                " $fragmentType": "workflowTemplateFragment",
+              },
+              " $fragmentSpreads": { workflowTemplateFragment: true },
+            }}
+            onSubmit={vi.fn()}
+            visit={
+              { proposalCode: "ab", proposalNumber: 12345, number: 1 } as Visit
+            }
+          />
         </RelayEnvironmentProvider>
       </MemoryRouter>,
     );

@@ -62,18 +62,24 @@ describe("SubmittedMessagesList", () => {
     );
     expect(screen.getByTestId("status-icon-unknown")).toBeInTheDocument();
 
-    const networkAccordionInfo = screen.getByText("Submission error type NetworkError");
-    const networkAccordionDetails = screen.getByText(/Submission error message/);
+    const networkAccordionInfo = screen.getByText(
+      "Submission error type NetworkError",
+    );
+    const networkAccordionDetails = screen.getByText(
+      /Submission error message/,
+    );
     expect(networkAccordionDetails).not.toBeVisible();
     await user.click(networkAccordionInfo);
     expect(networkAccordionDetails).toBeVisible();
     expect(networkAccordionDetails).toHaveTextContent("Mock Error");
 
-    const graphqlAccordionInfo = screen.getByText("Submission error type GraphQL");
+    const graphqlAccordionInfo = screen.getByText(
+      "Submission error type GraphQL",
+    );
     const graphqlAccordionDetails = screen.getByText(/Error 0/);
     expect(graphqlAccordionDetails).not.toBeVisible();
     await user.click(graphqlAccordionInfo);
     expect(graphqlAccordionDetails).toBeVisible();
-    expect(graphqlAccordionDetails).toHaveTextContent("Mock graphql error")
+    expect(graphqlAccordionDetails).toHaveTextContent("Mock graphql error");
   });
 });
