@@ -99,8 +99,15 @@ function SpectroscopyPlots({
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h, static: true },
     { i: "1", x: 1, y: 0, w: w, h: h, static: true },
-    { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h, static: true },
-    // { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h, static: true },
+    {
+      i: "2",
+      x: !expanded ? 2 : 0,
+      y: !expanded ? 0 : h,
+      w: w,
+      h: h,
+      static: true,
+    },
+    // { i: "3", x: !expanded ? 3 : 1, !expanded ? 0 : h, w: w, h: h, static: true },
   ];
 
   const plots = useMemo(
