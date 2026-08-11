@@ -38,11 +38,6 @@ export default function Controls({
       sx={{
         display: "flex",
         flexDirection: "column",
-        // gap: 1,
-        // px: 2,
-        // py: 1.25,
-        bgcolor: "background.paper",
-        // borderTop: 1,
         borderColor: "divider",
       }}
     >

@@ -119,7 +119,7 @@ function SpectroscopyPlots({
             plotConfig={{ title: key + " channel" }}
             customToolbarChildren={null}
             values={channels[key] ?? EMPTY_NDT}
-            //tightAxes //requires Davidia 1.0.5
+            //tightAxes //requires Davidia 1.1.0
           />
         </Box>
       )),

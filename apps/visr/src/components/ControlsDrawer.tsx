@@ -26,6 +26,7 @@ function ControlsDrawer({
           flexGrow: open ? 1 : 0,
           transition: "flex-grow 0.4s ease, height 0.4s ease",
           boxSizing: "border-box",
+          bgcolor: "transparent",
         },
       }}
     >
