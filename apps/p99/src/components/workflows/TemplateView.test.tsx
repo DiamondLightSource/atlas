@@ -21,7 +21,7 @@ vi.mock("react-relay", async () => {
     useFragment: vi.fn(),
     useLazyLoadQuery: vi.fn(),
     useMutation: actual.useMutation,
-    useSubscription: actual.useSubscription,
+    useSubscription: vi.fn(),
   };
 });
 
