@@ -75,7 +75,7 @@ const CHANNELS = [
   { key: "red", label: "Red channel" },
   { key: "green", label: "Green channel" },
   { key: "blue", label: "Blue channel" },
-  { key: "gray", label: "Gray channel" }, // using gray channel to stop typing errors
+  //{ key: "gray", label: "Gray channel" }, // using gray channel to stop typing errors
 ] as const;
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
@@ -100,7 +100,7 @@ function SpectroscopyPlots({
     { i: "0", x: 0, y: 0, w: w, h: h, static: true },
     { i: "1", x: 1, y: 0, w: w, h: h, static: true },
     { i: "2", x: !expanded ? 2 : 0, y: 0, w: w, h: h, static: true },
-    { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h, static: true },
+    // { i: "3", x: !expanded ? 3 : 1, y: 0, w: w, h: h, static: true },
   ];
 
   const plots = useMemo(
@@ -125,7 +125,7 @@ function SpectroscopyPlots({
       )),
     [channels, plotAspectRatio],
   );
-  console.log("red channel", channels["gray"]);
+
   return (
     <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
@@ -133,7 +133,7 @@ function SpectroscopyPlots({
           layout={layout}
           width={width}
           gridConfig={{
-            cols: !expanded ? plots.length : plots.length / 2,
+            cols: !expanded ? plots.length : 2,
             rowHeight: 25,
             margin: [10, 10],
           }}

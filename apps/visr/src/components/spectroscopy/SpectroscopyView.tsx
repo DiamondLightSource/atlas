@@ -39,7 +39,7 @@ function SpectroscopyView() {
     }
   });
 
-  const DRAWER_COLLAPSED_HEIGHT = 80;
+  const DRAWER_COLLAPSED_HEIGHT = 100;
   const NAVBAR_HEIGHT = 32;
   const PLOT_ASPECT_RATIO = 0.75;
 
