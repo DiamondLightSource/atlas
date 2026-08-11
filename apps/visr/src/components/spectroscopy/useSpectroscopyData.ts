@@ -15,7 +15,7 @@ export interface DataChannels {
   red: NDT | null;
   green: NDT | null;
   blue: NDT | null;
-  gray: NDT | null;
+  // gray: NDT | null;
 }
 
 export function useSpectroscopyData(fetchMap: FetchMapFunction) {
@@ -27,7 +27,7 @@ export function useSpectroscopyData(fetchMap: FetchMapFunction) {
     red: null,
     green: null,
     blue: null,
-    gray: null,
+    // gray: null,
   });
 
   /** Cached interval id */
@@ -55,13 +55,13 @@ export function useSpectroscopyData(fetchMap: FetchMapFunction) {
       if (!filepath) return;
       try {
         const basePath = "/entry/instrument/spectroscopy_detector/";
-        const [red, green, blue, gray] = await Promise.all([
+        const [red, green, blue] = await Promise.all([
           fetchMap(filepath, basePath + "RedTotal", "red", snake),
           fetchMap(filepath, basePath + "GreenTotal", "green", snake),
           fetchMap(filepath, basePath + "BlueTotal", "blue", snake),
-          fetchMap(filepath, basePath + "GrayTotal", "gray", snake),
+          // fetchMap(filepath, basePath + "GrayTotal", "gray", snake),
         ]);
-        setData({ red, green, blue, gray });
+        setData({ red, green, blue });
       } catch (err) {
         console.error("Polling error:", err);
       }
