@@ -13,6 +13,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
+import { InstrumentSessionProvider } from "@atlas/app-shell";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -27,15 +28,17 @@ enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
-        <RelayEnvironmentProvider environment={RelayEnvironment}>
-          <QueryClientProvider client={queryClient}>
-            <UserAuthProvider>
-              <BlueapiProvider api={api}>
-                <RouterProvider router={router} />
-              </BlueapiProvider>
-            </UserAuthProvider>
-          </QueryClientProvider>
-        </RelayEnvironmentProvider>
+        <InstrumentSessionProvider>
+          <RelayEnvironmentProvider environment={RelayEnvironment}>
+            <QueryClientProvider client={queryClient}>
+              <UserAuthProvider>
+                <BlueapiProvider api={api}>
+                  <RouterProvider router={router} />
+                </BlueapiProvider>
+              </UserAuthProvider>
+            </QueryClientProvider>
+          </RelayEnvironmentProvider>
+        </InstrumentSessionProvider>
       </ThemeProvider>
     </StrictMode>,
   );
