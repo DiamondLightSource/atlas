@@ -1,10 +1,9 @@
-import { Box, Divider, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import CameraViewer from "./CameraViewer";
-import VolumeViewer from "./VolumeViewer";
-import Controls from "./Controls";
-import SliceViewer from "./SliceViewer";
+import Controls from "./TomographyControls";
 import { Plane } from "./PlaneEnum";
+import ControlsDrawer from "../ControlsDrawer";
+import TomographyPlots from "./TomographyPlots";
 
 interface Volume {
   volumeData: Uint8Array;
@@ -21,6 +20,9 @@ function TomographyView() {
   // const [revolve, setRevolve] = useState(false);
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  const DRAWER_COLLAPSED_HEIGHT = 80;
+  const NAVBAR_HEIGHT = 32;
 
   useEffect(() => {
     async function loadTestVolume() {
@@ -112,73 +114,44 @@ function TomographyView() {
     setPlane(radioValue);
   };
 
-  if (!volume) return <Box />;
   // revolve to be implemented
+
+  if (!volume) return <Box />;
+
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "100%",
-        height: "92dvh",
-        color: "text.primary",
-        bgcolor: "background.default",
+        flexGrow: 1,
+        minWidth: 260 * 3,
+        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <Stack direction="row" divider={<Divider orientation="vertical" />}>
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <CameraViewer />
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <VolumeViewer
-            volumeData={volume.volumeData}
-            volumeShape={volume.volumeShape}
-            visible={volumeVisible}
-          />
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-            width: "30%",
-            minWidth: 260,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <SliceViewer
-            volumeData={volume.volumeData}
-            volumeShape={volume.volumeShape}
-            slice={slice}
-            plane={plane}
-          />
-        </Box>
-      </Stack>
-      <Controls
-        onRun={handleRun}
-        onReset={handleReset}
-        onSlide={handleSlider}
-        onSetDirection={handlePlane}
+      <TomographyPlots
+        volumeData={volume.volumeData}
+        volumeVisible={volumeVisible}
         plane={plane}
-        progress={progress}
         slice={slice}
         volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+        drawerOpen={drawerOpen}
+      />
+      <ControlsDrawer
+        open={drawerOpen}
+        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
+        onToggle={() => setDrawerOpen(prev => !prev)}
+        controls={
+          <Controls
+            onRun={handleRun}
+            onReset={handleReset}
+            onSlide={handleSlider}
+            onSetDirection={handlePlane}
+            plane={plane}
+            progress={progress}
+            slice={slice}
+            volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+          />
+        }
       />
     </Box>
   );

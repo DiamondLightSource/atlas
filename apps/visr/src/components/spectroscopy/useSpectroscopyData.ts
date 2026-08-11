@@ -15,6 +15,7 @@ export interface DataChannels {
   red: NDT | null;
   green: NDT | null;
   blue: NDT | null;
+  // gray: NDT | null;
 }
 
 export function useSpectroscopyData(fetchMap: FetchMapFunction) {
@@ -26,6 +27,7 @@ export function useSpectroscopyData(fetchMap: FetchMapFunction) {
     red: null,
     green: null,
     blue: null,
+    // gray: null,
   });
 
   /** Cached interval id */
@@ -57,6 +59,7 @@ export function useSpectroscopyData(fetchMap: FetchMapFunction) {
           fetchMap(filepath, basePath + "RedTotal", "red", snake),
           fetchMap(filepath, basePath + "GreenTotal", "green", snake),
           fetchMap(filepath, basePath + "BlueTotal", "blue", snake),
+          // fetchMap(filepath, basePath + "GrayTotal", "gray", snake),
         ]);
         setData({ red, green, blue });
       } catch (err) {

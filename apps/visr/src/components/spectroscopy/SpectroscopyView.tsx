@@ -1,11 +1,12 @@
 import { Box } from "@mui/material";
-import RawSpectroscopyData from "./RawSpectroscopyData";
-import { SpectroscopyForm } from "./SpectroscopyForm";
-import { useEffect } from "react";
+import SpectroscopyPlots from "./SpectroscopyPlots";
+import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
 import { visitTextToVisit } from "../../utils/common";
+import ControlsDrawer from "../ControlsDrawer";
+import { SpectroscopyForm } from "./SpectroscopyForm";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -16,6 +17,8 @@ export type SpectroscopyFormData = {
 };
 
 function SpectroscopyView() {
+  const [drawerOpen, setDrawerOpen] = useState(true);
+
   // set off workflow when scan ends
   const scanEvent = useScanEvents();
   const { instrumentSession } = useInstrumentSession();
@@ -36,16 +39,30 @@ function SpectroscopyView() {
     }
   });
 
+  const DRAWER_COLLAPSED_HEIGHT = 100;
+  const NAVBAR_HEIGHT = 32;
+  const PLOT_ASPECT_RATIO = 0.75;
+
   return (
     <Box
       sx={{
-        margin: 2,
         display: "flex",
         flexDirection: "column",
+        flexGrow: 1,
+        minWidth: drawerOpen ? 600 : 400,
+        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
-      <RawSpectroscopyData />
-      <SpectroscopyForm />
+      <SpectroscopyPlots
+        expanded={!drawerOpen}
+        plotAspectRatio={PLOT_ASPECT_RATIO}
+      />
+      <ControlsDrawer
+        open={drawerOpen}
+        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
+        onToggle={() => setDrawerOpen(prev => !prev)}
+        controls={<SpectroscopyForm />}
+      />
     </Box>
   );
 }

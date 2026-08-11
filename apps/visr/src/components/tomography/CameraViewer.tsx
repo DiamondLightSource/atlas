@@ -8,7 +8,6 @@ export default function CameraViewer() {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        bgcolor: "background.paper",
         borderRight: 1,
         borderColor: "divider",
       }}
