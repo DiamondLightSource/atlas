@@ -25,7 +25,7 @@ describe("SubmissionForm", () => {
       " $fragmentType": "workflowTemplateFragment",
     });
 
-    const page = render(
+    render(
       <MemoryRouter initialEntries={["/"]} initialIndex={0}>
         <RelayEnvironmentProvider environment={RelayEnvironment}>
           <SubmissionForm
