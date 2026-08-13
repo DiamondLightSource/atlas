@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bd1b8135caeb17d19bce04484c0b8df1>>
+ * @generated SignedSource<<c731cfba30bed7d89bb2b7b626f8cc04>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,18 +15,18 @@ export type VisitInput = {
   proposalCode: string;
   proposalNumber: number;
 };
-export type subscribeAndRenderSubscription$variables = {
+export type RenderSubmittedMessageTestQuery$variables = {
   name: string;
   visit: VisitInput;
 };
-export type subscribeAndRenderSubscription$data = {
+export type RenderSubmittedMessageTestQuery$data = {
   readonly workflow: {
     readonly " $fragmentSpreads": FragmentRefs<"renderSubmittedMessageFragment">;
   };
 };
-export type subscribeAndRenderSubscription = {
-  response: subscribeAndRenderSubscription$data;
-  variables: subscribeAndRenderSubscription$variables;
+export type RenderSubmittedMessageTestQuery = {
+  response: RenderSubmittedMessageTestQuery$data;
+  variables: RenderSubmittedMessageTestQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -60,7 +60,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "subscribeAndRenderSubscription",
+    "name": "RenderSubmittedMessageTestQuery",
     "selections": [
       {
         "alias": null,
@@ -79,7 +79,7 @@ return {
         "storageKey": null
       }
     ],
-    "type": "Subscription",
+    "type": "Query",
     "abstractKey": null
   },
   "kind": "Request",
@@ -89,7 +89,7 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "subscribeAndRenderSubscription",
+    "name": "RenderSubmittedMessageTestQuery",
     "selections": [
       {
         "alias": null,
@@ -130,16 +130,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1ca97628bb694c4d5fe00452a2a1d3f8",
+    "cacheID": "5ca78f304d1729649dbb93c2a951718a",
     "id": null,
     "metadata": {},
-    "name": "subscribeAndRenderSubscription",
-    "operationKind": "subscription",
-    "text": "subscription subscribeAndRenderSubscription(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n}\n"
+    "name": "RenderSubmittedMessageTestQuery",
+    "operationKind": "query",
+    "text": "query RenderSubmittedMessageTestQuery(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c3057cb3b2ce67c2a8d0cf51ff221958";
+(node as any).hash = "bcee8b4885b894a415baa73e47a2a0ff";
 
 export default node;

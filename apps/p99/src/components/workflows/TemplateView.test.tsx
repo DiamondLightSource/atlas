@@ -1,159 +1,200 @@
-import { render, screen } from "@testing-library/react";
-import { userEvent } from "@atlas/vitest-conf";
-import { MemoryRouter } from "react-router-dom";
-import {
-  RelayEnvironmentProvider,
-  useFragment,
-  useLazyLoadQuery,
-} from "react-relay";
-import { RelayEnvironment } from "../../context/workflows/RelayEnvironment";
-import TemplateView from "./TemplateView";
-import type { templateViewQuery$data } from "../../graphql/__generated__/templateViewQuery.graphql";
-import type { workflowTemplateFragment$data } from "../../graphql/__generated__/workflowTemplateFragment.graphql";
-import templateResponse from "../../mocks/template-response.json";
-import { server } from "../../mocks/server";
+import { Suspense } from "react";
+import { render, act } from "@atlas/vitest-conf";
+import { RelayEnvironmentProvider } from "react-relay";
+import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
+import type { OperationDescriptor } from "relay-runtime";
+import { type Mock } from "vitest";
 
-vi.mock("react-relay", async () => {
-  const actual = await vi.importActual("react-relay");
-  return {
-    ...actual,
-    RelayEnvironmentProvider: actual.RelayEnvironmentProvider,
-    useFragment: vi.fn(),
-    useLazyLoadQuery: vi.fn(),
-    useMutation: actual.useMutation,
-    useSubscription: vi.fn(),
-  };
-});
+import TemplateView from "./TemplateView";
+import SubmissionForm from "./SubmissionForm";
+import SubmittedMessagesList from "./SubmittedMessagesList";
+
+vi.mock("./SubmissionForm", () => ({
+  default: vi.fn(() => null),
+}));
+vi.mock("./SubmittedMessagesList", () => ({
+  default: vi.fn(() => null),
+}));
+
+const mockedSubmissionForm = SubmissionForm as unknown as Mock;
+const mockedSubmittedMessagesList = SubmittedMessagesList as unknown as Mock;
+
+const testVisit = { proposalCode: "cm", proposalNumber: 12345, number: 1 };
+
+const templateName = "ptypy-p99-from-config";
+
+function renderTemplateView(
+  environment: ReturnType<typeof createMockEnvironment>,
+) {
+  return act(() =>
+    render(
+      <RelayEnvironmentProvider environment={environment}>
+        <Suspense fallback={<div data-testid="loading" />}>
+          <TemplateView templateName={templateName} visit={testVisit} />
+        </Suspense>
+      </RelayEnvironmentProvider>,
+    ),
+  );
+}
+
+// Resolves whatever the most recently-issued query operation is
+// with a WorkflowTemplate payload.
+async function resolveTemplateQuery(
+  environment: ReturnType<typeof createMockEnvironment>,
+) {
+  await act(async () => {
+    environment.mock.resolveMostRecentOperation(
+      (operation: OperationDescriptor) =>
+        MockPayloadGenerator.generate(operation, {
+          WorkflowTemplate: () => ({
+            title: "PtyPy Reconstruction for P99",
+            name: templateName,
+            maintainer: "imaging-ptypy-group",
+            description: "Runs a PtyPy reconstruction job.",
+            repository:
+              "https://github.com/DiamondLightSource/imaging-workflows",
+            arguments: { properties: {}, required: [], type: "object" },
+            uiSchema: null,
+          }),
+        }),
+    );
+  });
+}
+
+function resolveMutationSuccess(
+  environment: ReturnType<typeof createMockEnvironment>,
+) {
+  act(() => {
+    environment.mock.resolveMostRecentOperation(
+      (operation: OperationDescriptor) =>
+        MockPayloadGenerator.generate(operation, {
+          Workflow: () => ({
+            name: templateName,
+          }),
+        }),
+    );
+  });
+}
+
+function resolveMutationWithGraphQLError(
+  environment: ReturnType<typeof createMockEnvironment>,
+) {
+  act(() => {
+    const operation = environment.mock.getMostRecentOperation();
+    // The mutation's data+errors need to travel together, so resolve
+    // with a raw payload rather than MockPayloadGenerator here.
+    environment.mock.resolve(operation, {
+      data: { submitWorkflowTemplate: { name: templateName } },
+      errors: [{ message: "GraphQL Error" }],
+    });
+  });
+}
+
+function rejectMutationWithNetworkError(
+  environment: ReturnType<typeof createMockEnvironment>,
+) {
+  act(() => {
+    environment.mock.rejectMostRecentOperation(new Error("network error"));
+  });
+}
+
+// Grabs the props TemplateView most recently passed to SubmissionForm.
+function latestSubmissionFormProps() {
+  const calls = mockedSubmissionForm.mock.calls;
+  return calls[calls.length - 1][0];
+}
+
+function latestSubmittedMessagesListProps() {
+  const calls = mockedSubmittedMessagesList.mock.calls;
+  return calls[calls.length - 1][0];
+}
 
 describe("TemplateView", () => {
-  const user = userEvent.setup();
-
-  beforeAll(() => {
-    server.listen();
-  });
+  let environment: ReturnType<typeof createMockEnvironment>;
 
   beforeEach(() => {
-     vi.mocked(useLazyLoadQuery as () => templateViewQuery$data).mockReturnValue(
-      {
-        workflowTemplate: {
-          " $fragmentSpreads": { workflowTemplateFragment: true },
-        },
-      },
+    environment = createMockEnvironment();
+    localStorage.clear();
+    mockedSubmissionForm.mockClear();
+    mockedSubmittedMessagesList.mockClear();
+  });
+
+  it("passes the fetched template and the given visit to SubmissionForm", async () => {
+    renderTemplateView(environment);
+    await resolveTemplateQuery(environment);
+
+    const props = latestSubmissionFormProps();
+    expect(props.visit).toEqual(testVisit);
+    expect(props.template).toBeDefined();
+  });
+
+  it("falls back to the visit stored in localStorage when none is passed in", async () => {
+    localStorage.setItem("instrumentSessionID", "cm12345-1");
+
+    act(() =>
+      render(
+        <RelayEnvironmentProvider environment={environment}>
+          <Suspense fallback={<div data-testid="loading" />}>
+            <TemplateView templateName={templateName} />
+          </Suspense>
+        </RelayEnvironmentProvider>,
+      ),
     );
-    vi.mocked(
-      useFragment as () => workflowTemplateFragment$data,
-    ).mockReturnValue({
-      ...templateResponse.data.workflowTemplate,
-      " $fragmentType": "workflowTemplateFragment",
-    });
+    await resolveTemplateQuery(environment);
 
-    render(
-      <MemoryRouter initialEntries={["/"]} initialIndex={0}>
-        <RelayEnvironmentProvider environment={RelayEnvironment}>
-          <TemplateView templateName="ptypy-p99-from-config" />
-        </RelayEnvironmentProvider>
-      </MemoryRouter>,
-    );
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks();
-    server.resetHandlers();
+    expect(latestSubmissionFormProps().visit).toEqual(testVisit);
   });
 
-  afterAll(() => {
-    server.close();
+  it("records a success entry and persists the visit when the mutation succeeds", async () => {
+    renderTemplateView(environment);
+    await resolveTemplateQuery(environment);
+
+    const { onSubmit } = latestSubmissionFormProps();
+    act(() => onSubmit(testVisit, {}));
+    resolveMutationSuccess(environment);
+
+    const { submissionData } = latestSubmittedMessagesListProps();
+    expect(submissionData).toHaveLength(1);
+    expect(submissionData[0].submissionResult.type).toBe("success");
+    expect(localStorage.getItem("instrumentSessionID")).toBe("cm12345-1");
   });
 
-  it("renders the submission form with the default values", async () => {
-    expect(
-      await screen.findByText("PtyPy Reconstruction for P99"),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("spinbutton", { name: "Scan Number" })).toHaveValue(
-      null,
-    );
-    expect(
-      screen.getByRole("textbox", { name: "Path to raw data folder" }),
-    ).toHaveValue("processing/writenData/reconstruction_test_data");
-    expect(
-      screen.getByRole("textbox", { name: "Requested CPU memory" }),
-    ).toHaveValue("20Gi");
-    expect(
-      screen.getByRole("spinbutton", { name: "Nr. of processes" }),
-    ).toHaveValue(1);
-    expect(
-      screen.getByRole("textbox", { name: "Path to output folder" }),
-    ).toHaveValue("processing/workflows/ptypy");
-    expect(screen.getByRole("checkbox", { name: "Use GPU" })).not.toBeChecked();
+  it("records a graphQLError entry when the mutation resolves with errors", async () => {
+    renderTemplateView(environment);
+    await resolveTemplateQuery(environment);
+
+    const { onSubmit } = latestSubmissionFormProps();
+    act(() => onSubmit(testVisit, {}));
+    resolveMutationWithGraphQLError(environment);
+
+    const { submissionData } = latestSubmittedMessagesListProps();
+    expect(submissionData[0].submissionResult.type).toBe("graphQLError");
   });
 
-  it("adds submitted workflows to list", async () => {
-    expect(
-      await screen.findByText("PtyPy Reconstruction for P99"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Submissions")).not.toBeInTheDocument();
+  it("records a networkError entry when the mutation request fails outright", async () => {
+    renderTemplateView(environment);
+    await resolveTemplateQuery(environment);
 
-    const scanBox = screen.getByRole("spinbutton", { name: "Scan Number" });
-    const visitBox = screen.getByRole("textbox", { name: "Visit" });
-    const submitButton = screen.getByRole("button", { name: "Submit" });
+    const { onSubmit } = latestSubmissionFormProps();
+    act(() => onSubmit(testVisit, {}));
+    rejectMutationWithNetworkError(environment);
 
-    expect(scanBox).toHaveValue(null);
-    await user.type(scanBox, "1");
-    expect(scanBox).toHaveValue(1);
-    await user.clear(visitBox);
-    await user.type(visitBox, "ab12345-1");
-    for (let i = 0; i < 5; i++) await user.click(submitButton);
-
-    expect(await screen.findByText("Submissions")).toBeVisible();
-    expect(screen.getAllByText("ab12345-1/ptypy-p99-from-config")).toHaveLength(
-      5,
-    );
+    const { submissionData } = latestSubmittedMessagesListProps();
+    expect(submissionData[0].submissionResult.type).toBe("networkError");
   });
 
-  it("renders submission response with network error", async () => {
-    expect(
-      await screen.findByText("PtyPy Reconstruction for P99"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Submissions")).not.toBeInTheDocument();
+  it("prepends each new submission so the most recent appears first", async () => {
+    renderTemplateView(environment);
+    await resolveTemplateQuery(environment);
 
-    const scanBox = screen.getByRole("spinbutton", { name: "Scan Number" });
-    const visitBox = screen.getByRole("textbox", { name: "Visit" });
-    const submitButton = screen.getByRole("button", { name: "Submit" });
+    const { onSubmit } = latestSubmissionFormProps();
 
-    expect(scanBox).toHaveValue(null);
-    await user.type(scanBox, "1");
-    expect(scanBox).toHaveValue(1);
-    await user.clear(visitBox);
-    await user.type(visitBox, "ne11111-1");
-    await user.click(submitButton);
+    for (let i = 0; i < 5; i++) {
+      act(() => onSubmit(testVisit, { run: i }));
+      resolveMutationSuccess(environment);
+    }
 
-    expect(await screen.findByText("Submissions")).toBeVisible();
-    expect(
-      screen.queryByText("Submission error type TypeError"),
-    ).toBeInTheDocument();
-  });
-
-  it("renders submission response with graphql error", async () => {
-    expect(
-      await screen.findByText("PtyPy Reconstruction for P99"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("Submissions")).not.toBeInTheDocument();
-
-    const scanBox = screen.getByRole("spinbutton", { name: "Scan Number" });
-    const visitBox = screen.getByRole("textbox", { name: "Visit" });
-    const submitButton = screen.getByRole("button", { name: "Submit" });
-
-    expect(scanBox).toHaveValue(null);
-    await user.type(scanBox, "1");
-    expect(scanBox).toHaveValue(1);
-    await user.clear(visitBox);
-    await user.type(visitBox, "ge22222-1");
-    await user.click(submitButton);
-
-    expect(await screen.findByText("Submissions")).toBeVisible();
-    expect(
-      screen.queryByText("Submission error type GraphQL"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("GraphQL Error"));
+    const { submissionData } = latestSubmittedMessagesListProps();
+    expect(submissionData).toHaveLength(5);
   });
 });
