@@ -93,7 +93,7 @@ describe("PlanCard", () => {
     );
 
     const buttons = screen.getAllByRole("button");
-    const runButton = buttons.find(btn => btn.textContent?.includes("Run"));
+    const runButton = buttons.find((btn) => btn.textContent?.includes("Run"));
     expect(runButton).not.toBeDisabled();
   });
 
@@ -110,7 +110,7 @@ describe("PlanCard", () => {
     );
 
     const buttons = screen.getAllByRole("button");
-    const runButton = buttons.find(btn => btn.textContent?.includes("Run"));
+    const runButton = buttons.find((btn) => btn.textContent?.includes("Run"));
     expect(runButton).toBeDisabled();
   });
 
