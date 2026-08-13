@@ -9,6 +9,7 @@ import RenderSubmittedMessage, {
   type RenderSubmittedMessageProps,
 } from "./RenderSubmittedMessage";
 import { RenderSubmittedMessageTestQuery } from "./RenderSubmittedMessage.testQuery";
+import { type RenderSubmittedMessageTestQuery$data } from "./__generated__/RenderSubmittedMessageTestQuery.graphql";
 
 // Harness resolves the test query so RenderSubmittedMessage's own
 // useFragment call has a real fragment key when a test wants one.
@@ -27,18 +28,37 @@ function TestHarness({
   index: number;
   useResolvedFragment: boolean;
 }) {
-  const data = useResolvedFragment
-    ? (useLazyLoadQuery(RenderSubmittedMessageTestQuery, {
-        visit: testVisit,
-        name: workflowName,
-      }) as any)
-    : null;
+  if (useResolvedFragment) {
+    return <TestHarnessWithResolvedFragment result={result} index={index} />;
+  }
+
+  return <TestHarnessWithoutResolvedFragment result={result} index={index} />;
+}
+
+function TestHarnessWithResolvedFragment({
+  result,
+  index,
+}: Pick<Parameters<typeof TestHarness>[0], "result" | "index">) {
+  const data = useLazyLoadQuery(RenderSubmittedMessageTestQuery, {
+    visit: testVisit,
+    name: workflowName,
+  }) as RenderSubmittedMessageTestQuery$data;
+
   return (
     <RenderSubmittedMessage
       result={result}
       index={index}
-      fragmentRef={data?.workflow ?? null}
+      fragmentRef={data.workflow}
     />
+  );
+}
+
+function TestHarnessWithoutResolvedFragment({
+  result,
+  index,
+}: Pick<Parameters<typeof TestHarness>[0], "result" | "index">) {
+  return (
+    <RenderSubmittedMessage result={result} index={index} fragmentRef={null} />
   );
 }
 
