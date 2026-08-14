@@ -1,4 +1,4 @@
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 
 import { ExperimentList } from "../components/ExperimentTable/ULIMSExperimentsTable.tsx";
 
