@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import TomographyControls from "./TomographyControls";
 import { TomographyForm } from "./TomographyForm";
 import { Plane } from "./PlaneEnum";
