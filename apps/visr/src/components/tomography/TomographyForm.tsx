@@ -3,7 +3,13 @@ import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
-import { Box } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { visitTextToVisit } from "../../utils/common";
 
@@ -34,7 +40,6 @@ export function TomographyForm() {
         flexDirection: "column",
         gap: 3,
         p: 3,
-        maxWidth: 600,
       }}
     >
       <Box
@@ -66,13 +71,32 @@ export function TomographyForm() {
           onSubmit={visit => setInstrumentSession(visitToText(visit))}
           submitButton={false}
         />
+        <FormControl>
+          <FormLabel id="light-source-label" sx={{ mb: 1 }}>
+            Light Source
+          </FormLabel>
+          <ToggleButtonGroup
+            exclusive
+            aria-labelledby="light-source-label"
+            value={formData.light_source}
+            onChange={(_, value: LightSource | null) =>
+              value && setFormData({ ...formData, light_source: value })
+            }
+          >
+            <ToggleButton value={LightSource.LED}>LED</ToggleButton>
+            <ToggleButton value={LightSource.SR}>Synchrotron</ToggleButton>
+            <ToggleButton value={LightSource.DARK}>Off</ToggleButton>
+          </ToggleButtonGroup>
+        </FormControl>
       </Box>
-
       <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
           gap: 2,
+          pt: 1,
+          borderTop: 1,
+          borderColor: "divider",
         }}
       >
         <RunPlanButton
@@ -87,21 +111,27 @@ export function TomographyForm() {
           instrumentSession={instrumentSession}
           buttonText="Fly Scan"
         />
-        <RunPlanButton
-          name="calibration"
-          params={formData}
-          instrumentSession={instrumentSession}
-          buttonText="Take Dark/Flat"
-        />
+        <Box
+          sx={{
+            ml: "auto",
+            "& .MuiButton-root": {
+              backgroundColor: "secondary.main",
+              "&:hover": { backgroundColor: "secondary.dark" },
+            },
+          }}
+        >
+          <RunPlanButton
+            name="calibration"
+            params={formData}
+            instrumentSession={instrumentSession}
+            buttonText="Take Dark/Flat"
+          />
+        </Box>
       </Box>
 
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end",
-          pt: 1,
-          borderTop: 1,
-          borderColor: "divider",
         }}
       >
         <AbortButton />
