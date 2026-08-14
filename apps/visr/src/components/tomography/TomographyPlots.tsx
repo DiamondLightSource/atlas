@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import CameraViewer from "./CameraViewer";
 import VolumeViewer from "./VolumeViewer";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
@@ -35,7 +34,10 @@ function TomographyPlots({
   if (!volumeData) return <Box />;
 
   const views = [
-    <CameraViewer />,
+    <img
+      src="https://visr-pvws.diamond.ac.uk/mjpg/BL01B-DI-CAM-01:PVA:OUTPUT"
+      alt="Detector"
+    />,
     <VolumeViewer
       volumeData={volumeData}
       volumeShape={volumeShape}
