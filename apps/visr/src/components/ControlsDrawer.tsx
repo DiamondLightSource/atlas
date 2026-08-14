@@ -47,7 +47,7 @@ function ControlsDrawer({
         <Typography variant="overline">Controls</Typography>
         <IconButton
           onClick={onToggle}
-          aria-label={open ? "Collapse controls" : "Expand controls"}
+          aria-label={open ? "Collapse" : "Expand"}
           aria-expanded={open}
         >
           {open ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
