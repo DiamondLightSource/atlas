@@ -45,9 +45,9 @@ beforeEach(() => {
     mutateAsync: vi.fn().mockResolvedValue(undefined),
   });
   mockedUseInstrumentSession.mockReturnValue({
-    instrumentSession: "CM44163-3",
+    instrumentSession: "cm44163-3",
     setInstrumentSession: vi.fn(),
-    sessionsList: ["CM44163-3"],
+    sessionsList: ["cm44163-3"],
   });
 });
 
@@ -283,7 +283,7 @@ describe("ExperimentList", () => {
       </MemoryRouter>,
     );
 
-    // Initial render uses CM44163-3 → proposal 44163, session 3
+    // Initial render uses cm44163-3 → proposal 44163, session 3
     expect(mockedUseQuery).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.objectContaining({ variables: { proposal: 44163, session: 3 } }),
@@ -291,9 +291,9 @@ describe("ExperimentList", () => {
 
     // Switch to a different session
     mockedUseInstrumentSession.mockReturnValue({
-      instrumentSession: "CM55555-1",
+      instrumentSession: "cm55555-1",
       setInstrumentSession: vi.fn(),
-      sessionsList: ["CM55555-1"],
+      sessionsList: ["cm55555-1"],
     });
 
     rerender(
