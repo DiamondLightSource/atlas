@@ -11,12 +11,9 @@ interface Volume {
   volumeShape: [number, number, number];
 }
 
-const SCAN_DURATION_MS = 3000;
-
 function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
   const [volumeVisible, setVolumeVisible] = useState(true);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // const [revolve, setRevolve] = useState(false);
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
