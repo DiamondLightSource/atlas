@@ -17,7 +17,8 @@ import type {
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
-import { useInstrumentSession, parseInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
+
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -75,11 +76,11 @@ export function ExperimentList() {
     );
   }
 
-  const parsedSession = parseInstrumentSession(instrumentSession);
+  const visit = visitTextToVisit(instrumentSession);
 
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
-    skip: !parsedSession,
-    variables: parsedSession ?? { proposal: 0, session: 0 },
+    skip: !visit,
+    variables: { proposal: visit?.proposalNumber ?? 0, session: visit?.number ?? 0 },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
   });
@@ -161,9 +162,9 @@ export function ExperimentList() {
     },
     muiToolbarAlertBannerProps: error
       ? {
-          color: "error",
-          children: `Error: ${error.message}`,
-        }
+        color: "error",
+        children: `Error: ${error.message}`,
+      }
       : undefined,
   });
 
