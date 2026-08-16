@@ -4,6 +4,7 @@ import { ExperimentList } from "./ULIMSExperimentsTable";
 import * as apollo from "@apollo/client/react";
 import { MemoryRouter } from "react-router-dom";
 import * as queueService from "../../queue/queueService";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 vi.mock("@apollo/client/react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@apollo/client/react")>();
@@ -43,6 +44,9 @@ const mockExperiments = {
           name: "Exp 1",
           sample: {
             name: "Sample A",
+            container: {
+              parent: null,
+            },
             data: {
               density: 1.2,
               composition: "H2O",
@@ -63,6 +67,12 @@ const mockExperiments = {
           name: "Exp 2",
           sample: {
             name: "Sample B",
+            container: {
+              parent: {
+                id: "container-parent-id",
+                name: "i15-1 robot table",
+              },
+            },
             data: {
               density: 1.2,
               composition: "CO2",
@@ -82,11 +92,15 @@ const mockExperiments = {
   },
 };
 
+const testTheme = createTheme();
+
 const renderComponent = () =>
   render(
-    <MemoryRouter>
-      <ExperimentList />
-    </MemoryRouter>,
+    <ThemeProvider theme={testTheme}>
+      <MemoryRouter>
+        <ExperimentList />
+      </MemoryRouter>
+    </ThemeProvider>,
   );
 
 describe("ExperimentList", () => {
@@ -198,6 +212,9 @@ describe("ExperimentList", () => {
           sample: {
             data: { composition: "H2O", density: 1.2 },
             name: "Sample A",
+            container: {
+              parent: null,
+            },
           },
         },
       });
@@ -234,6 +251,9 @@ describe("ExperimentList", () => {
           sample: {
             data: { composition: "H2O", density: 1.2 },
             name: "Sample A",
+            container: {
+              parent: null,
+            },
           },
         },
       });
@@ -248,9 +268,41 @@ describe("ExperimentList", () => {
           sample: {
             data: { composition: "CO2", density: 1.2 },
             name: "Sample B",
+            container: {
+              parent: {
+                id: "container-parent-id",
+                name: "i15-1 robot table",
+              },
+            },
           },
         },
       });
     });
+  });
+
+  it("highlights rows amber when the sample container has no parent", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    const missingParentRow = screen.getByText("Exp 1").closest("tr");
+    const hasParentRow = screen.getByText("Exp 2").closest("tr");
+
+    expect(missingParentRow).toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(missingParentRow).toHaveAttribute(
+      "title",
+      "Sample container is not mounted on the robot table.",
+    );
+
+    expect(hasParentRow).not.toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(hasParentRow).not.toHaveAttribute("title");
   });
 });

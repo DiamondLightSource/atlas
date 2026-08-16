@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, useTheme } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -17,6 +17,7 @@ import type {
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
+import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -32,6 +33,9 @@ export type SampleData = {
   composition: string;
   packing_fraction: number;
 };
+
+const SAMPLE_NOT_ON_TABLE =
+  "Sample container is not mounted on the robot table.";
 
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
@@ -94,6 +98,16 @@ export function ExperimentList() {
     );
   }, [typedExperiments]);
 
+  const hasContainerNotOnTable = (experiment: ExperimentTableData) => {
+    const container = experiment.experiment?.sample?.container;
+    return (
+      container != null &&
+      (container.parent == null || container.parent.name !== ROBOT_TABLE_NAME)
+    );
+  };
+
+  const theme = useTheme();
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
@@ -103,6 +117,16 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    muiTableBodyRowProps: ({ row }) => {
+      const showWarning = hasContainerNotOnTable(row.original);
+
+      return {
+        sx: showWarning
+          ? { backgroundColor: theme.palette.warning.light }
+          : undefined,
+        title: showWarning ? SAMPLE_NOT_ON_TABLE : undefined,
+      };
+    },
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 

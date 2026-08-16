@@ -63,7 +63,7 @@ const REMOVE_PUCK_FROM_TABLE: TypedDocumentNode<
   RemovePuckFromTableMutationVariables
 > = removePuckFromTableMutation;
 
-const ROBOT_TABLE_NAME = "i15-1 robot table";
+export const ROBOT_TABLE_NAME = "i15-1 robot table";
 const INSTRUMENT_KEY = "I15-1";
 const PUCK_CONTAINER_TYPE = "i15-1 puck";
 
