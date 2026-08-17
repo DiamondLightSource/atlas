@@ -77,7 +77,13 @@ describe("QueueView", () => {
           experiment: {
             name: "Exp 1",
             instrument_session: "session2",
-            sample: { id: "sample2", name: "my_sample", data: {} },
+            sample: {
+              id: "sample2",
+              name: "my_sample",
+              data: {},
+              container: { positionInParent: { position: 1 } },
+              positionInContainer: { position: 1 },
+            },
             experiment_definition: {
               name: "PlanB",
               id: "123",
@@ -140,7 +146,13 @@ describe("QueueView", () => {
           experiment: {
             name: "exp_2",
             instrument_session: "session2",
-            sample: { id: "sample2", name: "my_sample", data: {} },
+            sample: {
+              id: "sample2",
+              name: "my_sample",
+              data: {},
+              container: { positionInParent: { position: 1 } },
+              positionInContainer: { position: 1 },
+            },
             experiment_definition: {
               name: "planB",
               id: "123",
@@ -176,7 +188,13 @@ describe("QueueView", () => {
           experiment: {
             name: "exp_1",
             instrument_session: "session1",
-            sample: { id: "sample1", name: "my_sample", data: {} },
+            sample: {
+              id: "sample1",
+              name: "my_sample",
+              data: {},
+              container: { positionInParent: { position: 1 } },
+              positionInContainer: { position: 1 },
+            },
             experiment_definition: {
               name: "planA",
               id: "123",
@@ -218,7 +236,13 @@ describe("QueueView", () => {
           experiment: {
             name: "exp_1",
             instrument_session: "session1",
-            sample: { id: "sample1", name: "my_sample", data: {} },
+            sample: {
+              id: "sample1",
+              name: "my_sample",
+              data: {},
+              container: { positionInParent: { position: 1 } },
+              positionInContainer: { position: 1 },
+            },
             experiment_definition: {
               name: "planA",
               id: "123",
