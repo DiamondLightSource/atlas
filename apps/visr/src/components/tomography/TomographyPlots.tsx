@@ -1,8 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import VolumeViewer from "./VolumeViewer";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
+import VolumeRenderer from "./VolumeRenderer";
 
 interface Props {
   volumeData: Uint8Array;
@@ -16,7 +16,6 @@ interface Props {
 function TomographyPlots({
   volumeData,
   volumeShape,
-  volumeVisible,
   plane,
   slice,
   drawerOpen,
@@ -38,10 +37,10 @@ function TomographyPlots({
       src="https://visr-pvws.diamond.ac.uk/mjpg/BL01B-DI-CAM-01:PVA:OUTPUT"
       alt="Detector"
     />,
-    <VolumeViewer
+    <VolumeRenderer
       volumeData={volumeData}
       volumeShape={volumeShape}
-      visible={volumeVisible}
+      // revolve={revolve}
     />,
     <SliceViewer
       volumeData={volumeData}
