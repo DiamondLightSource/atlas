@@ -39,22 +39,12 @@ export default function SliceViewer({
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        borderRight: 1,
-        borderColor: "divider",
-      }}
-    >
-      <HeatmapPlot
-        aspect="auto"
-        plotConfig={{}}
-        values={sliceNdarray}
-        domain={[0, 255]}
-        customToolbarChildren={null}
-      />
-    </Box>
+    <HeatmapPlot
+      aspect="auto"
+      plotConfig={{}}
+      values={sliceNdarray}
+      domain={[0, 255]}
+      customToolbarChildren={null}
+    />
   );
 }

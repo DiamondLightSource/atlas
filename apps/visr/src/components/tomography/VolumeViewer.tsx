@@ -14,35 +14,22 @@ export default function VolumeViewer({
   volumeShape,
   visible,
 }: Props) {
-  return (
+  return visible && volumeData && volumeShape ? (
+    <VolumeRenderer
+      volumeData={volumeData}
+      volumeShape={volumeShape}
+      // revolve={revolve}
+    />
+  ) : (
     <Box
       sx={{
+        flex: 1,
         display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        backgroundClipcolor: "background.paper",
-        borderRight: 1,
-        borderColor: "divider",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      {visible && volumeData && volumeShape ? (
-        <VolumeRenderer
-          volumeData={volumeData}
-          volumeShape={volumeShape}
-          // revolve={revolve}
-        />
-      ) : (
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography color="text.secondary">...</Typography>
-        </Box>
-      )}
+      <Typography color="text.secondary">...</Typography>
     </Box>
   );
 }
