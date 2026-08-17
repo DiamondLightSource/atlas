@@ -48,35 +48,13 @@ export default function SliceViewer({
         borderColor: "divider",
       }}
     >
-      <Box
-        sx={{
-          px: 2,
-          py: 1.25,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Typography variant="overline" color="primary">
-          Slice View
-        </Typography>
-      </Box>
-      <div
-        style={{
-          flex: 1,
-          justifyContent: "center",
-        }}
-      >
-        <HeatmapPlot
-          aspect="auto"
-          plotConfig={{}}
-          values={sliceNdarray}
-          domain={[0, 255]}
-          customToolbarChildren={null}
-        />
-      </div>
+      <HeatmapPlot
+        aspect="auto"
+        plotConfig={{}}
+        values={sliceNdarray}
+        domain={[0, 255]}
+        customToolbarChildren={null}
+      />
     </Box>
   );
 }

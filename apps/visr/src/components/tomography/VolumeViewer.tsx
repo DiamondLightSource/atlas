@@ -25,22 +25,6 @@ export default function VolumeViewer({
         borderColor: "divider",
       }}
     >
-      <Box
-        sx={{
-          px: 2,
-          py: 1.25,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Typography variant="overline" color="primary">
-          Reconstruction
-        </Typography>
-      </Box>
-
       {visible && volumeData && volumeShape ? (
         <VolumeRenderer
           volumeData={volumeData}

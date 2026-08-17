@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import VolumeViewer from "./VolumeViewer";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
@@ -50,14 +50,33 @@ function TomographyPlots({
       plane={plane}
     />,
   ];
+  const titles = ["Camera View", "Reconstruction", "Slice View"];
   const plots = views.map((view, i) => (
     <Box
       key={i}
       sx={{
-        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        borderRight: 1,
+        borderColor: "divider",
         minWidth: 260,
       }}
     >
+      <Box
+        sx={{
+          px: 2,
+          py: 1.25,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Typography variant="overline" color="primary">
+          {titles[i]}
+        </Typography>
+      </Box>
       {view}
     </Box>
   ));
