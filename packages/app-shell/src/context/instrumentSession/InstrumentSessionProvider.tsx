@@ -40,7 +40,7 @@ export const InstrumentSessionProvider = ({
         if (!rawItem) {
           return sessionsList ? sessionsList[0] : null;
         }
-        return rawItem;
+        return JSON.parse(rawItem);
       } catch (error) {
         console.error(
           "Failed to load instrument session from localStorage:",
