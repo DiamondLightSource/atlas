@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "generate:graphql": "graphql-codegen --config graphqlCodegen.ts",
-    "generate:queue": "npx @hey-api/openapi-ts@next -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/main/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue",
+    "generate:queue": "openapi-ts -i https://raw.githubusercontent.com/DiamondLightSource/daq-queuing-service/main/docs/reference/rest_api.json -o /workspaces/atlas/apps/i15-1/generated/queue",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
   },
