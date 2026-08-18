@@ -6,14 +6,15 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import { Science, ExpandMore } from "@mui/icons-material";
-import { ListSubheader } from "@mui/material";
+import { ListSubheader, Tooltip } from "@mui/material";
 
 export function InstrumentSessionView() {
   const { instrumentSession, setInstrumentSession, instrumentSessionList } =
     useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const menuDisabled = instrumentSessionList.length <= 1 ? true : false;
+  const menuDisabled =
+    !instrumentSessionList || instrumentSessionList.length <= 1;
   const id = "session-input";
   const staticButtonId = `${id}-staticButton`;
   const buttonId = `${id}-button`;
@@ -35,6 +36,22 @@ export function InstrumentSessionView() {
     setAnchorEl(null);
   };
 
+  if (!instrumentSession && !instrumentSessionList) {
+    return (
+      <div>
+        <Tooltip title="Use 'Get Sessions' to fetch available sessions.">
+          <Button
+            data-testid={staticButtonId}
+            startIcon={<Science />}
+            color="secondary"
+            variant="outlined"
+          >
+            {"No Session Selected"}
+          </Button>
+        </Tooltip>
+      </div>
+    );
+  }
   if (menuDisabled) {
     return (
       <div>
@@ -44,7 +61,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession}
+          {instrumentSession ? instrumentSession : "No Session Selected"}
         </Button>
       </div>
     );
@@ -62,7 +79,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession}
+          {instrumentSession ? instrumentSession : "No Session Selected"}
         </Button>
         <Menu
           data-testid={menuId}
@@ -77,7 +94,7 @@ export function InstrumentSessionView() {
         >
           <Divider />
           <ListSubheader> Available Sessions </ListSubheader>
-          {instrumentSessionList.map((option, index) => (
+          {instrumentSessionList?.map((option, index) => (
             <MenuItem
               key={option}
               selected={index === selectedIndex}

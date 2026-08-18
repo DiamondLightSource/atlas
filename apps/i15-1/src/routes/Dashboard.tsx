@@ -4,12 +4,14 @@ import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturi
 import QueueIcon from "@mui/icons-material/Queue";
 import { useUserAuth } from "../context/userAuth/useUserAuth.ts";
 import { User } from "@diamondlightsource/sci-react-ui";
+import { InstrumentSessionButton } from "../components/getInstrumentSessionButton.tsx";
 
 function Dashboard() {
   const user = useUserAuth();
 
   const handleLogIn = () => window.location.assign("/oauth2/sign_in");
   const handleLogOut = () => window.location.assign("/oauth2/sign_out");
+
   return (
     <>
       <Container maxWidth="sm" sx={{ mb: 4 }}>
@@ -26,6 +28,7 @@ function Dashboard() {
                 : { fedid: user.person }
             }
           />
+          <InstrumentSessionButton />
           <Stack direction={"row"} spacing={5}>
             <Button
               component={Link}

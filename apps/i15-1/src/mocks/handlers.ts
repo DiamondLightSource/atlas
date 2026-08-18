@@ -167,6 +167,27 @@ const fakeContainersForInstrument: {
   },
 };
 
+const fakeInstrumentSession = {
+  data: {
+    instrumentByKey: {
+      instrumentSessions: {
+        edges: [
+          {
+            node: {
+              instrumentSessionReference: "CM44163-4",
+            },
+          },
+          {
+            node: {
+              instrumentSessionReference: "CM44163-5",
+            },
+          },
+        ],
+      },
+    },
+  },
+};
+
 function setWorkerState(new_state: string) {
   workerStatus.status = new_state;
 }
@@ -751,6 +772,10 @@ export const handlers = [
       } else {
         return HttpResponse.json(fakeExperiments);
       }
+    }
+
+    if (body.operationName === "InstrumentSession") {
+      return HttpResponse.json(fakeInstrumentSession);
     }
 
     return HttpResponse.json(fakeExperiments);

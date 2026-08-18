@@ -19,7 +19,6 @@ import type {
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
 
-
 export type ExperimentDefinitionData = {
   q_max: number;
   frames: number;
@@ -76,11 +75,14 @@ export function ExperimentList() {
     );
   }
 
-  const visit = visitTextToVisit(instrumentSession);
+  const visit = visitTextToVisit(instrumentSession ?? "cm0-0");
 
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
     skip: !visit,
-    variables: { proposal: visit?.proposalNumber ?? 0, session: visit?.number ?? 0 },
+    variables: {
+      proposal: visit?.proposalNumber ?? 0,
+      session: visit?.number ?? 0,
+    },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
   });
@@ -162,9 +164,9 @@ export function ExperimentList() {
     },
     muiToolbarAlertBannerProps: error
       ? {
-        color: "error",
-        children: `Error: ${error.message}`,
-      }
+          color: "error",
+          children: `Error: ${error.message}`,
+        }
       : undefined,
   });
 
