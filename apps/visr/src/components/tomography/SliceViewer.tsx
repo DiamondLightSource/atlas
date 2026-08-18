@@ -58,7 +58,7 @@ export default function SliceViewer({
         }}
       >
         <HeatmapPlot
-          aspect="equal"
+          aspect={"auto"}
           plotConfig={{}}
           values={sliceNdarray}
           domain={[0, 255]}

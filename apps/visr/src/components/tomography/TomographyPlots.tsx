@@ -93,7 +93,7 @@ function TomographyPlots({
     <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
-          key={`${width}`}
+          key={`${width}`} //re-render the grid on width change so that plots resize correctly 
           layout={layout}
           width={width}
           gridConfig={{
