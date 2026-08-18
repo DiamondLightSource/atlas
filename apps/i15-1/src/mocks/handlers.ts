@@ -177,11 +177,6 @@ const fakeInstrumentSession = {
               instrumentSessionReference: "CM44163-4",
             },
           },
-          {
-            node: {
-              instrumentSessionReference: "CM44163-5",
-            },
-          },
         ],
       },
     },

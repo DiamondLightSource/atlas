@@ -36,6 +36,10 @@ export function InstrumentSessionView() {
     setAnchorEl(null);
   };
 
+  if (instrumentSessionList && instrumentSessionList.length == 1) {
+    setInstrumentSession(instrumentSessionList[0]);
+  }
+
   if (!instrumentSession && !instrumentSessionList) {
     return (
       <div>
