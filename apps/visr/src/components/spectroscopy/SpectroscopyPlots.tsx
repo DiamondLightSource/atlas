@@ -84,7 +84,7 @@ export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 interface SpectroscopyPlotsProps {
   expanded: boolean;
-  plotAspectRatio: number;
+  plotAspectRatio: number | "auto" | "equal";
 }
 
 function SpectroscopyPlots({
@@ -125,7 +125,7 @@ function SpectroscopyPlots({
         >
           <ImagePlot
             key={i}
-            aspect={"auto"}
+            aspect={plotAspectRatio}
             plotConfig={{ title: key + " channel" }}
             customToolbarChildren={null}
             values={channels[key] ?? EMPTY_NDT}
@@ -143,7 +143,7 @@ function SpectroscopyPlots({
     >
       {mounted && (
         <ReactGridLayout
-          key={width} //re-render the grid on width change so that plots resize correctly 
+          key={width} //re-render the grid on width change so that plots resize correctly
           layout={layout}
           width={width}
           gridConfig={{
