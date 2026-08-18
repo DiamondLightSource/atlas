@@ -16,7 +16,7 @@ export const InstrumentSessionButton = () => {
     InstrumentSessionQueryVariables
   > = getInstrumentSessionsQuery;
 
-  const [fetchSessions, { loading, error }] = useLazyQuery(GET_SESSIONS);
+  const [fetchSessions] = useLazyQuery(GET_SESSIONS);
 
   const handleButtonClick = async () => {
     try {
