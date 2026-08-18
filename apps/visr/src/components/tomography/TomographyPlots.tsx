@@ -49,41 +49,51 @@ function TomographyPlots({
       plane={plane}
     />,
   ];
+
   const titles = ["Camera View", "Reconstruction", "Slice View"];
+
   const plots = views.map((view, i) => (
     <Box
       key={i}
       sx={{
+        width: "100%",
+        height: "100%",
+        minHeight: 100,
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
         borderRight: 1,
         borderColor: "divider",
         minWidth: 260,
       }}
     >
+      <Typography
+        variant="overline"
+        color="primary"
+        borderBottom={1}
+        borderColor={"divider"}
+      >
+        {titles[i]}
+      </Typography>
       <Box
         sx={{
-          px: 2,
-          py: 1.25,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: 1,
-          borderColor: "divider",
+          flex: 1,
+          minHeight: 0,
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
         }}
       >
-        <Typography variant="overline" color="primary">
-          {titles[i]}
-        </Typography>
+        {view}
       </Box>
-      {view}
     </Box>
   ));
-  console.log(plots[0]);
+
   return (
-    <Box ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
+    <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
+          key={`${width}`}
           layout={layout}
           width={width}
           gridConfig={{
@@ -91,6 +101,8 @@ function TomographyPlots({
             rowHeight: drawerOpen ? 25 : 50,
             margin: [20, 20], //twice the margin of Spectroscopy plots as half the number of rows
           }}
+          autoSize
+          onLayoutChange={() => {}}
         >
           {plots}
         </ReactGridLayout>

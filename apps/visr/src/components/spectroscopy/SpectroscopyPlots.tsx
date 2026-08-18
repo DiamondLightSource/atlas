@@ -116,13 +116,16 @@ function SpectroscopyPlots({
         <Box
           key={i}
           sx={{
-            flex: 1,
-            justifyContent: "center",
+            display: "grid", //this makes the plots fill the parent box
+            // display: "flex", //this fixes the centering issue of the plots when drawer is closed
+            flex: 1, //this option fixes the sizing issue when the window is resized
+            // justifyContent: "center",
+            minWidth: 260,
           }}
         >
           <ImagePlot
             key={i}
-            aspect={plotAspectRatio}
+            aspect={"equal"}
             plotConfig={{ title: key + " channel" }}
             customToolbarChildren={null}
             values={channels[key] ?? EMPTY_NDT}
@@ -134,7 +137,10 @@ function SpectroscopyPlots({
   );
 
   return (
-    <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
+    <Box
+      ref={containerRef! as React.RefObject<HTMLDivElement>}
+      sx={{ display: "flex" }}
+    >
       {mounted && (
         <ReactGridLayout
           layout={layout}
