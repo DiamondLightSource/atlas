@@ -2,20 +2,20 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
+import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelAllTasksQueueDeleteData, CancelAllTasksQueueDeleteResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
-    /**
-     * You can provide a client instance returned by `createClient()` instead of
-     * individual options. This might be also useful if you want to implement a
-     * custom client.
-     */
-    client?: Client;
-    /**
-     * You can pass arbitrary values through the `meta` object. This can be
-     * used to access values that aren't defined as part of the SDK function.
-     */
-    meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
+  /**
+   * You can provide a client instance returned by `createClient()` instead of
+   * individual options. This might be also useful if you want to implement a
+   * custom client.
+   */
+  client?: Client;
+  /**
+   * You can pass arbitrary values through the `meta` object. This can be
+   * used to access values that aren't defined as part of the SDK function.
+   */
+  meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
 /**
@@ -42,13 +42,18 @@ export const getQueueStateQueueStateGet = <ThrowOnError extends boolean = false>
  * Update Queue State
  */
 export const updateQueueStateQueueStatePatch = <ThrowOnError extends boolean = false>(options: Options<UpdateQueueStateQueueStatePatchData, ThrowOnError>): RequestResult<UpdateQueueStateQueueStatePatchResponses, UpdateQueueStateQueueStatePatchErrors, ThrowOnError> => (options.client ?? client).patch<UpdateQueueStateQueueStatePatchResponses, UpdateQueueStateQueueStatePatchErrors, ThrowOnError>({
-    url: '/queue/state',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
+  url: '/queue/state',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
 });
+
+/**
+ * Cancel All Tasks
+ */
+export const cancelAllTasksQueueDelete = <ThrowOnError extends boolean = false>(options?: Options<CancelAllTasksQueueDeleteData, ThrowOnError>): RequestResult<CancelAllTasksQueueDeleteResponses, unknown, ThrowOnError> => (options?.client ?? client).delete<CancelAllTasksQueueDeleteResponses, unknown, ThrowOnError>({ url: '/queue', ...options });
 
 /**
  * Get Queued Tasks
@@ -59,12 +64,12 @@ export const getQueuedTasksQueueGet = <ThrowOnError extends boolean = false>(opt
  * Add Tasks To Queue
  */
 export const addTasksToQueueQueuePost = <ThrowOnError extends boolean = false>(options: Options<AddTasksToQueueQueuePostData, ThrowOnError>): RequestResult<AddTasksToQueueQueuePostResponses, AddTasksToQueueQueuePostErrors, ThrowOnError> => (options.client ?? client).post<AddTasksToQueueQueuePostResponses, AddTasksToQueueQueuePostErrors, ThrowOnError>({
-    url: '/queue',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
+  url: '/queue',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
 });
 
 /**
@@ -76,12 +81,12 @@ export const moveTaskQueueMovePost = <ThrowOnError extends boolean = false>(opti
  * Cancel Tasks
  */
 export const cancelTasksQueueTasksDelete = <ThrowOnError extends boolean = false>(options: Options<CancelTasksQueueTasksDeleteData, ThrowOnError>): RequestResult<CancelTasksQueueTasksDeleteResponses, CancelTasksQueueTasksDeleteErrors, ThrowOnError> => (options.client ?? client).delete<CancelTasksQueueTasksDeleteResponses, CancelTasksQueueTasksDeleteErrors, ThrowOnError>({
-    url: '/queue/tasks',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
+  url: '/queue/tasks',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
 });
 
 /**

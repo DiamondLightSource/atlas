@@ -81,7 +81,7 @@ describe("QueueView", () => {
               id: "sample2",
               name: "my_sample",
               data: {},
-              container: { positionInParent: { position: 1 } },
+              container: { positionInParent: { position: 1 }, id: "" },
               positionInContainer: { position: 1 },
             },
             experiment_definition: {
@@ -105,7 +105,10 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as unknown as UseQueryResult<TaskWithPosition[], Error>);
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
 
     vi.spyOn(queueService, "useGetAllTasks").mockReturnValue({
       data: [
@@ -147,7 +150,7 @@ describe("QueueView", () => {
               id: "sample2",
               name: "my_sample",
               data: {},
-              container: { positionInParent: { position: 1 } },
+              container: { positionInParent: { position: 1 }, id: "" },
               positionInContainer: { position: 1 },
             },
             experiment_definition: {
@@ -171,7 +174,10 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as unknown as UseQueryResult<TaskWithPosition[], Error>);
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
 
     vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
       data: [
@@ -186,7 +192,7 @@ describe("QueueView", () => {
               id: "sample1",
               name: "my_sample",
               data: {},
-              container: { positionInParent: { position: 1 } },
+              container: { positionInParent: { position: 1 }, id: "" },
               positionInContainer: { position: 1 },
             },
             experiment_definition: {
@@ -199,7 +205,10 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as unknown as UseQueryResult<TaskWithPosition[], Error>);
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
 
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
       mutate: vi.fn(),
@@ -231,7 +240,7 @@ describe("QueueView", () => {
               id: "sample1",
               name: "my_sample",
               data: {},
-              container: { positionInParent: { position: 1 } },
+              container: { positionInParent: { position: 1 }, id: "" },
               positionInContainer: { position: 1 },
             },
             experiment_definition: {
@@ -244,7 +253,10 @@ describe("QueueView", () => {
           kind: "Experiment",
         },
       ],
-    } as unknown as UseQueryResult<TaskWithPosition[], Error>);
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
 
     render(<QueueView />);
 
