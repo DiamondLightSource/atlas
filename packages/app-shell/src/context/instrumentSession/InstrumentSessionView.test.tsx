@@ -19,7 +19,8 @@ vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
     useInstrumentSession: () => ({
       instrumentSession: "cm54321-1",
       setInstrumentSession: vi.fn(),
-      sessionsList: ["cm123-4", "cm567-8"],
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
     }),
   };
 });

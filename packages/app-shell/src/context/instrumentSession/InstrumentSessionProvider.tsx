@@ -2,11 +2,13 @@ import { useState, useEffect, useContext, type ReactNode } from "react";
 import { createContext } from "react";
 
 export const ID_STORAGE_KEY = "instrument-session-id";
+export const LIST_STORAGE_KEY = "instrument-session-list";
 
 export type InstrumentSessionContextType = {
   instrumentSession: string;
   setInstrumentSession: (session: string) => void;
-  sessionsList: string[];
+  instrumentSessionList: string[];
+  setInstrumentSessionList: (list: string[]) => void;
 };
 
 export const InstrumentSessionContext = createContext<
@@ -20,6 +22,31 @@ export const InstrumentSessionProvider = ({
   children: ReactNode;
   sessionsList?: string[];
 }) => {
+  const [instrumentSessionList, setInstrumentSessionList] = useState<string[]>(
+    () => {
+      try {
+        const rawItem = localStorage.getItem(LIST_STORAGE_KEY);
+        if (!rawItem) {
+          return sessionsList;
+        }
+        return JSON.parse(rawItem);
+      } catch (error) {
+        console.error(
+          "Failed to load instrument session from localStorage:",
+          error,
+        );
+        return sessionsList;
+      }
+    },
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      LIST_STORAGE_KEY,
+      JSON.stringify(instrumentSessionList),
+    );
+  }, [instrumentSessionList]);
+
   const [instrumentSession, setInstrumentSession] = useState<string>(() => {
     try {
       const rawItem = localStorage.getItem(ID_STORAGE_KEY);
@@ -45,7 +72,8 @@ export const InstrumentSessionProvider = ({
       value={{
         instrumentSession,
         setInstrumentSession,
-        sessionsList,
+        instrumentSessionList,
+        setInstrumentSessionList,
       }}
     >
       {children}

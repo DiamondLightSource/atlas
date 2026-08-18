@@ -9,11 +9,11 @@ import { Science, ExpandMore } from "@mui/icons-material";
 import { ListSubheader } from "@mui/material";
 
 export function InstrumentSessionView() {
-  const { instrumentSession, setInstrumentSession, sessionsList } =
+  const { instrumentSession, setInstrumentSession, instrumentSessionList } =
     useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const menuDisabled = sessionsList.length <= 1 ? true : false;
+  const menuDisabled = instrumentSessionList.length <= 1 ? true : false;
   const id = "session-input";
   const staticButtonId = `${id}-staticButton`;
   const buttonId = `${id}-button`;
@@ -77,7 +77,7 @@ export function InstrumentSessionView() {
         >
           <Divider />
           <ListSubheader> Available Sessions </ListSubheader>
-          {sessionsList.map((option, index) => (
+          {instrumentSessionList.map((option, index) => (
             <MenuItem
               key={option}
               selected={index === selectedIndex}
