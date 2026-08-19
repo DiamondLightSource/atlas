@@ -20,6 +20,17 @@ function SpectroscopyPlots({
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
   const { data: channels } = useSpectroscopyData();
+  console.debug(
+    "channel shapes (r, g, b)",
+    channels.red.shape,
+    channels.green.shape,
+    channels.blue.shape,
+  );
+  console.debug(
+    "x, y axes sizes",
+    channels.xValues.size,
+    channels.yValues.size,
+  );
   const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
   const w = 1;
