@@ -31,11 +31,9 @@ ui-base:
           port: 8000
 
     - id: supergraph
-      path: /api/graphql
+      path: /api/supergraph
       rewriteTarget: /graphql
       target:
         external:
           uri: https://graph-nightly.diamond.ac.uk
       passHostHeader: false
-
-  identityProvider: legacy
