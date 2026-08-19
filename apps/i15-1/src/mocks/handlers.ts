@@ -735,7 +735,22 @@ export const handlers = [
     }
 
     if (body.operationName === "GetSessionPlaylist") {
-      return HttpResponse.json(fakeExperiments);
+      const { session } = (
+        body as {
+          variables: { proposal: number; session: number };
+        }
+      ).variables;
+      if (session == 4) {
+        return HttpResponse.json({
+          data: {
+            experiments: {
+              edges: [],
+            },
+          },
+        });
+      } else {
+        return HttpResponse.json(fakeExperiments);
+      }
     }
 
     return HttpResponse.json(fakeExperiments);
