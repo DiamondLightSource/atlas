@@ -14,15 +14,13 @@ export interface DataChannels {
 
 /** Return type of `/api/data/binned` */
 type SpectroscopyData = {
-  values: {
-    RedTotal: number[][];
-    GreenTotal: number[][];
-    BlueTotal: number[][];
-    /** X bin edges with size of the above datasets + 1 */
-    x_limits: number[];
-    /** Y bin edges with size of the above datasets + 1 */
-    y_limits: number[];
-  };
+  RedTotal: number[][];
+  GreenTotal: number[][];
+  BlueTotal: number[][];
+  /** X bin edges with size of the above datasets + 1 */
+  x_limits: number[];
+  /** Y bin edges with size of the above datasets + 1 */
+  y_limits: number[];
 };
 
 type RGBColour = "red" | "green" | "blue" | "gray";
@@ -140,11 +138,11 @@ export function useSpectroscopyData(): {
       try {
         const resp: SpectroscopyData = await fetchData(uuid);
         setData({
-          red: toRgbNdt(resp.values.RedTotal, "red"),
-          green: toRgbNdt(resp.values.GreenTotal, "green"),
-          blue: toRgbNdt(resp.values.BlueTotal, "blue"),
-          xValues: binEdgesToCentrePoints(resp.values.x_limits),
-          yValues: binEdgesToCentrePoints(resp.values.y_limits),
+          red: toRgbNdt(resp.RedTotal, "red"),
+          green: toRgbNdt(resp.GreenTotal, "green"),
+          blue: toRgbNdt(resp.BlueTotal, "blue"),
+          xValues: binEdgesToCentrePoints(resp.x_limits),
+          yValues: binEdgesToCentrePoints(resp.y_limits),
         });
       } catch (err) {
         console.error("Polling error:", err);

@@ -67,7 +67,7 @@ export const handlers = [
     } else {
       data = binnedReadback;
     }
-    return HttpResponse.json({ values: data });
+    return HttpResponse.json(data);
   }),
 
   http.get("/api/data/map", ({ request }) => {
