@@ -20,7 +20,7 @@ ui-base:
       rewriteTarget: /graphql
       target:
         external:
-          uri: https://graph-nightly.diamond.ac.uk/
+          uri: https://graph-nightly.diamond.ac.uk
       passHostHeader: false
 
   authConfigFlags: |
