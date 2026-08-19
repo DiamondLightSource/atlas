@@ -4,6 +4,7 @@ import VolumeViewer from "./VolumeViewer";
 import SliceViewer from "./SliceViewer";
 import { Plane } from "./PlaneEnum";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
+import { useLayoutEffect, useState } from "react";
 
 interface Props {
   volumeData: Uint8Array;
@@ -25,6 +26,33 @@ function TomographyPlots({
   const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
   const w = 1;
+  const verticalMargin = 20;
+  const minimumRowHeight = 10;
+  const minimumGridHeight = minimumRowHeight * h + verticalMargin * (h - 1);
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      setContainerHeight(entry.contentRect.height);
+    });
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, [containerRef]);
+
+  const rowHeight =
+    containerHeight > 0
+      ? Math.max(
+          (containerHeight - verticalMargin * (h - 1)) / h,
+          minimumRowHeight,
+        )
+      : drawerOpen
+        ? minimumRowHeight
+        : 50;
+  const gridHeight = rowHeight * h + verticalMargin * (h - 1);
 
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h, static: true },
@@ -52,24 +80,34 @@ function TomographyPlots({
     <Box
       key={i}
       sx={{
-        flex: 1,
-        minWidth: 260,
+        // flex: 1,
+        // minWidth: 260,
+        maxHeight: gridHeight,
       }}
     >
       {view}
     </Box>
   ));
-  console.log(plots[0]);
+
   return (
-    <Box ref={containerRef! as React.RefObject<HTMLDivElement>} color="blue">
+    <Box
+      ref={containerRef! as React.RefObject<HTMLDivElement>}
+      sx={{
+        flex: "1 1 0",
+        height: gridHeight,
+        minHeight: minimumGridHeight,
+        overflow: "visible",
+      }}
+    >
       {mounted && (
         <ReactGridLayout
           layout={layout}
           width={width}
+          style={{ height: gridHeight }}
           gridConfig={{
             cols: drawerOpen ? 3 : 3,
-            rowHeight: drawerOpen ? 25 : 50,
-            margin: [20, 20], //twice the margin of Spectroscopy plots as half the number of rows
+            rowHeight: rowHeight,
+            margin: [verticalMargin, verticalMargin],
           }}
         >
           {plots}
