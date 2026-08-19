@@ -71,13 +71,6 @@ function TomographyView() {
     };
   }, []);
 
-  // reset reverts progress bar and volume viewing
-  // const handleReset = () => {
-  //   if (intervalRef.current) clearInterval(intervalRef.current);
-  //   setVolumeVisible(false);
-  //   setProgress(0);
-  // };
-
   const handleSlider = (event: Event, newValue: number | number[]) => {
     const slice = typeof newValue == "number" ? newValue : newValue[0];
     setSlice(slice);
