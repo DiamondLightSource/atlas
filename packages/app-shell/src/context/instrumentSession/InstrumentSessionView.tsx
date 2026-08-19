@@ -35,10 +35,11 @@ export function InstrumentSessionView() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  if (instrumentSessionList && instrumentSessionList.length == 1) {
-    setInstrumentSession(instrumentSessionList[0]);
-  }
+  const handleStaticButtonClick = () => {
+    if (instrumentSessionList) {
+      setInstrumentSession(instrumentSessionList[0]);
+    }
+  };
 
   if (!instrumentSession && !instrumentSessionList) {
     return (
@@ -55,8 +56,25 @@ export function InstrumentSessionView() {
         </Tooltip>
       </div>
     );
-  }
-  if (menuDisabled) {
+  } else if (
+    instrumentSessionList &&
+    instrumentSessionList.length == 1 &&
+    !instrumentSession
+  ) {
+    return (
+      <div>
+        <Button
+          data-testid={staticButtonId}
+          startIcon={<Science />}
+          color="secondary"
+          variant="outlined"
+          onClick={handleStaticButtonClick}
+        >
+          {"Assign Session"}
+        </Button>
+      </div>
+    );
+  } else if (menuDisabled && instrumentSession) {
     return (
       <div>
         <Button
@@ -65,7 +83,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession ? instrumentSession : "No Session Selected"}
+          {instrumentSession}
         </Button>
       </div>
     );

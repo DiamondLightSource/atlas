@@ -9,7 +9,8 @@ import { useInstrumentSession } from "@atlas/app-shell";
 import { Button } from "@mui/material";
 
 export const InstrumentSessionButton = () => {
-  const { setInstrumentSessionList } = useInstrumentSession();
+  const { setInstrumentSession, setInstrumentSessionList } =
+    useInstrumentSession();
 
   const GET_SESSIONS: TypedDocumentNode<
     InstrumentSessionQuery,
@@ -31,6 +32,9 @@ export const InstrumentSessionButton = () => {
           return ref ? [ref.toLocaleLowerCase()] : [];
         });
         setInstrumentSessionList(sessionsList);
+        if (sessionsList.length == 1) {
+          setInstrumentSession(sessionsList[0]);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch sessions:", err);

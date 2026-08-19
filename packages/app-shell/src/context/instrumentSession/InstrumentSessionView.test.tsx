@@ -5,6 +5,7 @@ import {
   useInstrumentSession,
 } from "./InstrumentSessionProvider";
 import { describe, it, expect, vi } from "vitest";
+import { isValidElement } from "react";
 
 function renderComponentWithProvider() {
   return render(
@@ -13,20 +14,6 @@ function renderComponentWithProvider() {
     </InstrumentSessionProvider>,
   );
 }
-
-// vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
-//   const actual =
-//     await importOriginal<typeof import("./InstrumentSessionProvider")>();
-//   return {
-//     ...actual,
-//     useInstrumentSession: () => ({
-//       instrumentSession: "cm54321-1",
-//       setInstrumentSession: vi.fn(),
-//       instrumentSessionList: ["cm123-4", "cm567-8"],
-//       setInstrumentSessionList: vi.fn(),
-//     }),
-//   };
-// });
 
 vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
   const actual =
@@ -38,9 +25,6 @@ vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
 });
 
 describe("InstrumentSessionView", () => {
-  const mockSetInstrumentSession = vi.fn();
-  const mockSetInstrumentSessionList = vi.fn();
-
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
@@ -79,7 +63,6 @@ describe("InstrumentSessionView", () => {
     expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
       "cm54321-1",
     );
-    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
   });
 
   it("shows no session selected when there is no session selected", () => {
@@ -97,59 +80,120 @@ describe("InstrumentSessionView", () => {
     );
   });
 
-  // it("shows sessions from the provided sessions list when clicked", async () => {
-  //   vi.mocked(useInstrumentSession).mockReturnValue({
-  //     instrumentSession: "cm54321-1",
-  //     setInstrumentSession: vi.fn(),
-  //     instrumentSessionList: ["cm123-4", "cm567-8"],
-  //     setInstrumentSessionList: vi.fn(),
-  //   });
+  it("shows sessions from the provided sessions list when clicked", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
 
-  //   renderComponentWithProvider();
+    renderComponentWithProvider();
 
-  //   const user = userEvent.setup();
-  //   await user.click(screen.getByTestId("session-input-button"));
-  //   expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
-  //   expect(screen.getByText("cm123-4")).toBeInTheDocument();
-  //   expect(screen.getByText("cm567-8")).toBeInTheDocument();
-  // });
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+    expect(screen.getByText("cm123-4")).toBeInTheDocument();
+    expect(screen.getByText("cm567-8")).toBeInTheDocument();
+  });
 
-  // it("closes menu when a menu item has been clicked", async () => {
-  //   vi.mocked(useInstrumentSession).mockReturnValue({
-  //     instrumentSession: "cm54321-1",
-  //     setInstrumentSession: vi.fn(),
-  //     instrumentSessionList: ["cm123-4", "cm567-8"],
-  //     setInstrumentSessionList: vi.fn(),
-  //   });
+  it("closes menu when a menu item has been clicked", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
 
-  //   renderComponentWithProvider();
+    renderComponentWithProvider();
 
-  //   const user = userEvent.setup();
-  //   await user.click(screen.getByTestId("session-input-button"));
-  //   expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
 
-  //   await user.click(screen.getByText("cm123-4"));
-  //   expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
-  // });
+    await user.click(screen.getByText("cm123-4"));
+    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+  });
 
-  // it("closes menu when button has been clicked again", async () => {
-  //   vi.mocked(useInstrumentSession).mockReturnValue({
-  //     instrumentSession: "cm54321-1",
-  //     setInstrumentSession: vi.fn(),
-  //     instrumentSessionList: ["cm123-4", "cm567-8"],
-  //     setInstrumentSessionList: vi.fn(),
-  //   });
+  it("closes menu when button has been clicked again", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
 
-  //   renderComponentWithProvider();
+    renderComponentWithProvider();
 
-  //   const user = userEvent.setup();
-  //   await user.click(screen.getByTestId("session-input-button"));
-  //   expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("session-input-button"));
+    expect(screen.getByTestId("session-input-menu")).toBeInTheDocument();
 
-  //   const backdrop = screen.getByRole("presentation").firstChild;
-  //   if (backdrop instanceof Element) {
-  //     await user.click(backdrop);
-  //   }
-  //   expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
-  // });
+    const backdrop = screen.getByRole("presentation").firstChild;
+    if (backdrop instanceof Element) {
+      await user.click(backdrop);
+    }
+    expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+  });
+
+  it("shows a tooltip when no sessions list or session is available", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: null,
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.hover(screen.getByTestId("session-input-staticButton"));
+    const tip = await screen.findByRole("tooltip");
+    expect(tip).toBeInTheDocument();
+    expect(tip).toHaveTextContent(
+      "Use 'Get Sessions' to fetch available sessions.",
+    );
+  });
+
+  it("shows assign session when there is only one session available but no active session", () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm12345-1"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    expect(
+      screen.getByTestId("session-input-staticButton"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
+      "Assign Session",
+    );
+  });
+
+  it("assigns session when there is only one session available but no active session and button is clicked", async () => {
+    const mockSetInstrumentSession = vi.fn();
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: mockSetInstrumentSession,
+      instrumentSessionList: ["cm12345-1"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    expect(
+      screen.getByTestId("session-input-staticButton"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
+      "Assign Session",
+    );
+
+    await user.click(screen.getByTestId("session-input-staticButton"));
+    expect(mockSetInstrumentSession).toHaveBeenCalled();
+  });
 });
