@@ -3,7 +3,7 @@ import SpectroscopyPlots from "./SpectroscopyPlots";
 import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
-import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
+import { useInstrumentSession } from "@atlas/app-shell";
 import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
 import { SpectroscopyForm } from "./SpectroscopyForm";

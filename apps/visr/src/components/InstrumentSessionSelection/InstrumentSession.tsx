@@ -1,5 +1,5 @@
 import { useLazyLoadQuery } from "react-relay/hooks";
-import { graphql } from "relay-runtime";
+import { Environment, fetchQuery, graphql } from "relay-runtime";
 import type { InstrumentSessionQuery as InstrumentSessionQueryType } from "./__generated__/InstrumentSessionQuery.graphql";
 
 const instrumentSessionQuery = graphql`
@@ -17,24 +17,15 @@ const instrumentSessionQuery = graphql`
   }
 `;
 
-function GetInstrumentSessions() {
+export function useInstrumentSessions() {
   const data = useLazyLoadQuery<InstrumentSessionQueryType>(
     instrumentSessionQuery,
     { instrumentName: "ViSR" },
   );
 
-  const sessionListLen =
-    data.instrumentByName?.instrumentSessions.edges.length ?? 1;
-  const sessionsList = [];
-
-  for (let i = 0; i < sessionListLen; i++) {
-    sessionsList.push(
-      data.instrumentByName?.instrumentSessions.edges[
-        i
-      ].node.instrumentSessionReference?.toLowerCase(),
-    );
-  }
-  return sessionsList;
+  return (
+    data.instrumentByName?.instrumentSessions.edges
+      .map(edge => edge.node.instrumentSessionReference?.toLowerCase())
+      .filter((session): session is string => session !== undefined) ?? []
+  );
 }
-
-export default GetInstrumentSessions;
