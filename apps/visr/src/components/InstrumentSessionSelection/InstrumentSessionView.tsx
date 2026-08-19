@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
-import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
+import { useInstrumentSession } from "@atlas/app-shell";
 import {
   Divider,
   List,

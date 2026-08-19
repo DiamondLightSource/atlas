@@ -14,6 +14,7 @@ import { visitTextToVisit } from "../../utils/common";
 import { Box } from "@mui/material";
 import SubmittedMessagesList from "./SubmittedMessagesList";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
+import { useInstrumentSession } from "@atlas/app-shell";
 
 const templateViewQuery = graphql`
   query TemplateViewQuery($templateName: String!) {
@@ -43,9 +44,8 @@ export default function TemplateView({
     )[]
   >([]);
 
-  const storedVisit = visitTextToVisit(
-    localStorage.getItem("instrumentSessionID") ?? "",
-  );
+  const { instrumentSession } = useInstrumentSession();
+  const storedVisit = visitTextToVisit(instrumentSession);
 
   const submit = useSubmitWorkflow(templateName);
 
