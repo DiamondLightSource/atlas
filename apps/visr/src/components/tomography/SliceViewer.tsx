@@ -9,12 +9,14 @@ interface Props {
   volumeShape: [number, number, number];
   plane: Plane;
   slice: number;
+  resizeKey?: string;
 }
 export default function SliceViewer({
   volumeData,
   volumeShape,
   plane,
   slice,
+  resizeKey,
 }: Props) {
   if (volumeData == undefined || volumeShape == undefined) {
     return <Box />;
@@ -58,6 +60,7 @@ export default function SliceViewer({
         }}
       >
         <HeatmapPlot
+          key={resizeKey}
           aspect={"auto"}
           plotConfig={{}}
           values={sliceNdarray}

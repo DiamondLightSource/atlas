@@ -30,6 +30,8 @@ function TomographyPlots({
     { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h, static: true },
   ];
 
+  const resizeKey = `${width}`; //`${drawerOpen}-${width}`;
+
   if (!volumeData) return <Box />;
 
   const views = [
@@ -47,6 +49,7 @@ function TomographyPlots({
       volumeShape={volumeShape}
       slice={slice}
       plane={plane}
+      resizeKey={resizeKey}
     />,
   ];
 
@@ -93,7 +96,7 @@ function TomographyPlots({
     <Box ref={containerRef! as React.RefObject<HTMLDivElement>}>
       {mounted && (
         <ReactGridLayout
-          key={`${width}`} //re-render the grid on width change so that plots resize correctly 
+          //key={`${width}`} //re-render the grid on width change so that plots resize correctly
           layout={layout}
           width={width}
           gridConfig={{
