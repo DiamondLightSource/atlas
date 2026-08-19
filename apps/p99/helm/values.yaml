@@ -20,3 +20,8 @@ ui-base:
       target:
         external:
           uri: https://graph.diamond.ac.uk
+
+  authConfigFlags: |
+    skip_auth_routes = ["GET=^/$", "GET=^/assets"]
+    api_routes = ["^/oauth2", "^/api"]
+    skip_provider_button = true
