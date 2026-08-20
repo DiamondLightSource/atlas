@@ -26,9 +26,8 @@ function TomographyPlots({
   const { width, containerRef, mounted } = useContainerWidth();
   const h = 10;
   const w = 1;
-  const verticalMargin = 20;
-  const minimumRowHeight = 10;
-  const minimumGridHeight = minimumRowHeight * h + verticalMargin * (h - 1);
+  const minimumRowHeight = 20;
+  const minimumGridHeight = minimumRowHeight * h;
   const [containerHeight, setContainerHeight] = useState(0);
 
   useLayoutEffect(() => {
@@ -45,14 +44,11 @@ function TomographyPlots({
 
   const rowHeight =
     containerHeight > 0
-      ? Math.max(
-          (containerHeight - verticalMargin * (h - 1)) / h,
-          minimumRowHeight,
-        )
+      ? Math.max(containerHeight / h, minimumRowHeight)
       : drawerOpen
         ? minimumRowHeight
         : 50;
-  const gridHeight = rowHeight * h + verticalMargin * (h - 1);
+  const gridHeight = rowHeight * h;
 
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: h, static: true },
@@ -107,7 +103,7 @@ function TomographyPlots({
           gridConfig={{
             cols: drawerOpen ? 3 : 3,
             rowHeight: rowHeight,
-            margin: [verticalMargin, verticalMargin],
+            margin: [0, 0],
           }}
         >
           {plots}
