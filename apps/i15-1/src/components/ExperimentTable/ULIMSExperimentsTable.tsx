@@ -36,9 +36,6 @@ export type SampleData = {
   packing_fraction: number;
 };
 
-const SAMPLE_NOT_ON_TABLE =
-  "Sample container is not mounted on the robot table.";
-
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
 ): ExperimentTableData => ({
@@ -104,12 +101,19 @@ export function ExperimentList() {
     );
   }, [typedExperiments]);
 
-  const hasContainerNotOnTable = (experiment: ExperimentTableData) => {
+  const experimentNotQueueable = (experiment: ExperimentTableData) => {
     const container = experiment.experiment?.sample?.container;
-    return (
-      container != null &&
-      (container.parent == null || container.parent.name !== ROBOT_TABLE_NAME)
-    );
+    if (container == null) {
+      return "Sample is not in a container";
+    }
+    if (
+      container.parent == null ||
+      container.parent.name !== ROBOT_TABLE_NAME
+    ) {
+      return "Sample container is not mounted on the robot table";
+    }
+
+    return "";
   };
 
   const theme = useTheme();
@@ -121,27 +125,29 @@ export function ExperimentList() {
     enableRowDragging: false,
     enableRowSelection: true,
     muiSelectCheckboxProps: ({ row }) => {
-      if (!hasContainerNotOnTable(row.original)) {
+      const experimentErrorMessage = experimentNotQueueable(row.original);
+
+      if (experimentErrorMessage === "") {
         return {};
       }
 
       return {
         disabled: true,
-        icon: <ErrorIcon titleAccess={SAMPLE_NOT_ON_TABLE} />,
-        checkedIcon: <ErrorIcon titleAccess={SAMPLE_NOT_ON_TABLE} />,
+        icon: <ErrorIcon titleAccess={experimentErrorMessage} />,
+        checkedIcon: <ErrorIcon titleAccess={experimentErrorMessage} />,
       };
     },
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     muiTableBodyRowProps: ({ row }) => {
-      const showWarning = hasContainerNotOnTable(row.original);
+      const experimentErrorMessage = experimentNotQueueable(row.original);
 
       return {
-        sx: showWarning
+        sx: experimentErrorMessage
           ? { backgroundColor: theme.palette.warning.light }
           : undefined,
-        title: showWarning ? SAMPLE_NOT_ON_TABLE : undefined,
+        title: experimentErrorMessage ? experimentErrorMessage : undefined,
       };
     },
     renderTopToolbarCustomActions: ({ table }) => {

@@ -104,6 +104,27 @@ const mockExperiments = {
           },
         },
       },
+      {
+        node: {
+          name: "Exp 3",
+          sample: {
+            name: "Sample B",
+            container: null,
+            data: {
+              density: 1.2,
+              composition: "CO2",
+            },
+          },
+          experimentDefinition: {
+            name: "Def 3",
+            data: {
+              beam_energy: 20,
+              time_per_pdf: 10,
+              focused_beam_size: 5,
+            },
+          },
+        },
+      },
     ],
   },
 };
@@ -255,7 +276,7 @@ describe("ExperimentList", () => {
     fireEvent.click(screen.getByRole("button", { name: /add all to queue/i }));
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledTimes(2);
+      expect(mutateAsync).toHaveBeenCalledTimes(3);
       expect(mutateAsync).toHaveBeenNthCalledWith(1, {
         experiment: {
           name: "Exp 1",
@@ -296,7 +317,7 @@ describe("ExperimentList", () => {
     });
   });
 
-  it("highlights rows amber when the sample container has no parent", () => {
+  it("highlights rows amber when the sample has no parent", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
       loading: false,
@@ -305,7 +326,7 @@ describe("ExperimentList", () => {
 
     renderComponent();
 
-    const missingParentRow = screen.getByText("Exp 1").closest("tr");
+    const missingParentRow = screen.getByText("Exp 3").closest("tr");
     const hasParentRow = screen.getByText("Exp 2").closest("tr");
 
     expect(missingParentRow).toHaveStyle({
@@ -313,7 +334,33 @@ describe("ExperimentList", () => {
     });
     expect(missingParentRow).toHaveAttribute(
       "title",
-      "Sample container is not mounted on the robot table.",
+      "Sample is not in a container",
+    );
+
+    expect(hasParentRow).not.toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(hasParentRow).not.toHaveAttribute("title");
+  });
+
+  it("highlights rows amber when the sample container is not on the robot table", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    const notOnTableRow = screen.getByText("Exp 1").closest("tr");
+    const hasParentRow = screen.getByText("Exp 2").closest("tr");
+
+    expect(notOnTableRow).toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(notOnTableRow).toHaveAttribute(
+      "title",
+      "Sample container is not mounted on the robot table",
     );
 
     expect(hasParentRow).not.toHaveStyle({
