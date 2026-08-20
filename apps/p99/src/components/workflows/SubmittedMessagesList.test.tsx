@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { SubmissionData } from "../../utils/types";
 import { MemoryRouter } from "react-router-dom";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "../../context/workflows/RelayEnvironment";
+import { RelayEnvironment } from "../../context/supergraph/RelayEnvironment";
 import SubmittedMessagesList from "./SubmittedMessagesList";
 import { userEvent } from "@atlas/vitest-conf";
 
