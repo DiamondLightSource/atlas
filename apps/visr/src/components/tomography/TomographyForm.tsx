@@ -121,10 +121,10 @@ export function TomographyForm() {
           }}
         >
           <RunPlanButton
-            name="correction"
+            name="darks_flats"
             params={{ light_source: formData.light_source }}
             instrumentSession={instrumentSession}
-            buttonText="Acquire Correction Image"
+            buttonText="Acquire Darks/Flats"
           />
         </Box>
       </Box>
