@@ -1,0 +1,1826 @@
+type Artifact {
+  """The file name of the artifact"""
+  name: String!
+
+  """The download URL for the artifact"""
+  url: Url!
+
+  """The MIME type of the artifact data"""
+  mimeType: String!
+}
+
+scalar Creator
+
+"""
+Implement the DateTime<Utc> scalar
+
+The input/output is a string in RFC3339 format.
+"""
+scalar DateTime
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).
+"""
+scalar JSON
+
+"""A scalar that can represent any JSON Object value."""
+scalar JSONObject
+
+"""Represents a label selector for filtering workflows based on labels"""
+input LabelSelector {
+  """The label key to filter on"""
+  key: String!
+
+  """The operator to use for the label selection"""
+  operator: WorkflowLabelSelectorOperator!
+
+  """The values to match against the label key (if applicable)"""
+  values: [String!]
+}
+
+"""A single log line streamed from a pod"""
+type LogEntry {
+  """The log line content"""
+  content: String!
+
+  """The name of the pod producing the log"""
+  podName: String!
+}
+
+"""The root mutation of the service"""
+type Mutation {
+  """submit specific workflow template"""
+  submitWorkflowTemplate(name: String!, visit: VisitInput!, parameters: JSON!): Workflow!
+
+  """
+  Submit a manifest (YAML) as a one-off Workflow within a visit's namespace.
+  
+  The input is typically a `WorkflowTemplate` (the manifest developers author and
+  store in their repository). It is submitted via the Argo Server API so the graph
+  remains the single source of truth for submissions. To match the behaviour of the
+  workflows CLI, the manifest is coerced into a one-off Workflow: `kind` is set to
+  `Workflow`, and a fixed `metadata.name` is rewritten to a `metadata.generateName`
+  (suffixed with `-`) so repeated submissions yield fresh, uniquely named Workflows.
+  """
+  submitWorkflow(visit: VisitInput!, manifest: String!): Workflow!
+
+  """Create a Trigger from a template"""
+  createTrigger(templateRef: String!, name: String, visit: VisitInput): Trigger
+  createExperimentDefinition(input: CreateExperimentDefinitionInput!): CreateExperimentDefinitionResponse
+  experimentDefinition(id: UUID!): ExperimentDefinitionMutations
+  deleteExperiment(id: UUID!): DeleteExperimentResponse
+  restoreExperiment(id: UUID!): DeleteExperimentResponse
+  deleteExperimentDefinition(id: UUID!): DeletedExperimentDefinitionResponse
+  restoreExperimentDefinition(id: UUID!): DeletedExperimentDefinitionResponse
+  createInstrumentSession(input: CreateInstrumentSessionInput!): InstrumentSession!
+  instrumentSession(proposalNumber: Int!, instrumentSessionNumber: Int!): InstrumentSessionMutations
+  createOrValidateSamples(input: CreateOrValidateSampleInput!): CreateSamplesResponse!
+  sample(sampleId: UUID!): SampleMutations
+  deleteSample(sampleId: UUID!): DeleteSampleResponse!
+  restoreSample(sampleId: UUID!): RestoreSampleResponse!
+
+  """Create a new container type"""
+  createContainerType(input: CreateContainerTypeInput!): CreateContainerTypeResponse!
+
+  """Mutations relating to a specific container type"""
+  containerType(name: String!): ContainerTypeMutations!
+
+  """Create a new container"""
+  createContainer(input: CreateContainerInput!): CreateContainerResponse!
+
+  """Muatations relating to a specific container"""
+  container(id: UUID = null, barcode: String = null): ContainerMutations!
+}
+
+"""Represents Relay Node types"""
+union NodeValue = Workflow
+
+"""Information about pagination in a connection"""
+type PageInfo {
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""The root query of the service"""
+type Query {
+  node(id: ID!): NodeValue
+
+  """
+  Get a single [`Workflow`] by proposal, visit, and name.
+  
+  In case of two workflows with the same name, returns the most recent.
+  """
+  workflow(visit: VisitInput!, name: String!): Workflow @deprecated(reason: "Use workflowById instead")
+
+  """Get a single [`Workflow`] by unique ID."""
+  workflowById(id: ID!): Workflow
+
+  """Find all workflows available for a given visit"""
+  workflows(visit: VisitInput!, cursor: String, limit: Int, filter: WorkflowFilter): WorkflowConnection!
+
+  """Retrieves a single cluster workflow template by name"""
+  workflowTemplate(name: String!): WorkflowTemplate!
+
+  """
+  Retrieves all cluster workflow templates with respective pagination data
+  """
+  workflowTemplates(cursor: String, limit: Int, filter: WorkflowTemplatesFilter): WorkflowTemplateConnection!
+
+  """Get a specific Trigger by name and visit"""
+  trigger(name: String!, visit: String): Trigger
+
+  """Get multiple Triggers across namespaces"""
+  triggers(cursor: String, limit: Int): TriggerConnection!
+  jsonSchema(url: String!): JSONSchema
+  jsonSchemas(type: String = null, instrument: String = null): [JSONSchema!]!
+  experimentDefinition(id: UUID!): ExperimentDefinition
+  experimentDefinitions(instrumentSessions: [InstrumentSessionInput!]!, filter: ExperimentDefinitionFilterInput = null, first: Int = null, last: Int = null, after: String = null, before: String = null): ExperimentDefinitionConnection
+  experiment(id: UUID!): Experiment
+  experiments(instrumentSessions: [InstrumentSessionInput!]!, first: Int = null, last: Int = null, after: String = null, before: String = null): ExperimentConnection
+
+  """Get a proposal by its number"""
+  proposal(proposalNumber: Int!): Proposal
+
+  """Get a list of proposals"""
+  proposals(first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [ProposalSortInput!] = null, filterBy: ProposalFilterInput = null): ProposalConnection!
+
+  """
+  Get a proposal by its reference string e.g. 'MX12345'. The lookup is case-insensitive.
+  """
+  proposalByReference(reference: String!): Proposal
+
+  """Get a instrument session"""
+  instrumentSession(proposalNumber: Int!, instrumentSessionNumber: Int!): InstrumentSession
+
+  """
+  Get an instrument session by its reference string e.g. 'MX12345-1'. The lookup is case-insensitive.
+  """
+  instrumentSessionByReference(reference: String!): InstrumentSession
+
+  """Get a list of instrument sessions"""
+  instrumentSessions(proposalNumber: Int = null, proposalCategory: String = null, first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [InstrumentSessionSortInput!] = null, filterBy: InstrumentSessionFilterInput = null): InstrumentSessionConnection!
+
+  """Get an instrument by name"""
+  instrumentByName(name: String!): Instrument
+
+  """Get an instrument by key"""
+  instrumentByKey(key: String!): Instrument
+
+  """Get a list of instruments"""
+  instruments(scienceGroup: String = null): [Instrument!]!
+
+  """Get an account"""
+  account(username: String!): Account
+
+  """Get a sample by its id"""
+  sample(sampleId: UUID!): Sample
+
+  """Get a list of samples associated with a given instrument session"""
+  samples(first: Int = null, instrumentSessions: [InstrumentSessionInput!] = null, filter: SampleFilterInput! = {schemaUrl: null, createdTime: null, updatedTime: null, name: null, data: null}, before: String = null, after: String = null, last: Int = null, orderBy: SampleOrder! = {name: null, createdTime: null, updatedTime: null}): SampleConnection!
+
+  """Fetch a single container type, by specifying its name"""
+  containerType(name: String!): ContainerType
+
+  """Fetch multiple container types, by specifying associated instruments"""
+  containerTypes(instrumentKeys: [String!]!, first: Int = 20, last: Int = null, before: String = null, after: String = null): ContainerTypeConnection!
+
+  """Fetch a single container, by specifying either its id or barcode"""
+  container(id: UUID = null, barcode: String = null): Container
+
+  "\n        Fetch multiple containers, by specifying either its parent, a child, an\n        associated instrument, or associated instrument sessions"
+  containers(instrumentSessions: [InstrumentSessionInput!] = null, instrumentKeys: [String!] = null, filter: ContainerFilterInput = null, first: Int = 20, last: Int = null, before: String = null, after: String = null): ContainerConnection!
+}
+
+"""Supported DLS science groups"""
+enum ScienceGroup {
+  """Macromolecular Crystallography"""
+  MX
+
+  """Workflows Examples"""
+  EXAMPLES
+
+  """Magnetic Materials"""
+  MAGNETIC_MATERIALS
+
+  """Soft Condensed Matter"""
+  CONDENSED_MATTER
+
+  """Imaging and Microscopy"""
+  IMAGING
+
+  """Biological Cryo-Imaging"""
+  BIO_CRYO_IMAGING
+
+  """Structures and Surfaces"""
+  SURFACES
+
+  """Crystallography"""
+  CRYSTALLOGRAPHY
+
+  """Spectroscopy"""
+  SPECTROSCOPY
+}
+
+"""The root mutation of the service"""
+type Subscription {
+  """Processing to subscribe to logs for a single pod of a workflow"""
+  logs(visit: VisitInput!, workflowName: String!, taskId: String!): LogEntry!
+
+  """Processing to subscribe to data for all workflows in a session"""
+  workflow(visit: VisitInput!, name: String!): Workflow!
+}
+
+type Task {
+  """Unique name of the task"""
+  id: String!
+
+  """Display name of the task"""
+  name: String!
+
+  """Current status of a task"""
+  status: TaskStatus!
+
+  """Parent of a task"""
+  depends: [String!]!
+
+  """Children of a task"""
+  dependencies: [String!]!
+
+  """Artifacts produced by a task"""
+  artifacts: [Artifact!]!
+
+  """Node type - Pod, DAG, etc"""
+  stepType: String!
+
+  """Start time for a task on a workflow"""
+  startTime: DateTime
+
+  """End time for a task on a workflow"""
+  endTime: DateTime
+
+  """
+  A human readable message indicating details about why this step is in this condition
+  """
+  message: String
+}
+
+enum TaskStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  SKIPPED
+  FAILED
+  ERROR
+  OMITTED
+}
+
+scalar Template
+
+"""Information about where the template is stored"""
+type TemplateSource {
+  """The URL of the GitHub repository"""
+  repositoryUrl: String!
+
+  """The path to the template within the repository"""
+  path: String!
+
+  """The current tracked branch of the repository"""
+  targetRevision: String!
+}
+
+"""A Trigger for creating automated workflows"""
+type Trigger {
+  """The name of the Trigger"""
+  name: String
+
+  """The name of a ClusterTriggerTemplate that the Trigger is created from"""
+  templateRef: String
+
+  """The beamline that the Trigger monitors"""
+  beamline: String
+}
+
+type TriggerConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [TriggerEdge!]!
+
+  """A list of nodes."""
+  nodes: [Trigger!]!
+}
+
+"""An edge in a connection."""
+type TriggerEdge {
+  """The item at the end of the edge"""
+  node: Trigger!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""
+URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
+"""
+scalar Url
+
+"""A visit to an instrument as part of a session"""
+type Visit {
+  """Project Proposal Code"""
+  proposalCode: String!
+
+  """Project Proposal Number"""
+  proposalNumber: Int!
+
+  """Session visit Number"""
+  number: Int!
+}
+
+"""A visit to an instrument as part of a session"""
+input VisitInput {
+  """Project Proposal Code"""
+  proposalCode: String!
+
+  """Project Proposal Number"""
+  proposalNumber: Int!
+
+  """Session visit Number"""
+  number: Int!
+}
+
+type Workflow {
+  """The unique ID derived from the visit, name and uid"""
+  id: ID!
+
+  """The name given to the workflow, unique within a given visit"""
+  name: String!
+
+  """The visit the Workflow was run against"""
+  visit: Visit!
+
+  """The current status of the workflow"""
+  status: WorkflowStatus
+
+  """The top-level workflow parameters"""
+  parameters: JSONObject
+
+  """The name of the template used to run the workflow"""
+  templateRef: String
+
+  """The workflow creator"""
+  creator: WorkflowCreator!
+}
+
+type WorkflowConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [WorkflowEdge!]!
+
+  """A list of nodes."""
+  nodes: [Workflow!]!
+}
+
+"""Information about the creator of a workflow."""
+type WorkflowCreator {
+  """
+  An identifier unique to the creator of the workflow.
+  Typically this is the creator's Fed-ID.
+  """
+  creatorId: String!
+}
+
+"""An edge in a connection."""
+type WorkflowEdge {
+  """The item at the end of the edge"""
+  node: Workflow!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""All tasks in the workflow have errored"""
+type WorkflowErroredStatus {
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
+}
+
+"""All tasks in the workflow have failed"""
+type WorkflowFailedStatus {
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
+}
+
+"""All the supported Workflows filters"""
+input WorkflowFilter {
+  """
+  The status of the workflow (e.g., pending, running, succeeded, failed, error)
+  """
+  workflowStatusFilter: WorkflowStatusFilter
+
+  """The fedid of the user who created the workflow"""
+  creator: Creator
+
+  """The workflow template"""
+  template: Template
+
+  """Additional label selectors for filtering workflows"""
+  labelSelectors: [LabelSelector!]
+}
+
+"""Supported operators for label selection in workflows"""
+enum WorkflowLabelSelectorOperator {
+  """Match resources with an exact label value."""
+  EQ
+
+  """
+  Match resources with a label value that is not equal to a specified value.
+  """
+  NE
+
+  """Match resources with a label value in a set of values."""
+  IN
+
+  """Match resources with a label value not in a set of values."""
+  NOT_IN
+
+  """
+  Match resources that have a specific label key, regardless of its value.
+  """
+  EXISTS
+
+  """Match resources that do not have a specific label key."""
+  DOES_NOT_EXIST
+}
+
+type WorkflowPendingStatus {
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+}
+
+type WorkflowRunningStatus {
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
+}
+
+"""The status of a workflow"""
+union WorkflowStatus = WorkflowPendingStatus | WorkflowRunningStatus | WorkflowSucceededStatus | WorkflowFailedStatus | WorkflowErroredStatus
+
+"""Represents workflow status filters"""
+input WorkflowStatusFilter {
+  pending: Boolean! = false
+  running: Boolean! = false
+  succeeded: Boolean! = false
+  failed: Boolean! = false
+  error: Boolean! = false
+}
+
+"""All tasks in the workflow have succeded"""
+type WorkflowSucceededStatus {
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
+}
+
+type WorkflowTemplate {
+  """The name given to the workflow template, globally unique"""
+  name: String!
+
+  """The group who maintains the workflow template"""
+  maintainer: String!
+
+  """A human readable title for the workflow template"""
+  title: String
+
+  """A human readable description of the workflow which is created"""
+  description: String
+
+  """The repository storing the code associated with this template."""
+  repository: String
+
+  """A JSON Schema describing the arguments of a Workflow Template"""
+  arguments: JSON!
+
+  """
+  A JSON Forms UI Schema describing how to render the arguments of the Workflow Template
+  """
+  uiSchema: JSON
+
+  """Information about where the template is obtained from"""
+  templateSource: TemplateSource
+}
+
+type WorkflowTemplateConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [WorkflowTemplateEdge!]!
+
+  """A list of nodes."""
+  nodes: [WorkflowTemplate!]!
+}
+
+"""An edge in a connection."""
+type WorkflowTemplateEdge {
+  """The item at the end of the edge"""
+  node: WorkflowTemplate!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Supported label filters for ClusterWorkflowTemplates"""
+input WorkflowTemplatesFilter {
+  """The science group owning the template eg imaging"""
+  scienceGroup: [ScienceGroup!]
+}
+
+"""A JSON schema"""
+type JSONSchema {
+  """The identifier of the schema"""
+  id: String!
+
+  """A URL from which the schema can be accessed"""
+  url: String!
+
+  """The type of object the shema describes (if known)"""
+  type: String
+
+  """The title of the schema"""
+  title: String
+
+  """The version of the schema"""
+  version: String
+
+  """The instrument the schema was created for"""
+  instrument: String
+
+  """The description og the schema"""
+  description: String
+}
+
+"""Values required to create an experiment definition"""
+input CreateExperimentDefinitionInput {
+  name: String!
+  data: JSON!
+  dataSchemaUrl: String!
+  proposalNumber: Int!
+  instrumentSessionNumber: Int!
+}
+
+"""Return type when creating an experiment definition"""
+type CreateExperimentDefinitionResponse {
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Experiment Definition that has been created"""
+  experimentDefinition: ExperimentDefinition
+
+  """Errors that occurred during validation"""
+  errors: [ExperimentDefinitionErrorDetails!]!
+}
+
+"""Values required for the createExperiments mutation"""
+input CreateExperimentsInput {
+  experiments: [ExperimentInput!]!
+}
+
+"""Return type when updating an experiment definition"""
+type CreateExperimentsResponse {
+  """Whether the operation has succeeded without errors"""
+  success: Boolean!
+
+  """Experiments created"""
+  experiments: [Experiment!]
+
+  """Errors that occurred during experiments creation"""
+  errors: [String!]!
+}
+
+input DatetimeFilterInputV2 {
+  """
+  Will filter to items where the `DateTime` field is greater than (i.e. after) the provided value
+  """
+  greaterThan: DateTime = null
+
+  """
+  Will filter to items where the `DateTime` field is less than (i.e. before) the provided value
+  """
+  lessThan: DateTime = null
+}
+
+"""The details of an deleted record validation error"""
+type DeleteErrorDetails {
+  """The type of error that occurred"""
+  type: String!
+
+  """
+  Tuple of strings identifying where in the record schema the error occurred.
+  """
+  location: [String!]!
+
+  """A human readable error message."""
+  message: String!
+}
+
+"""Return type when marking an record as deleted"""
+type DeleteExperimentResponse {
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Errors that occurred during validation"""
+  errors: [DeleteErrorDetails!]!
+}
+
+"""Return type when marking an record as deleted"""
+type DeletedExperimentDefinitionResponse {
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Errors that occurred during validation"""
+  errors: [DeleteErrorDetails!]!
+}
+
+type Experiment {
+  id: UUID!
+  name: String!
+  createdTime: DateTime!
+  updatedTime: DateTime!
+  deleted: Boolean!
+  experimentDefinition: ExperimentDefinition!
+  createdBy: String!
+  modifiedBy: String!
+
+  """The sample that this experiment is associated with"""
+  sample: Sample!
+}
+
+type ExperimentConnection {
+  edges: [ExperimentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ExperimentDefinition {
+  id: UUID!
+  name: String!
+  createdTime: DateTime!
+  updatedTime: DateTime!
+  data: JSON!
+  dataSchemaUrl: String!
+  proposalNumber: Int!
+  instrumentSessionNumber: Int!
+  deleted: Boolean!
+  createdBy: String!
+  modifiedBy: String!
+
+  """
+  The instrument session that this experiment definition is associated with
+  """
+  instrumentSession: InstrumentSession!
+
+  """Experiments associated with this experiment definition"""
+  experiments: [Experiment!]!
+}
+
+type ExperimentDefinitionConnection {
+  edges: [ExperimentDefinitionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ExperimentDefinitionEdge {
+  cursor: String!
+  node: ExperimentDefinition!
+}
+
+"""The details of an experiment definition validation error"""
+type ExperimentDefinitionErrorDetails {
+  """The type of error that occurred"""
+  type: String!
+
+  """
+  Tuple of strings identifying where in the experiment definition schema the error occurred.
+  """
+  location: [String!]!
+
+  """A human readable error message."""
+  message: String!
+}
+
+"""Values required to filter a list of experiment definitions"""
+input ExperimentDefinitionFilterInput {
+  """Filter by the name of experiment definitions"""
+  name: StringFilterInputV2 = null
+
+  """Filter by the created datetime of experiment definitions"""
+  createdTime: DatetimeFilterInputV2 = null
+
+  """Filter by the update datetime of experiment definitions"""
+  updatedTime: DatetimeFilterInputV2 = null
+
+  """Filter by the data schema URL of experiment definitions"""
+  dataSchemaUrl: StringFilterInputV2 = null
+
+  """Filter within the JSON data of experiment definitions"""
+  data: [JSONFilterInputV2!] = null
+}
+
+"""Mutations for a given experiment defintion"""
+type ExperimentDefinitionMutations {
+  updateExperimentDefinition(input: UpdateExperimentDefinitionInput!): UpdateExperimentDefinitionResponse!
+  createExperiments(input: CreateExperimentsInput!): CreateExperimentsResponse!
+}
+
+type ExperimentEdge {
+  cursor: String!
+  node: Experiment!
+}
+
+"""Values required to create an experiment"""
+input ExperimentInput {
+  name: String!
+  sampleId: UUID!
+}
+
+type InstrumentSession {
+  instrumentSessionNumber: Int!
+  proposal: Proposal
+
+  """Experiment Definitions"""
+  experimentDefinitions(first: Int = null, last: Int = null, after: String = null, before: String = null): ExperimentDefinitionConnection!
+
+  """Experiments associated with this session"""
+  experiments(first: Int = null, last: Int = null, after: String = null, before: String = null): ExperimentConnection!
+  instrumentSessionId: Int! @deprecated(reason: "instrument_session_id is deprecated and will be removed in a future version.")
+  instrumentSessionReference: String
+  startTime: DateTime
+  endTime: DateTime
+  type: String
+  state: String
+  riskRating: String
+  instrument: Instrument!
+  roles: [InstrumentSessionRole!]!
+
+  """Samples associated with a given instrument session"""
+  samples(first: Int = null, filter: SampleFilterInput! = {schemaUrl: null, createdTime: null, updatedTime: null, name: null, data: null}, before: String = null, after: String = null, last: Int = null, orderBy: SampleOrder! = {name: null, createdTime: null, updatedTime: null}): SampleConnection!
+}
+
+"""Values required to uniquely identify an instrument session"""
+input InstrumentSessionInput {
+  proposalNumber: Int!
+  instrumentSessionNumber: Int!
+}
+
+input JSONFilterConditionInput @oneOf {
+  stringFilter: StringFilterInputV2 = null
+  datetimeFilter: DatetimeFilterInputV2 = null
+  numericFilter: NumericFilterInputV2 = null
+}
+
+input JSONFilterInputV2 {
+  """The JSON path to the field to filter. Must start with '$.'"""
+  path: String!
+
+  """The filter operation to apply to the field"""
+  condition: JSONFilterConditionInput!
+}
+
+input NumericFilterInputV2 {
+  """
+  Will filter to items where the numeric field is greater than the provided value
+  """
+  greaterThan: Float = null
+
+  """
+  Will filter to items where the numeric field is less than the provided value
+  """
+  lessThan: Float = null
+}
+
+type Proposal {
+  proposalNumber: Int!
+  proposalCategory: String
+  title: String
+  summary: String
+  state: ProposalState!
+  proposalReference: String
+  instrumentSessions(first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [InstrumentSessionSortInput!] = null, filterBy: InstrumentSessionFilterInput = null): InstrumentSessionConnection!
+  instruments: [Instrument!]!
+  roles: [ProposalAccount!]!
+}
+
+type Sample {
+  id: UUID!
+  experiments: [Experiment!]!
+  name: String!
+  data: JSON!
+  createdTime: DateTime!
+  updatedTime: DateTime!
+  dataSchemaUrl: String!
+  deleted: Boolean!
+
+  """Samples from which this sample is derived"""
+  parents(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleConnection!
+
+  """Samples derived from this sample"""
+  children(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleConnection!
+
+  """Events linked to this sample"""
+  events(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleEventConnection!
+
+  """The JSON schema that the sample's `data` conforms to"""
+  dataSchema: JSON!
+
+  """The instrument sessions that this sample is associated with"""
+  instrumentSessions: [InstrumentSession!]!
+  images: [SampleImage!]!
+
+  """The container containing the sample"""
+  container: Container
+
+  """The sample's position within a container"""
+  positionInContainer: ContainerPosition
+}
+
+input StringFilterInputV2 {
+  """
+  Will filter to items where the `String` field is a member of the provided value
+  """
+  in: [String!] = null
+
+  """
+  Will filter to items where the `String` field is equal to the provided value
+  """
+  equalTo: String = null
+
+  """
+  Will filter to items where the `String` field is not equal to the provided value
+  """
+  notEqualTo: String = null
+
+  """
+  Will filter to items where the `String` field is not a member of the provided value
+  """
+  notIn: [String!] = null
+
+  """
+  Will filter to items where the `String` field is contains the provided value
+  """
+  contains: String = null
+}
+
+scalar UUID
+
+"""Values that can be updated on experiment definition"""
+input UpdateExperimentDefinitionInput {
+  name: String
+  data: JSON
+  dataSchemaUrl: String
+}
+
+"""Return type when updating an experiment definition"""
+type UpdateExperimentDefinitionResponse {
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Experiment Definition that has been updated"""
+  experimentDefinition: ExperimentDefinition
+
+  """Errors that occurred during validation"""
+  errors: [ExperimentDefinitionErrorDetails!]!
+}
+
+type Account {
+  username: String!
+  emailAddress: String
+  title: String
+  givenName: String
+  familyName: String
+  type: AccountType!
+  state: AccountState!
+  accountId: Int! @deprecated(reason: "account_id is deprecated and will be removed in a future version.")
+  proposalRoles: [ProposalAccount!]!
+  instrumentSessionRoles: [InstrumentSessionRole!]!
+}
+
+input AccountFilterInput {
+  emailAddress: StringFilterInput = null
+  givenName: StringFilterInput = null
+  familyName: StringFilterInput = null
+}
+
+enum AccountSortField {
+  family_name
+  given_name
+}
+
+input AccountSortInput {
+  field: AccountSortField!
+  orderBy: SortOrder!
+}
+
+enum AccountState {
+  enabled
+  disabled
+}
+
+enum AccountType {
+  user
+  staff
+  functional
+}
+
+input CreateInstrumentSessionInput {
+  """Number of the proposal the session is for"""
+  proposalNumber: Int!
+
+  """Name of the instrument the session is for"""
+  instrumentName: String!
+
+  """
+  Instrument Session information that isn't needed by the Session Service but should be passed through the UAS
+  """
+  additionalInfo: JSON = null
+}
+
+input DateTimeFilterInput {
+  eq: DateTime = null
+  neq: DateTime = null
+  gt: DateTime = null
+  lt: DateTime = null
+  gte: DateTime = null
+  lte: DateTime = null
+}
+
+type Instrument {
+  name: String!
+  key: String!
+  scienceGroup: String
+  description: String
+  proposals(first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [ProposalSortInput!] = null, filterBy: ProposalFilterInput = null): ProposalConnection!
+  instrumentSessions(first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [InstrumentSessionSortInput!] = null, filterBy: InstrumentSessionFilterInput = null): InstrumentSessionConnection!
+
+  """
+  Get paginated staff accounts for this instrument. Trusted users see all accounts; fedid users see only accounts linked to sessions or instruments they are associated with.
+  """
+  staff(first: Int = null, last: Int = null, after: String = null, before: String = null, sortBy: [AccountSortInput!] = null, filterBy: AccountFilterInput = null): StaffConnection!
+}
+
+type InstrumentSessionConnection {
+  edges: [InstrumentSessionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type InstrumentSessionEdge {
+  cursor: String!
+  node: InstrumentSession!
+}
+
+input InstrumentSessionFilterInput {
+  instrumentSessionNumber: IntFilterInput = null
+  startTime: DateTimeFilterInput = null
+  endTime: DateTimeFilterInput = null
+  type: StringFilterInput = null
+  state: InstrumentSessionStateFilterInput = null
+  riskRating: StringFilterInput = null
+  proposalNumber: IntFilterInput = null
+}
+
+type InstrumentSessionMutations {
+  instrumentSessionNumber: Int!
+  proposalNumber: Int!
+
+  """Create or validate samples associated with this instrument session"""
+  createOrValidateSamples(input: CreateOrValidateSampleInputBase!): CreateSamplesResponse!
+}
+
+type InstrumentSessionRole {
+  instrumentSession: InstrumentSession!
+  account: Account!
+  role: String!
+  onSite: Boolean!
+}
+
+enum InstrumentSessionSortField {
+  instrumentSessionNumber
+  startTime
+  endTime
+  type
+  state
+  riskRating
+  proposalNumber
+}
+
+input InstrumentSessionSortInput {
+  field: InstrumentSessionSortField!
+  orderBy: SortOrder!
+}
+
+enum InstrumentSessionState {
+  CANCELLED
+  COMPLETED
+  FUTURE
+  IN_PROGRESS
+}
+
+input InstrumentSessionStateFilterInput {
+  eq: InstrumentSessionState = null
+  neq: InstrumentSessionState = null
+}
+
+input IntFilterInput {
+  eq: Int = null
+  neq: Int = null
+  gt: Int = null
+  lt: Int = null
+  gte: Int = null
+  lte: Int = null
+}
+
+type ProposalAccount {
+  proposal: Proposal!
+  account: Account!
+  role: String!
+}
+
+type ProposalConnection {
+  edges: [ProposalEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProposalEdge {
+  cursor: String!
+  node: Proposal!
+}
+
+input ProposalFilterInput {
+  proposalNumber: IntFilterInput = null
+  proposalCategory: StringFilterInput = null
+  title: StringFilterInput = null
+  state: ProposalStateFilterInput = null
+}
+
+enum ProposalSortField {
+  proposalNumber
+}
+
+input ProposalSortInput {
+  field: ProposalSortField!
+  orderBy: SortOrder!
+}
+
+enum ProposalState {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+input ProposalStateFilterInput {
+  eq: ProposalState = null
+  neq: ProposalState = null
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+type Staff {
+  username: String!
+  emailAddress: String
+  title: String
+  givenName: String
+  familyName: String
+  type: AccountType!
+  state: AccountState!
+}
+
+type StaffConnection {
+  edges: [StaffEdge!]!
+  pageInfo: PageInfo!
+}
+
+type StaffEdge {
+  cursor: String!
+  node: Staff!
+}
+
+input StringFilterInput {
+  eq: String = null
+  neq: String = null
+  contains: String = null
+  notContains: String = null
+  startsWith: String = null
+  endsWith: String = null
+}
+
+input AddSampleEventInput {
+  description: String!
+}
+
+input CreateOrValidateSampleInput {
+  """URL of the JSON schema the samples' `data` should be validated against"""
+  dataSchemaUrl: String!
+
+  """Samples to be created"""
+  samples: [SampleIn!]!
+
+  """
+  Whether or not the provided samples should only be validated and not created
+  """
+  validateOnly: Boolean! = false
+
+  """Number of the proposal the samples should be associated with"""
+  proposalNumber: Int!
+
+  """Number of the instrument session the samples should be associated with"""
+  instrumentSessionNumber: Int!
+}
+
+input CreateOrValidateSampleInputBase {
+  """URL of the JSON schema the samples' `data` should be validated against"""
+  dataSchemaUrl: String!
+
+  """Samples to be created"""
+  samples: [SampleIn!]!
+
+  """
+  Whether or not the provided samples should only be validated and not created
+  """
+  validateOnly: Boolean! = false
+}
+
+"""Return type when creating or validating samples"""
+type CreateSamplesResponse {
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Samples that have been created"""
+  samples: [Sample!]!
+
+  """Errors that occurred during sample validation"""
+  errors: [SampleValidationError!]!
+}
+
+input DatetimeOperatorInput {
+  """
+  Will filter to items where the `DateTime` field is greater than (i.e. after) the provided value
+  """
+  gt: DateTime = null
+
+  """
+  Will filter to items where the `DateTime` field is less than (i.e. before) the provided value
+  """
+  lt: DateTime = null
+}
+
+"""Return type when deleting a sample"""
+type DeleteSampleResponse {
+  """Whether the operation has succeeded"""
+  success: Boolean!
+
+  """Errors that occurred during the operation"""
+  errors: [String!]!
+}
+
+"""The details of sample validation error"""
+type ErrorDetails {
+  """The type of error that occurred"""
+  type: String!
+
+  """
+  Tuple of strings identifying where in the sample schema the error occurred.
+  """
+  location: [String!]!
+
+  """A human readable error message."""
+  message: String!
+}
+
+input JSONOperator @oneOf {
+  stringOperator: StringOperatorInput = null
+  datetimeOperator: DatetimeOperatorInput = null
+  numericOperator: NumericOperatorInput = null
+}
+
+input JSONOperatorInput {
+  """A JSON path specifying the value to filter. Must start with '$.'"""
+  path: String!
+
+  """The operator to apply to the JSON field"""
+  operator: JSONOperator!
+}
+
+input NumericOperatorInput {
+  """
+  Will filter to items where the numeric field is greater than the provided value
+  """
+  gt: Float = null
+
+  """
+  Will filter to items where the numeric field is less than the provided value
+  """
+  lt: Float = null
+}
+
+"""Return type when restoring a deleted sample"""
+type RestoreSampleResponse {
+  """Whether the operation has succeeded"""
+  success: Boolean!
+
+  """Errors that occurred during the operation"""
+  errors: [String!]!
+}
+
+type SampleConnection {
+  edges: [SampleEdge!]!
+  pageInfo: PageInfo!
+}
+
+type SampleEdge {
+  cursor: String!
+  node: Sample!
+}
+
+type SampleEvent {
+  id: UUID!
+  timestamp: DateTime!
+  description: String!
+}
+
+type SampleEventConnection {
+  edges: [SampleEventEdge!]!
+  pageInfo: PageInfo!
+}
+
+type SampleEventEdge {
+  cursor: String!
+  node: SampleEvent!
+}
+
+input SampleFilterInput {
+  """Filter on the `schemaUrl` field of `Sample`"""
+  schemaUrl: StringOperatorInput = null
+
+  """Filter on the `createdTime` field of `Sample`"""
+  createdTime: DatetimeOperatorInput = null
+
+  """Filter on the `createdTime` field of `Sample`"""
+  updatedTime: DatetimeOperatorInput = null
+
+  """Filter on the `name` field of `Sample`"""
+  name: StringOperatorInput = null
+
+  """Filter on the `data` field of `Sample`"""
+  data: [JSONOperatorInput!] = null
+}
+
+type SampleImage {
+  url: String!
+  filename: String!
+}
+
+input SampleIn {
+  """Name of the sample"""
+  name: String!
+
+  """Data of the sample"""
+  data: JSON!
+}
+
+type SampleMutations {
+  sampleId: UUID!
+  updateSample(input: UpdateSampleInput!): UpdateSampleResponse!
+  linkInstrumentSessionToSample(proposalNumber: Int!, instrumentSessionNumber: Int!): Void
+  addSampleEvent(sampleEvent: AddSampleEventInput!): SampleEvent!
+  createSampleImageUploadUrl(filename: String!, contentType: String!, contentLength: Int!): String!
+
+  """Assign this sample to a container"""
+  addSampleToContainer(input: AddSampleToContainerInput!): AddSampleToContainerResponse!
+}
+
+input SampleOrder {
+  name: SortingOrder = null
+  createdTime: SortingOrder = null
+  updatedTime: SortingOrder = null
+}
+
+"""The details of errors occurred when validating a sample"""
+type SampleValidationError {
+  """
+  The index of the sample in CreateSampleInput.samples for which the error occurred
+  """
+  index: Int!
+
+  """Errors that occurred when validating the sample"""
+  errors: [ErrorDetails!]!
+}
+
+enum SortingOrder {
+  ASC
+  DESC
+}
+
+"""Conditions used to filter results based on the value of a String field"""
+input StringOperatorInput {
+  """
+  Will filter to items where the `String` field is equal to the provided value
+  """
+  eq: String = null
+
+  """
+  Will filter to items where the `String` field is not equal to the provided value
+  """
+  ne: String = null
+
+  """
+  Will filter to items where the `String` field is a member of the provided value
+  """
+  in: [String!] = null
+
+  """
+  Will filter to items where the `String` field is not a member of the provided value
+  """
+  nin: [String!] = null
+
+  """
+  Will filter to items where the `String` field is contains the provided value
+  """
+  contains: String = null
+}
+
+input UpdateSampleInput {
+  """Name of the sample"""
+  name: String
+
+  """Data of the sample"""
+  data: JSON
+
+  """URL of the JSON schema the samples' `data` should be validated against"""
+  dataSchemaUrl: String
+}
+
+"""Return type when updating a sample"""
+type UpdateSampleResponse {
+  """Whether the operation has succeeded"""
+  success: Boolean!
+
+  """Sample that has been updated"""
+  sample: Sample
+
+  """Errors that occurred during the operation"""
+  errors: [SampleValidationError!]!
+}
+
+"""Represents NULL values"""
+scalar Void
+
+"""Values required to set a container's children"""
+input AddContainersToContainerInput {
+  containerPositions: [ChildContainerPositionInput!]!
+}
+
+type AddContainersToContainerResponse {
+  success: Boolean!
+  containerPositions: [ContainerPosition!]
+  errors: [String!]!
+}
+
+input AddSampleToContainerInput {
+  containerPosition: ContainerPositionInput!
+}
+
+type AddSampleToContainerResponse {
+  success: Boolean!
+  samplePosition: SamplePostion
+  errors: [String!]!
+}
+
+input AddSamplesToContainerInput {
+  samplePositions: [SamplePositionInput!]!
+}
+
+type AddSamplesToContainerResponse {
+  success: Boolean!
+  samplePositions: [SamplePostion!]
+  errors: [String!]!
+}
+
+"""Values required to assign a contianer to an instrument"""
+input AssignContainerToInstrumentInput {
+  """The unique key of the instrument this container should be assigned to"""
+  instrumentKey: String!
+}
+
+type AssignContainerToInstrumentResponse {
+  success: Boolean!
+  errors: [String!]!
+}
+
+"""Values required to assign a contianer to an instrument session"""
+input AssignContainerToInstrumentSessionInput {
+  """The instrument session this container should be assigned to"""
+  instrumentSession: InstrumentSessionInput!
+}
+
+type AssignContainerToInstrumentSessionResponse {
+  success: Boolean!
+  errors: [String!]!
+}
+
+"""Values required to specify a container's position within a container"""
+input ChildContainerPositionInput {
+  childContainerId: UUID!
+  position: Int = null
+}
+
+"""A container that can store samples and/or other containers"""
+type Container {
+  """The unique identifier of this container"""
+  id: UUID!
+
+  """When the container was created in the service"""
+  createdTime: DateTime!
+
+  """When the container was last updated in the service"""
+  updatedTime: DateTime!
+
+  """The name of the container"""
+  name: String!
+
+  """The type of this container"""
+  type: ContainerType!
+
+  """The manufacturer's serial number of the container"""
+  serialNumber: String
+
+  """The facility barcode for the container"""
+  barcode: String
+
+  """Whether or not the container has been marked as discarded"""
+  deleted: Boolean!
+
+  """The user that created the container"""
+  createdBy: String!
+
+  """The user that last modified the container"""
+  modifiedBy: String!
+
+  """
+  The instrument sessions that this container is currently associated with
+  """
+  instrumentSessions: [InstrumentSession!]!
+
+  """Sample positions within this container"""
+  samplePositions: [SamplePostion!]!
+
+  """The top-level fixed location where this container is stored"""
+  location: Container
+  parent: Container
+
+  """The container position occupied by this container"""
+  positionInParent: ContainerPosition
+  children: [Container!]!
+
+  """Container positions within this container"""
+  containerPositions: [ContainerPosition!]!
+}
+
+type ContainerConnection {
+  edges: [ContainerEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ContainerEdge {
+  cursor: String!
+  node: Container!
+}
+
+"""Values required to filter a list of containers"""
+input ContainerFilterInput {
+  """Filter using the id of the container's parent"""
+  parentId: UUIDFilterInputV2 = null
+
+  """Filter using the of the container's children"""
+  childId: UUIDFilterInputV2 = null
+
+  """Include/exclude 'deleted' containers"""
+  includeDeleted: Boolean! = false
+
+  """Filter to containers with/without child containers"""
+  hasChildren: Boolean = null
+
+  """Filter to containers with/without a parent"""
+  hasParent: Boolean = null
+}
+
+type ContainerMutations {
+  """Update this container"""
+  updateContainer(input: UpdateContainerInput!): UpdateContainerResponse!
+
+  """Add containers to this container"""
+  addContainersToContainer(input: AddContainersToContainerInput!): AddContainersToContainerResponse!
+
+  """Remove containers from this container"""
+  removeContainersFromContainer(input: RemoveContainersFromContainerInput!): RemoveContainersFromContainerResponse!
+
+  """Set the container that this container is contained within"""
+  setParentContainer(input: SetParentContainerInput!): SetParentContainerResponse!
+
+  """Add samples to this container"""
+  addSamplesToContainer(input: AddSamplesToContainerInput!): AddSamplesToContainerResponse!
+
+  """Remove samples from this container"""
+  removeSamplesFromContainer(input: RemoveSamplesFromContainerInput!): RemoveSamplesFromContainerResponse!
+
+  """Associate this container with an instrument session"""
+  assignContainerToInstrumentSession(input: AssignContainerToInstrumentSessionInput!): AssignContainerToInstrumentSessionResponse!
+
+  """Unassign this container from an instrument session"""
+  unassignContainerFromInstrumentSession(input: UnassignContainerFromInstrumentSessionInput!): UnassignContainerFromInstrumentSessionResponse!
+
+  """Associate this container with an instrument"""
+  assignContainerToInstrument(input: AssignContainerToInstrumentInput!): AssignContainerToInstrumentResponse!
+
+  """Unassign this container from an instrument"""
+  unassignContainerFromInstrument(input: UnassignContainerFromInstrumentInput!): UnassignContainerFromInstrumentResponse!
+}
+
+type ContainerPosition {
+  position: Int
+  container: Container
+}
+
+"""Values required to specify a position within a container"""
+input ContainerPositionInput {
+  parentContainerId: UUID!
+  position: Int = null
+}
+
+"""A type of container"""
+type ContainerType {
+  """The unique name of the container type"""
+  name: String!
+
+  """A description of this type of container"""
+  description: String!
+
+  """The number of containers the container can hold"""
+  numberOfContainerPositions: Int
+
+  """The number of samples the container can hold"""
+  numberOfSamplePositions: Int
+
+  """Used to distingush storage locations from moveable containers"""
+  isFixedLocation: Boolean!
+
+  """The user that created the container type"""
+  createdBy: String!
+
+  """The user user that last modified the container type"""
+  modifiedBy: String!
+}
+
+type ContainerTypeConnection {
+  edges: [ContainerTypeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ContainerTypeEdge {
+  cursor: String!
+  node: ContainerType!
+}
+
+type ContainerTypeMutations {
+  """Update this container type"""
+  updateContainerType(input: UpdateContainerTypeInput!): UpdateContainerTypeResponse!
+}
+
+"""Values required to create a container"""
+input CreateContainerInput {
+  """The unique key of an instrument associated with this container"""
+  instrumentKey: String = null
+
+  """An instrument session associated with this container"""
+  instrumentSession: InstrumentSessionInput = null
+
+  """The name of the type of this container"""
+  type: String!
+
+  """The name of the container"""
+  name: String!
+
+  """The serial number of this container"""
+  serialNumber: String = null
+
+  """The facility barcode of the container"""
+  barcode: String = null
+}
+
+type CreateContainerResponse {
+  success: Boolean!
+  container: Container
+  errors: [String!]!
+}
+
+"""Values required to create a container type"""
+input CreateContainerTypeInput {
+  """The unique key of an instrument associated with this container type"""
+  instrumentKey: String!
+
+  """The unique name of this container type"""
+  name: String!
+
+  """A description of this container type"""
+  description: String!
+
+  """Whether or not this container type is a fixed storage location"""
+  isFixedLocation: Boolean!
+
+  """The number of container positions within this container"""
+  numberOfContainerPositions: Int = 0
+
+  """The number of sample positions within this container"""
+  numberOfSamplePositions: Int = 0
+}
+
+type CreateContainerTypeResponse {
+  success: Boolean!
+  containerType: ContainerType
+  errors: [String!]!
+}
+
+"""Values required to remove containers from a container"""
+input RemoveContainersFromContainerInput {
+  containerIds: [UUID!]!
+}
+
+type RemoveContainersFromContainerResponse {
+  success: Boolean!
+}
+
+"""Values required to remove samples from a container"""
+input RemoveSamplesFromContainerInput {
+  sampleIds: [UUID!]!
+}
+
+type RemoveSamplesFromContainerResponse {
+  success: Boolean!
+}
+
+"""Values required to specify a sample's position within a container"""
+input SamplePositionInput {
+  sampleId: UUID!
+  position: Int = null
+}
+
+type SamplePostion {
+  position: Int
+  sample: Sample
+}
+
+"""Values required to set a container's parent"""
+input SetParentContainerInput {
+  containerPosition: ContainerPositionInput!
+}
+
+type SetParentContainerResponse {
+  success: Boolean!
+  containerPosition: ContainerPosition
+  errors: [String!]!
+}
+
+input UUIDFilterInputV2 {
+  """
+  Will filter to items where the `UUID` field is a member of the provided value
+  """
+  in: [UUID!] = null
+
+  """
+  Will filter to items where the `UUID` field is equal to the provided value
+  """
+  equalTo: UUID = null
+
+  """
+  Will filter to items where the `UUID` field is not equal to the provided value
+  """
+  notEqualTo: UUID = null
+
+  """
+  Will filter to items where the `UUID` field is not a member of the provided value
+  """
+  notIn: [UUID!] = null
+}
+
+"""Values required to unassign a contianer from an instrument"""
+input UnassignContainerFromInstrumentInput {
+  """
+  The unique key of the instrument this container should be unassigned from
+  """
+  instrumentKey: String!
+}
+
+type UnassignContainerFromInstrumentResponse {
+  success: Boolean!
+  errors: [String!]!
+}
+
+"""Values required to unassign a contianer from an instrument session"""
+input UnassignContainerFromInstrumentSessionInput {
+  """The instrument session this container should be unassigned from"""
+  instrumentSession: InstrumentSessionInput!
+}
+
+type UnassignContainerFromInstrumentSessionResponse {
+  success: Boolean!
+  errors: [String!]!
+}
+
+"""Values required to update a container"""
+input UpdateContainerInput {
+  """The name of the container"""
+  name: String
+
+  """The serial number of this container"""
+  serialNumber: String
+
+  """The facility barcode of the container"""
+  barcode: String
+}
+
+type UpdateContainerResponse {
+  success: Boolean!
+  container: Container
+  errors: [String!]!
+}
+
+"""Values required to update a container type"""
+input UpdateContainerTypeInput {
+  """The unique name of the container type"""
+  name: String
+
+  """A description of this container type"""
+  description: String
+
+  """Used to distingush storage locations from moveable containers"""
+  isFixedLocation: Boolean
+}
+
+type UpdateContainerTypeResponse {
+  success: Boolean!
+  containerType: ContainerType
+  errors: [String!]!
+}
