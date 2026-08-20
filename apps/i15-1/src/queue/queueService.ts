@@ -270,16 +270,16 @@ export const clearHistory = async (): Promise<number> => {
   return response.data;
 };
 
-export const submitQueueTask = async ({
-  experiment,
+export const submitQueueTasks = async ({
+  experiments,
   taskPosition,
 }: {
-  experiment: Experiment | TaskRequest;
+  experiments: (Experiment | TaskRequest)[];
   taskPosition?: number;
 }) => {
   const data: AddTasksToQueueQueuePostData = {
     url: `/queue`,
-    body: [experiment],
+    body: experiments,
     query: {
       position: taskPosition,
     },
@@ -288,10 +288,10 @@ export const submitQueueTask = async ({
   return await addTasksToQueueQueuePost(data);
 };
 
-export function useSumbitQueueTask() {
+export function useSumbitQueueTasks() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: submitQueueTask,
+    mutationFn: submitQueueTasks,
     onSuccess: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ["queue"] }),

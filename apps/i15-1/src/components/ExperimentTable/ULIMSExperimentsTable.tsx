@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
 import ErrorIcon from "@mui/icons-material/Error";
-import { useSumbitQueueTask } from "../../queue/queueService";
+import { useSumbitQueueTasks } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
 import type {
@@ -57,24 +57,20 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 export function ExperimentList() {
   const location = useLocation();
   const { instrumentSession } = useInstrumentSession();
-  const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
+  const { mutateAsync: submitTasksAsync } = useSumbitQueueTasks();
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
-    await Promise.all(
-      selected.map((exp) =>
-        submitTaskAsync({
-          experiment: {
-            name: exp.experiment.name,
-            experiment_definition: exp.experiment
-              .experimentDefinition as ExperimentDefinition,
-            sample: exp.experiment.sample as Sample,
-            instrument_session:
-              exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
-              "",
-          },
-        }),
-      ),
-    );
+    await submitTasksAsync({
+      experiments: selected.map((exp) => ({
+        name: exp.experiment.name,
+        experiment_definition: exp.experiment
+          .experimentDefinition as ExperimentDefinition,
+        sample: exp.experiment.sample as Sample,
+        instrument_session:
+          exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
+          "",
+      })),
+    });
   }
 
   const visit = visitTextToVisit(instrumentSession);

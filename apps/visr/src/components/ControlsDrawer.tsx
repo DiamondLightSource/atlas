@@ -1,12 +1,13 @@
 import { Drawer, Box, IconButton, Typography } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import { Children, Fragment, type ReactNode } from "react";
 
 interface ControlsDrawerProps {
   open: boolean;
   collapsedHeight: number;
   onToggle: () => void;
-  controls: JSX.Element;
+  controls: ReactNode | ReactNode[];
 }
 
 function ControlsDrawer({
@@ -15,6 +16,8 @@ function ControlsDrawer({
   onToggle,
   controls,
 }: ControlsDrawerProps) {
+  const items = Children.toArray(controls);
+
   return (
     <Drawer
       anchor="bottom"
@@ -27,28 +30,57 @@ function ControlsDrawer({
           transition: "flex-grow 0.4s ease, height 0.4s ease",
           boxSizing: "border-box",
           bgcolor: "transparent",
+          overflowY: "auto",
         },
       }}
     >
       <Box
         sx={{
           display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
           px: 2,
           height: 64,
+          flexShrink: 0,
         }}
       >
         <Typography variant="overline">Controls</Typography>
-        <IconButton onClick={onToggle}>
+        <IconButton
+          onClick={onToggle}
+          aria-label={open ? "Collapse" : "Expand"}
+          aria-expanded={open}
+        >
           {open ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
         </IconButton>
       </Box>
+
       <Box
         sx={{
-          px: 10,
+          display: open ? "flex" : "none",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 3,
+          alignItems: "flex-start",
+          px: { xs: 3, md: 6 },
+          pb: 3,
         }}
       >
-        {open ? controls : <Box />}
+        {items.map((control, index) => (
+          <Fragment key={index}>
+            {index > 0 && (
+              <Box
+                sx={{
+                  alignSelf: "stretch",
+                  borderTop: { xs: 1, md: 0 },
+                  borderLeft: { xs: 0, md: 1 },
+                  borderColor: "divider",
+                  mx: { xs: 6, md: 0 },
+                  my: { xs: 0, md: 4 },
+                }}
+              />
+            )}
+            <Box sx={{ flex: 1, minWidth: 0 }}>{control}</Box>
+          </Fragment>
+        ))}
       </Box>
     </Drawer>
   );
