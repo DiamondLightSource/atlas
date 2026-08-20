@@ -63,20 +63,23 @@ export default function SliceViewer({
           Slice View
         </Typography>
       </Box>
-      <div
-        style={{
+      <Box
+        sx={{
           flex: 1,
+          display: "flex",
+          minHeight: 0,
           justifyContent: "center",
+          overflow: "hidden",
         }}
       >
         <HeatmapPlot
-          aspect="auto"
+          aspect="equal"
           plotConfig={{}}
           values={sliceNdarray}
           domain={[0, 255]}
           customToolbarChildren={null}
         />
-      </div>
+      </Box>
     </Box>
   );
 }

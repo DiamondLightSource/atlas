@@ -76,8 +76,9 @@ function TomographyPlots({
     <Box
       key={i}
       sx={{
-        // flex: 1,
-        // minWidth: 260,
+        width: "100%",
+        height: "100%",
+        minWidth: 260,
         maxHeight: gridHeight,
       }}
     >
@@ -90,6 +91,8 @@ function TomographyPlots({
       ref={containerRef! as React.RefObject<HTMLDivElement>}
       sx={{
         flex: "1 1 0",
+        width: "100%",
+        minWidth: 0,
         height: gridHeight,
         minHeight: minimumGridHeight,
         overflow: "visible",
