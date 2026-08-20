@@ -19,7 +19,7 @@ vi.mock("../../queue/queueService", async (importOriginal) => {
     await importOriginal<typeof import("../../queue/queueService")>();
   return {
     ...actual,
-    useSumbitQueueTask: vi.fn(),
+    useSumbitQueueTasks: vi.fn(),
   };
 });
 
@@ -31,7 +31,7 @@ vi.mock("@atlas/app-shell", async (importOriginal) => {
   };
 });
 
-const mockedUseSubmitTask = queueService.useSumbitQueueTask as unknown as Mock;
+const mockedUseSubmitTask = queueService.useSumbitQueueTasks as unknown as Mock;
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
 const mockedUseInstrumentSession =
   appShell.useInstrumentSession as unknown as Mock;
@@ -204,18 +204,20 @@ describe("ExperimentList", () => {
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledTimes(1);
       expect(mutateAsync).toHaveBeenCalledWith({
-        experiment: {
-          name: "Exp 1",
-          instrument_session: "",
-          experiment_definition: {
-            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-            name: "Def 1",
+        experiments: [
+          {
+            name: "Exp 1",
+            instrument_session: "",
+            experiment_definition: {
+              data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+              name: "Def 1",
+            },
+            sample: {
+              data: { composition: "H2O", density: 1.2 },
+              name: "Sample A",
+            },
           },
-          sample: {
-            data: { composition: "H2O", density: 1.2 },
-            name: "Sample A",
-          },
-        },
+        ],
       });
     });
   });
@@ -238,34 +240,34 @@ describe("ExperimentList", () => {
     fireEvent.click(screen.getByRole("button", { name: /add all to queue/i }));
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledTimes(2);
+      expect(mutateAsync).toHaveBeenCalledTimes(1);
       expect(mutateAsync).toHaveBeenNthCalledWith(1, {
-        experiment: {
-          name: "Exp 1",
-          instrument_session: "",
-          experiment_definition: {
-            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-            name: "Def 1",
+        experiments: [
+          {
+            name: "Exp 1",
+            instrument_session: "",
+            experiment_definition: {
+              data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+              name: "Def 1",
+            },
+            sample: {
+              data: { composition: "H2O", density: 1.2 },
+              name: "Sample A",
+            },
           },
-          sample: {
-            data: { composition: "H2O", density: 1.2 },
-            name: "Sample A",
+          {
+            name: "Exp 2",
+            instrument_session: "",
+            experiment_definition: {
+              data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
+              name: "Def 2",
+            },
+            sample: {
+              data: { composition: "CO2", density: 1.2 },
+              name: "Sample B",
+            },
           },
-        },
-      });
-      expect(mutateAsync).toHaveBeenNthCalledWith(2, {
-        experiment: {
-          name: "Exp 2",
-          instrument_session: "",
-          experiment_definition: {
-            data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-            name: "Def 2",
-          },
-          sample: {
-            data: { composition: "CO2", density: 1.2 },
-            name: "Sample B",
-          },
-        },
+        ],
       });
     });
   });
