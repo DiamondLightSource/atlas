@@ -1,28 +1,17 @@
-import {
-  DiamondDSTheme,
-  ThemeProvider,
-} from "@diamondlightsource/sci-react-ui";
+import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
 import { RouterProvider } from "react-router-dom";
 
 import Spectroscopy from "./routes/Spectroscopy.tsx";
-import { StrictMode, type ReactNode } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import Workflows from "./routes/Workflows.tsx";
-import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment.ts";
-import { createApi, type Api } from "@atlas/blueapi";
-import { BlueapiProvider } from "@atlas/blueapi-query";
+import { createApi } from "@atlas/blueapi";
 import Tomography from "./routes/Tomography.tsx";
-import type { Theme } from "@mui/material";
-import {
-  createRouter,
-  InstrumentSessionProvider,
-  type SectionGroup,
-} from "@atlas/app-shell";
+import { createRouter, type SectionGroup } from "@atlas/app-shell";
 import { PlanBrowser } from "@atlas/blueapi-ui";
-import { useInstrumentSessions } from "./components/InstrumentSessionSelection/InstrumentSession.tsx";
 import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
+import { AppProviders } from "./AppProviders.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -61,44 +50,6 @@ const router = createRouter({
 
 const api = createApi("/api/blueapi");
 const queryClient = new QueryClient();
-
-const InstrumentSessionLoader = ({ children }: { children: ReactNode }) => {
-  const sessions = useInstrumentSessions().filter(
-    (session): session is string => session !== undefined,
-  );
-  if (sessions.length === 0) {
-    sessions.push("0-0");
-  }
-  return (
-    <InstrumentSessionProvider sessionsList={sessions}>
-      {children}
-    </InstrumentSessionProvider>
-  );
-};
-
-const AppProviders = ({
-  api,
-  queryClient,
-  theme,
-  children,
-}: {
-  api: Api;
-  queryClient: QueryClient;
-  theme: Theme;
-  children: ReactNode;
-}) => {
-  return (
-    <ThemeProvider theme={theme}>
-      <RelayEnvironmentProvider environment={RelayEnvironment}>
-        <InstrumentSessionLoader>
-          <QueryClientProvider client={queryClient}>
-            <BlueapiProvider api={api}>{children}</BlueapiProvider>
-          </QueryClientProvider>
-        </InstrumentSessionLoader>
-      </RelayEnvironmentProvider>
-    </ThemeProvider>
-  );
-};
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
