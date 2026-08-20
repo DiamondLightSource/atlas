@@ -9,6 +9,7 @@ import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
+import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTask } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
@@ -119,6 +120,17 @@ export function ExperimentList() {
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: true,
+    muiSelectCheckboxProps: ({ row }) => {
+      if (!hasContainerNotOnTable(row.original)) {
+        return {};
+      }
+
+      return {
+        disabled: true,
+        icon: <ErrorIcon titleAccess={SAMPLE_NOT_ON_TABLE} />,
+        checkedIcon: <ErrorIcon titleAccess={SAMPLE_NOT_ON_TABLE} />,
+      };
+    },
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
