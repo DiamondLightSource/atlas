@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c731cfba30bed7d89bb2b7b626f8cc04>>
+ * @generated SignedSource<<9c473f603b589c9fd2fab1aa81f93533>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -20,9 +20,12 @@ export type RenderSubmittedMessageTestQuery$variables = {
   visit: VisitInput;
 };
 export type RenderSubmittedMessageTestQuery$data = {
-  readonly workflow: {
-    readonly " $fragmentSpreads": FragmentRefs<"renderSubmittedMessageFragment">;
-  };
+  readonly workflow:
+    | {
+        readonly " $fragmentSpreads": FragmentRefs<"renderSubmittedMessageFragment">;
+      }
+    | null
+    | undefined;
 };
 export type RenderSubmittedMessageTestQuery = {
   response: RenderSubmittedMessageTestQuery$data;
