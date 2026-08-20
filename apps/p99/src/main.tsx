@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
+import { RelayEnvironment } from "./context/supergraph/RelayEnvironment.ts";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
