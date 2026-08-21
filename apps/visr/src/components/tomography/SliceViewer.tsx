@@ -9,7 +9,7 @@ interface Props {
   volumeShape: [number, number, number];
   plane: Plane;
   slice: number;
-  resizeKey?: string;
+  resizeKey?: string; //if this depends on a value, the plot will remount every time that value changes. If no need for it to remound, leave as undefined
 }
 export default function SliceViewer({
   volumeData,
@@ -41,14 +41,6 @@ export default function SliceViewer({
   }
 
   return (
-    // <Box
-    //   sx={{
-    //     width: "100%",
-    //     height: "100%",
-    //     minHeight: 0,
-    //     display: "flex",
-    //   }}
-    // >
     <Box
       sx={{
         flex: 1,
@@ -56,7 +48,7 @@ export default function SliceViewer({
         height: "100%",
         minHeight: 0,
         minWidth: 0,
-        display: "flex",
+        display: "grid",
       }}
     >
       <HeatmapPlot
@@ -68,6 +60,5 @@ export default function SliceViewer({
         customToolbarChildren={null}
       />
     </Box>
-    // </Box>
   );
 }

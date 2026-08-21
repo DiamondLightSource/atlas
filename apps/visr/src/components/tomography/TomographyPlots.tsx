@@ -30,7 +30,7 @@ function TomographyPlots({
     { i: "2", x: drawerOpen ? 2 : 2, y: 0, w: w, h: h, static: true },
   ];
 
-  const resizeKey = `${width}`; //`${drawerOpen}-${width}`;
+  const resizeKey = `${drawerOpen}`; // `${width}`; //`${drawerOpen}-${width}`;
 
   if (!volumeData) return <Box />;
 
