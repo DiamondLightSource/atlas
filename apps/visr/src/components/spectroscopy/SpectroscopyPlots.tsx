@@ -116,12 +116,20 @@ function SpectroscopyPlots({
         <Box
           key={i}
           sx={{
-            //display: "grid", //this makes the plots fill the parent box
-            display: "flex", //this fixes the centering issue of the plots when drawer is closed
-            flex: 1, //this option fixes the sizing issue when the window is resized
-            justifyContent: "center",
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            minHeight: 0,
             minWidth: 260,
+            display: "grid",
           }}
+          // sx={{
+          //   display: "grid", //this makes the plots fill the parent box
+          //   //display: "flex", //this fixes the centering issue of the plots when drawer is closed
+          //   flex: 1, //this option fixes the sizing issue when the window is resized
+          //   justifyContent: "center",
+          //   minWidth: 260,
+          // }}
         >
           <ImagePlot
             key={i}
@@ -139,11 +147,11 @@ function SpectroscopyPlots({
   return (
     <Box
       ref={containerRef! as React.RefObject<HTMLDivElement>}
-      sx={{ display: "flex" }}
+      sx={{ display: "grid" }}
     >
       {mounted && (
         <ReactGridLayout
-          key={width} //re-render the grid on width change so that plots resize correctly
+          //key={width} //re-render the grid on width change so that plots resize correctly
           layout={layout}
           width={width}
           gridConfig={{

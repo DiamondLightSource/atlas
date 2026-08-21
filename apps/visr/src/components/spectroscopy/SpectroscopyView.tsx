@@ -46,7 +46,7 @@ function SpectroscopyView() {
   return (
     <Box
       sx={{
-        display: "flex",
+        display: "grid",
         flexDirection: "column",
         flexGrow: 1,
         minWidth: drawerOpen ? 600 : 400,
