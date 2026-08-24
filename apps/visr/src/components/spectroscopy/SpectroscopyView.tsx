@@ -41,12 +41,12 @@ function SpectroscopyView() {
 
   const DRAWER_COLLAPSED_HEIGHT = 100;
   const NAVBAR_HEIGHT = 32;
-  const PLOT_ASPECT_RATIO = 0.75;
+  const PLOT_ASPECT_RATIO = "equal";
 
   return (
     <Box
       sx={{
-        display: "flex",
+        display: "grid",
         flexDirection: "column",
         flexGrow: 1,
         minWidth: drawerOpen ? 600 : 400,
