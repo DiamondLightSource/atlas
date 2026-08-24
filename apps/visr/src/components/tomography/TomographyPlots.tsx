@@ -91,7 +91,7 @@ function TomographyPlots({
         overflow: "hidden",
         borderRight: 1,
         borderColor: "divider",
-        minWidth: 260,
+        // minWidth: 260,
         maxHeight: gridHeight,
       }}
     >
@@ -100,6 +100,7 @@ function TomographyPlots({
         color="primary"
         borderBottom={1}
         borderColor={"divider"}
+        marginLeft={2}
       >
         {titles[i]}
       </Typography>
