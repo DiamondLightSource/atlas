@@ -4,6 +4,7 @@ import { ExperimentList } from "./ULIMSExperimentsTable";
 import * as apollo from "@apollo/client/react";
 import { MemoryRouter } from "react-router-dom";
 import * as queueService from "../../queue/queueService";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import * as appShell from "@atlas/app-shell";
 
 vi.mock("@apollo/client/react", async (importOriginal) => {
@@ -59,6 +60,9 @@ const mockExperiments = {
           name: "Exp 1",
           sample: {
             name: "Sample A",
+            container: {
+              parent: null,
+            },
             data: {
               density: 1.2,
               composition: "H2O",
@@ -79,6 +83,12 @@ const mockExperiments = {
           name: "Exp 2",
           sample: {
             name: "Sample B",
+            container: {
+              parent: {
+                id: "container-parent-id",
+                name: "i15-1 robot table",
+              },
+            },
             data: {
               density: 1.2,
               composition: "CO2",
@@ -94,15 +104,40 @@ const mockExperiments = {
           },
         },
       },
+      {
+        node: {
+          name: "Exp 3",
+          sample: {
+            name: "Sample B",
+            container: null,
+            data: {
+              density: 1.2,
+              composition: "CO2",
+            },
+          },
+          experimentDefinition: {
+            name: "Def 3",
+            data: {
+              beam_energy: 20,
+              time_per_pdf: 10,
+              focused_beam_size: 5,
+            },
+          },
+        },
+      },
     ],
   },
 };
 
+const testTheme = createTheme();
+
 const renderComponent = () =>
   render(
-    <MemoryRouter>
-      <ExperimentList />
-    </MemoryRouter>,
+    <ThemeProvider theme={testTheme}>
+      <MemoryRouter>
+        <ExperimentList />
+      </MemoryRouter>
+    </ThemeProvider>,
   );
 
 describe("ExperimentList", () => {
@@ -215,6 +250,9 @@ describe("ExperimentList", () => {
             sample: {
               data: { composition: "H2O", density: 1.2 },
               name: "Sample A",
+              container: {
+                parent: null,
+              },
             },
           },
         ],
@@ -246,30 +284,127 @@ describe("ExperimentList", () => {
           {
             name: "Exp 1",
             instrument_session: "",
-            experiment_definition: {
-              data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-              name: "Def 1",
-            },
             sample: {
-              data: { composition: "H2O", density: 1.2 },
               name: "Sample A",
+              container: {
+                parent: null,
+              },
+              data: {
+                density: 1.2,
+                composition: "H2O",
+              },
+            },
+            experiment_definition: {
+              name: "Def 1",
+              data: {
+                beam_energy: 20,
+                time_per_pdf: 10,
+                focused_beam_size: 5,
+              },
             },
           },
           {
             name: "Exp 2",
             instrument_session: "",
-            experiment_definition: {
-              data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-              name: "Def 2",
-            },
+
             sample: {
-              data: { composition: "CO2", density: 1.2 },
               name: "Sample B",
+              container: {
+                parent: {
+                  id: "container-parent-id",
+                  name: "i15-1 robot table",
+                },
+              },
+              data: {
+                density: 1.2,
+                composition: "CO2",
+              },
+            },
+            experiment_definition: {
+              name: "Def 2",
+              data: {
+                beam_energy: 20,
+                time_per_pdf: 10,
+                focused_beam_size: 5,
+              },
+            },
+          },
+          {
+            name: "Exp 3",
+            instrument_session: "",
+
+            sample: {
+              name: "Sample B",
+              container: null,
+              data: {
+                density: 1.2,
+                composition: "CO2",
+              },
+            },
+            experiment_definition: {
+              name: "Def 3",
+              data: {
+                beam_energy: 20,
+                time_per_pdf: 10,
+                focused_beam_size: 5,
+              },
             },
           },
         ],
       });
     });
+  });
+
+  it("highlights rows amber when the sample has no parent", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    const missingParentRow = screen.getByText("Exp 3").closest("tr");
+    const hasParentRow = screen.getByText("Exp 2").closest("tr");
+
+    expect(missingParentRow).toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(missingParentRow).toHaveAttribute(
+      "title",
+      "Sample is not in a container",
+    );
+
+    expect(hasParentRow).not.toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(hasParentRow).not.toHaveAttribute("title");
+  });
+
+  it("highlights rows amber when the sample container is not on the robot table", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    const notOnTableRow = screen.getByText("Exp 1").closest("tr");
+    const hasParentRow = screen.getByText("Exp 2").closest("tr");
+
+    expect(notOnTableRow).toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(notOnTableRow).toHaveAttribute(
+      "title",
+      "Sample container is not mounted on the robot table",
+    );
+
+    expect(hasParentRow).not.toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(hasParentRow).not.toHaveAttribute("title");
   });
 
   it("re-queries with new proposal/session when the instrument session changes", () => {
@@ -278,7 +413,6 @@ describe("ExperimentList", () => {
       loading: false,
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
-
     const { rerender } = render(
       <MemoryRouter>
         <ExperimentList />

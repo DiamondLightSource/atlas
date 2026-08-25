@@ -1,5 +1,6 @@
 import type {
   Experiment,
+  Sample,
   TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
@@ -15,9 +16,10 @@ export function calculateNewPosition(
   return newPosition;
 }
 
-export function positionFromName(name: string): string {
-  const parts = name.split("_");
-  return "Puck " + parts[1] + " | Pin " + parts[2];
+export function positionFromSample(sample: Sample): string {
+  const pin = sample.positionInContainer.position;
+  const puck = sample.container.positionInParent.position;
+  return `Puck ${puck} | Pin ${pin}`;
 }
 
 export function getTableData(
@@ -35,7 +37,7 @@ export function getTableData(
           id: task.id,
           instrumentSession: task.experiment.instrument_session,
           sampleId: exp.sample.id,
-          samplePosition: positionFromName(exp.sample.name),
+          samplePosition: positionFromSample(exp.sample),
           density: exp.sample.data.density as number,
           beamSize: exp.experiment_definition.data.focused_beam_size as number,
           timePerPDF: exp.experiment_definition.data.time_per_pdf as number,

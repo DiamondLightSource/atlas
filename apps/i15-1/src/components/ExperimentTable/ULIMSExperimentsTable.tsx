@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, useTheme } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -9,6 +9,7 @@ import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
+import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTasks } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
@@ -17,8 +18,8 @@ import type {
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
+import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
-
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -76,7 +77,10 @@ export function ExperimentList() {
 
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
     skip: !visit,
-    variables: { proposal: visit?.proposalNumber ?? 0, session: visit?.number ?? 0 },
+    variables: {
+      proposal: visit?.proposalNumber ?? 0,
+      session: visit?.number ?? 0,
+    },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
   });
@@ -93,15 +97,55 @@ export function ExperimentList() {
     );
   }, [typedExperiments]);
 
+  const experimentNotQueueable = (experiment: ExperimentTableData) => {
+    const container = experiment.experiment?.sample?.container;
+    if (container == null) {
+      return "Sample is not in a container";
+    }
+    if (
+      container.parent == null ||
+      container.parent.name !== ROBOT_TABLE_NAME
+    ) {
+      return "Sample container is not mounted on the robot table";
+    }
+
+    return "";
+  };
+
+  const theme = useTheme();
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: true,
+    muiSelectCheckboxProps: ({ row }) => {
+      const experimentErrorMessage = experimentNotQueueable(row.original);
+
+      if (experimentErrorMessage === "") {
+        return {};
+      }
+
+      return {
+        disabled: true,
+        icon: <ErrorIcon titleAccess={experimentErrorMessage} />,
+        checkedIcon: <ErrorIcon titleAccess={experimentErrorMessage} />,
+      };
+    },
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    muiTableBodyRowProps: ({ row }) => {
+      const experimentErrorMessage = experimentNotQueueable(row.original);
+
+      return {
+        sx: experimentErrorMessage
+          ? { backgroundColor: theme.palette.warning.light }
+          : undefined,
+        title: experimentErrorMessage ? experimentErrorMessage : undefined,
+      };
+    },
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 
@@ -158,9 +202,9 @@ export function ExperimentList() {
     },
     muiToolbarAlertBannerProps: error
       ? {
-        color: "error",
-        children: `Error: ${error.message}`,
-      }
+          color: "error",
+          children: `Error: ${error.message}`,
+        }
       : undefined,
   });
 
