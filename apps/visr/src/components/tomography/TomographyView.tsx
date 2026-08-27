@@ -6,10 +6,25 @@ import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 interface Volume {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
 }
+
+// ---------------------------------------------------------------------------
+// Layout constants
+// ---------------------------------------------------------------------------
+
+const DRAWER_COLLAPSED_HEIGHT = 80;
+const NAVBAR_HEIGHT = 32;
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
@@ -18,9 +33,10 @@ function TomographyView() {
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const DRAWER_COLLAPSED_HEIGHT = 80;
-  const NAVBAR_HEIGHT = 32;
 
+  // -------------------------------------------------------------------------
+  // Load test volume
+  // -------------------------------------------------------------------------
   useEffect(() => {
     async function loadTestVolume() {
       const [metaRes, rawRes] = await Promise.all([
@@ -40,7 +56,9 @@ function TomographyView() {
     loadTestVolume();
   }, []);
 
-  //use local storage to persist values across multiple open tabs
+  // -------------------------------------------------------------------------
+  // Persist values across multiple open tabs
+  // -------------------------------------------------------------------------
   useEffect(() => {
     localStorage.setItem("plane", plane.toString());
     localStorage.setItem("volumeVisible", volumeVisible.toString());
@@ -71,6 +89,9 @@ function TomographyView() {
     };
   }, []);
 
+  // -------------------------------------------------------------------------
+  // Handlers
+  // -------------------------------------------------------------------------
   const handleSlider = (event: Event, newValue: number | number[]) => {
     const slice = typeof newValue == "number" ? newValue : newValue[0];
     setSlice(slice);
@@ -85,6 +106,9 @@ function TomographyView() {
 
   if (!volume) return <Box />;
 
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
   return (
     <Box
       sx={{
@@ -100,7 +124,7 @@ function TomographyView() {
         volumeVisible={volumeVisible}
         plane={plane}
         slice={slice}
-        volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+        volumeShape={volume.volumeShape}
         drawerOpen={drawerOpen}
       />
       <ControlsDrawer
@@ -114,7 +138,7 @@ function TomographyView() {
             onSetDirection={handlePlane}
             plane={plane}
             slice={slice}
-            volumeShape={volume ? volume.volumeShape : [0, 0, 0]}
+            volumeShape={volume.volumeShape}
           />,
         ]}
       />
