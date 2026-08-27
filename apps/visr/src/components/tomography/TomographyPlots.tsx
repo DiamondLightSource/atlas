@@ -57,7 +57,7 @@ function TomographyPlots({
   // -------------------------------------------------------------------------
   const h = 10;
   const w = 1;
-  const minimumRowHeight = 40;
+  const minimumRowHeight = 30;
   const minimumGridHeight = minimumRowHeight * h;
   const [containerHeight, setContainerHeight] = useState(0);
 
