@@ -25,7 +25,7 @@ interface Props {
 
 function CamPva() {
   const [imgSrc, setImgSrc] = useState(
-    "https://visr-pvws.diamond.ac.uk/mjpg/BL01B-DI-CAM-01:PVA:OUTPUT",
+    "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-05:PVA:OUTPUT",
   );
 
   return (
