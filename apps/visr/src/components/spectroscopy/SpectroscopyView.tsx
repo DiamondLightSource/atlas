@@ -16,10 +16,20 @@ export type SpectroscopyFormData = {
   exposure_time: number;
 };
 
+// ---------------------------------------------------------------------------
+// Layout constants
+// ---------------------------------------------------------------------------
+
+const DRAWER_COLLAPSED_HEIGHT = 80;
+const NAVBAR_HEIGHT = 48;
+const PLOT_ASPECT_RATIO = "equal";
+
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
 
-  // set off workflow when scan ends
+  // -------------------------------------------------------------------------
+  // Set off workflow when scan ends
+  // -------------------------------------------------------------------------
   const scanEvent = useScanEvents();
   const { instrumentSession } = useInstrumentSession();
 
@@ -37,12 +47,14 @@ function SpectroscopyView() {
         "input-file-path": scanEvent.filepath,
       });
     }
-  });
+  }, [scanEvent, instrumentSession, submitWorkflow]);
 
-  const DRAWER_COLLAPSED_HEIGHT = 100;
-  const NAVBAR_HEIGHT = 32;
-  const PLOT_ASPECT_RATIO = 0.75;
-
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+  // Flex column, not grid: the plots take the remaining space via flex:1 1 0
+  // and the drawer keeps its own height. A grid would split the spare height
+  // evenly between the two rows instead.
   return (
     <Box
       sx={{

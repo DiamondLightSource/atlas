@@ -31,6 +31,7 @@ function ControlsDrawer({
           boxSizing: "border-box",
           bgcolor: "transparent",
           overflowY: "auto",
+          flexShrink: 0,
         },
       }}
     >
@@ -40,7 +41,7 @@ function ControlsDrawer({
           alignItems: "center",
           justifyContent: "space-between",
           px: 2,
-          height: 64,
+          height: 80,
           flexShrink: 0,
         }}
       >
