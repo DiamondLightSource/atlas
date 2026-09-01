@@ -3,13 +3,12 @@ import { graphql } from "relay-runtime";
 import type { InstrumentSessionQuery as InstrumentSessionQueryType } from "./__generated__/InstrumentSessionQuery.graphql";
 
 const instrumentSessionQuery = graphql`
-  query InstrumentSessionQuery($instrumentName: String!) {
-    instrumentByName(name: $instrumentName) {
+  query InstrumentSessionQuery($instrumentKey: String!) {
+    instrumentByKey(key: $instrumentKey) {
       instrumentSessions(filterBy: { state: { eq: IN_PROGRESS } }) {
         edges {
           node {
             instrumentSessionReference
-            state
           }
         }
       }
@@ -17,24 +16,15 @@ const instrumentSessionQuery = graphql`
   }
 `;
 
-function GetInstrumentSessions() {
+export function useInstrumentSessions() {
   const data = useLazyLoadQuery<InstrumentSessionQueryType>(
     instrumentSessionQuery,
-    { instrumentName: "ViSR" },
+    { instrumentKey: "B01-1" },
   );
 
-  const sessionListLen =
-    data.instrumentByName?.instrumentSessions.edges.length ?? 1;
-  const sessionsList = [];
-
-  for (let i = 0; i < sessionListLen; i++) {
-    sessionsList.push(
-      data.instrumentByName?.instrumentSessions.edges[
-        i
-      ].node.instrumentSessionReference?.toLowerCase(),
-    );
-  }
-  return sessionsList;
+  return (
+    data.instrumentByKey?.instrumentSessions.edges
+      .map(edge => edge.node.instrumentSessionReference?.toLowerCase())
+      .filter((session): session is string => session !== undefined) ?? []
+  );
 }
-
-export default GetInstrumentSessions;
