@@ -510,6 +510,16 @@ importers:
         specifier: '*'
         version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
 
+  packages/supergraph:
+    dependencies:
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
+    devDependencies:
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
+
   packages/vitest-conf:
     dependencies:
       vitest:
@@ -2306,6 +2316,9 @@ packages:
 
   '@types/relay-runtime@19.0.3':
     resolution: {integrity: sha512-pvpWWQq5e9KeESF8klQaP2igLLhr2bRd3XxVCxNpGElsPQiP6Mejr59RT9/OGY3O3i8jAGGQsshVe0QCQDbxNg==}
+
+  '@types/relay-runtime@20.1.1':
+    resolution: {integrity: sha512-loM2iJteknnJcsxrynmBVb7pIDkSkJUuCMnAa/oDFcrvaxkDvq8iy0J2UshMdDy14iJJocDblXeAu7c6Q1+Ucw==}
 
   '@types/relay-test-utils@19.0.0':
     resolution: {integrity: sha512-yC/wVgDetV+88HrHLKlesIfju3RGsp32vLs0IiwBPKD0npQSTrFddcP3FNPe5Kkk4/Y/kgY3oR/DA8g8Bmmppw==}
@@ -7731,6 +7744,8 @@ snapshots:
 
   '@types/relay-runtime@19.0.3': {}
 
+  '@types/relay-runtime@20.1.1': {}
+
   '@types/relay-test-utils@19.0.0':
     dependencies:
       '@types/react': 18.3.28
@@ -10217,7 +10232,7 @@ snapshots:
 
   react-relay@20.1.1(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       fbjs: 3.0.5
       invariant: 2.2.4
       nullthrows: 1.1.1
@@ -10372,7 +10387,7 @@ snapshots:
 
   relay-runtime@20.1.1:
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       fbjs: 3.0.5
       invariant: 2.2.4
     transitivePeerDependencies:
