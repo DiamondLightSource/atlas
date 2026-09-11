@@ -11,9 +11,10 @@ import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
-import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
+import { AuthContextProvider, createOAuth2ProxyProvider } from "@atlas/auth";
+import { createMockAuthProvider } from "@atlas/auth/mock";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -24,6 +25,10 @@ async function enableMocking() {
 
 const queryClient = new QueryClient();
 export const api = createApi("/api/blueapi");
+const authProvider = import.meta.env.DEV
+  ? createMockAuthProvider()
+  : createOAuth2ProxyProvider();
+
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -31,11 +36,11 @@ enableMocking().then(() => {
         <InstrumentSessionProvider>
           <RelayEnvironmentProvider environment={RelayEnvironment}>
             <QueryClientProvider client={queryClient}>
-              <UserAuthProvider>
+              <AuthContextProvider provider={authProvider}>
                 <BlueapiProvider api={api}>
                   <RouterProvider router={router} />
                 </BlueapiProvider>
-              </UserAuthProvider>
+              </AuthContextProvider>
             </QueryClientProvider>
           </RelayEnvironmentProvider>
         </InstrumentSessionProvider>
