@@ -668,9 +668,9 @@ export const handlers = [
     return HttpResponse.json(workerStatus.status);
   }),
 
-  http.get("/oauth2/userinfo", () => {
-    return HttpResponse.json({ preferredUsername: "abc123456" });
-  }),
+  // http.get("/oauth2/userinfo", () => {
+  //   return HttpResponse.json({ preferredUsername: "abc123456" });
+  // }),
 
   http.get("/api/blueapi/worker/state", () => {
     if (workerStatus.duration >= 10) {

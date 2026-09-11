@@ -36,6 +36,7 @@ const navigation: SectionGroup[] = [
         name: "Setup",
         icon: <SlidersHorizontal />,
         path: "setup",
+        isProtected: true,
         pages: [
           {
             name: "Playlist",
@@ -55,6 +56,7 @@ const navigation: SectionGroup[] = [
         name: "Acquisition",
         icon: <ScanQrCode />,
         path: "acquisition",
+        isProtected: true,
         pages: [
           {
             name: "Home",
@@ -78,6 +80,7 @@ const navigation: SectionGroup[] = [
         name: "Queue",
         icon: <ListTodo />,
         path: "queue",
+        isProtected: true,
         pages: [
           {
             name: "All queue tasks",
@@ -101,6 +104,7 @@ const navigation: SectionGroup[] = [
         name: "Log",
         icon: <ClipboardClock />,
         path: "log",
+        isProtected: true,
         pages: [{ name: "Log", element: <div /> }],
       },
     ],

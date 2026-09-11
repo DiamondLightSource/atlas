@@ -6,18 +6,23 @@ import { SidebarNav, type Navigation } from "./SidebarNav";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
+import { useAuth } from "@atlas/auth";
 
 export function toNavItemGroups(routerProps: RouterProps): Navigation {
+  const { isAuthenticated } = useAuth();
+
   return routerProps.navigation.map((group) => ({
     name: group.name,
-    navItems: group.sections.map((section) => ({
-      label: section.name,
-      icon: section.icon,
-      linkProps: {
-        to: routePath(section),
-        component: NavLink,
-      },
-    })),
+    navItems: group.sections
+      .filter((section) => isAuthenticated || !section.isProtected)
+      .map((section) => ({
+        label: section.name,
+        icon: section.icon,
+        linkProps: {
+          to: routePath(section),
+          component: NavLink,
+        },
+      })),
   }));
 }
 

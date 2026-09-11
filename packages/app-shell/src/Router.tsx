@@ -48,6 +48,8 @@ export interface Section extends LabelledRoute {
 
   /** First one is default */
   pages: Page[];
+
+  isProtected?: boolean;
 }
 
 export interface Page extends LabelledRoute {
