@@ -209,6 +209,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -264,6 +266,8 @@ const fakeHistory = [
                   composition: "Stuff",
                   packing_fraction: 0.5,
                 },
+                container: { positionInParent: { position: 2 } },
+                positionInContainer: { position: 1 },
               },
               experiment_definition: {
                 name: "run_full_collection",
@@ -319,6 +323,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 3 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -439,6 +445,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -515,7 +523,7 @@ const fakeQueue = [
       params: {
         time: 10,
       },
-      instrument_session: "string",
+      instrument_session: "cm44163-3",
     },
     id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
     status: "Queued",
@@ -526,7 +534,7 @@ const fakeQueue = [
           params: {
             time: 10,
           },
-          instrument_session: "string",
+          instrument_session: "cm44163-3",
         },
         parent_task_id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
         status: "Waiting",
@@ -537,7 +545,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 0,
+    position: 2,
     kind: "Plan",
   },
   {
@@ -553,6 +561,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 2 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -620,7 +630,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 1,
+    position: 3,
     kind: "Experiment",
   },
 ];
