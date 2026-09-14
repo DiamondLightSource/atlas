@@ -209,6 +209,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -264,6 +266,8 @@ const fakeHistory = [
                   composition: "Stuff",
                   packing_fraction: 0.5,
                 },
+                container: { positionInParent: { position: 2 } },
+                positionInContainer: { position: 1 },
               },
               experiment_definition: {
                 name: "run_full_collection",
@@ -319,6 +323,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 3 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -439,6 +445,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -553,6 +561,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 2 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
