@@ -523,7 +523,7 @@ const fakeQueue = [
       params: {
         time: 10,
       },
-      instrument_session: "string",
+      instrument_session: "cm44163-3",
     },
     id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
     status: "Queued",
@@ -534,7 +534,7 @@ const fakeQueue = [
           params: {
             time: 10,
           },
-          instrument_session: "string",
+          instrument_session: "cm44163-3",
         },
         parent_task_id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
         status: "Waiting",
@@ -545,7 +545,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 0,
+    position: 2,
     kind: "Plan",
   },
   {
@@ -630,7 +630,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 1,
+    position: 3,
     kind: "Experiment",
   },
 ];
