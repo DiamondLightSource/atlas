@@ -8,30 +8,13 @@ export type ClientOptions = {
  * AppConfig
  */
 export type AppConfig = {
-  blueapi: ApplicationConfig;
+  blueapi: BlueapiConfig;
   converter: ConverterConfig;
-};
-
-/**
- * ApplicationConfig
- *
- * Config for the worker application as a whole. Root of
- * config tree.
- */
-export type ApplicationConfig = {
-  stomp?: StompConfig;
-  tiled?: TiledConfig;
-  env?: EnvironmentConfig;
-  logging?: LoggingConfig;
-  api?: RestConfig;
-  scratch?: ScratchConfig | null;
   oidc?: OidcConfig | null;
   /**
-   * Auth Token Path
+   * Authorisation Whitelist
    */
-  auth_token_path?: string | null;
-  numtracker?: NumtrackerConfig | null;
-  opa?: OpaConfig | null;
+  authorisation_whitelist?: Array<string> | null;
 };
 
 /**
@@ -81,6 +64,14 @@ export type BlueapiCallResponse = {
    * Blueapi Id
    */
   blueapi_id: string | null;
+};
+
+/**
+ * BlueapiConfig
+ */
+export type BlueapiConfig = {
+  stomp?: StompConfig;
+  api?: RestConfig;
 };
 
 /**
@@ -146,48 +137,6 @@ export type ConverterConfig = {
 };
 
 /**
- * DeviceManagerSource
- */
-export type DeviceManagerSource = {
-  /**
-   * Module
-   *
-   * Module to be imported
-   */
-  module: string;
-  /**
-   * Kind
-   */
-  kind?: 'deviceManager';
-  /**
-   * Mock
-   *
-   * If true, ophyd_async device connections are mocked
-   */
-  mock?: boolean;
-  /**
-   * Name
-   *
-   * Name of the device manager in the module
-   */
-  name?: string;
-};
-
-/**
- * EnvironmentConfig
- *
- * Config for the RunEngine environment
- */
-export type EnvironmentConfig = {
-  /**
-   * Sources
-   */
-  sources?: Array<PlanSource | DeviceManagerSource>;
-  events?: WorkerEventConfig;
-  metadata?: MetadataConfig | null;
-};
-
-/**
  * Experiment
  */
 export type Experiment = {
@@ -199,7 +148,7 @@ export type Experiment = {
    * Instrument Session
    */
   instrument_session: string;
-  sample: Sample;
+  sample: Sample | null;
   experiment_definition: ExperimentDefinition;
 };
 
@@ -224,20 +173,6 @@ export type ExperimentDefinition = {
 };
 
 /**
- * GraylogConfig
- */
-export type GraylogConfig = {
-  /**
-   * Enabled
-   */
-  enabled?: boolean;
-  /**
-   * Url
-   */
-  url?: string;
-};
-
-/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -248,41 +183,6 @@ export type HttpValidationError = {
 };
 
 /**
- * LoggingConfig
- */
-export type LoggingConfig = {
-  /**
-   * Level
-   */
-  level?: 'NOTSET' | 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
-  graylog?: GraylogConfig;
-};
-
-/**
- * MetadataConfig
- */
-export type MetadataConfig = {
-  /**
-   * Instrument
-   */
-  instrument: string;
-};
-
-/**
- * NumtrackerConfig
- */
-export type NumtrackerConfig = {
-  /**
-   * Url
-   */
-  url?: string;
-  /**
-   * Detector File Template
-   */
-  detector_file_template?: string;
-};
-
-/**
  * OIDCConfig
  */
 export type OidcConfig = {
@@ -290,16 +190,8 @@ export type OidcConfig = {
    * Well Known Url
    *
    * URL to fetch OIDC config from the provider
-   *
-   * @deprecated
    */
-  well_known_url?: string | null;
-  /**
-   * Issuer
-   *
-   * URL of OIDC provider
-   */
-  issuer?: string | null;
+  well_known_url: string;
   /**
    * Client Id
    *
@@ -321,51 +213,9 @@ export type OidcConfig = {
 };
 
 /**
- * OpaConfig
- */
-export type OpaConfig = {
-  /**
-   * Root
-   */
-  root?: string;
-  /**
-   * Audience
-   */
-  audience?: string;
-  /**
-   * Tiled Service Account Check
-   */
-  tiled_service_account_check: string;
-  /**
-   * Submit Task Check
-   */
-  submit_task_check: string;
-  /**
-   * Admin Check
-   */
-  admin_check: string;
-};
-
-/**
  * PauseReason
  */
 export type PauseReason = 'Pause requested by user' | 'Paused as queue completed' | 'Paused as last task errored';
-
-/**
- * PlanSource
- */
-export type PlanSource = {
-  /**
-   * Module
-   *
-   * Module to be imported
-   */
-  module: string;
-  /**
-   * Kind
-   */
-  kind?: 'planFunctions';
-};
 
 /**
  * QueueState
@@ -419,70 +269,6 @@ export type Sample = {
   };
   container: Container;
   positionInContainer: ContainerPosition;
-};
-
-/**
- * ScratchConfig
- */
-export type ScratchConfig = {
-  /**
-   * Root
-   *
-   * The root directory of the scratch area, all repositories will be cloned under this directory.
-   */
-  root?: string;
-  /**
-   * Required Gid
-   *
-   *
-   * Required owner GID for the scratch directory. If supplied, the setup-scratch
-   * command will check the scratch area ownership and raise an error if it is
-   * not owned by <GID>, or if it does not have SGID permission bit set.
-   *
-   */
-  required_gid?: number | null;
-  /**
-   * Repositories
-   *
-   * Details of repositories to be cloned and imported into blueapi
-   */
-  repositories?: Array<ScratchRepository>;
-};
-
-/**
- * ScratchRepository
- */
-export type ScratchRepository = {
-  /**
-   * Name
-   *
-   * Unique name for this repository in the scratch directory
-   */
-  name?: string;
-  /**
-   * Remote Url
-   *
-   * URL to clone from
-   */
-  remote_url?: string;
-  /**
-   * Target Revision
-   *
-   * Revision (branch or tag) to check out when cloning - defaults to remote's HEAD. If a tag is used, the repo will be left in a 'detached head' state.
-   */
-  target_revision?: string;
-};
-
-/**
- * ServiceAccount
- */
-export type ServiceAccount = {
-  /**
-   * Client Id
-   *
-   * Service account client ID
-   */
-  client_id?: string;
 };
 
 /**
@@ -621,28 +407,25 @@ export type TaskWithPosition = {
    */
   position: number | null;
   kind: TaskKind;
+  user: User | null;
 };
 
 /**
- * TiledConfig
+ * User
  */
-export type TiledConfig = {
+export type User = {
   /**
-   * Enabled
-   *
-   * True if blueapi should forward data to a Tiled instance
+   * Fedid
    */
-  enabled?: boolean;
+  fedid: string;
   /**
-   * Url
+   * Email
    */
-  url?: string;
+  email?: string | null;
   /**
-   * Authentication
-   *
-   * Tiled Authentication can be API_KEY or OIDC Service account
+   * Name
    */
-  authentication?: string | ServiceAccount | null;
+  name?: string | null;
 };
 
 /**
@@ -673,86 +456,18 @@ export type ValidationError = {
   };
 };
 
-/**
- * WorkerEventConfig
- *
- * Config for event broadcasting via the message bus
- */
-export type WorkerEventConfig = {
-  /**
-   * Broadcast Status Events
-   */
-  broadcast_status_events?: boolean;
+export type ReadRootGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/';
 };
 
-/**
- * AppConfig
- */
-export type AppConfigWritable = {
-  blueapi: ApplicationConfigWritable;
-  converter: ConverterConfig;
-};
-
-/**
- * ApplicationConfig
- *
- * Config for the worker application as a whole. Root of
- * config tree.
- */
-export type ApplicationConfigWritable = {
-  stomp?: StompConfig;
-  tiled?: TiledConfigWritable;
-  env?: EnvironmentConfig;
-  logging?: LoggingConfig;
-  api?: RestConfig;
-  scratch?: ScratchConfig | null;
-  oidc?: OidcConfig | null;
+export type ReadRootGetResponses = {
   /**
-   * Auth Token Path
+   * Successful Response
    */
-  auth_token_path?: string | null;
-  numtracker?: NumtrackerConfig | null;
-  opa?: OpaConfig | null;
-};
-
-/**
- * ServiceAccount
- */
-export type ServiceAccountWritable = {
-  /**
-   * Client Id
-   *
-   * Service account client ID
-   */
-  client_id?: string;
-  /**
-   * Client Secret
-   *
-   * Service account client secret
-   */
-  client_secret?: string;
-};
-
-/**
- * TiledConfig
- */
-export type TiledConfigWritable = {
-  /**
-   * Enabled
-   *
-   * True if blueapi should forward data to a Tiled instance
-   */
-  enabled?: boolean;
-  /**
-   * Url
-   */
-  url?: string;
-  /**
-   * Authentication
-   *
-   * Tiled Authentication can be API_KEY or OIDC Service account
-   */
-  authentication?: string | ServiceAccountWritable | null;
+  200: unknown;
 };
 
 export type HealthzHealthzGetData = {
@@ -768,36 +483,6 @@ export type HealthzHealthzGetResponses = {
    */
   200: unknown;
 };
-
-export type ReadRootGetData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/';
-};
-
-export type ReadRootGetResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type GetConfigConfigGetData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/config';
-};
-
-export type GetConfigConfigGetResponses = {
-  /**
-   * Successful Response
-   */
-  200: AppConfig;
-};
-
-export type GetConfigConfigGetResponse = GetConfigConfigGetResponses[keyof GetConfigConfigGetResponses];
 
 export type GetQueueStateQueueStateGetData = {
   body?: never;
@@ -839,6 +524,22 @@ export type UpdateQueueStateQueueStatePatchResponses = {
 };
 
 export type UpdateQueueStateQueueStatePatchResponse = UpdateQueueStateQueueStatePatchResponses[keyof UpdateQueueStateQueueStatePatchResponses];
+
+export type GetConfigConfigGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/config';
+};
+
+export type GetConfigConfigGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: AppConfig;
+};
+
+export type GetConfigConfigGetResponse = GetConfigConfigGetResponses[keyof GetConfigConfigGetResponses];
 
 export type CancelAllTasksQueueDeleteData = {
   body?: never;
