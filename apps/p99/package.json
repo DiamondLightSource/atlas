@@ -18,9 +18,11 @@
     "@atlas/app-shell": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
+    "@diamondlightsource/davidia": "^1.1.0",
     "@diamondlightsource/sci-react-ui": "^0.6.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@h5web/lib": "^15.0.0",
     "@jsonforms/core": "3.6.0",
     "@jsonforms/material-renderers": "3.6.0",
     "@jsonforms/react": "3.6.0",
@@ -31,12 +33,15 @@
     "ajv": "^8.20.0",
     "axios": "^1.18.0",
     "lucide-react": "^1.18.0",
+    "ndarray": "^1.0.19",
     "react-relay": "^20.1.1",
-    "relay-runtime": "^20.1.1"
+    "relay-runtime": "^20.1.1",
+    "three": "^0.164.1"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
     "@eslint/js": "^9.39.4",
+    "@types/ndarray": "^1.0.14",
     "@types/react-relay": "^18.2.1",
     "@types/relay-runtime": "^19.0.3",
     "@types/relay-test-utils": "^19.0.0",
