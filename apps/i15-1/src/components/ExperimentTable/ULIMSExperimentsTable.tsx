@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client/react";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, useTheme } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -9,7 +9,8 @@ import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
-import { useSumbitQueueTask } from "../../queue/queueService";
+import ErrorIcon from "@mui/icons-material/Error";
+import { useSumbitQueueTasks } from "../../queue/queueService";
 import { getSessionPlaylistQuery } from "../../graphql/getSessionPlaylistQuery";
 import { type ExperimentNode } from "../../graphql/getSessionPlaylistQueryTyped";
 import type {
@@ -17,6 +18,7 @@ import type {
   GetSessionPlaylistQuery,
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
+import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
 
 export type ExperimentDefinitionData = {
@@ -55,24 +57,20 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 export function ExperimentList() {
   const location = useLocation();
   const { instrumentSession } = useInstrumentSession();
-  const { mutateAsync: submitTaskAsync } = useSumbitQueueTask();
+  const { mutateAsync: submitTasksAsync } = useSumbitQueueTasks();
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
-    await Promise.all(
-      selected.map((exp) =>
-        submitTaskAsync({
-          experiment: {
-            name: exp.experiment.name,
-            experiment_definition: exp.experiment
-              .experimentDefinition as ExperimentDefinition,
-            sample: exp.experiment.sample as Sample,
-            instrument_session:
-              exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
-              "",
-          },
-        }),
-      ),
-    );
+    await submitTasksAsync({
+      experiments: selected.map((exp) => ({
+        name: exp.experiment.name,
+        experiment_definition: exp.experiment
+          .experimentDefinition as ExperimentDefinition,
+        sample: exp.experiment.sample as Sample,
+        instrument_session:
+          exp.experiment.sample.instrumentSessions?.[0]?.instrumentSessionReference?.toLowerCase() ??
+          "",
+      })),
+    });
   }
 
   const visit = visitTextToVisit(instrumentSession ?? "cm0-0");
@@ -99,15 +97,55 @@ export function ExperimentList() {
     );
   }, [typedExperiments]);
 
+  const experimentNotQueueable = (experiment: ExperimentTableData) => {
+    const container = experiment.experiment?.sample?.container;
+    if (container == null) {
+      return "Sample is not in a container";
+    }
+    if (
+      container.parent == null ||
+      container.parent.name !== ROBOT_TABLE_NAME
+    ) {
+      return "Sample container is not mounted on the robot table";
+    }
+
+    return "";
+  };
+
+  const theme = useTheme();
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: true,
+    muiSelectCheckboxProps: ({ row }) => {
+      const experimentErrorMessage = experimentNotQueueable(row.original);
+
+      if (experimentErrorMessage === "") {
+        return {};
+      }
+
+      return {
+        disabled: true,
+        icon: <ErrorIcon titleAccess={experimentErrorMessage} />,
+        checkedIcon: <ErrorIcon titleAccess={experimentErrorMessage} />,
+      };
+    },
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    muiTableBodyRowProps: ({ row }) => {
+      const experimentErrorMessage = experimentNotQueueable(row.original);
+
+      return {
+        sx: experimentErrorMessage
+          ? { backgroundColor: theme.palette.warning.light }
+          : undefined,
+        title: experimentErrorMessage ? experimentErrorMessage : undefined,
+      };
+    },
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
@@ -9,12 +9,14 @@ interface Props {
   volumeShape: [number, number, number];
   plane: Plane;
   slice: number;
+  resizeKey?: string; //if this depends on a value, the plot will remount every time that value changes. If no need for it to remound, leave as undefined
 }
 export default function SliceViewer({
   volumeData,
   volumeShape,
   plane,
   slice,
+  resizeKey,
 }: Props) {
   if (volumeData == undefined || volumeShape == undefined) {
     return <Box />;
@@ -39,44 +41,13 @@ export default function SliceViewer({
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        borderRight: 1,
-        borderColor: "divider",
-      }}
-    >
-      <Box
-        sx={{
-          px: 2,
-          py: 1.25,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Typography variant="overline" color="primary">
-          Slice View
-        </Typography>
-      </Box>
-      <div
-        style={{
-          flex: 1,
-          justifyContent: "center",
-        }}
-      >
-        <HeatmapPlot
-          aspect="auto"
-          plotConfig={{}}
-          values={sliceNdarray}
-          domain={[0, 255]}
-          customToolbarChildren={null}
-        />
-      </div>
-    </Box>
+    <HeatmapPlot
+      key={resizeKey}
+      aspect={"equal"}
+      plotConfig={{}}
+      values={sliceNdarray}
+      domain={[0, 255]}
+      customToolbarChildren={null}
+    />
   );
 }

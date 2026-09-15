@@ -1,5 +1,6 @@
 import { http, HttpResponse, ws, passthrough } from "msw";
 import plansResponse from "./plans-response.json";
+import { ROBOT_TABLE_NAME } from "../components/PucksTable/PucksTable";
 
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 
@@ -14,6 +15,14 @@ const fakeExperiments = {
           node: {
             name: "Test experiment",
             sample: {
+              container: {
+                id: "019fae86-1551-74f2-b876-f2b5dd4dbb43",
+                positionInParent: null,
+                parent: null,
+              },
+              positionInContainer: {
+                position: 3,
+              },
               name: "Test_8_1",
               id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
               instrumentSessions: [
@@ -45,6 +54,19 @@ const fakeExperiments = {
           node: {
             name: "Test experiment 2",
             sample: {
+              container: {
+                id: "019fae86-1551-74f2-b876-f2b5dd4dbb43",
+                positionInParent: {
+                  position: 1,
+                },
+                parent: {
+                  id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+                  name: ROBOT_TABLE_NAME,
+                },
+              },
+              positionInContainer: {
+                position: 2,
+              },
               name: "Test_8_2",
               id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
               instrumentSessions: [
@@ -208,6 +230,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -263,6 +287,8 @@ const fakeHistory = [
                   composition: "Stuff",
                   packing_fraction: 0.5,
                 },
+                container: { positionInParent: { position: 2 } },
+                positionInContainer: { position: 1 },
               },
               experiment_definition: {
                 name: "run_full_collection",
@@ -318,6 +344,8 @@ const fakeHistory = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 3 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -438,6 +466,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 1 } },
+        positionInContainer: { position: 1 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -514,7 +544,7 @@ const fakeQueue = [
       params: {
         time: 10,
       },
-      instrument_session: "string",
+      instrument_session: "cm44163-3",
     },
     id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
     status: "Queued",
@@ -525,7 +555,7 @@ const fakeQueue = [
           params: {
             time: 10,
           },
-          instrument_session: "string",
+          instrument_session: "cm44163-3",
         },
         parent_task_id: "1c27208a-ad57-48ed-bae0-fd36ec683230",
         status: "Waiting",
@@ -536,7 +566,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 0,
+    position: 2,
     kind: "Plan",
   },
   {
@@ -552,6 +582,8 @@ const fakeQueue = [
           composition: "Stuff",
           packing_fraction: 0.5,
         },
+        container: { positionInParent: { position: 2 } },
+        positionInContainer: { position: 2 },
       },
       experiment_definition: {
         name: "run_full_collection",
@@ -619,7 +651,7 @@ const fakeQueue = [
         blueapi_id: null,
       },
     ],
-    position: 1,
+    position: 3,
     kind: "Experiment",
   },
 ];
