@@ -2,6 +2,7 @@ import {
   DiamondDSTheme,
   ThemeProvider,
 } from "@diamondlightsource/sci-react-ui";
+import "@diamondlightsource/sci-react-ui/font-styles.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import Dashboard from "./routes/Dashboard.tsx";
