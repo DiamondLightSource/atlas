@@ -1,0 +1,471 @@
+{
+  "data": [
+    {
+      "id": "ccd49f4d-ae6e-4db7-ab89-552f7fd046a2",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "5b619d41-b078-4f84-b234-c977757d4ef0",
+            "time": 1782826892.9617522,
+            "reason": "",
+            "run_start": "ccd49f4d-ae6e-4db7-ab89-552f7fd046a2",
+            "num_events": { "primary": 49 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "ccd49f4d-ae6e-4db7-ab89-552f7fd046a2",
+            "time": 1782826880.3501267,
+            "user": "wvx67826",
+            "scan_id": 7,
+            "versions": {
+              "ophyd": "1.11.2",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.19.3"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-bs-7",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/dls/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2"
+      },
+      "meta": null
+    },
+    {
+      "id": "f38d94c7-5897-4b80-a0e2-d75e04c82e43",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "8f86d13f-7dba-4716-b8d6-04fa62172483",
+            "time": 1782309458.4686759,
+            "reason": "",
+            "run_start": "f38d94c7-5897-4b80-a0e2-d75e04c82e43",
+            "num_events": { "primary": 17 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "f38d94c7-5897-4b80-a0e2-d75e04c82e43",
+            "time": 1782309448.9730556,
+            "user": "wvx67826",
+            "scan_id": 6,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-bs-6",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/dls/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/f38d94c7-5897-4b80-a0e2-d75e04c82e43",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/f38d94c7-5897-4b80-a0e2-d75e04c82e43",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/f38d94c7-5897-4b80-a0e2-d75e04c82e43"
+      },
+      "meta": null
+    },
+    {
+      "id": "9a0ed790-4767-4b54-92b2-21b818150255",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "f046b8ac-5b8f-4f6c-8600-517345f399ce",
+            "time": 1782307265.558766,
+            "reason": "",
+            "run_start": "9a0ed790-4767-4b54-92b2-21b818150255",
+            "num_events": { "primary": 20 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "9a0ed790-4767-4b54-92b2-21b818150255",
+            "time": 1782307257.1254478,
+            "user": "wvx67826",
+            "scan_id": 5,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-bs-5",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/dls/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/9a0ed790-4767-4b54-92b2-21b818150255",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/9a0ed790-4767-4b54-92b2-21b818150255",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/9a0ed790-4767-4b54-92b2-21b818150255"
+      },
+      "meta": null
+    },
+    {
+      "id": "8fdd81d1-a248-46f2-b04a-2bfabb0349a5",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "b584c591-c95d-4efb-a99c-5459c0d0fa31",
+            "time": 1782307167.134837,
+            "reason": "",
+            "run_start": "8fdd81d1-a248-46f2-b04a-2bfabb0349a5",
+            "num_events": { "primary": 21 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "8fdd81d1-a248-46f2-b04a-2bfabb0349a5",
+            "time": 1782307158.7149749,
+            "user": "wvx67826",
+            "scan_id": 4,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-bs-4",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/dls/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/8fdd81d1-a248-46f2-b04a-2bfabb0349a5",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/8fdd81d1-a248-46f2-b04a-2bfabb0349a5",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/8fdd81d1-a248-46f2-b04a-2bfabb0349a5"
+      },
+      "meta": null
+    },
+    {
+      "id": "faf4b726-ec2b-4a87-b068-8339027f652f",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "73fe0718-c591-4d99-bf93-0caf90a7fa7f",
+            "time": 1782307028.0129292,
+            "reason": "",
+            "run_start": "faf4b726-ec2b-4a87-b068-8339027f652f",
+            "num_events": { "primary": 20 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "faf4b726-ec2b-4a87-b068-8339027f652f",
+            "time": 1782307019.7223997,
+            "user": "wvx67826",
+            "scan_id": 3,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-3",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/dls/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/faf4b726-ec2b-4a87-b068-8339027f652f",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/faf4b726-ec2b-4a87-b068-8339027f652f",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/faf4b726-ec2b-4a87-b068-8339027f652f"
+      },
+      "meta": null
+    },
+    {
+      "id": "cdcafd18-0085-4bf8-a014-6ccf42e862bf",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "65a9d5b9-2046-49f4-baa3-8c7f4db6b4c3",
+            "time": 1782306612.5770347,
+            "reason": "",
+            "run_start": "cdcafd18-0085-4bf8-a014-6ccf42e862bf",
+            "num_events": { "primary": 20 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "cdcafd18-0085-4bf8-a014-6ccf42e862bf",
+            "time": 1782306604.2772295,
+            "user": "wvx67826",
+            "scan_id": 2,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "scan_file": "p99-2",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2",
+            "data_session_directory": "/data/p99/data/2026/cm44186-2",
+            "detector_file_template": "{instrument}-{scan_id}-{device_name}"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/cdcafd18-0085-4bf8-a014-6ccf42e862bf",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/cdcafd18-0085-4bf8-a014-6ccf42e862bf",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/cdcafd18-0085-4bf8-a014-6ccf42e862bf"
+      },
+      "meta": null
+    },
+    {
+      "id": "354d64d8-524e-41f8-9334-9c023daeedd2",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "e70ca6ae-21c2-429a-87c0-aa434b0e53bd",
+            "time": 1781857400.8782716,
+            "reason": "<AsyncStatus, device: andor2_det, task: <coroutine object AsyncStatusBase.__init__.<locals>.wait_with_error_message at 0x7f884dc57840>, errored: AssertionError()>",
+            "run_start": "354d64d8-524e-41f8-9334-9c023daeedd2",
+            "num_events": {},
+            "exit_status": "fail"
+          },
+          "start": {
+            "uid": "354d64d8-524e-41f8-9334-9c023daeedd2",
+            "time": 1781857398.646841,
+            "user": "wvx67826",
+            "scan_id": 1,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2"
+          }
+        },
+        "structure": { "contents": null, "count": 0 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/354d64d8-524e-41f8-9334-9c023daeedd2",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/354d64d8-524e-41f8-9334-9c023daeedd2",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/354d64d8-524e-41f8-9334-9c023daeedd2"
+      },
+      "meta": null
+    },
+    {
+      "id": "cf187b93-26c7-496c-b706-7cf058d07272",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "846f6a35-d42e-4f97-942b-f8cafa984c71",
+            "time": 1781799298.2311933,
+            "reason": "",
+            "run_start": "cf187b93-26c7-496c-b706-7cf058d07272",
+            "num_events": { "primary": 209 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "cf187b93-26c7-496c-b706-7cf058d07272",
+            "time": 1781799245.5052104,
+            "user": "wvx67826",
+            "scan_id": 4,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/cf187b93-26c7-496c-b706-7cf058d07272",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/cf187b93-26c7-496c-b706-7cf058d07272",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/cf187b93-26c7-496c-b706-7cf058d07272"
+      },
+      "meta": null
+    },
+    {
+      "id": "97cc1763-f4a2-4135-8e35-493a5f5f754f",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "1eede080-059f-49a9-b449-7c5596f0ba47",
+            "time": 1781798509.4805417,
+            "reason": "",
+            "run_start": "97cc1763-f4a2-4135-8e35-493a5f5f754f",
+            "num_events": { "primary": 23 },
+            "exit_status": "success"
+          },
+          "start": {
+            "uid": "97cc1763-f4a2-4135-8e35-493a5f5f754f",
+            "time": 1781798503.4633725,
+            "user": "wvx67826",
+            "scan_id": 3,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2"
+          }
+        },
+        "structure": { "contents": null, "count": 1 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/97cc1763-f4a2-4135-8e35-493a5f5f754f",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/97cc1763-f4a2-4135-8e35-493a5f5f754f",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/97cc1763-f4a2-4135-8e35-493a5f5f754f"
+      },
+      "meta": null
+    },
+    {
+      "id": "1896cab9-2cfe-4fd3-98dd-03854f9e0b8b",
+      "attributes": {
+        "ancestors": [],
+        "structure_family": "container",
+        "specs": [{ "name": "BlueskyRun", "version": "3.0" }],
+        "metadata": {
+          "stop": {
+            "uid": "e5665978-08a8-4743-bb4e-fecb342b968e",
+            "time": 1781798482.8104072,
+            "reason": "<AsyncStatus, device: sample_stage-x, task: <coroutine object AsyncStatusBase.__init__.<locals>.wait_with_error_message at 0x7fd97938f240>, errored: MotorLimitsError('Velocity 1.0 mm/s was requested for a motor  with max speed of 0.6 mm/s')>",
+            "run_start": "1896cab9-2cfe-4fd3-98dd-03854f9e0b8b",
+            "num_events": {},
+            "exit_status": "fail"
+          },
+          "start": {
+            "uid": "1896cab9-2cfe-4fd3-98dd-03854f9e0b8b",
+            "time": 1781798482.642141,
+            "user": "wvx67826",
+            "scan_id": 2,
+            "versions": {
+              "ophyd": "1.11.1",
+              "bluesky": "1.15.0",
+              "event_model": "1.23.1",
+              "ophyd_async": "0.16"
+            },
+            "plan_name": "",
+            "plan_type": "Plan",
+            "instrument": "p99",
+            "instrument_session": "cm44186-2"
+          }
+        },
+        "structure": { "contents": null, "count": 0 },
+        "access_blob": { "tags": ["27566922"] },
+        "sorting": [{ "key": "", "direction": 1 }],
+        "data_sources": null
+      },
+      "links": {
+        "self": "https://tiled-ui.diamond.ac.uk/api/v1/metadata/1896cab9-2cfe-4fd3-98dd-03854f9e0b8b",
+        "search": "https://tiled-ui.diamond.ac.uk/api/v1/search/1896cab9-2cfe-4fd3-98dd-03854f9e0b8b",
+        "full": "https://tiled-ui.diamond.ac.uk/api/v1/container/full/1896cab9-2cfe-4fd3-98dd-03854f9e0b8b"
+      },
+      "meta": null
+    }
+  ],
+  "error": null,
+  "links": {
+    "self": "https://tiled-ui.diamond.ac.uk/api/v1/search/?page[offset]=0&page[limit]=10",
+    "first": "https://tiled-ui.diamond.ac.uk/api/v1/search/?page[offset]=0&page[limit]=10",
+    "last": "https://tiled-ui.diamond.ac.uk/api/v1/search/?page[offset]=10&page[limit]=10",
+    "next": "https://tiled-ui.diamond.ac.uk/api/v1/search/?page[offset]=10&page[limit]=10",
+    "prev": null
+  },
+  "meta": { "count": 11 }
+}
