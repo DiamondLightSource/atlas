@@ -22,17 +22,19 @@ export function AppProviders({ api, theme, children }: Props) {
   const config = useLoadPvwsConfig();
   return (
     <ThemeProvider theme={theme}>
-      <InstrumentSessionProvider sessionsList={["cm44163-3", "cm44163-4"]}>
-        <ReduxProvider store={store(config)}>
-          <QueryClientProvider client={new QueryClient()}>
-            <UserAuthProvider>
-              <BlueapiProvider api={api}>
-                <ApolloProvider client={client}>{children}</ApolloProvider>
-              </BlueapiProvider>
-            </UserAuthProvider>
-          </QueryClientProvider>
-        </ReduxProvider>
-      </InstrumentSessionProvider>
+      <ReduxProvider store={store(config)}>
+        <QueryClientProvider client={new QueryClient()}>
+          <UserAuthProvider>
+            <BlueapiProvider api={api}>
+              <ApolloProvider client={client}>
+                <InstrumentSessionProvider>
+                  {children}
+                </InstrumentSessionProvider>
+              </ApolloProvider>
+            </BlueapiProvider>
+          </UserAuthProvider>
+        </QueryClientProvider>
+      </ReduxProvider>
     </ThemeProvider>
   );
 }

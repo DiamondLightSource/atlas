@@ -1,7 +1,11 @@
 import { render, screen, userEvent, within } from "@atlas/vitest-conf";
 import { InstrumentSessionView } from "./InstrumentSessionView";
-import { InstrumentSessionProvider } from "./InstrumentSessionProvider";
+import {
+  InstrumentSessionProvider,
+  useInstrumentSession,
+} from "./InstrumentSessionProvider";
 import { describe, it, expect, vi } from "vitest";
+import { isValidElement } from "react";
 
 function renderComponentWithProvider() {
   return render(
@@ -16,26 +20,74 @@ vi.mock(import("./InstrumentSessionProvider"), async (importOriginal) => {
     await importOriginal<typeof import("./InstrumentSessionProvider")>();
   return {
     ...actual,
-    useInstrumentSession: () => ({
-      instrumentSession: "cm54321-1",
-      setInstrumentSession: vi.fn(),
-      sessionsList: ["cm123-4", "cm567-8"],
-    }),
+    useInstrumentSession: vi.fn(),
   };
 });
 
 describe("InstrumentSessionView", () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.clearAllMocks();
   });
 
   it("shows only the current instrument session", () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
     renderComponentWithProvider();
+
     expect(screen.getByTestId("session-input-button")).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-button")).toHaveTextContent(
+      "cm54321-1",
+    );
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
   });
 
+  it("shows a static button when only one session is available", () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm54321-1"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    expect(
+      screen.getByTestId("session-input-staticButton"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
+      "cm54321-1",
+    );
+  });
+
+  it("shows no session selected when there is no session selected", () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    expect(screen.getByTestId("session-input-button")).toHaveTextContent(
+      "No Session Selected",
+    );
+  });
+
   it("shows sessions from the provided sessions list when clicked", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
     renderComponentWithProvider();
 
     const user = userEvent.setup();
@@ -46,6 +98,13 @@ describe("InstrumentSessionView", () => {
   });
 
   it("closes menu when a menu item has been clicked", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
     renderComponentWithProvider();
 
     const user = userEvent.setup();
@@ -57,6 +116,13 @@ describe("InstrumentSessionView", () => {
   });
 
   it("closes menu when button has been clicked again", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: "cm54321-1",
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm123-4", "cm567-8"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
     renderComponentWithProvider();
 
     const user = userEvent.setup();
@@ -68,5 +134,66 @@ describe("InstrumentSessionView", () => {
       await user.click(backdrop);
     }
     expect(screen.queryByTestId("session-input-menu")).not.toBeInTheDocument();
+  });
+
+  it("shows a tooltip when no sessions list or session is available", async () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: null,
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    await user.hover(screen.getByTestId("session-input-staticButton"));
+    const tip = await screen.findByRole("tooltip");
+    expect(tip).toBeInTheDocument();
+    expect(tip).toHaveTextContent(
+      "Use 'Get Sessions' to fetch available sessions.",
+    );
+  });
+
+  it("shows assign session when there is only one session available but no active session", () => {
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: vi.fn(),
+      instrumentSessionList: ["cm12345-1"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    expect(
+      screen.getByTestId("session-input-staticButton"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
+      "Assign Session",
+    );
+  });
+
+  it("assigns session when there is only one session available but no active session and button is clicked", async () => {
+    const mockSetInstrumentSession = vi.fn();
+    vi.mocked(useInstrumentSession).mockReturnValue({
+      instrumentSession: null,
+      setInstrumentSession: mockSetInstrumentSession,
+      instrumentSessionList: ["cm12345-1"],
+      setInstrumentSessionList: vi.fn(),
+    });
+
+    renderComponentWithProvider();
+
+    const user = userEvent.setup();
+    expect(
+      screen.getByTestId("session-input-staticButton"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("session-input-staticButton")).toHaveTextContent(
+      "Assign Session",
+    );
+
+    await user.click(screen.getByTestId("session-input-staticButton"));
+    expect(mockSetInstrumentSession).toHaveBeenCalled();
   });
 });

@@ -73,7 +73,7 @@ export function ExperimentList() {
     });
   }
 
-  const visit = visitTextToVisit(instrumentSession);
+  const visit = visitTextToVisit(instrumentSession ?? "cm0-0");
 
   const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
     skip: !visit,

@@ -179,4 +179,23 @@ describe("RunPlanButton", () => {
       );
     });
   });
+
+  it("shows error message when no instrument session is set", async () => {
+    mockSubmitTask.mockResolvedValue(mockResponse);
+    mockSetActiveTask.mockResolvedValue(mockResponse);
+    mockGetTask.mockResolvedValue(mockTask);
+
+    const user = userEvent.setup();
+    render(
+      <RunPlanButton name="test_plan" params={[]} instrumentSession={null} />,
+    );
+
+    user.click(screen.getByText("Run"));
+    await waitFor(() => {
+      const alert = screen.getByRole("alert");
+      expect(alert).toHaveTextContent(
+        "Failed to run plan test_plan, no instrument session was set.",
+      );
+    });
+  });
 });

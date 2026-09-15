@@ -6,14 +6,15 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import { Science, ExpandMore } from "@mui/icons-material";
-import { ListSubheader } from "@mui/material";
+import { ListSubheader, Tooltip } from "@mui/material";
 
 export function InstrumentSessionView() {
-  const { instrumentSession, setInstrumentSession, sessionsList } =
+  const { instrumentSession, setInstrumentSession, instrumentSessionList } =
     useInstrumentSession();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const menuDisabled = sessionsList.length <= 1 ? true : false;
+  const menuDisabled =
+    !instrumentSessionList || instrumentSessionList.length <= 1;
   const id = "session-input";
   const staticButtonId = `${id}-staticButton`;
   const buttonId = `${id}-button`;
@@ -34,8 +35,46 @@ export function InstrumentSessionView() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleStaticButtonClick = () => {
+    if (instrumentSessionList) {
+      setInstrumentSession(instrumentSessionList[0]);
+    }
+  };
 
-  if (menuDisabled) {
+  if (!instrumentSession && !instrumentSessionList) {
+    return (
+      <div>
+        <Tooltip title="Use 'Get Sessions' to fetch available sessions.">
+          <Button
+            data-testid={staticButtonId}
+            startIcon={<Science />}
+            color="secondary"
+            variant="outlined"
+          >
+            {"No Session Selected"}
+          </Button>
+        </Tooltip>
+      </div>
+    );
+  } else if (
+    instrumentSessionList &&
+    instrumentSessionList.length == 1 &&
+    !instrumentSession
+  ) {
+    return (
+      <div>
+        <Button
+          data-testid={staticButtonId}
+          startIcon={<Science />}
+          color="secondary"
+          variant="outlined"
+          onClick={handleStaticButtonClick}
+        >
+          {"Assign Session"}
+        </Button>
+      </div>
+    );
+  } else if (menuDisabled && instrumentSession) {
     return (
       <div>
         <Button
@@ -62,7 +101,7 @@ export function InstrumentSessionView() {
           color="secondary"
           variant="outlined"
         >
-          {instrumentSession}
+          {instrumentSession ? instrumentSession : "No Session Selected"}
         </Button>
         <Menu
           data-testid={menuId}
@@ -77,7 +116,7 @@ export function InstrumentSessionView() {
         >
           <Divider />
           <ListSubheader> Available Sessions </ListSubheader>
-          {sessionsList.map((option, index) => (
+          {instrumentSessionList?.map((option, index) => (
             <MenuItem
               key={option}
               selected={index === selectedIndex}
