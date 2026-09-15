@@ -1,5 +1,13 @@
 import { useQuery } from "@apollo/client/react";
-import { Button, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Snackbar,
+  Stack,
+  Typography,
+  useTheme,
+  type SnackbarCloseReason,
+} from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -7,7 +15,7 @@ import {
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTasks } from "../../queue/queueService";
@@ -149,6 +157,20 @@ export function ExperimentList() {
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 
+      const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+      const [msg, setMsg] = useState<string>("");
+
+      const handleSnackbarClose = (
+        _event: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+      ) => {
+        if (reason === "clickaway") {
+          return;
+        }
+
+        setOpenSnackbar(false);
+      };
+
       return (
         <Stack
           direction="row"
@@ -171,6 +193,8 @@ export function ExperimentList() {
                   .getSelectedRowModel()
                   .rows.map((row) => row.original);
                 await submitQueueTasks(selected);
+                setMsg(`${selectedCount} tasks added to queue`);
+                setOpenSnackbar(true);
               }}
             >
               Add selected {selectedCount} to queue
@@ -187,11 +211,23 @@ export function ExperimentList() {
                   .rows.map((row) => row.original);
 
                 await submitQueueTasks(allRows);
+                setMsg(`All tasks added to queue`);
+                setOpenSnackbar(true);
               }}
             >
               Add all to queue
             </Button>
           )}
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={10000}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <Alert onClose={handleSnackbarClose} severity="success">
+              {msg}
+            </Alert>
+          </Snackbar>
         </Stack>
       );
     },
