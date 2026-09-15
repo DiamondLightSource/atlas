@@ -1,31 +1,17 @@
-import {
-  DiamondDSTheme,
-  ThemeProvider,
-} from "@diamondlightsource/sci-react-ui";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
+import { RouterProvider } from "react-router-dom";
 
-import Dashboard from "./routes/Dashboard.tsx";
-import { InstrumentSessionProvider } from "./context/instrumentSession/InstrumentSessionProvider.tsx";
-import JsonFormsPlans from "./routes/Plans.tsx";
-import { Layout } from "./routes/Layout.tsx";
 import Spectroscopy from "./routes/Spectroscopy.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-declare global {
-  interface Window {
-    global?: typeof globalThis;
-  }
-}
-
-window.global ||= window;
+import { QueryClient } from "@tanstack/react-query";
 import Workflows from "./routes/Workflows.tsx";
-import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment.ts";
 import { createApi } from "@atlas/blueapi";
-import { BlueapiProvider } from "@atlas/blueapi-query";
 import Tomography from "./routes/Tomography.tsx";
+import { createRouter, type SectionGroup } from "@atlas/app-shell";
+import { PlanBrowser } from "@atlas/blueapi-ui";
+import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
+import { AppProviders } from "./AppProviders.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -34,52 +20,43 @@ async function enableMocking() {
   }
 }
 
-const router = createBrowserRouter([
+const navigation: SectionGroup[] = [
   {
-    path: "/",
-    element: <Layout />,
-    children: [
+    sections: [
       {
-        index: true,
-        element: <Dashboard />,
+        name: "Acquisition",
+        icon: <ScanQrCode />,
+        path: "acquisition",
+        pages: [
+          { name: "Spectroscopy", element: <Spectroscopy /> },
+          { name: "Tomography", element: <Tomography /> },
+          { name: "Plans", element: <PlanBrowser /> },
+        ],
       },
       {
-        path: "spectroscopy",
-        element: <Spectroscopy />,
-      },
-      {
-        path: "tomography",
-        element: <Tomography />,
-      },
-      {
-        path: "plans",
-        element: <JsonFormsPlans />,
-      },
-      {
-        path: "/workflows",
-        element: <Workflows />,
+        name: "Analysis",
+        icon: <ChartNoAxesCombined />,
+        path: "analysis",
+        pages: [{ name: "Workflows", element: <Workflows /> }],
       },
     ],
   },
-]);
+];
+
+const router = createRouter({
+  title: "ViSR",
+  navigation,
+});
 
 const api = createApi("/api/blueapi");
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
-    <RelayEnvironmentProvider environment={RelayEnvironment}>
-      <InstrumentSessionProvider>
-        <StrictMode>
-          <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
-            <QueryClientProvider client={queryClient}>
-              <BlueapiProvider api={api}>
-                <RouterProvider router={router} />
-              </BlueapiProvider>
-            </QueryClientProvider>
-          </ThemeProvider>
-        </StrictMode>
-      </InstrumentSessionProvider>
-    </RelayEnvironmentProvider>,
+    <StrictMode>
+      <AppProviders api={api} queryClient={queryClient} theme={DiamondDSTheme}>
+        <RouterProvider router={router} />
+      </AppProviders>
+    </StrictMode>,
   );
 });
