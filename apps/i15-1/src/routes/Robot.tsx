@@ -109,12 +109,12 @@ function RobotControl() {
           <RunPlanButton
             name="robot_load"
             params={formData}
-            instrumentSession={instrumentSession ?? "cm0-0"}
+            instrumentSession={instrumentSession}
             buttonText="Load Sample"
           />
           <RunPlanButton
             name="robot_unload"
-            instrumentSession={instrumentSession ?? "cm0-0"}
+            instrumentSession={instrumentSession}
             buttonText="Unload Sample"
           />
         </Stack>
