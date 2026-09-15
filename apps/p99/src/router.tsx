@@ -1,8 +1,14 @@
 import { type SectionGroup, createRouter } from "@atlas/app-shell";
-import { FileText, LucideLayoutDashboard, ServerCog } from "lucide-react";
+import {
+  FileText,
+  LucideLayoutDashboard,
+  ServerCog,
+  Wallpaper,
+} from "lucide-react";
 import Dashboard from "./routes/Dashboard";
 import Plans from "./routes/Plans";
 import Workflows from "./routes/Workflows";
+import Visualisation from "./routes/Visualisation";
 
 const navigation: SectionGroup[] = [
   {
@@ -37,6 +43,17 @@ const navigation: SectionGroup[] = [
           {
             name: "Workflows",
             element: <Workflows />,
+          },
+        ],
+      },
+      {
+        name: "Visualisation",
+        icon: <Wallpaper />,
+        path: "visualisation",
+        pages: [
+          {
+            name: "Visualisation",
+            element: <Visualisation />,
           },
         ],
       },

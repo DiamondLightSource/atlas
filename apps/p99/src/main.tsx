@@ -28,7 +28,7 @@ enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
-        <InstrumentSessionProvider>
+        <InstrumentSessionProvider sessionsList={["cm37284-1", "cm37284-2"]}>
           <RelayEnvironmentProvider environment={RelayEnvironment}>
             <QueryClientProvider client={queryClient}>
               <UserAuthProvider>
