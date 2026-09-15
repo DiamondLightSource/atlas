@@ -1,0 +1,164 @@
+{
+  "data": {
+    "id": "primary",
+    "attributes": {
+      "ancestors": ["ccd49f4d-ae6e-4db7-ab89-552f7fd046a2"],
+      "structure_family": "container",
+      "specs": [
+        { "name": "BlueskyEventStream", "version": "3.0" },
+        { "name": "composite", "version": null }
+      ],
+      "metadata": {
+        "uid": "b162c47e-000e-4da0-9adb-fa3b45b5c249",
+        "time": 1782826882.4677913,
+        "hints": {
+          "sample_stage-x": { "fields": ["sample_stage-x"] },
+          "sample_stage-y": { "fields": ["sample_stage-y"] }
+        },
+        "data_keys": {
+          "sample_stage-x": {
+            "dtype": "number",
+            "shape": [],
+            "units": "mm",
+            "limits": {
+              "control": { "low": -7.0, "high": 7.0 },
+              "display": { "low": -7.0, "high": 7.0 }
+            },
+            "source": "ca://BL99P-MO-STAGE-02:X.RBV",
+            "precision": 3,
+            "dtype_numpy": "<f8",
+            "object_name": "sample_stage-x"
+          },
+          "sample_stage-y": {
+            "dtype": "number",
+            "shape": [],
+            "units": "mm",
+            "limits": {
+              "control": { "low": -7.0, "high": 7.0 },
+              "display": { "low": -7.0, "high": 7.0 }
+            },
+            "source": "ca://BL99P-MO-STAGE-02:Y.RBV",
+            "precision": 3,
+            "dtype_numpy": "<f8",
+            "object_name": "sample_stage-y"
+          }
+        },
+        "configuration": {
+          "sample_stage-x": {
+            "data": {
+              "sample_stage-x-offset": 0.0,
+              "sample_stage-x-velocity": 0.6,
+              "sample_stage-x-motor_egu": "mm"
+            },
+            "data_keys": {
+              "sample_stage-x-offset": {
+                "dtype": "number",
+                "shape": [],
+                "units": "mm",
+                "limits": {
+                  "control": {
+                    "low": -9007199254740991,
+                    "high": 9007199254740991
+                  },
+                  "display": {
+                    "low": -9007199254740991,
+                    "high": 9007199254740991
+                  }
+                },
+                "source": "ca://BL99P-MO-STAGE-02:X.OFF",
+                "precision": 3,
+                "dtype_numpy": "<f8"
+              },
+              "sample_stage-x-velocity": {
+                "dtype": "number",
+                "shape": [],
+                "units": "mm/sec",
+                "limits": {
+                  "control": { "low": 0.0, "high": 0.6 },
+                  "display": { "low": 0.0, "high": 0.6 }
+                },
+                "source": "ca://BL99P-MO-STAGE-02:X.VELO",
+                "precision": 3,
+                "dtype_numpy": "<f8"
+              },
+              "sample_stage-x-motor_egu": {
+                "dtype": "string",
+                "shape": [],
+                "source": "ca://BL99P-MO-STAGE-02:X.EGU",
+                "dtype_numpy": "|S40"
+              }
+            },
+            "timestamps": {
+              "sample_stage-x-offset": 631152000.0,
+              "sample_stage-x-velocity": 631152000.0,
+              "sample_stage-x-motor_egu": 1782825942.372606
+            }
+          },
+          "sample_stage-y": {
+            "data": {
+              "sample_stage-y-offset": 0.0,
+              "sample_stage-y-velocity": 0.2,
+              "sample_stage-y-motor_egu": "mm"
+            },
+            "data_keys": {
+              "sample_stage-y-offset": {
+                "dtype": "number",
+                "shape": [],
+                "units": "mm",
+                "limits": {
+                  "control": {
+                    "low": -9007199254740991,
+                    "high": 9007199254740991
+                  },
+                  "display": {
+                    "low": -9007199254740991,
+                    "high": 9007199254740991
+                  }
+                },
+                "source": "ca://BL99P-MO-STAGE-02:Y.OFF",
+                "precision": 3,
+                "dtype_numpy": "<f8"
+              },
+              "sample_stage-y-velocity": {
+                "dtype": "number",
+                "shape": [],
+                "units": "mm/sec",
+                "limits": {
+                  "control": { "low": 0.0, "high": 0.6 },
+                  "display": { "low": 0.0, "high": 0.6 }
+                },
+                "source": "ca://BL99P-MO-STAGE-02:Y.VELO",
+                "precision": 3,
+                "dtype_numpy": "<f8"
+              },
+              "sample_stage-y-motor_egu": {
+                "dtype": "string",
+                "shape": [],
+                "source": "ca://BL99P-MO-STAGE-02:Y.EGU",
+                "dtype_numpy": "|S40"
+              }
+            },
+            "timestamps": {
+              "sample_stage-y-offset": 631152000.0,
+              "sample_stage-y-velocity": 1782826882.437072,
+              "sample_stage-y-motor_egu": 1782825942.37262
+            }
+          }
+        }
+      },
+      "structure": { "contents": null, "count": 1 },
+      "access_blob": { "tags": ["27566922"] },
+      "sorting": [{ "key": "", "direction": 1 }],
+      "data_sources": null
+    },
+    "links": {
+      "self": "http://p51-blueapi.diamond.ac.uk/api/v1/metadata/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2/primary",
+      "search": "http://p51-blueapi.diamond.ac.uk/api/v1/search/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2/primary",
+      "full": "http://p51-blueapi.diamond.ac.uk/api/v1/container/full/ccd49f4d-ae6e-4db7-ab89-552f7fd046a2/primary"
+    },
+    "meta": null
+  },
+  "error": null,
+  "links": null,
+  "meta": {}
+}
