@@ -7,6 +7,7 @@ import { router } from "./router.tsx";
 
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
+import { createMockAuthProvider, createOAuth2ProxyProvider } from "@atlas/auth";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -15,12 +16,20 @@ async function enableMocking() {
   }
 }
 
-const api = createApi("/api/blueapi");
+const authProvider = import.meta.env.DEV
+  ? createMockAuthProvider()
+  : createOAuth2ProxyProvider();
+
+const api = createApi("/api/blueapi", authProvider.getAccessToken);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <AppProviders api={api} theme={DiamondDSTheme}>
+      <AppProviders
+        authProvider={authProvider}
+        api={api}
+        theme={DiamondDSTheme}
+      >
         <RouterProvider router={router} />
       </AppProviders>
     </StrictMode>,

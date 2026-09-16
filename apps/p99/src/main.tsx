@@ -13,8 +13,12 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/workflows/RelayEnvironment.ts";
 import { router } from "./router.tsx";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
-import { AuthContextProvider, createOAuth2ProxyProvider } from "@atlas/auth";
-import { createMockAuthProvider } from "@atlas/auth/mock";
+import {
+  AuthContextProvider,
+  createMockAuthProvider,
+  createOAuth2ProxyProvider,
+  type AuthProvider,
+} from "@atlas/auth";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -23,27 +27,28 @@ async function enableMocking() {
   }
 }
 
-const queryClient = new QueryClient();
-export const api = createApi("/api/blueapi");
-const authProvider = import.meta.env.DEV
+const authProvider: AuthProvider = import.meta.env.DEV
   ? createMockAuthProvider()
   : createOAuth2ProxyProvider();
+
+const queryClient = new QueryClient();
+export const api = createApi("/api/blueapi", authProvider.getAccessToken);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
-        <InstrumentSessionProvider>
-          <RelayEnvironmentProvider environment={RelayEnvironment}>
-            <QueryClientProvider client={queryClient}>
-              <AuthContextProvider provider={authProvider}>
+        <AuthContextProvider provider={authProvider}>
+          <InstrumentSessionProvider>
+            <RelayEnvironmentProvider environment={RelayEnvironment}>
+              <QueryClientProvider client={queryClient}>
                 <BlueapiProvider api={api}>
                   <RouterProvider router={router} />
                 </BlueapiProvider>
-              </AuthContextProvider>
-            </QueryClientProvider>
-          </RelayEnvironmentProvider>
-        </InstrumentSessionProvider>
+              </QueryClientProvider>
+            </RelayEnvironmentProvider>
+          </InstrumentSessionProvider>
+        </AuthContextProvider>
       </ThemeProvider>
     </StrictMode>,
   );

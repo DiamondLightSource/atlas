@@ -12,6 +12,7 @@ import { createRouter, type SectionGroup } from "@atlas/app-shell";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
 import { AppProviders } from "./AppProviders.tsx";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -48,7 +49,7 @@ const router = createRouter({
   navigation,
 });
 
-const api = createApi("/api/blueapi");
+const api = createApi("/api/blueapi", authProvider.getAccessToken);
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {

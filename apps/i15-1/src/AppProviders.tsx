@@ -10,35 +10,31 @@ import { store } from "@diamondlightsource/cs-web-lib";
 import { useLoadPvwsConfig } from "@atlas/pvws-config";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "./context/experimentDefinitions/apolloClient";
-import { AuthContextProvider, createOAuth2ProxyProvider } from "@atlas/auth";
-import { createMockAuthProvider } from "@atlas/auth/mock";
+import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
 
 type Props = {
+  authProvider: AuthProvider;
   api: Api;
   theme: Theme;
   children: ReactNode;
 };
 
-const provider = import.meta.env.DEV
-  ? createMockAuthProvider()
-  : createOAuth2ProxyProvider();
-
 const queryClient = new QueryClient();
-export function AppProviders({ api, theme, children }: Props) {
+export function AppProviders({ authProvider, api, theme, children }: Props) {
   const config = useLoadPvwsConfig();
   return (
     <ThemeProvider theme={theme}>
-      <InstrumentSessionProvider sessionsList={["cm44163-3", "cm44163-4"]}>
-        <ReduxProvider store={store(config)}>
-          <QueryClientProvider client={queryClient}>
-            <AuthContextProvider provider={provider}>
+      <AuthContextProvider provider={authProvider}>
+        <InstrumentSessionProvider sessionsList={["cm44163-3", "cm44163-4"]}>
+          <ReduxProvider store={store(config)}>
+            <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={api}>
                 <ApolloProvider client={client}>{children}</ApolloProvider>
               </BlueapiProvider>
-            </AuthContextProvider>
-          </QueryClientProvider>
-        </ReduxProvider>
-      </InstrumentSessionProvider>
+            </QueryClientProvider>
+          </ReduxProvider>
+        </InstrumentSessionProvider>
+      </AuthContextProvider>
     </ThemeProvider>
   );
 }

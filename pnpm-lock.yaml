@@ -272,6 +272,9 @@ importers:
       '@atlas/app-shell':
         specifier: workspace:*
         version: link:../../packages/app-shell
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../../packages/blueapi
