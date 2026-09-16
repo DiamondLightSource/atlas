@@ -8,3 +8,4 @@ export {
 export type { AccessTokenGetter } from "./authenticatedFetch";
 export { createRelayFetchFunction, useRelayFetchFunction } from "./relayFetch";
 export type { RelayFetchFunctionOptions } from "./relayFetch";
+export { createMockAuthProvider } from "./mock";
