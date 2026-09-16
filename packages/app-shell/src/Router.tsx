@@ -2,12 +2,15 @@ import { Layout } from "./Layout";
 import {
   createBrowserRouter,
   Navigate,
+  Outlet,
   type RouteObject,
 } from "react-router-dom";
 import { TabbedPanel, type TabDescription } from "./TabbedRoute";
 
 import type { ReactNode } from "react";
 import type React from "react";
+import { Box } from "@mui/material";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 /** App title and navigational intent */
 export interface RouterProps {
@@ -37,6 +40,7 @@ export interface SectionGroup {
 export interface LabelledRoute {
   name: string;
   path?: string;
+  isProtected?: boolean;
 }
 
 /**
@@ -65,17 +69,31 @@ export function routePath(route: LabelledRoute) {
   return route.path ?? sanitisePath(route.name);
 }
 
+function createChildElement(section: Section) {
+  // either a TabbedPanel when the section contains multiple pages,
+  // or just an Outlet if single page
+
+  let element: JSX.Element;
+  if (section.pages.length == 1) {
+    element = (
+      <Box p={1}>
+        <Outlet />
+      </Box>
+    );
+  } else {
+    const tabbedPages: TabDescription[] = section.pages.map((page) => {
+      return {
+        label: page.name,
+        path: routePath(page),
+      };
+    });
+    const sectionPath = routePath(section);
+    element = <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />;
+  }
+  return section.isProtected ? <ProtectedRoute children={element} /> : element;
+}
+
 function childRoute(section: Section): RouteObject {
-  const tabbedPages: TabDescription[] = section.pages.map((page) => {
-    return {
-      label: page.name,
-      path: routePath(page),
-    };
-  });
-  const sectionPath = routePath(section);
-  const element = (
-    <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />
-  );
   const childPageRoutes: RouteObject[] = section.pages.map((page) => {
     return {
       path: routePath(page),
@@ -86,8 +104,8 @@ function childRoute(section: Section): RouteObject {
   const firstTab = section.pages[0];
   const firstTabPath = routePath(firstTab);
   return {
-    path: sectionPath,
-    element: element,
+    path: routePath(section),
+    element: createChildElement(section),
     children: [
       ...(firstTab
         ? [

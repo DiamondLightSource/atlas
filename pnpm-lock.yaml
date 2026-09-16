@@ -269,6 +269,9 @@ importers:
 
   apps/visr:
     dependencies:
+      '@atlas/app-shell':
+        specifier: workspace:*
+        version: link:../../packages/app-shell
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../../packages/blueapi
@@ -317,6 +320,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.90.21
         version: 5.90.21(react@18.3.1)
+      lucide-react:
+        specifier: ^1.33.0
+        version: 1.33.0(react@18.3.1)
       ndarray:
         specifier: ^1.0.19
         version: 1.0.19
@@ -4204,6 +4210,11 @@ packages:
 
   lucide-react@1.24.0:
     resolution: {integrity: sha512-YT6mBD8lGKkg4nM39enlm94/sfJIiW0YKUT60fBy4YK8tai31ylg1VhGNWxkpSKHo9UagfnZqwIff3HTDQwXeA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-react@1.33.0:
+    resolution: {integrity: sha512-MTRwMy0ZlL8Ur/vOAiJ9XGHE+kFPC7brq6MxAm0GiGXEBj0qy0jA/pG4N675oSzciO/UCdX8T+5yUQdmDeTLxg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -9741,6 +9752,10 @@ snapshots:
       react: 18.3.1
 
   lucide-react@1.24.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  lucide-react@1.33.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

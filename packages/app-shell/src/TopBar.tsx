@@ -75,25 +75,6 @@ export function TopBar({ title, open, setOpen }: Props) {
             variant="h6"
             noWrap
             component="div"
-            sx={{
-              ml: 1.5,
-              mr: 1.25,
-            }}
-          >
-            Data Acquisition
-          </Typography>
-
-          <Divider
-            orientation="vertical"
-            variant="middle"
-            flexItem
-            sx={{ borderColor: "currentColor", opacity: 0.3 }}
-          />
-
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
             sx={{ ml: 1.5, mr: 1.25 }}
           >
             {title}
