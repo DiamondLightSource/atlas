@@ -8,6 +8,7 @@ function createFakeProvider(
 ): AuthProvider {
   return {
     getUser: vi.fn().mockResolvedValue(null),
+    getAccessToken: vi.fn().mockResolvedValue(null),
     login: vi.fn(),
     logout: vi.fn(),
     ...overrides,

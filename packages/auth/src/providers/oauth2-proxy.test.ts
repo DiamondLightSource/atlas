@@ -1,4 +1,7 @@
-import { createOAuth2ProxyProvider } from "./oauth2-proxy";
+import {
+  createOAuth2ProxyProvider,
+  TOKEN_REFRESH_SKEW_SECONDS,
+} from "./oauth2-proxy";
 
 function encodeIdentityHeader(claims: Record<string, unknown>): string {
   const payload = Buffer.from(JSON.stringify(claims)).toString("base64url");
@@ -103,6 +106,88 @@ describe("createOAuth2ProxyProvider().getUser()", () => {
       fakeResponse({ status: 200, body: null }),
     );
     await expect(provider.getUser()).resolves.toBeNull();
+  });
+});
+
+describe("createOauth2ProxyProvider().getAccessToken()", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  function tokenWithExpiry(secondsFromNow: number) {
+    const exp = Math.floor(Date.now() / 1000) + secondsFromNow;
+    return encodeIdentityHeader({ sub: "abc123", exp });
+  }
+
+  it("returns null on 401", async () => {
+    const provider = createOAuth2ProxyProvider();
+    vi.mocked(fetch).mockResolvedValue(fakeResponse({ status: 401 }));
+    await expect(provider.getAccessToken()).resolves.toBeNull();
+  });
+
+  it("returns null when header is missing", async () => {
+    const provider = createOAuth2ProxyProvider();
+    vi.mocked(fetch).mockResolvedValue(fakeResponse({ status: 200 }));
+    await expect(provider.getAccessToken()).resolves.toBeNull();
+  });
+
+  it("returns the token from the X-Access-Token header", async () => {
+    const provider = createOAuth2ProxyProvider();
+    const token = tokenWithExpiry(TOKEN_REFRESH_SKEW_SECONDS + 200);
+    const mockResponse = fakeResponse({
+      status: 200,
+      headers: { "x-access-token": token },
+    });
+    vi.mocked(fetch).mockResolvedValue(mockResponse);
+    await expect(provider.getAccessToken()).resolves.toBe(token);
+  });
+
+  it("caches the token instead of refetching while it's still valid", async () => {
+    const provider = createOAuth2ProxyProvider();
+    const token = tokenWithExpiry(TOKEN_REFRESH_SKEW_SECONDS + 200);
+    vi.mocked(fetch).mockResolvedValue(
+      fakeResponse({
+        status: 200,
+        headers: { "x-access-token": token },
+      }),
+    );
+
+    await provider.getAccessToken();
+    await provider.getAccessToken();
+
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it("refetches once the cached token is close to expiry", async () => {
+    const provider = createOAuth2ProxyProvider();
+    const expiry = 300;
+    const firstToken = tokenWithExpiry(expiry);
+
+    vi.mocked(fetch).mockResolvedValue(
+      fakeResponse({
+        status: 200,
+        headers: { "x-access-token": firstToken },
+      }),
+    );
+
+    // this will result in a cached token expiring in 300 seconds:
+    await provider.getAccessToken();
+
+    // advance time to a point forcing a refetch
+    const now = expiry - TOKEN_REFRESH_SKEW_SECONDS;
+    vi.setSystemTime(new Date(`2026-01-01T00:00:${now}Z`));
+
+    // expect a refetch
+    await provider.getAccessToken();
+
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 });
 
