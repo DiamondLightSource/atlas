@@ -1,6 +1,7 @@
 import type { AuthProvider, User } from "../types";
 
 const USERINFO_ENDPOINT = "/oauth2/userinfo";
+const HEADERS_CHECK_ENDPOINT = "/api/authheaders";
 const LOGIN_ENDPOINT = "/oauth2/start";
 const LOGOUT_ENDPOINT = "/oauth2/sign_out";
 
@@ -71,9 +72,13 @@ export function createOAuth2ProxyProvider(): AuthProvider {
 
       if (!authenticated) return null;
 
+      const idHeaderRes = await fetch(HEADERS_CHECK_ENDPOINT, {
+        credentials: "include",
+      });
+
       // Preferred: the injected Identity header (full id_token claims).
       // fetch() header lookups are case-insensitive, so "identity" is fine.
-      const identityHeader = res.headers.get(IDENTITY_HEADER);
+      const identityHeader = idHeaderRes.headers.get(IDENTITY_HEADER);
       if (identityHeader) {
         const claims = decodeJwtPayload(identityHeader);
         if (claims) return normalizeClaims(claims);
@@ -95,13 +100,16 @@ export function createOAuth2ProxyProvider(): AuthProvider {
         return cachedToken.value;
       }
 
-      const { res, authenticated } = await fetchUserInfo();
+      const { authenticated } = await fetchUserInfo();
       if (!authenticated) {
         cachedToken = null;
         return null;
       }
 
-      const token = res.headers.get(ACCESS_TOKEN_HEADER);
+      const tokenHeaderRes = await fetch(HEADERS_CHECK_ENDPOINT, {
+        credentials: "include",
+      });
+      const token = tokenHeaderRes.headers.get(ACCESS_TOKEN_HEADER);
       if (!token) {
         cachedToken = null;
         return null;
