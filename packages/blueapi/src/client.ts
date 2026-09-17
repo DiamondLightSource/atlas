@@ -1,10 +1,10 @@
-import type { AccessTokenGetter } from "@atlas/auth";
-import { createAuthenticatedAxios } from "@atlas/auth/axios";
+import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
 import { type AxiosInstance } from "axios";
+import type { LoginFn } from "../../auth/src/loginRedirect";
 
 export function createApiClient(
   baseURL: string,
-  getAccessToken: AccessTokenGetter,
+  login: LoginFn,
 ): AxiosInstance {
-  return createAuthenticatedAxios(getAccessToken, { baseURL });
+  return createAxiosWithLoginRedirect(login, { baseURL });
 }

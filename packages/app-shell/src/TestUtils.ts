@@ -7,7 +7,6 @@ import type { AuthProvider } from "@atlas/auth";
  */
 export const testAuthProvider: AuthProvider = {
   getUser: vi.fn().mockResolvedValue({ id: "1", name: "Bob" }),
-  getAccessToken: vi.fn().mockResolvedValue("tok-123"),
   login: vi.fn(),
   logout: vi.fn(),
 };

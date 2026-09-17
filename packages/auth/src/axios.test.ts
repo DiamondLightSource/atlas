@@ -1,59 +1,56 @@
 import { describe, it, expect } from "vitest";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import { createAuthenticatedAxios } from "./axios";
+import type { AxiosResponse } from "axios";
+import { createAxiosWithLoginRedirect } from "./axios";
 
-/**
- * A custom axios adapter that captures the outgoing config instead of
- * hitting the network, so we can assert on headers without mocking
- * fetch/XHR underneath axios.
- */
-function captureAdapter() {
-  let captured: AxiosRequestConfig | null = null;
-  const adapter = async (
-    config: AxiosRequestConfig,
-  ): Promise<AxiosResponse> => {
-    captured = config;
-    return {
-      data: null,
-      status: 200,
-      statusText: "OK",
-      headers: {},
-      config,
-    } as AxiosResponse;
-  };
-  return { adapter, getCaptured: () => captured };
-}
-
-describe("createAuthenticatedAxios", () => {
-  it("attaches an Authorization header when a token is available", async () => {
-    const { adapter, getCaptured } = captureAdapter();
-    const instance = createAuthenticatedAxios(async () => "tok-123", {
-      adapter,
+describe("createAxiosWithLoginRedirect", () => {
+  beforeEach(() => {
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { pathname: "/dashboard", search: "?x=1" },
     });
-
-    await instance.get("/api/things");
-
-    expect(getCaptured()?.headers?.Authorization).toBe("Bearer tok-123");
   });
 
-  it("omits the header when there's no token", async () => {
-    const { adapter, getCaptured } = captureAdapter();
-    const instance = createAuthenticatedAxios(async () => null, { adapter });
+  function failingAdapter(status: number) {
+    return async (): Promise<AxiosResponse> => {
+      const error: any = new Error(`Request failed with status ${status}`);
+      error.response = { status, data: null, headers: {}, config: {} };
+      error.isAxiosError = true;
+      throw error;
+    };
+  }
 
-    await instance.get("/api/things");
-
-    expect(getCaptured()?.headers?.Authorization).toBeUndefined();
-  });
-
-  it("preserves config passed to createAuthenticatedAxios", async () => {
-    const { adapter, getCaptured } = captureAdapter();
-    const instance = createAuthenticatedAxios(async () => "tok-123", {
-      adapter,
-      baseURL: "https://api.example.com",
+  it("calls login and still rejects on a 401", async () => {
+    const login = vi.fn();
+    const instance = createAxiosWithLoginRedirect(login, {
+      adapter: failingAdapter(401),
     });
 
-    await instance.get("/api/things");
+    await expect(instance.get("/api/scans")).rejects.toThrow();
+    expect(login).toHaveBeenLastCalledWith("/dashboard?x=1");
+  });
 
-    expect(getCaptured()?.baseURL).toBe("https://api.example.com");
+  it("does not call login() on a non-401 error", async () => {
+    const login = vi.fn();
+    const instance = createAxiosWithLoginRedirect(login, {
+      adapter: failingAdapter(500),
+    });
+
+    await expect(instance.get("/api/scans")).rejects.toThrow();
+    expect(login).not.toHaveBeenCalled();
+  });
+
+  it("only calls login() once across concurrent 401s", async () => {
+    const login = vi.fn();
+    const instance = createAxiosWithLoginRedirect(login, {
+      adapter: failingAdapter(401),
+    });
+
+    await Promise.allSettled([
+      instance.get("/api/a"),
+      instance.get("/api/b"),
+      instance.get("/api/c"),
+    ]);
+
+    expect(login).toHaveBeenCalledOnce();
   });
 });

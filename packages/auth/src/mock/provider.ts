@@ -1,7 +1,6 @@
 import type { AuthProvider, User } from "../types";
 
 const MOCK_USER_KEY = "atlas-auth:mock-user";
-const MOCK_AUTH_TOKEN_KEY = "atlas-auth:mock-token";
 
 const defaultMockUser: User = {
   id: "jbi14214",
@@ -13,13 +12,11 @@ const defaultMockUser: User = {
 function setMockUser(user: Partial<User> = {}): User {
   const merged: User = { ...defaultMockUser, ...user };
   localStorage.setItem(MOCK_USER_KEY, JSON.stringify(merged));
-  localStorage.setItem(MOCK_AUTH_TOKEN_KEY, "tok-123");
   return merged;
 }
 
 function clearMockUser(): void {
   localStorage.removeItem(MOCK_USER_KEY);
-  localStorage.removeItem(MOCK_AUTH_TOKEN_KEY);
 }
 
 function getMockUser(): User | null {
@@ -39,9 +36,6 @@ export function createMockAuthProvider(): AuthProvider {
   return {
     async getUser() {
       return getMockUser();
-    },
-    async getAccessToken() {
-      return localStorage.getItem(MOCK_AUTH_TOKEN_KEY);
     },
     login(returnTo) {
       setMockUser();

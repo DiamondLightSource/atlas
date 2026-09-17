@@ -6,10 +6,6 @@ const LOGIN_ENDPOINT = "/oauth2/start";
 const LOGOUT_ENDPOINT = "/oauth2/sign_out";
 
 const IDENTITY_HEADER = "identity";
-const ACCESS_TOKEN_HEADER = "x-access-token";
-
-/** Skip a refetch if the cached token still has at least this much validity left */
-export const TOKEN_REFRESH_SKEW_SECONDS = 30;
 
 /**
  * Decodes the base64url-encoded id_token that oauth2-proxy injects via:
@@ -50,8 +46,6 @@ function normalizeClaims(claims: Record<string, unknown>): User {
 }
 
 export function createOAuth2ProxyProvider(): AuthProvider {
-  let cachedToken: { value: string; expiresAt: number } | null = null;
-
   async function fetchUserInfo() {
     const res = await fetch(USERINFO_ENDPOINT, { credentials: "include" });
 
@@ -89,36 +83,6 @@ export function createOAuth2ProxyProvider(): AuthProvider {
       // without the header injection set up).
       const body = await res.json().catch(() => null);
       return body ? normalizeClaims(body) : null;
-    },
-
-    async getAccessToken() {
-      const now = Date.now() / 1000;
-      if (
-        cachedToken &&
-        cachedToken.expiresAt - now > TOKEN_REFRESH_SKEW_SECONDS
-      ) {
-        return cachedToken.value;
-      }
-
-      const { authenticated } = await fetchUserInfo();
-      if (!authenticated) {
-        cachedToken = null;
-        return null;
-      }
-
-      const tokenHeaderRes = await fetch(HEADERS_CHECK_ENDPOINT, {
-        credentials: "include",
-      });
-      const token = tokenHeaderRes.headers.get(ACCESS_TOKEN_HEADER);
-      if (!token) {
-        cachedToken = null;
-        return null;
-      }
-
-      const claims = decodeJwtPayload(token);
-      const expiresAt = typeof claims?.exp === "number" ? claims.exp : now + 55;
-      cachedToken = { value: token, expiresAt };
-      return token;
     },
 
     login(returnTo) {

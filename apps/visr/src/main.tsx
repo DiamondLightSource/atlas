@@ -49,7 +49,7 @@ const router = createRouter({
   navigation,
 });
 
-const api = createApi("/api/blueapi", authProvider.getAccessToken);
+const api = createApi("/api/blueapi", authProvider.login);
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {

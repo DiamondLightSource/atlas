@@ -1,4 +1,4 @@
-import { createAuthenticatedFetch } from "@atlas/auth";
+import { createFetchLoginRedirect } from "@atlas/auth";
 import {
   Environment,
   Network,
@@ -9,11 +9,9 @@ import {
 import { authProvider } from "./auth";
 
 const HTTP_ENDPOINT = "/api/supergraph";
-const authenticatedFetch = createAuthenticatedFetch(
-  authProvider.getAccessToken,
-);
+const fetchWithLoginRedirect = createFetchLoginRedirect(authProvider.login);
 const fetchFn: FetchFunction = async (request, variables) => {
-  const resp = await authenticatedFetch(HTTP_ENDPOINT, {
+  const resp = await fetchWithLoginRedirect(HTTP_ENDPOINT, {
     method: "POST",
     credentials: "include",
     headers: {

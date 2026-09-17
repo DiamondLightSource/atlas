@@ -16,14 +16,6 @@ export interface AuthProvider {
   /** Resolve the current user, or `null` if there isn't one. */
   getUser(): Promise<User | null>;
 
-  /**
-   * Currently-valid access token, or `null` if unauthenticated.
-   * Implementations should refresh internally when the cached token
-   * is close to expiry, so callers can just await this before every request
-   * without caring about token lifetimes.
-   */
-  getAccessToken(): Promise<string | null>;
-
   /** Kick off the login flow (may redirect the browser). */
   login(returnTo?: string): void;
 

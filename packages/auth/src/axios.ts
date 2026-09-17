@@ -2,41 +2,32 @@ import { useMemo } from "react";
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import { useAuth } from "./AuthContext";
-import type { AccessTokenGetter } from "./authenticatedFetch";
+import { guardLoginOnce, type LoginFn } from "./loginRedirect";
 
-/**
- * Creates an axios instance that attaches a fresh Authorization: Bearer
- * header to every request via a request interceptor
- */
-export function createAuthenticatedAxios(
-  getAccessToken: AccessTokenGetter,
+export function createAxiosWithLoginRedirect(
+  login: LoginFn,
   config?: AxiosRequestConfig,
 ): AxiosInstance {
   const instance = axios.create(config);
+  const triggerRedirect = guardLoginOnce(login);
 
-  instance.interceptors.request.use(async (requestConfig) => {
-    const token = await getAccessToken();
-    if (token) {
-      requestConfig.headers.Authorization = `Bearer ${token}`;
-    }
-    return requestConfig;
-  });
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error?.response?.status === 401) {
+        triggerRedirect();
+      }
+      return Promise.reject(error);
+    },
+  );
 
   return instance;
 }
 
-/**
- * Same as createAuthenticatedAxios, wired to the current AuthContext.
- * `config` is only read on the first render — pass a stable reference
- * (or none) rather than an inline object literal if you need it, since
- * changing it won't rebuild the instance.
- */
-export function useAuthenticatedAxios(
+/** Wired to the current AuthContext */
+export function useAxiosWithLoginRedirect(
   config?: AxiosRequestConfig,
 ): AxiosInstance {
-  const { getAccessToken } = useAuth();
-  return useMemo(
-    () => createAuthenticatedAxios(getAccessToken, config),
-    [getAccessToken],
-  );
+  const { login } = useAuth();
+  return useMemo(() => createAxiosWithLoginRedirect(login, config), [login]);
 }

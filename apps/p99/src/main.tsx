@@ -32,7 +32,7 @@ const authProvider: AuthProvider = import.meta.env.DEV
   : createOAuth2ProxyProvider();
 
 const queryClient = new QueryClient();
-export const api = createApi("/api/blueapi", authProvider.getAccessToken);
+export const api = createApi("/api/blueapi", authProvider.login);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(

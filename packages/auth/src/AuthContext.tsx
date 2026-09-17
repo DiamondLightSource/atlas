@@ -21,11 +21,6 @@ interface AuthContextValue {
   logout: (returnTo?: string) => void;
   /** Re-run the auth check, e.g. after the tab regains focus. */
   refresh: () => Promise<void>;
-  /**
-   * A currently-valid access token to attatch to upstream API calls,
-   * or `null` if unauthenticated.
-   */
-  getAccessToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -72,7 +67,6 @@ export function AuthContextProvider({
       login: (returnTo) => impl.login(returnTo),
       logout: (returnTo) => impl.logout(returnTo),
       refresh,
-      getAccessToken: impl.getAccessToken,
     }),
     [status, user, impl, refresh],
   );

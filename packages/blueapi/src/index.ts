@@ -1,9 +1,9 @@
-import type { AccessTokenGetter } from "@atlas/auth";
 import { createApiClient } from "./client";
 import { createDevicesApi } from "./devices";
 import { createPlansApi } from "./plans";
 import { createTasksApi } from "./tasks";
 import { createWorkerApi } from "./worker";
+import type { LoginFn } from "../../auth/src/loginRedirect";
 
 export type { Plan, PlansResponse } from "./plans";
 export type {
@@ -16,8 +16,8 @@ export type {
 export type { WorkerState, WorkerStateRequest } from "./worker";
 export type { Device, DeviceResponse } from "./devices";
 
-export function createApi(baseURL: string, getAccessToken: AccessTokenGetter) {
-  const client = createApiClient(baseURL, getAccessToken);
+export function createApi(baseURL: string, login: LoginFn) {
+  const client = createApiClient(baseURL, login);
 
   return {
     devices: createDevicesApi(client),

@@ -20,7 +20,7 @@ const authProvider = import.meta.env.DEV
   ? createMockAuthProvider()
   : createOAuth2ProxyProvider();
 
-const api = createApi("/api/blueapi", authProvider.getAccessToken);
+const api = createApi("/api/blueapi", authProvider.login);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
