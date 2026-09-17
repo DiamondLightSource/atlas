@@ -1,7 +1,7 @@
 import type { AuthProvider, User } from "../types";
 
 const USERINFO_ENDPOINT = "/oauth2/userinfo";
-const HEADERS_CHECK_ENDPOINT = "/api/authheaders";
+const HEADERS_CHECK_ENDPOINT = "/auth/me";
 const LOGIN_ENDPOINT = "/oauth2/start";
 const LOGOUT_ENDPOINT = "/oauth2/sign_out";
 
