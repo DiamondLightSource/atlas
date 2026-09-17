@@ -17,7 +17,7 @@ import type { TaskRequest, TaskResponse } from "@atlas/blueapi";
 export type RunPlanButtonProps = {
   name: string;
   params?: object;
-  instrumentSession: string;
+  instrumentSession: string | null;
   buttonText?: string;
 };
 
@@ -89,19 +89,28 @@ export function RunPlanButton({
   const handleClick = async () => {
     setOpenSnackbar(true);
     setLoading(true);
-    const taskRequest: TaskRequest = {
-      name: name,
-      params: params,
-      instrument_session: instrumentSession,
-    };
-    await submitAndRunTask(taskRequest).catch((error) => {
+    if (instrumentSession) {
+      const taskRequest: TaskRequest = {
+        name: name,
+        params: params,
+        instrument_session: instrumentSession,
+      };
+      await submitAndRunTask(taskRequest).catch((error) => {
+        setSeverity("error");
+        setMsg(
+          `Failed to run plan ${name}, see console and blueapi logs for full error.`,
+        );
+        console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
+      });
+      setLoading(false);
+    } else {
       setSeverity("error");
-      setMsg(
-        `Failed to run plan ${name}, see console and blueapi logs for full error.`,
+      setMsg(`Failed to run plan ${name}, no instrument session was set.`);
+      console.log(
+        `Failed to run plan ${name}.\n No instrument session was set.`,
       );
-      console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
-    });
-    setLoading(false);
+      setLoading(false);
+    }
   };
 
   const handleSnackbarClose = (
