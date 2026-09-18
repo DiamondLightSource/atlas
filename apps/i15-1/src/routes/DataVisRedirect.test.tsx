@@ -5,10 +5,10 @@ import { DataVisRedirect } from "./DataVisRedirect";
 
 function renderAtDatavis() {
   return render(
-    <MemoryRouter initialEntries={["/datavis"]}>
+    <MemoryRouter initialEntries={["/queue", "/datavis"]} initialIndex={1}>
       <Routes>
+        <Route path="/queue" element={<div>Queue page</div>} />
         <Route path="/datavis" element={<DataVisRedirect />} />
-        <Route path="/dashboard" element={<div>Dashboard page</div>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -31,9 +31,9 @@ describe("DataVisRedirect", () => {
     );
   });
 
-  it("redirects back to the dashboard", () => {
+  it("navigates back to the previous page", () => {
     renderAtDatavis();
 
-    expect(screen.getByText("Dashboard page")).toBeInTheDocument();
+    expect(screen.getByText("Queue page")).toBeInTheDocument();
   });
 });

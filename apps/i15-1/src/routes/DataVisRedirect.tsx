@@ -5,8 +5,9 @@ const DATAVIS_URL = "https://i15-1-datavis.diamond.ac.uk/";
 
 /**
  * Not a real page: opens the DataVis app in a new tab, then
- * immediately redirects back to the dashboard so the "DataVis"
- * nav entry behaves like an external link rather than a route.
+ * immediately navigates back to wherever the user was before, so
+ * the DataVis nav entry behaves like an external link rather
+ * than a route.
  */
 export function DataVisRedirect() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export function DataVisRedirect() {
       opened.current = true;
       window.open(DATAVIS_URL, "_blank", "noopener,noreferrer");
     }
-    navigate("/dashboard", { replace: true });
+    navigate(-1); /**redirects to the last visited page */
   }, [navigate]);
 
   return null;
