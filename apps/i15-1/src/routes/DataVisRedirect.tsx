@@ -17,8 +17,8 @@ export function DataVisRedirect() {
     if (!opened.current) {
       opened.current = true;
       window.open(DATAVIS_URL, "_blank", "noopener,noreferrer");
+      navigate(-1); /**redirects to the last visited page */
     }
-    navigate(-1); /**redirects to the last visited page */
   }, [navigate]);
 
   return null;
