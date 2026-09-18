@@ -221,14 +221,6 @@ export function ExperimentList() {
               color="primary"
               startIcon={<QueueIcon />}
               onClick={async () => handleClick(selectedCount)}
-              // onClick={async () => {
-              //   const selected = table
-              //     .getSelectedRowModel()
-              //     .rows.map((row) => row.original);
-              //   await submitQueueTasks(selected);
-              //   setMsg(`${selectedCount} tasks added to queue`);
-              //   setOpenSnackbar(true);
-              // }}
             >
               Add selected {selectedCount} to queue
             </Button>
@@ -237,17 +229,6 @@ export function ExperimentList() {
               variant="contained"
               startIcon={<QueueIcon />}
               onClick={async () => handleClick(selectedCount)}
-              // onClick={async () => {
-              //   table.toggleAllRowsSelected(true);
-
-              //   const allRows = table
-              //     .getPrePaginationRowModel()
-              //     .rows.map((row) => row.original);
-
-              //   await submitQueueTasks(allRows);
-              //   setMsg(`All tasks added to queue`);
-              //   setOpenSnackbar(true);
-              // }}
             >
               Add all to queue
             </Button>
