@@ -8,6 +8,7 @@ import { router } from "./router.tsx";
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
 import { createMockAuthProvider, createOAuth2ProxyProvider } from "@atlas/auth";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -15,10 +16,6 @@ async function enableMocking() {
     return worker.start();
   }
 }
-
-const authProvider = import.meta.env.DEV
-  ? createMockAuthProvider()
-  : createOAuth2ProxyProvider();
 
 const api = createApi("/api/blueapi", authProvider.login);
 

@@ -12,14 +12,14 @@ import type {
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
+import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
+import { authProvider } from "../auth";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
 // with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
-const QUEUE_SOCKET: string = USE_LOCAL
-  ? "http://127.0.0.1:8001"
-  : "/api/daq-queue";
+const QUEUE_SOCKET: string = "/api/daq-queue";
 
 client.setConfig({ baseUrl: QUEUE_SOCKET });
 
@@ -33,7 +33,7 @@ const handlers = {
 };
 
 export function createQueueApiClient(baseURL: string): AxiosInstance {
-  return axios.create({ baseURL });
+  return createAxiosWithLoginRedirect(authProvider.login, { baseURL });
 }
 
 export function useQueueEvents() {

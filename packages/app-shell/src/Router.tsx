@@ -90,7 +90,8 @@ function createChildElement(section: Section) {
     const sectionPath = routePath(section);
     element = <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />;
   }
-  return section.isProtected ? <ProtectedRoute children={element} /> : element;
+  // return section.isProtected ? <ProtectedRoute children={element} /> : element;
+  return element;
 }
 
 function childRoute(section: Section): RouteObject {
