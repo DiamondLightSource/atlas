@@ -100,9 +100,12 @@ describe("QueueView", () => {
               time_completed: null,
               task_request: { name: "sleep", instrument_session: "session2" },
               blueapi_id: "1",
+              tiled_ids: [],
+              scan_ids: [],
             },
           ],
           kind: "Experiment",
+          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -135,9 +138,12 @@ describe("QueueView", () => {
               time_completed: "2026-07-06T10:23:55.100463",
               task_request: { name: "sleep", instrument_session: "session1" },
               blueapi_id: "0",
+              tiled_ids: [],
+              scan_ids: [],
             },
           ],
           kind: "Plan",
+          user: null,
         },
         {
           id: "1",
@@ -203,6 +209,7 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
+          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -251,6 +258,7 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
+          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
