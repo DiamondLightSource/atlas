@@ -4,6 +4,7 @@ import {
   SystemControls,
 } from "@atlas/app-shell";
 import {
+  Activity,
   ClipboardClock,
   ListTodo,
   LucideLayoutDashboard,
@@ -15,6 +16,7 @@ import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
 import Pucks from "./routes/Pucks";
 import { QueueView } from "./routes/QueueView";
+import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
@@ -90,6 +92,17 @@ const navigation: SectionGroup[] = [
           {
             name: "Previous tasks",
             element: <QueueView />,
+          },
+        ],
+      },
+      {
+        name: "DataVis",
+        icon: <Activity />,
+        path: "datavis",
+        pages: [
+          {
+            name: "DataVis",
+            element: <DataVisRedirect />,
           },
         ],
       },
