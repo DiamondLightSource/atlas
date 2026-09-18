@@ -285,7 +285,15 @@ export const submitQueueTasks = async ({
     },
   };
 
-  return await addTasksToQueueQueuePost(data);
+  await addTasksToQueueQueuePost(data).then( async (response) => {
+    if (response.response?.ok) {
+      return response;
+    } else {
+      throw new Error(`Couldn't add task to queue: ${response.error}`)
+    }
+  })
+
+  // return await addTasksToQueueQueuePost(data);
 };
 
 export function useSumbitQueueTasks() {
@@ -298,5 +306,8 @@ export function useSumbitQueueTasks() {
         client.invalidateQueries({ queryKey: ["tasks"] }),
       ]);
     },
+    onError: async (error) => {
+      console.error(error.message)
+    }
   });
 }

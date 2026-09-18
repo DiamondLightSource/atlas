@@ -44,6 +44,8 @@ export type SampleData = {
   packing_fraction: number;
 };
 
+type SeverityLevel = "success" | "info" | "warning" | "error";
+
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
 ): ExperimentTableData => ({
@@ -122,6 +124,10 @@ export function ExperimentList() {
 
   const theme = useTheme();
 
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [msg, setMsg] = useState<string>("");
+  const [severity, setSeverity] = useState<SeverityLevel>("info");
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
@@ -157,8 +163,34 @@ export function ExperimentList() {
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 
-      const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-      const [msg, setMsg] = useState<string>("");
+      const handleClick = async (selected: number) => {
+        let selectedRows;
+        let successMsg;
+        if (selected > 0) {
+          console.log("Add selected")
+          selectedRows = table
+            .getSelectedRowModel()
+            .rows.map((row) => row.original);
+          successMsg = `${selected} tasks added to queue`;
+        } else {
+          console.log("Add all")
+          table.toggleAllRowsSelected(true);
+          selectedRows = table
+            .getPrePaginationRowModel()
+            .rows.map((row) => row.original);
+          successMsg = `All tasks added to queue`;
+        }
+        setOpenSnackbar(true);
+        try {
+          await submitQueueTasks(selectedRows);
+          setSeverity("success");
+          setMsg(successMsg);
+        } catch (error) {
+          console.error(`Could not submit selected tasks to queue: ${error}`)
+          setSeverity("error");
+          setMsg(`Could not submit selected tasks to queue: ${error}`)
+        }
+      }
 
       const handleSnackbarClose = (
         _event: React.SyntheticEvent | Event,
@@ -188,14 +220,15 @@ export function ExperimentList() {
               variant="contained"
               color="primary"
               startIcon={<QueueIcon />}
-              onClick={async () => {
-                const selected = table
-                  .getSelectedRowModel()
-                  .rows.map((row) => row.original);
-                await submitQueueTasks(selected);
-                setMsg(`${selectedCount} tasks added to queue`);
-                setOpenSnackbar(true);
-              }}
+              onClick={async () => handleClick(selectedCount)}
+              // onClick={async () => {
+              //   const selected = table
+              //     .getSelectedRowModel()
+              //     .rows.map((row) => row.original);
+              //   await submitQueueTasks(selected);
+              //   setMsg(`${selectedCount} tasks added to queue`);
+              //   setOpenSnackbar(true);
+              // }}
             >
               Add selected {selectedCount} to queue
             </Button>
@@ -203,17 +236,18 @@ export function ExperimentList() {
             <Button
               variant="contained"
               startIcon={<QueueIcon />}
-              onClick={async () => {
-                table.toggleAllRowsSelected(true);
+              onClick={async () => handleClick(selectedCount)}
+              // onClick={async () => {
+              //   table.toggleAllRowsSelected(true);
 
-                const allRows = table
-                  .getPrePaginationRowModel()
-                  .rows.map((row) => row.original);
+              //   const allRows = table
+              //     .getPrePaginationRowModel()
+              //     .rows.map((row) => row.original);
 
-                await submitQueueTasks(allRows);
-                setMsg(`All tasks added to queue`);
-                setOpenSnackbar(true);
-              }}
+              //   await submitQueueTasks(allRows);
+              //   setMsg(`All tasks added to queue`);
+              //   setOpenSnackbar(true);
+              // }}
             >
               Add all to queue
             </Button>
@@ -224,7 +258,7 @@ export function ExperimentList() {
             onClose={handleSnackbarClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
-            <Alert onClose={handleSnackbarClose} severity="success">
+            <Alert onClose={handleSnackbarClose} severity={severity}>
               {msg}
             </Alert>
           </Snackbar>
