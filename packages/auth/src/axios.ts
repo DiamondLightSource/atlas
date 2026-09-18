@@ -15,6 +15,13 @@ export function createAxiosWithLoginRedirect(
     (response) => response,
     (error) => {
       if (error?.response?.status === 401) {
+        const method = (
+          (error.response?.config?.method as string) ?? "get"
+        ).toUpperCase();
+        const url = (error.config?.baseURL ?? "") + (error.config?.url ?? "");
+        console.warn(
+          `[@atlas/auth] 401 from ${method} ${url} - redirecting to login`,
+        );
         triggerRedirect();
       }
       return Promise.reject(error);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { AxiosResponse } from "axios";
+import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { createAxiosWithLoginRedirect } from "./axios";
 
 describe("createAxiosWithLoginRedirect", () => {
@@ -11,9 +11,10 @@ describe("createAxiosWithLoginRedirect", () => {
   });
 
   function failingAdapter(status: number) {
-    return async (): Promise<AxiosResponse> => {
+    return async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
       const error: any = new Error(`Request failed with status ${status}`);
-      error.response = { status, data: null, headers: {}, config: {} };
+      error.response = { status, data: null, headers: {}, config };
+      error.config = config;
       error.isAxiosError = true;
       throw error;
     };
@@ -52,5 +53,21 @@ describe("createAxiosWithLoginRedirect", () => {
     ]);
 
     expect(login).toHaveBeenCalledOnce();
+  });
+
+  it("logs the method and URL of the call that triggered the redirect", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const instance = createAxiosWithLoginRedirect(vi.fn(), {
+      adapter: failingAdapter(401),
+      baseURL: "https://atlas.diamond.ac.uk",
+    });
+
+    await instance.get("/api/scans").catch(() => {});
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("GET https://atlas.diamond.ac.uk/api/scans"),
+    );
+
+    warn.mockRestore();
   });
 });

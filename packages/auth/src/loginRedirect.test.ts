@@ -54,4 +54,18 @@ describe("createFetchWithLoginRedirect", () => {
 
     expect(login).toHaveBeenCalledOnce();
   });
+
+  it("logs the method and URL of the call that triggered the redirect", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchImpl = vi.fn().mockResolvedValue(fakeResponse(401));
+    const wrapped = createFetchLoginRedirect(vi.fn(), fetchImpl);
+
+    await wrapped("/api/scans", { method: "POST" });
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("POST /api/scans"),
+    );
+
+    warn.mockRestore();
+  });
 });

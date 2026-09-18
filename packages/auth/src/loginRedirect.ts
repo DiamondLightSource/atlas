@@ -35,6 +35,11 @@ export function createFetchLoginRedirect(
   ): Promise<Response> {
     const res = await fetchImpl(input, init);
     if (res.status === 401) {
+      const method = init?.method ?? "GET";
+      const url = input instanceof Request ? input.url : String(input);
+      console.warn(
+        `[@atlas/auth] 401 from ${method} ${url} - redirecting to login`,
+      );
       triggerRedirect();
     }
     return res;
