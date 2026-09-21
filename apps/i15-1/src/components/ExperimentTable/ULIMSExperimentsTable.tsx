@@ -164,8 +164,8 @@ export function ExperimentList() {
       const selectedCount = table.getSelectedRowModel().rows.length;
 
       const handleClick = async (selected: number) => {
-        let selectedRows;
-        let successMsg;
+        let selectedRows: ExperimentTableData[];
+        let successMsg: string;
         if (selected > 0) {
           console.log("Add selected");
           selectedRows = table
