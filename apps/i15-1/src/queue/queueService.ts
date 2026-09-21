@@ -289,6 +289,7 @@ export const submitQueueTasks = async ({
     if (response.response?.ok) {
       return response;
     } else {
+      console.error(JSON.stringify(response.error?.detail));
       throw new Error(
         `${response.response?.status}, ${response.response?.statusText}`,
       );
