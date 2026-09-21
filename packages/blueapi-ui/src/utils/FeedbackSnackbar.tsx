@@ -1,5 +1,4 @@
 import { Alert, Snackbar, type SnackbarCloseReason } from "@mui/material";
-import { Proportions } from "lucide-react";
 import React from "react";
 
 export type SeverityLevel = "success" | "info" | "warning" | "error";

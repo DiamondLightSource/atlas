@@ -9,9 +9,11 @@ import {
 import type { WorkerStateRequest } from "@atlas/blueapi";
 import { useSetWorkerState } from "@atlas/blueapi-query";
 import React, { useState } from "react";
+import { FeedbackSnackbar } from "@atlas/blueapi-ui";
 
 export function AbortPlanButton() {
   const workerState = useSetWorkerState();
+  const abortMsg = "Abort button pressed, will abort current plan ...";
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
   const abortPlan = async () => {
@@ -27,17 +29,6 @@ export function AbortPlanButton() {
     await abortPlan();
   };
 
-  const handleSnackbarClose = (
-    _event: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenSnackbar(false);
-  };
-
   return (
     <React.Fragment>
       <Tooltip title="Abort current blueapi operation" placement="bottom">
@@ -50,16 +41,13 @@ export function AbortPlanButton() {
           Abort
         </Button>
       </Tooltip>
-      <Snackbar
+      <FeedbackSnackbar
         open={openSnackbar}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert onClose={handleSnackbarClose} severity="warning">
-          Abort button pressed, will abort current plan ...
-        </Alert>
-      </Snackbar>
+        setOpen={setOpenSnackbar}
+        message={abortMsg}
+        severity="warning"
+        timeout={5000}
+      />
     </React.Fragment>
   );
 }
