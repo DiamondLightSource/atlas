@@ -167,13 +167,13 @@ export function ExperimentList() {
         let selectedRows;
         let successMsg;
         if (selected > 0) {
-          console.log("Add selected")
+          console.log("Add selected");
           selectedRows = table
             .getSelectedRowModel()
             .rows.map((row) => row.original);
-          successMsg = `${selected} tasks added to queue`;
+          successMsg = `${selected} task(s) added to queue`;
         } else {
-          console.log("Add all")
+          console.log("Add all");
           table.toggleAllRowsSelected(true);
           selectedRows = table
             .getPrePaginationRowModel()
@@ -186,11 +186,11 @@ export function ExperimentList() {
           setSeverity("success");
           setMsg(successMsg);
         } catch (error) {
-          console.error(`Could not submit selected tasks to queue: ${error}`)
+          console.error(`Could not submit selected tasks to queue: ${error}`);
           setSeverity("error");
-          setMsg(`Could not submit selected tasks to queue: ${error}`)
+          setMsg(`Could not submit selected tasks to queue: ${error}`);
         }
-      }
+      };
 
       const handleSnackbarClose = (
         _event: React.SyntheticEvent | Event,
