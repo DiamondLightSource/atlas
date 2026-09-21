@@ -361,7 +361,7 @@ describe("ExperimentList", () => {
       // Table alert
       expect(alerts[0]).toHaveTextContent("3 of 3 row(s) selected");
       // Snackbar
-      expect(alerts[1]).toHaveTextContent("All tasks added to queue");
+      expect(alerts[1]).toHaveTextContent("All tasks (3) added to queue");
     });
   });
 
