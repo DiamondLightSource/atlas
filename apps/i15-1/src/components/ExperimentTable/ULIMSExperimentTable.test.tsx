@@ -375,7 +375,7 @@ describe("ExperimentList", () => {
     await waitFor(() => {
       const alerts = screen.getAllByRole("alert");
       expect(alerts[1]).toHaveTextContent(
-        "Could not submit selected tasks to queue:",
+        "Could not submit selected tasks to queue",
       );
     });
   });

@@ -178,7 +178,7 @@ export function ExperimentList() {
           selectedRows = table
             .getPrePaginationRowModel()
             .rows.map((row) => row.original);
-          successMsg = `All tasks added to queue`;
+          successMsg = `All tasks (${selectedRows.length}) added to queue`;
         }
         setOpenSnackbar(true);
         try {
@@ -188,7 +188,7 @@ export function ExperimentList() {
         } catch (error) {
           console.error(`Could not submit selected tasks to queue: ${error}`);
           setSeverity("error");
-          setMsg(`Could not submit selected tasks to queue: ${error}`);
+          setMsg(`Could not submit selected tasks to queue.\n${error}`);
         }
       };
 
