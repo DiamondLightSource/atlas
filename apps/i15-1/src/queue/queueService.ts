@@ -289,11 +289,11 @@ export const submitQueueTasks = async ({
     if (response.response?.ok) {
       return response;
     } else {
-      throw new Error(`Couldn't add task to queue: ${response.error?.detail}`);
+      throw new Error(
+        `${response.response?.status}, ${response.response?.statusText}`,
+      );
     }
   });
-
-  // return await addTasksToQueueQueuePost(data);
 };
 
 export function useSumbitQueueTasks() {
