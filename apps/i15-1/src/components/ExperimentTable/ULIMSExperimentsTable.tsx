@@ -28,6 +28,7 @@ import type {
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
+import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -43,8 +44,6 @@ export type SampleData = {
   composition: string;
   packing_fraction: number;
 };
-
-type SeverityLevel = "success" | "info" | "warning" | "error";
 
 const convertNodeToTableData = (
   node: ExperimentNode<SampleData, ExperimentDefinitionData>,
@@ -192,25 +191,6 @@ export function ExperimentList() {
         }
       };
 
-      const handleSnackbarClose = (
-        _event: React.SyntheticEvent | Event,
-        reason?: SnackbarCloseReason,
-      ) => {
-        if (reason === "clickaway") {
-          return;
-        }
-
-        setOpenSnackbar(false);
-      };
-
-      const getOpenDuration = (severity: SeverityLevel) => {
-        if (severity === "error") {
-          return 10000;
-        } else {
-          return 1000;
-        }
-      };
-
       return (
         <Stack
           direction="row"
@@ -241,16 +221,12 @@ export function ExperimentList() {
               Add all to queue
             </Button>
           )}
-          <Snackbar
+          <FeedbackSnackbar
             open={openSnackbar}
-            autoHideDuration={getOpenDuration(severity)}
-            onClose={handleSnackbarClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          >
-            <Alert onClose={handleSnackbarClose} severity={severity}>
-              {msg}
-            </Alert>
-          </Snackbar>
+            setOpen={setOpenSnackbar}
+            message={msg}
+            severity={severity}
+          />
         </Stack>
       );
     },
