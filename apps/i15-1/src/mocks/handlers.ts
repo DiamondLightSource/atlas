@@ -839,5 +839,5 @@ export const handlers = [
 
   http.post("/api/daq-queue/queue", () => {
     return HttpResponse.json(fakeExperiments);
-  })
+  }),
 ];

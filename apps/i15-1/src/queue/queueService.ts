@@ -285,13 +285,13 @@ export const submitQueueTasks = async ({
     },
   };
 
-  await addTasksToQueueQueuePost(data).then( async (response) => {
+  await addTasksToQueueQueuePost(data).then(async (response) => {
     if (response.response?.ok) {
       return response;
     } else {
-      throw new Error(`Couldn't add task to queue: ${response.error}`)
+      throw new Error(`Couldn't add task to queue: ${response.error?.detail}`);
     }
-  })
+  });
 
   // return await addTasksToQueueQueuePost(data);
 };
@@ -307,7 +307,7 @@ export function useSumbitQueueTasks() {
       ]);
     },
     onError: async (error) => {
-      console.error(error.message)
-    }
+      console.error(error.message);
+    },
   });
 }

@@ -365,6 +365,21 @@ describe("ExperimentList", () => {
     });
   });
 
+  it("shows alert with error message when submission to queue fails", async () => {
+    mockedUseSubmitTask.mockResolvedValue(null);
+
+    renderComponent();
+
+    fireEvent.click(screen.getByRole("button", { name: /add all to queue/i }));
+
+    await waitFor(() => {
+      const alerts = screen.getAllByRole("alert");
+      expect(alerts[1]).toHaveTextContent(
+        "Could not submit selected tasks to queue:",
+      );
+    });
+  });
+
   it("highlights rows amber when the sample has no parent", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
