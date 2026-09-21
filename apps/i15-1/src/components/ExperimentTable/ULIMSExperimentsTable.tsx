@@ -235,7 +235,7 @@ export function ExperimentList() {
           )}
           <Snackbar
             open={openSnackbar}
-            autoHideDuration={10000}
+            autoHideDuration={2000}
             onClose={handleSnackbarClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
