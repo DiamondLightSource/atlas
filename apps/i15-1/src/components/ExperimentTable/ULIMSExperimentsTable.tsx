@@ -203,6 +203,14 @@ export function ExperimentList() {
         setOpenSnackbar(false);
       };
 
+      const getOpenDuration = (severity: SeverityLevel) => {
+        if (severity === "error") {
+          return 10000;
+        } else {
+          return 1000;
+        }
+      };
+
       return (
         <Stack
           direction="row"
@@ -235,7 +243,7 @@ export function ExperimentList() {
           )}
           <Snackbar
             open={openSnackbar}
-            autoHideDuration={2000}
+            autoHideDuration={getOpenDuration(severity)}
             onClose={handleSnackbarClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
