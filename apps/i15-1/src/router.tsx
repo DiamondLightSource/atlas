@@ -5,7 +5,6 @@ import {
 } from "@atlas/app-shell";
 import {
   Activity,
-  ClipboardClock,
   ListTodo,
   LucideLayoutDashboard,
   ScanQrCode,
