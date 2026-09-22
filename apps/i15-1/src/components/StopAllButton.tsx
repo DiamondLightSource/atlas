@@ -92,7 +92,7 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
         {
           name: "move",
           instrument_session: session,
-          params: { fast_shutter: "Close" },
+          params: { moves: { fast_shutter: "Close" } },
         },
         (interim) => {
           setSeverity(interim.severity);
