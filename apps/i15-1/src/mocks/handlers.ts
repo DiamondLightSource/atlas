@@ -1005,4 +1005,8 @@ export const handlers = [
   http.get("/api/daq-queue/tasks", () => {
     return HttpResponse.json([...fakeHistory, ...fakeQueue]);
   }),
+
+  http.post("/api/daq-queue/queue", () => {
+    return HttpResponse.json(fakeExperiments);
+  }),
 ];

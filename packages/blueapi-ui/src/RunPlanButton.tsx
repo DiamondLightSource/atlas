@@ -1,9 +1,4 @@
-import {
-  Alert,
-  Button,
-  Snackbar,
-  type SnackbarCloseReason,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import React, { useState } from "react";
 
 import {
@@ -13,6 +8,7 @@ import {
   useSubmitTask,
 } from "@atlas/blueapi-query";
 import type { TaskRequest, TaskResponse } from "@atlas/blueapi";
+import { FeedbackSnackbar, type SeverityLevel } from "./utils/FeedbackSnackbar";
 
 export type RunPlanButtonProps = {
   name: string;
@@ -20,8 +16,6 @@ export type RunPlanButtonProps = {
   instrumentSession: string | null;
   buttonText?: string;
 };
-
-type SeverityLevel = "success" | "info" | "warning" | "error";
 
 const idleState = "IDLE";
 const abortState = "ABORTING";
@@ -113,17 +107,6 @@ export function RunPlanButton({
     }
   };
 
-  const handleSnackbarClose = (
-    _event: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenSnackbar(false);
-  };
-
   const isButtonDisabled = () => {
     const workerState = useGetWorkerState();
     const disable = workerState.data !== idleState;
@@ -142,16 +125,12 @@ export function RunPlanButton({
       >
         {buttonText}
       </Button>
-      <Snackbar
+      <FeedbackSnackbar
         open={openSnackbar}
-        autoHideDuration={10000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={severity}>
-          {msg}
-        </Alert>
-      </Snackbar>
+        setOpen={setOpenSnackbar}
+        message={msg}
+        severity={severity}
+      />
     </React.Fragment>
   );
 }
