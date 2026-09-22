@@ -106,7 +106,6 @@ describe("QueueView", () => {
             },
           ],
           kind: "Experiment",
-          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -145,7 +144,6 @@ describe("QueueView", () => {
             },
           ],
           kind: "Plan",
-          user: null,
         },
         {
           id: "1",
@@ -212,7 +210,6 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
-          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -262,7 +259,6 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
-          user: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
