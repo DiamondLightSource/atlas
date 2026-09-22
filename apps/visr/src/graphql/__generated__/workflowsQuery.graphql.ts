@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c3bb986a7e30fdfbeca998c39fb560a0>>
+ * @generated SignedSource<<93b8db52b82531bfd7fb750d306cfdf1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,6 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
+export type WorkflowLabelSelectorOperator = "DOES_NOT_EXIST" | "EQ" | "EXISTS" | "IN" | "NE" | "NOT_IN" | "%future added value";
 export type VisitInput = {
   number: number;
   proposalCode: string;
@@ -16,6 +17,7 @@ export type VisitInput = {
 };
 export type WorkflowFilter = {
   creator?: any | null | undefined;
+  labelSelectors?: ReadonlyArray<LabelSelector> | null | undefined;
   template?: any | null | undefined;
   workflowStatusFilter?: WorkflowStatusFilter | null | undefined;
 };
@@ -25,6 +27,11 @@ export type WorkflowStatusFilter = {
   pending?: boolean;
   running?: boolean;
   succeeded?: boolean;
+};
+export type LabelSelector = {
+  key: string;
+  operator: WorkflowLabelSelectorOperator;
+  values?: ReadonlyArray<string> | null | undefined;
 };
 export type workflowsQuery$variables = {
   cursor?: string | null | undefined;
