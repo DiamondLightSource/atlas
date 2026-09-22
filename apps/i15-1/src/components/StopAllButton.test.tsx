@@ -109,7 +109,7 @@ describe("StopAllButton", () => {
         {
           name: "move",
           instrument_session: "cm11111-1",
-          params: { fast_shutter: "Close" },
+          params: { moves: { fast_shutter: "Close" } },
         },
         expect.any(Function),
       );
@@ -131,7 +131,7 @@ describe("StopAllButton", () => {
         {
           name: "move",
           instrument_session: "cm22222-2",
-          params: { fast_shutter: "Close" },
+          params: { moves: { fast_shutter: "Close" } },
         },
         expect.any(Function),
       );
@@ -206,27 +206,11 @@ describe("StopAllButton", () => {
     });
   });
 
-  it("shows a submission-failed message when the task submission itself fails", async () => {
+  it("shows an error message when the task fails", async () => {
     useInstrumentSessionMock.mockReturnValue({
       instrumentSession: "cm11111-1",
     });
-    submitAndRunTaskMock.mockRejectedValue(new Error("SUBMISSION_FAILED"));
-
-    render(<StopAllButton />);
-    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "Abort submission failed!",
-      );
-    });
-  });
-
-  it("shows a generic error message for other task failures", async () => {
-    useInstrumentSessionMock.mockReturnValue({
-      instrumentSession: "cm11111-1",
-    });
-    submitAndRunTaskMock.mockRejectedValue(new Error("Some other failure"));
+    submitAndRunTaskMock.mockRejectedValue(new Error("Some failure"));
 
     render(<StopAllButton />);
     fireEvent.click(screen.getByRole("button", { name: /stop all/i }));

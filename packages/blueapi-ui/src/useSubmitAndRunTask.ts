@@ -53,7 +53,7 @@ export function useSubmitAndRunTask() {
   ): Promise<RunResult> => {
     const response = await submitTask.mutateAsync(task);
     if (!response) {
-      throw new Error("SUBMISSION_FAILED");
+      throw new Error("Plan submission failed!");
     }
     onSubmitted?.({ severity: "info", message: "Plan submission successful!" });
     return runTask(response.task_id);

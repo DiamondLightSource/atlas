@@ -102,14 +102,9 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
       setSeverity(result.severity);
       setMsg(result.message);
     } catch (error) {
-      if (error instanceof Error && error.message === "SUBMISSION_FAILED") {
-        setSeverity("error");
-        setMsg("Abort submission failed!");
-      } else {
-        setSeverity("error");
-        setMsg("Failed to abort, see console and blueapi logs for full error.");
-        console.log(`Failed to abort.\n Reason: ${error}`);
-      }
+      setSeverity("error");
+      setMsg("Failed to abort, see console and blueapi logs for full error.");
+      console.log(`Failed to abort.\n Reason: ${error}`);
     }
   };
 

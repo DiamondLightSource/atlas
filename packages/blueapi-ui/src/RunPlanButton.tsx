@@ -47,16 +47,11 @@ export function RunPlanButton({
         setSeverity(result.severity);
         setMsg(result.message);
       } catch (error) {
-        if (error instanceof Error && error.message === "SUBMISSION_FAILED") {
-          setSeverity("error");
-          setMsg("Plan submission failed!");
-        } else {
-          setSeverity("error");
-          setMsg(
-            `Failed to run plan ${name}, see console and blueapi logs for full error.`,
-          );
-          console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
-        }
+        setSeverity("error");
+        setMsg(
+          `Failed to run plan ${name}, see console and blueapi logs for full error.`,
+        );
+        console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
       } finally {
         setLoading(false);
       }
