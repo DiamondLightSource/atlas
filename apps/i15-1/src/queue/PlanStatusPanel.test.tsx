@@ -128,7 +128,9 @@ describe("TiledLinks", () => {
     const link = screen.getByText("10000").closest("a") as HTMLElement;
     await user.hover(link);
 
-    expect(await screen.findByText("tiled")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Open collection in tiled"),
+    ).toBeInTheDocument();
   });
 
   it("renders plain text (not a link) when a tiled_id is null", () => {

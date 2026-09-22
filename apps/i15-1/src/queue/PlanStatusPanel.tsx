@@ -18,7 +18,7 @@ function TiledLinks({ tiled_ids, run_numbers }: TiledLinksRowProps) {
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
       {tiled_ids.map((tiled_id, index) =>
         tiled_id != null ? (
-          <Tooltip title="tiled" key={index}>
+          <Tooltip title="Open collection in tiled" key={index}>
             <Link
               href={`${TILED_BASE_URL}${tiled_id}`}
               target="_blank"
