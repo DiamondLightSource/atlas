@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useGetWorkerState } from "@atlas/blueapi-query";
 import type { TaskRequest } from "@atlas/blueapi";
 
-import { useSubmitAndRunTask, type SeverityLevel } from "./useSubmitAndRunTask";
-import { FeedbackSnackbar } from "./utils/FeedbackSnackbar";
+import { useSubmitAndRunTask } from "./useSubmitAndRunTask";
+import { FeedbackSnackbar, type SeverityLevel } from "./utils/FeedbackSnackbar";
 
 export type RunPlanButtonProps = {
   name: string;
