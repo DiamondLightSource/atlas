@@ -71,6 +71,7 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue({
       data: [
         {
+          user: null,
           id: "1",
           position: 0,
           status: "Queued",
@@ -100,6 +101,8 @@ describe("QueueView", () => {
               time_completed: null,
               task_request: { name: "sleep", instrument_session: "session2" },
               blueapi_id: "1",
+              tiled_ids: [],
+              scan_ids: [],
             },
           ],
           kind: "Experiment",
@@ -113,6 +116,7 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "useGetAllTasks").mockReturnValue({
       data: [
         {
+          user: null,
           id: "0",
           position: null,
           status: "Complete",
@@ -135,6 +139,8 @@ describe("QueueView", () => {
               time_completed: "2026-07-06T10:23:55.100463",
               task_request: { name: "sleep", instrument_session: "session1" },
               blueapi_id: "0",
+              tiled_ids: [],
+              scan_ids: [],
             },
           ],
           kind: "Plan",
@@ -182,6 +188,7 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
       data: [
         {
+          user: null,
           id: "0",
           position: null,
           status: "Complete",
@@ -230,6 +237,7 @@ describe("QueueView", () => {
     vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
       data: [
         {
+          user: null,
           id: "0",
           position: null,
           status: "Error",

@@ -7,7 +7,7 @@ import {
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTasks } from "../../queue/queueService";
@@ -20,6 +20,7 @@ import type {
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
+import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
 export type ExperimentDefinitionData = {
   q_max: number;
@@ -114,6 +115,10 @@ export function ExperimentList() {
 
   const theme = useTheme();
 
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [msg, setMsg] = useState<string>("");
+  const [severity, setSeverity] = useState<SeverityLevel>("info");
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
@@ -149,6 +154,35 @@ export function ExperimentList() {
     renderTopToolbarCustomActions: ({ table }) => {
       const selectedCount = table.getSelectedRowModel().rows.length;
 
+      const handleClick = async (selected: number) => {
+        let selectedRows: ExperimentTableData[];
+        let successMsg: string;
+        if (selected > 0) {
+          console.log("Add selected");
+          selectedRows = table
+            .getSelectedRowModel()
+            .rows.map((row) => row.original);
+          successMsg = `${selected} task(s) added to queue`;
+        } else {
+          console.log("Add all");
+          table.toggleAllRowsSelected(true);
+          selectedRows = table
+            .getPrePaginationRowModel()
+            .rows.map((row) => row.original);
+          successMsg = `All tasks (${selectedRows.length}) added to queue`;
+        }
+        setOpenSnackbar(true);
+        try {
+          await submitQueueTasks(selectedRows);
+          setSeverity("success");
+          setMsg(successMsg);
+        } catch (error) {
+          console.error(`Could not submit selected tasks to queue: ${error}`);
+          setSeverity("error");
+          setMsg(`Could not submit selected tasks to queue.\n${error}`);
+        }
+      };
+
       return (
         <Stack
           direction="row"
@@ -166,12 +200,7 @@ export function ExperimentList() {
               variant="contained"
               color="primary"
               startIcon={<QueueIcon />}
-              onClick={async () => {
-                const selected = table
-                  .getSelectedRowModel()
-                  .rows.map((row) => row.original);
-                await submitQueueTasks(selected);
-              }}
+              onClick={async () => handleClick(selectedCount)}
             >
               Add selected {selectedCount} to queue
             </Button>
@@ -179,19 +208,17 @@ export function ExperimentList() {
             <Button
               variant="contained"
               startIcon={<QueueIcon />}
-              onClick={async () => {
-                table.toggleAllRowsSelected(true);
-
-                const allRows = table
-                  .getPrePaginationRowModel()
-                  .rows.map((row) => row.original);
-
-                await submitQueueTasks(allRows);
-              }}
+              onClick={async () => handleClick(selectedCount)}
             >
               Add all to queue
             </Button>
           )}
+          <FeedbackSnackbar
+            open={openSnackbar}
+            setOpen={setOpenSnackbar}
+            message={msg}
+            severity={severity}
+          />
         </Stack>
       );
     },

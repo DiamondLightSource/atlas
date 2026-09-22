@@ -268,6 +268,8 @@ const fakeHistory = [
         },
         errors: [],
         blueapi_id: "445773b4-b318-473d-9a60-83f2e38d54ba",
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -312,6 +314,8 @@ const fakeHistory = [
         result: "success",
         errors: [],
         blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
+        tiled_ids: ["6eb38bd5-5e90-4194-932c-5f9eaebb5fa2"],
+        scan_ids: ["10000"],
       },
       {
         task_request: {
@@ -326,6 +330,8 @@ const fakeHistory = [
         result: "success",
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
     ],
     position: null,
@@ -382,6 +388,8 @@ const fakeHistory = [
         },
         errors: [],
         blueapi_id: "445773b4-b318-473d-9a60-83f2e38d54ba",
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -416,6 +424,54 @@ const fakeHistory = [
             },
           },
           instrument_session: "cm44163-3",
+          tiled_ids: ["89632163-7378-44e9-bc0e-1eb90669b21e"],
+          scan_ids: ["10002"],
+        },
+        parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
+        status: "Success",
+        time_started: "2026-07-14T10:40:11.605521",
+        time_completed: "2026-07-14T10:40:11.911974",
+        result: "success",
+        errors: [],
+        blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
+        tiled_ids: ["823737d8-9604-47a5-962c-ce5cb2bf67c7"],
+        scan_ids: [10008],
+      },
+      {
+        task_request: {
+          name: "data_collection",
+          params: {
+            start_z: -20,
+            end_z: 0,
+            steps: 20,
+            exposure_time: 0.01,
+            metadata: {
+              sample: {
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                data: {
+                  density: 56,
+                  capillary: "bs1.5",
+                  composition: "Stuff",
+                  packing_fraction: 0.5,
+                },
+              },
+              experiment_definition: {
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+                data: {
+                  q_max: 67,
+                  frames: 90,
+                  beam_energy: 40,
+                  time_per_pdf: 2,
+                  focused_beam_size: 10,
+                },
+              },
+            },
+          },
+          instrument_session: "cm44163-3",
+          tiled_ids: ["89632163-7378-44e9-bc0e-1eb90669b21e"],
+          scan_ids: ["10002"],
         },
         parent_task_id: "b275be03-6375-4dc5-a31e-b1352c23dd9d",
         status: "Error",
@@ -431,6 +487,11 @@ const fakeHistory = [
           },
         ],
         blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
+        tiled_ids: [
+          "823737d8-9604-47a5-962c-ce5cb2bf67c7",
+          "c9158ed5-9b5b-49d7-a8d4-cc49211a1008",
+        ],
+        scan_ids: [10009, 10010],
       },
       {
         task_request: {
@@ -445,6 +506,8 @@ const fakeHistory = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
     ],
     position: null,
@@ -500,6 +563,8 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: "9363680a-2129-4012-9a87-58af7f963c55",
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -519,6 +584,54 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: "3edfdaf9-71f5-4a9b-87e7-170bb97e3eab",
+        tiled_ids: [],
+        scan_ids: [],
+      },
+      {
+        task_request: {
+          name: "data_collection",
+          params: {
+            start_z: -20,
+            end_z: 0,
+            steps: 20,
+            exposure_time: 0.01,
+            metadata: {
+              sample: {
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                data: {
+                  density: 56,
+                  capillary: "bs1.5",
+                  composition: "Stuff",
+                  packing_fraction: 0.5,
+                },
+              },
+              experiment_definition: {
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+                data: {
+                  q_max: 67,
+                  frames: 90,
+                  beam_energy: 40,
+                  time_per_pdf: 2,
+                  focused_beam_size: 10,
+                },
+              },
+            },
+          },
+          instrument_session: "cm44163-3",
+          tiled_ids: ["89632163-7378-44e9-bc0e-1eb90669b21e"],
+          scan_ids: ["10002"],
+        },
+        parent_task_id: "61e500d6-33ce-432e-9ae2-42ba1d5214a0",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -533,6 +646,8 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
     ],
     position: 1,
@@ -564,6 +679,8 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
     ],
     position: 2,
@@ -616,6 +733,8 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -635,6 +754,54 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
+      },
+      {
+        task_request: {
+          name: "data_collection",
+          params: {
+            start_z: -20,
+            end_z: 0,
+            steps: 20,
+            exposure_time: 0.01,
+            metadata: {
+              sample: {
+                name: "Test_8_1",
+                id: "a47cd8af-03f4-430b-9858-749c61f6e14c",
+                data: {
+                  density: 56,
+                  capillary: "bs1.5",
+                  composition: "Stuff",
+                  packing_fraction: 0.5,
+                },
+              },
+              experiment_definition: {
+                name: "run_full_collection",
+                id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
+                data: {
+                  q_max: 67,
+                  frames: 90,
+                  beam_energy: 40,
+                  time_per_pdf: 2,
+                  focused_beam_size: 10,
+                },
+              },
+            },
+          },
+          instrument_session: "cm44163-3",
+          tiled_ids: ["89632163-7378-44e9-bc0e-1eb90669b21e"],
+          scan_ids: ["10002"],
+        },
+        parent_task_id: "b715f350-401a-48b9-929f-d6bcad064264",
+        status: "Waiting",
+        time_started: null,
+        time_completed: null,
+        result: null,
+        errors: [],
+        blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
       {
         task_request: {
@@ -649,6 +816,8 @@ const fakeQueue = [
         result: null,
         errors: [],
         blueapi_id: null,
+        tiled_ids: [],
+        scan_ids: [],
       },
     ],
     position: 3,
@@ -835,5 +1004,9 @@ export const handlers = [
 
   http.get("/api/daq-queue/tasks", () => {
     return HttpResponse.json([...fakeHistory, ...fakeQueue]);
+  }),
+
+  http.post("/api/daq-queue/queue", () => {
+    return HttpResponse.json(fakeExperiments);
   }),
 ];

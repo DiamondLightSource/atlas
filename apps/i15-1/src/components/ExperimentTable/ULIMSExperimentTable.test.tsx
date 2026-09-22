@@ -257,6 +257,11 @@ describe("ExperimentList", () => {
           },
         ],
       });
+      const alerts = screen.getAllByRole("alert");
+      // Table alert
+      expect(alerts[0]).toHaveTextContent("1 of 3 row(s) selected");
+      // Snackbar
+      expect(alerts[1]).toHaveTextContent("1 task(s) added to queue");
     });
   });
 
@@ -352,6 +357,26 @@ describe("ExperimentList", () => {
           },
         ],
       });
+      const alerts = screen.getAllByRole("alert");
+      // Table alert
+      expect(alerts[0]).toHaveTextContent("3 of 3 row(s) selected");
+      // Snackbar
+      expect(alerts[1]).toHaveTextContent("All tasks (3) added to queue");
+    });
+  });
+
+  it("shows alert with error message when submission to queue fails", async () => {
+    mockedUseSubmitTask.mockResolvedValue(null);
+
+    renderComponent();
+
+    fireEvent.click(screen.getByRole("button", { name: /add all to queue/i }));
+
+    await waitFor(() => {
+      const alerts = screen.getAllByRole("alert");
+      expect(alerts[1]).toHaveTextContent(
+        "Could not submit selected tasks to queue",
+      );
     });
   });
 
