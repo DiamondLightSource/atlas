@@ -35,44 +35,36 @@ const navigation: SectionGroup[] = [
         ],
       },
       {
-        name: "Setup",
-        icon: <SlidersHorizontal />,
-        path: "setup",
-        pages: [
-          {
-            name: "Playlist",
-            element: <Playlist />,
-          },
-          {
-            name: "Samples",
-            element: <div />,
-          },
-          {
-            name: "Pucks",
-            element: <Pucks />,
-          },
-        ],
-      },
-      {
         name: "Acquisition",
         icon: <ScanQrCode />,
         path: "acquisition",
         pages: [
           {
-            name: "Home",
-            element: <div />,
-          },
-          {
             name: "Robot",
             element: <Robot />,
           },
           {
-            name: "Stage",
-            element: <div />,
-          },
-          {
             name: "Plans",
             element: <PlanBrowser />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    sections: [
+      {
+        name: "Setup",
+        icon: <SlidersHorizontal />,
+        path: "setup",
+        pages: [
+          {
+            name: "Pucks",
+            element: <Pucks />,
+          },
+          {
+            name: "Playlist",
+            element: <Playlist />,
           },
         ],
       },
@@ -105,16 +97,6 @@ const navigation: SectionGroup[] = [
             element: <DataVisRedirect />,
           },
         ],
-      },
-    ],
-  },
-  {
-    sections: [
-      {
-        name: "Log",
-        icon: <ClipboardClock />,
-        path: "log",
-        pages: [{ name: "Log", element: <div /> }],
       },
     ],
   },
