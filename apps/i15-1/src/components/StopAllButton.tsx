@@ -11,7 +11,8 @@ import { useBlueapi } from "@atlas/blueapi-query";
 import {
   useSubmitAndRunTask,
   type SeverityLevel,
-} from "../../../../packages/blueapi-ui/src/useSubmitAndRunTask";
+  FeedbackSnackbar,
+} from "@atlas/blueapi-ui";
 import { useInstrumentSession } from "@atlas/app-shell";
 
 export interface StopAllButtonProps {
@@ -68,16 +69,6 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
     }
   };
 
-  const handleSnackbarClose = (
-    _event: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
-
   return (
     <>
       <Button
@@ -101,16 +92,12 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
       >
         <DangerousOutlinedIcon /> {compact ? "" : "STOP ALL"}
       </Button>
-      <Snackbar
+      <FeedbackSnackbar
         open={openSnackbar}
-        autoHideDuration={10000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={severity}>
-          {msg}
-        </Alert>
-      </Snackbar>
+        setOpen={setOpenSnackbar}
+        message={msg}
+        severity={severity}
+      />
     </>
   );
 }

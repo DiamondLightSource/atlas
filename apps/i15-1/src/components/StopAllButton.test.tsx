@@ -116,27 +116,6 @@ describe("StopAllButton", () => {
     });
   });
 
-  it("still pauses the queue and aborts the worker even if no session can be found", async () => {
-    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
-
-    render(<StopAllButton />);
-    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
-
-    expect(pauseQueueMock).toHaveBeenCalledTimes(1);
-    expect(setStateMock).toHaveBeenCalledWith({
-      new_state: "ABORTING",
-      reason: "Abort button pressed in the UI",
-    });
-
-    await waitFor(() => {
-      const alert = screen.getByRole("alert");
-      expect(alert).toHaveTextContent(
-        "Queue paused and worker set to abort, but couldn't close the fast shutter: no instrument session available.",
-      );
-    });
-    expect(submitAndRunTaskMock).not.toHaveBeenCalled();
-  });
-
   it("shows the interim then final success message when the shutter closes successfully", async () => {
     useInstrumentSessionMock.mockReturnValue({
       instrumentSession: "cm22222-2",

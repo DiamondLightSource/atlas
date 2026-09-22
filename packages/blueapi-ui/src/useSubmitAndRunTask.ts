@@ -5,7 +5,7 @@ import {
 } from "@atlas/blueapi-query";
 import type { TaskRequest } from "@atlas/blueapi";
 
-export type SeverityLevel = "success" | "info" | "warning" | "error";
+import type { SeverityLevel } from "./utils/FeedbackSnackbar";
 
 export type RunResult = {
   severity: SeverityLevel;
