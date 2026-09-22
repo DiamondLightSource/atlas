@@ -1,9 +1,4 @@
-import {
-  Alert,
-  Button,
-  Snackbar,
-  type SnackbarCloseReason,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import { usePauseQueue } from "../queue/queueService";
 import DangerousOutlinedIcon from "@mui/icons-material/DangerousOutlined";
