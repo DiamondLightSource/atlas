@@ -83,6 +83,14 @@ export type BlueapiConfig = {
 };
 
 /**
+ * BlueapiConfig
+ */
+export type BlueapiConfig = {
+  stomp?: StompConfig;
+  api?: RestConfig;
+};
+
+/**
  * CORSConfig
  */
 export type CorsConfig = {
@@ -156,7 +164,7 @@ export type Experiment = {
    * Instrument Session
    */
   instrument_session: string;
-  sample: Sample;
+  sample: Sample | null;
   experiment_definition: ExperimentDefinition;
 };
 
