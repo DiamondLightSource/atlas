@@ -1,20 +1,53 @@
-import { Box, Collapse, Typography } from "@mui/material";
+import { Box, Collapse, Link, Tooltip, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
-import type {
-  BlueapiCallResponse,
-  CallStatus,
-  TaskRequest,
-} from "../../generated/queue/types.gen";
+import type { BlueapiCallResponse } from "../../generated/queue/types.gen";
 import { JsonView } from "../components/JsonView";
 import { TaskStatusIcon } from "./TaskStatusIcon";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+
+const TILED_BASE_URL = "https://tiled-ui.diamond.ac.uk/ui/browse/";
+
+interface TiledLinksRowProps {
+  tiled_ids: (string | null)[];
+  run_numbers: (string | number)[];
+}
+
+function TiledLinks({ tiled_ids, run_numbers }: TiledLinksRowProps) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      {tiled_ids.map((tiled_id, index) =>
+        tiled_id != null ? (
+          <Tooltip title="Open collection in tiled" key={index}>
+            <Link
+              href={`${TILED_BASE_URL}${tiled_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="hover"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.3,
+              }}
+            >
+              {run_numbers[index]}
+              <OpenInNewIcon sx={{ fontSize: 14 }} />
+            </Link>
+          </Tooltip>
+        ) : (
+          <Typography variant="body2" key={index}>
+            {run_numbers[index]}
+          </Typography>
+        ),
+      )}
+    </Box>
+  );
+}
 
 function PlanStatusRow({
-  status,
-  task_request,
+  blueapi_call,
 }: {
-  status: CallStatus;
-  task_request: TaskRequest;
+  blueapi_call: BlueapiCallResponse;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -36,12 +69,17 @@ function PlanStatusRow({
             color: "action.active",
           }}
         />
-        <TaskStatusIcon status={status} />
-        <Typography>{task_request.name}</Typography>
+        <TaskStatusIcon status={blueapi_call.status} />
+        <Typography>{blueapi_call.task_request.name}</Typography>
+
+        <TiledLinks
+          tiled_ids={blueapi_call.tiled_ids}
+          run_numbers={blueapi_call.scan_ids}
+        />
       </Box>
 
       <Collapse in={open} unmountOnExit>
-        <JsonView data={task_request} />
+        <JsonView data={blueapi_call.task_request} />
       </Collapse>
     </Box>
   );
@@ -53,8 +91,7 @@ export function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
       {data.map((call, i) => (
         <PlanStatusRow
           key={`${call.task_request.name}-${i}`}
-          status={call.status}
-          task_request={call.task_request}
+          blueapi_call={call}
         />
       ))}
     </Box>
