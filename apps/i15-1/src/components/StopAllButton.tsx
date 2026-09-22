@@ -5,8 +5,6 @@ import {
   type SnackbarCloseReason,
 } from "@mui/material";
 import { useState } from "react";
-import { useLazyQuery } from "@apollo/client/react";
-import type { TypedDocumentNode } from "@apollo/client";
 import { usePauseQueue } from "../queue/queueService";
 import DangerousOutlinedIcon from "@mui/icons-material/DangerousOutlined";
 import { useBlueapi } from "@atlas/blueapi-query";
@@ -15,56 +13,29 @@ import {
   type SeverityLevel,
 } from "../../../../packages/blueapi-ui/src/useSubmitAndRunTask";
 import { useInstrumentSession } from "@atlas/app-shell";
-import { getInstrumentSessionsQuery } from "../graphql/getInstrumentSessionsQuery.ts";
-import type {
-  InstrumentSessionQuery,
-  InstrumentSessionQueryVariables,
-} from "../graphql/getInstrumentSessionsQuery.generated.ts";
 
 export interface StopAllButtonProps {
   compact?: boolean;
 }
-
-const GET_SESSIONS: TypedDocumentNode<
-  InstrumentSessionQuery,
-  InstrumentSessionQueryVariables
-> = getInstrumentSessionsQuery;
 
 export function StopAllButton({ compact }: StopAllButtonProps) {
   const blueapi = useBlueapi();
   const pause_queue = usePauseQueue();
   const { submitAndRunTask } = useSubmitAndRunTask();
   const { instrumentSession } = useInstrumentSession();
-  const [fetchSessions] = useLazyQuery(GET_SESSIONS);
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [msg, setMsg] = useState<string>("");
   const [severity, setSeverity] = useState<SeverityLevel>("info");
 
-  // Use the currently selected session if there is one. Otherwise, any
-  // available session will do for the purposes of aborting.
-  const getAnySession = async (): Promise<string | null> => {
+  // Use the currently selected session if there is one. Otherwise, a default
+  // session should work for now (see https://github.com/DiamondLightSource/blueapi/issues/1616#issuecomment-5778972411)
+  const getAnySession = async (): Promise<string> => {
     if (instrumentSession) {
       return instrumentSession;
     }
 
-    try {
-      const { data } = await fetchSessions({
-        variables: { instrumentKey: "I15-1" },
-      });
-
-      const edges = data?.instrumentByKey?.instrumentSessions?.edges;
-      const sessionsList =
-        edges?.flatMap((edge) => {
-          const ref = edge?.node?.instrumentSessionReference;
-          return ref ? [ref.toLocaleLowerCase()] : [];
-        }) ?? [];
-
-      return sessionsList[0] ?? null;
-    } catch (err) {
-      console.error("Failed to fetch sessions:", err);
-      return null;
-    }
+    return "cm11111-1";
   };
 
   const abort = async () => {
@@ -76,17 +47,6 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
     });
 
     const session = await getAnySession();
-    if (!session) {
-      setSeverity("error");
-      setMsg(
-        "Queue paused and worker set to abort, but couldn't close the fast shutter: no instrument session available.",
-      );
-      console.log(
-        "Failed to close fast shutter.\n No instrument session available.",
-      );
-      return;
-    }
-
     try {
       const result = await submitAndRunTask(
         {

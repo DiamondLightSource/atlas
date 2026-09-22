@@ -5,7 +5,6 @@ import { fireEvent, render, screen, waitFor } from "@atlas/vitest-conf";
 const pauseQueueMock = vi.fn();
 const setStateMock = vi.fn();
 const submitAndRunTaskMock = vi.fn();
-const fetchSessionsMock = vi.fn();
 const useInstrumentSessionMock = vi.fn();
 
 vi.mock("../queue/queueService", () => ({
@@ -28,31 +27,14 @@ vi.mock("@atlas/app-shell", () => ({
   useInstrumentSession: () => useInstrumentSessionMock(),
 }));
 
-vi.mock("@apollo/client/react", () => ({
-  useLazyQuery: () => [fetchSessionsMock],
-}));
-
 vi.mock("../graphql/getInstrumentSessionsQuery.ts", () => ({
   getInstrumentSessionsQuery: {},
 }));
-
-const buildSessionsResponse = (refs: string[]) => ({
-  data: {
-    instrumentByKey: {
-      instrumentSessions: {
-        edges: refs.map((ref) => ({
-          node: { instrumentSessionReference: ref },
-        })),
-      },
-    },
-  },
-});
 
 describe("StopAllButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
-    fetchSessionsMock.mockResolvedValue(buildSessionsResponse([]));
     submitAndRunTaskMock.mockResolvedValue({
       severity: "success",
       message: "Plan succeeded",
@@ -98,30 +80,8 @@ describe("StopAllButton", () => {
 
   it("uses the currently selected instrument session without fetching sessions", async () => {
     useInstrumentSessionMock.mockReturnValue({
-      instrumentSession: "cm11111-1",
+      instrumentSession: "cm22222-2",
     });
-
-    render(<StopAllButton />);
-    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
-
-    await waitFor(() => {
-      expect(submitAndRunTaskMock).toHaveBeenCalledWith(
-        {
-          name: "move",
-          instrument_session: "cm11111-1",
-          params: { moves: { fast_shutter: "Close" } },
-        },
-        expect.any(Function),
-      );
-    });
-    expect(fetchSessionsMock).not.toHaveBeenCalled();
-  });
-
-  it("fetches and uses any available session when none is selected", async () => {
-    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
-    fetchSessionsMock.mockResolvedValue(
-      buildSessionsResponse(["CM22222-2", "CM33333-3"]),
-    );
 
     render(<StopAllButton />);
     fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
@@ -136,14 +96,28 @@ describe("StopAllButton", () => {
         expect.any(Function),
       );
     });
-    expect(fetchSessionsMock).toHaveBeenCalledWith({
-      variables: { instrumentKey: "I15-1" },
+  });
+
+  it("uses an arbitrary session when none is selected", async () => {
+    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
+
+    render(<StopAllButton />);
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
+
+    await waitFor(() => {
+      expect(submitAndRunTaskMock).toHaveBeenCalledWith(
+        {
+          name: "move",
+          instrument_session: "cm11111-1",
+          params: { moves: { fast_shutter: "Close" } },
+        },
+        expect.any(Function),
+      );
     });
   });
 
   it("still pauses the queue and aborts the worker even if no session can be found", async () => {
     useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
-    fetchSessionsMock.mockResolvedValue(buildSessionsResponse([]));
 
     render(<StopAllButton />);
     fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
@@ -163,27 +137,9 @@ describe("StopAllButton", () => {
     expect(submitAndRunTaskMock).not.toHaveBeenCalled();
   });
 
-  it("still pauses the queue and aborts the worker even if the session fetch throws", async () => {
-    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
-    fetchSessionsMock.mockRejectedValue(new Error("network error"));
-
-    render(<StopAllButton />);
-    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
-
-    expect(pauseQueueMock).toHaveBeenCalledTimes(1);
-    expect(setStateMock).toHaveBeenCalledTimes(1);
-
-    await waitFor(() => {
-      const alert = screen.getByRole("alert");
-      expect(alert).toHaveTextContent(
-        "Queue paused and worker set to abort, but couldn't close the fast shutter: no instrument session available.",
-      );
-    });
-  });
-
   it("shows the interim then final success message when the shutter closes successfully", async () => {
     useInstrumentSessionMock.mockReturnValue({
-      instrumentSession: "cm11111-1",
+      instrumentSession: "cm22222-2",
     });
     submitAndRunTaskMock.mockImplementation(async (_task, onSubmitted) => {
       onSubmitted?.({
