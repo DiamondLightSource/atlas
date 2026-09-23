@@ -124,7 +124,7 @@ export function ExperimentList() {
     data: flatExperiments,
     enableRowOrdering: false,
     enableRowDragging: false,
-    enableRowSelection: (row) => experimentNotQueueable(row.original) === "", // disables selection from check box
+    enableRowSelection: (row) => experimentNotQueueable(row.original) === "", // Disables selection of invalid rows from check box
     muiSelectCheckboxProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
@@ -167,10 +167,12 @@ export function ExperimentList() {
         } else {
           console.log("Add all");
           table.toggleAllRowsSelected(true);
+          // Filtering still needed as getPrePaginationRowModel will get all rows
+          // even the ones that at this point are not checked.
           selectedRows = table
             .getPrePaginationRowModel()
             .rows.map((row) => row.original)
-            .filter((row) => experimentNotQueueable(row) === ""); // Filter out the orange ones
+            .filter((row) => experimentNotQueueable(row) === ""); // Filter out the invalid rows
           successMsg = `All tasks (${selectedRows.length}) added to queue`;
         }
         setOpenSnackbar(true);
