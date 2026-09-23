@@ -193,8 +193,13 @@ export function QueueView() {
   });
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
-      <Stack direction={"column"} spacing={4} alignItems={"center"}>
+    <Box sx={{ display: "flex", height: "100%", width: "100%", gap: 1 }}>
+      <Stack
+        direction={"column"}
+        spacing={4}
+        alignItems={"stretch"}
+        sx={{ flex: 1, minWidth: 0 }}
+      >
         <MaterialReactTable table={table} />
       </Stack>
     </Box>
