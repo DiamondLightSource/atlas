@@ -7,13 +7,13 @@ import { User } from "@diamondlightsource/sci-react-ui";
 import { InstrumentSessionButton } from "../components/getInstrumentSessionButton.tsx";
 import { Console } from "@atlas/blueapi-ui";
 
-function Dashboard() {
+async function Dashboard() {
   const user = useUserAuth();
 
   const handleLogIn = () => window.location.assign("/oauth2/sign_in");
   const handleLogOut = () => window.location.assign("/oauth2/sign_out");
 
-  return <Console />;
+  return <></>;
 }
 
 export default Dashboard;

@@ -11,9 +11,11 @@ import React, { useRef, useState } from "react";
 
 export type CommandPromptState = "ready" | "evaluating" | "continuation";
 
+export type CommandHandler = (command: string) => void | Promise<void>;
+
 type CommandPromptProps = {
   placeholder: string;
-  onSubmit: (command: string) => void | Promise<void>;
+  onSubmit: CommandHandler;
   status?: CommandPromptState;
 };
 
