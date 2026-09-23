@@ -36,27 +36,24 @@ export function StopAllButton({ compact }: StopAllButtonProps) {
 
   const abort = async () => {
     setOpenSnackbar(true);
-    pause_queue();
-    blueapi.worker.setState({
-      new_state: "ABORTING",
-      reason: "Abort button pressed in the UI",
-    });
-
-    const session = await getAnySession();
+    setSeverity("warning");
+    setMsg("Stop All in progress");
     try {
-      const result = await submitAndRunTask(
-        {
-          name: "move",
-          instrument_session: session,
-          params: { moves: { fast_shutter: "Close" } },
-        },
-        (interim) => {
-          setSeverity(interim.severity);
-          setMsg(interim.message);
-        },
-      );
-      setSeverity(result.severity);
-      setMsg(result.message);
+      pause_queue();
+      blueapi.worker.setState({
+        new_state: "ABORTING",
+        reason: "Stop All button pressed in the UI",
+      });
+
+      const session = await getAnySession();
+      await submitAndRunTask({
+        name: "move",
+        instrument_session: session,
+        params: { moves: { fast_shutter: "Close" } },
+      });
+      setOpenSnackbar(true);
+      setSeverity("success");
+      setMsg("Stop All finished successfully");
     } catch (error) {
       setSeverity("error");
       setMsg("Failed to abort, see console and blueapi logs for full error.");

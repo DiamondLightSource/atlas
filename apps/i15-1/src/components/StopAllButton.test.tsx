@@ -64,7 +64,7 @@ describe("StopAllButton", () => {
 
     expect(setStateMock).toHaveBeenCalledWith({
       new_state: "ABORTING",
-      reason: "Abort button pressed in the UI",
+      reason: "Stop All button pressed in the UI",
     });
   });
 
@@ -87,14 +87,11 @@ describe("StopAllButton", () => {
     fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
 
     await waitFor(() => {
-      expect(submitAndRunTaskMock).toHaveBeenCalledWith(
-        {
-          name: "move",
-          instrument_session: "cm22222-2",
-          params: { moves: { fast_shutter: "Close" } },
-        },
-        expect.any(Function),
-      );
+      expect(submitAndRunTaskMock).toHaveBeenCalledWith({
+        name: "move",
+        instrument_session: "cm22222-2",
+        params: { moves: { fast_shutter: "Close" } },
+      });
     });
   });
 
@@ -105,27 +102,17 @@ describe("StopAllButton", () => {
     fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
 
     await waitFor(() => {
-      expect(submitAndRunTaskMock).toHaveBeenCalledWith(
-        {
-          name: "move",
-          instrument_session: "cm11111-1",
-          params: { moves: { fast_shutter: "Close" } },
-        },
-        expect.any(Function),
-      );
+      expect(submitAndRunTaskMock).toHaveBeenCalledWith({
+        name: "move",
+        instrument_session: "cm11111-1",
+        params: { moves: { fast_shutter: "Close" } },
+      });
     });
   });
 
-  it("shows the interim then final success message when the shutter closes successfully", async () => {
+  it("shows the interim then final success message when finished", async () => {
     useInstrumentSessionMock.mockReturnValue({
       instrumentSession: "cm22222-2",
-    });
-    submitAndRunTaskMock.mockImplementation(async (_task, onSubmitted) => {
-      onSubmitted?.({
-        severity: "info",
-        message: "Plan submission successful!",
-      });
-      return { severity: "success", message: "Plan succeeded" };
     });
 
     render(<StopAllButton />);
@@ -133,11 +120,13 @@ describe("StopAllButton", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(
-        "Plan submission successful!",
+        "Stop All in progress",
       );
     });
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Plan succeeded");
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Stop All finished successfully",
+      );
     });
   });
 
