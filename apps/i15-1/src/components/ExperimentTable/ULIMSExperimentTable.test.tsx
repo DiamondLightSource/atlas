@@ -204,7 +204,7 @@ describe("ExperimentList", () => {
     renderComponent();
 
     // Click row checkbox (MRT adds checkboxes automatically)
-    const checkbox = screen.getAllByRole("checkbox")[1]; // first is "select all", second is row
+    const checkbox = screen.getAllByRole("checkbox")[0];
     fireEvent.click(checkbox);
 
     expect(
@@ -229,7 +229,7 @@ describe("ExperimentList", () => {
 
     renderComponent();
 
-    const checkbox = screen.getAllByRole("checkbox")[1];
+    const checkbox = screen.getAllByRole("checkbox")[0];
     fireEvent.click(checkbox);
 
     fireEvent.click(
@@ -241,17 +241,20 @@ describe("ExperimentList", () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         experiments: [
           {
-            name: "Exp 1",
+            name: "Exp 2",
             instrument_session: "",
             experiment_definition: {
               data: { beam_energy: 20, focused_beam_size: 5, time_per_pdf: 10 },
-              name: "Def 1",
+              name: "Def 2",
             },
             sample: {
-              data: { composition: "H2O", density: 1.2 },
-              name: "Sample A",
+              data: { composition: "CO2", density: 1.2 },
+              name: "Sample B",
               container: {
-                parent: null,
+                parent: {
+                  id: "container-parent-id",
+                  name: "i15-1 robot table",
+                },
               },
             },
           },
@@ -265,7 +268,7 @@ describe("ExperimentList", () => {
     });
   });
 
-  it("submits all tasks when clicking 'Add all to queue'", async () => {
+  it("submits all valid tasks when clicking 'Add all to queue'", async () => {
     const mutateAsync = vi.fn().mockResolvedValue(undefined);
 
     mockedUseQuery.mockReturnValue({
@@ -286,28 +289,6 @@ describe("ExperimentList", () => {
       expect(mutateAsync).toHaveBeenCalledTimes(1);
       expect(mutateAsync).toHaveBeenNthCalledWith(1, {
         experiments: [
-          {
-            name: "Exp 1",
-            instrument_session: "",
-            sample: {
-              name: "Sample A",
-              container: {
-                parent: null,
-              },
-              data: {
-                density: 1.2,
-                composition: "H2O",
-              },
-            },
-            experiment_definition: {
-              name: "Def 1",
-              data: {
-                beam_energy: 20,
-                time_per_pdf: 10,
-                focused_beam_size: 5,
-              },
-            },
-          },
           {
             name: "Exp 2",
             instrument_session: "",
@@ -334,34 +315,13 @@ describe("ExperimentList", () => {
               },
             },
           },
-          {
-            name: "Exp 3",
-            instrument_session: "",
-
-            sample: {
-              name: "Sample B",
-              container: null,
-              data: {
-                density: 1.2,
-                composition: "CO2",
-              },
-            },
-            experiment_definition: {
-              name: "Def 3",
-              data: {
-                beam_energy: 20,
-                time_per_pdf: 10,
-                focused_beam_size: 5,
-              },
-            },
-          },
         ],
       });
       const alerts = screen.getAllByRole("alert");
       // Table alert
-      expect(alerts[0]).toHaveTextContent("3 of 3 row(s) selected");
+      expect(alerts[0]).toHaveTextContent("1 of 3 row(s) selected");
       // Snackbar
-      expect(alerts[1]).toHaveTextContent("All tasks (3) added to queue");
+      expect(alerts[1]).toHaveTextContent("All tasks (1) added to queue");
     });
   });
 
