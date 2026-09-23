@@ -1,13 +1,10 @@
 import { Button } from "@mui/material";
 import React, { useState } from "react";
 
-import {
-  useBlueapi,
-  useGetWorkerState,
-  useSetActiveTask,
-  useSubmitTask,
-} from "@atlas/blueapi-query";
-import type { TaskRequest, TaskResponse } from "@atlas/blueapi";
+import { useGetWorkerState } from "@atlas/blueapi-query";
+import type { TaskRequest } from "@atlas/blueapi";
+
+import { useSubmitAndRunTask } from "./useSubmitAndRunTask";
 import { FeedbackSnackbar, type SeverityLevel } from "./utils/FeedbackSnackbar";
 
 export type RunPlanButtonProps = {
@@ -18,7 +15,6 @@ export type RunPlanButtonProps = {
 };
 
 const idleState = "IDLE";
-const abortState = "ABORTING";
 
 export function RunPlanButton({
   name,
@@ -32,71 +28,33 @@ export function RunPlanButton({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const blueapi = useBlueapi();
-
-  const submitTask = useSubmitTask();
-  const startTask = useSetActiveTask();
-
-  const waitForIdle = async (timeoutInMs: number): Promise<void> => {
-    return new Promise((res) => setTimeout(res, timeoutInMs));
-  };
-
-  const runTask = async (task_id: string) => {
-    await startTask.mutateAsync(task_id).then(async (response) => {
-      if (response) {
-        let status = await blueapi.worker.getState();
-        while (status !== idleState && status !== abortState) {
-          await waitForIdle(100);
-          status = await blueapi.worker.getState();
-        }
-        const data = await blueapi.tasks.get(task_id);
-        if (data.is_complete) {
-          if (data.outcome?.outcome === "success") {
-            setSeverity("success");
-            setMsg("Plan succeeded");
-          } else if (data.outcome?.outcome === "error") {
-            throw new Error(`${data.errors[0]}`);
-          }
-        }
-      }
-    });
-  };
-
-  const submitAndRunTask = async (
-    task: TaskRequest,
-  ): Promise<TaskResponse | void> => {
-    await submitTask.mutateAsync(task).then(async (response) => {
-      if (response) {
-        setSeverity("info");
-        setMsg("Plan submission successful!");
-        await runTask(response.task_id).catch((error) => {
-          throw new Error(error);
-        });
-      } else {
-        setSeverity("error");
-        setMsg("Plan submission failed!");
-        throw new Error("Task couldn't be submitted");
-      }
-    });
-  };
+  const { submitAndRunTask } = useSubmitAndRunTask();
 
   const handleClick = async () => {
     setOpenSnackbar(true);
     setLoading(true);
     if (instrumentSession) {
       const taskRequest: TaskRequest = {
-        name: name,
-        params: params,
+        name,
+        params,
         instrument_session: instrumentSession,
       };
-      await submitAndRunTask(taskRequest).catch((error) => {
+      try {
+        const result = await submitAndRunTask(taskRequest, (interim) => {
+          setSeverity(interim.severity);
+          setMsg(interim.message);
+        });
+        setSeverity(result.severity);
+        setMsg(result.message);
+      } catch (error) {
         setSeverity("error");
         setMsg(
           `Failed to run plan ${name}, see console and blueapi logs for full error.`,
         );
         console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
-      });
-      setLoading(false);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setSeverity("error");
       setMsg(`Failed to run plan ${name}, no instrument session was set.`);

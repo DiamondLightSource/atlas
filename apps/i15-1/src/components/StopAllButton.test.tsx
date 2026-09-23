@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { StopAllButton } from "./StopAllButton";
-import { fireEvent, render, screen } from "@atlas/vitest-conf";
+import { fireEvent, render, screen, waitFor } from "@atlas/vitest-conf";
 
 const pauseQueueMock = vi.fn();
 const setStateMock = vi.fn();
+const submitAndRunTaskMock = vi.fn();
+const useInstrumentSessionMock = vi.fn();
 
 vi.mock("../queue/queueService", () => ({
   usePauseQueue: () => pauseQueueMock,
@@ -17,9 +19,26 @@ vi.mock("@atlas/blueapi-query", () => ({
   }),
 }));
 
+vi.mock("../../../../packages/blueapi-ui/src/useSubmitAndRunTask", () => ({
+  useSubmitAndRunTask: () => ({ submitAndRunTask: submitAndRunTaskMock }),
+}));
+
+vi.mock("@atlas/app-shell", () => ({
+  useInstrumentSession: () => useInstrumentSessionMock(),
+}));
+
+vi.mock("../graphql/getInstrumentSessionsQuery.ts", () => ({
+  getInstrumentSessionsQuery: {},
+}));
+
 describe("StopAllButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
+    submitAndRunTaskMock.mockResolvedValue({
+      severity: "success",
+      message: "Plan succeeded",
+    });
   });
 
   it("renders the abort button", () => {
@@ -45,7 +64,7 @@ describe("StopAllButton", () => {
 
     expect(setStateMock).toHaveBeenCalledWith({
       new_state: "ABORTING",
-      reason: "Abort button pressed in the UI",
+      reason: "Stop All button pressed in the UI",
     });
   });
 
@@ -57,5 +76,73 @@ describe("StopAllButton", () => {
     expect(pauseQueueMock.mock.invocationCallOrder[0]).toBeLessThan(
       setStateMock.mock.invocationCallOrder[0],
     );
+  });
+
+  it("uses the currently selected instrument session without fetching sessions", async () => {
+    useInstrumentSessionMock.mockReturnValue({
+      instrumentSession: "cm22222-2",
+    });
+
+    render(<StopAllButton />);
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
+
+    await waitFor(() => {
+      expect(submitAndRunTaskMock).toHaveBeenCalledWith({
+        name: "move",
+        instrument_session: "cm22222-2",
+        params: { moves: { fast_shutter: "Close" } },
+      });
+    });
+  });
+
+  it("uses an arbitrary session when none is selected", async () => {
+    useInstrumentSessionMock.mockReturnValue({ instrumentSession: null });
+
+    render(<StopAllButton />);
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
+
+    await waitFor(() => {
+      expect(submitAndRunTaskMock).toHaveBeenCalledWith({
+        name: "move",
+        instrument_session: "cm11111-1",
+        params: { moves: { fast_shutter: "Close" } },
+      });
+    });
+  });
+
+  it("shows the interim then final success message when finished", async () => {
+    useInstrumentSessionMock.mockReturnValue({
+      instrumentSession: "cm22222-2",
+    });
+
+    render(<StopAllButton />);
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Stop All in progress",
+      );
+    });
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Stop All finished successfully",
+      );
+    });
+  });
+
+  it("shows an error message when the task fails", async () => {
+    useInstrumentSessionMock.mockReturnValue({
+      instrumentSession: "cm11111-1",
+    });
+    submitAndRunTaskMock.mockRejectedValue(new Error("Some failure"));
+
+    render(<StopAllButton />);
+    fireEvent.click(screen.getByRole("button", { name: /stop all/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Failed to abort, see console and blueapi logs for full error.",
+      );
+    });
   });
 });

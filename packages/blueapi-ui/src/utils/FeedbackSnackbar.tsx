@@ -36,6 +36,7 @@ export function FeedbackSnackbar(props: FeedbackSnackbarProps): JSX.Element {
   return (
     <React.Fragment>
       <Snackbar
+        key={`${props.severity}-${props.message}`}
         open={props.open}
         autoHideDuration={timeout}
         onClose={handleSnackbarClose}
