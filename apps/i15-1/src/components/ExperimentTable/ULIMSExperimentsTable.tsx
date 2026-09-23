@@ -167,7 +167,6 @@ export function ExperimentList() {
             .getSelectedRowModel()
             .rows.map((row) => row.original);
           successMsg = `${selected} task(s) added to queue`;
-          // console.log(`Rows added: ${selectedRows}`);
         } else {
           console.log("Add all");
           table.toggleAllRowsSelected(true);
@@ -180,6 +179,7 @@ export function ExperimentList() {
           successMsg = `All tasks (${selectedRows.length}) added to queue`;
         }
         setOpenSnackbar(true);
+        console.log(`Rows added: ${JSON.stringify(selectedRows)}`);
         try {
           await submitQueueTasks(selectedRows);
           setSeverity("success");
