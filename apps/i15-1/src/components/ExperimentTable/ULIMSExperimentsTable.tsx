@@ -113,6 +113,10 @@ export function ExperimentList() {
     return "";
   };
 
+  const isExperimentQueueable = (experiment: ExperimentTableData): boolean => {
+    return experimentNotQueueable(experiment) ? false : true;
+  };
+
   const theme = useTheme();
 
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -124,7 +128,7 @@ export function ExperimentList() {
     data: flatExperiments,
     enableRowOrdering: false,
     enableRowDragging: false,
-    enableRowSelection: true,
+    enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
     muiSelectCheckboxProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
@@ -166,12 +170,16 @@ export function ExperimentList() {
         } else {
           console.log("Add all");
           table.toggleAllRowsSelected(true);
+          // Filtering still needed as getPrePaginationRowModel will get all rows
+          // even the ones that at this point are not checked.
           selectedRows = table
             .getPrePaginationRowModel()
-            .rows.map((row) => row.original);
+            .rows.map((row) => row.original)
+            .filter((row) => isExperimentQueueable(row)); // Filter out the invalid rows
           successMsg = `All tasks (${selectedRows.length}) added to queue`;
         }
         setOpenSnackbar(true);
+        console.log(`Rows added: ${JSON.stringify(selectedRows)}`);
         try {
           await submitQueueTasks(selectedRows);
           setSeverity("success");
