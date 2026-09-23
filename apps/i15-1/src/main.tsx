@@ -8,6 +8,8 @@ import { router } from "./router.tsx";
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
 
+import "@diamondlightsource/sci-react-ui/font-styles.css";
+
 async function enableMocking() {
   if (import.meta.env.DEV) {
     const { worker } = await import("./mocks/browser");
