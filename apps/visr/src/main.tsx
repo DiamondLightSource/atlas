@@ -26,6 +26,7 @@ import { RelayEnvironment } from "./RelayEnvironment.ts";
 import { createApi } from "@atlas/blueapi";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import Tomography from "./routes/Tomography.tsx";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-const api = createApi("/api/blueapi");
+const api = createApi("/api/blueapi", authProvider.login);
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {
