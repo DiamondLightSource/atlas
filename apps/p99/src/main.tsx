@@ -14,6 +14,7 @@ import { RelayEnvironment } from "./context/supergraph/RelayEnvironment.ts";
 import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -23,7 +24,7 @@ async function enableMocking() {
 }
 
 const queryClient = new QueryClient();
-export const api = createApi("/api/blueapi");
+export const api = createApi("/api/blueapi", authProvider.login);
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>

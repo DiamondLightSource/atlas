@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@atlas/app-shell": "workspace:*",
+    "@atlas/auth": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@diamondlightsource/sci-react-ui": "^0.6.2",

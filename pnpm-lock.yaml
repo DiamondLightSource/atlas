@@ -57,6 +57,9 @@ importers:
       '@atlas/app-shell':
         specifier: workspace:*
         version: link:../../packages/app-shell
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../../packages/blueapi
@@ -160,6 +163,9 @@ importers:
       '@atlas/app-shell':
         specifier: workspace:*
         version: link:../../packages/app-shell
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../../packages/blueapi
@@ -263,6 +269,9 @@ importers:
 
   apps/visr:
     dependencies:
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../../packages/blueapi
@@ -433,9 +442,12 @@ importers:
 
   packages/blueapi:
     dependencies:
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../auth
       axios:
-        specifier: ^1.13.5
-        version: 1.13.6
+        specifier: ^1.20.0
+        version: 1.20.0
     devDependencies:
       '@atlas/vitest-conf':
         specifier: workspace:*
@@ -507,7 +519,7 @@ importers:
     dependencies:
       '@diamondlightsource/cs-web-lib':
         specifier: 0.10.19
-        version: 0.10.19(b24c5f51dba915ae6a679a7010c5c2b9)
+        version: 0.10.19(d61807e829453f439b0a625b99a7eaae)
       '@mui/material':
         specifier: ^7.0.0
         version: 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3480,6 +3492,7 @@ packages:
   eslint@9.39.3:
     resolution: {integrity: sha512-VmQ+sifHUbI/IcSopBCF/HO3YiHQx/AVd3UVyYL6weuwW+HvON9VYn5l6Zl1WZzPWXPNZrSQpxwkkZ/VuvJZzg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -5964,7 +5977,7 @@ snapshots:
     transitivePeerDependencies:
       - graphql
 
-  '@diamondlightsource/cs-web-lib@0.10.19(b24c5f51dba915ae6a679a7010c5c2b9)':
+  '@diamondlightsource/cs-web-lib@0.10.19(d61807e829453f439b0a625b99a7eaae)':
     dependencies:
       '@mui/icons-material': 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
