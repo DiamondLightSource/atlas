@@ -16,6 +16,7 @@
   "dependencies": {
     "@apollo/client": "^4.2.3",
     "@atlas/app-shell": "workspace:*",
+    "@atlas/auth": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",

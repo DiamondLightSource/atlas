@@ -8,6 +8,7 @@ import { router } from "./router.tsx";
 
 import { createApi } from "@atlas/blueapi";
 import { AppProviders } from "./AppProviders.tsx";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -16,7 +17,7 @@ async function enableMocking() {
   }
 }
 
-const api = createApi("/api/blueapi");
+const api = createApi("/api/blueapi", authProvider.login);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(

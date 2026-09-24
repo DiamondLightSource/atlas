@@ -13,6 +13,7 @@ import { AppProviders } from "./AppProviders.tsx";
 import TomographyView from "./components/tomography/TomographyView.tsx";
 import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
 import Workflows from "./components/workflows/Workflows.tsx";
+import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -49,7 +50,7 @@ const router = createRouter({
   navigation,
 });
 
-const api = createApi("/api/blueapi");
+const api = createApi("/api/blueapi", authProvider.login);
 const queryClient = new QueryClient();
 
 enableMocking().then(() => {

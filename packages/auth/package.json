@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./axios": "./src/axios.ts",
+    "./axios": "./src/axiosLoginRedirect.ts",
     "./mock": "./src/mock/index.ts"
   },
   "scripts": {
