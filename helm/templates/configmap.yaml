@@ -10,4 +10,7 @@ data:
     cookie_expire = "168h"
     cookie_refresh = "45s"
     cookie_name = "{{ include "oauth2-proxy.fullname" . }}-cookie"
+    skip_auth_routes = ["GET=^/($|[^ao].*|a$|a[^p].*|ap$|ap[^i].*|o$|o[^a].*|oa$|oa[^u].*|oau$|oau[^t].*|oaut$|oaut[^h].*|oauth$|oauth[^2].*)"]
+    api_routes = ["^/oauth2", "^/api"]
+    skip_provider_button = true
 {{ include "ui-base.extraConfig" . | indent 4 }}
