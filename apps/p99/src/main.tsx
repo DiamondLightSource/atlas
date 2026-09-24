@@ -11,10 +11,10 @@ import { BlueapiProvider } from "@atlas/blueapi-query";
 import { createApi } from "@atlas/blueapi";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./context/supergraph/RelayEnvironment.ts";
-import { UserAuthProvider } from "./context/userAuth/UserAuthProvider.tsx";
 import { router } from "./router.tsx";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
 import { authProvider } from "./auth.ts";
+import { AuthContextProvider } from "@atlas/auth";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -29,17 +29,17 @@ enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
-        <InstrumentSessionProvider>
-          <RelayEnvironmentProvider environment={RelayEnvironment}>
-            <QueryClientProvider client={queryClient}>
-              <UserAuthProvider>
+        <AuthContextProvider provider={authProvider}>
+          <InstrumentSessionProvider>
+            <RelayEnvironmentProvider environment={RelayEnvironment}>
+              <QueryClientProvider client={queryClient}>
                 <BlueapiProvider api={api}>
                   <RouterProvider router={router} />
                 </BlueapiProvider>
-              </UserAuthProvider>
-            </QueryClientProvider>
-          </RelayEnvironmentProvider>
-        </InstrumentSessionProvider>
+              </QueryClientProvider>
+            </RelayEnvironmentProvider>
+          </InstrumentSessionProvider>
+        </AuthContextProvider>
       </ThemeProvider>
     </StrictMode>,
   );

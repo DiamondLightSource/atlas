@@ -4,6 +4,8 @@ import {
   ThemeProvider,
 } from "@diamondlightsource/sci-react-ui";
 import { TopBar } from "./TopBar";
+import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
+import { testAuthProvider } from "./TestUtils";
 
 vi.mock("@diamondlightsource/sci-react-ui", async () => {
   const actual = await vi.importActual<any>("@diamondlightsource/sci-react-ui");
@@ -29,7 +31,9 @@ function renderTopBar(barProps: {
 }) {
   return render(
     <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
-      <TopBar {...barProps} />
+      <AuthContextProvider provider={testAuthProvider}>
+        <TopBar {...barProps} />
+      </AuthContextProvider>
     </ThemeProvider>,
   );
 }
@@ -41,14 +45,16 @@ describe("TopBar", () => {
     setOpen: vi.fn(),
   };
 
-  it("Shows menu icon", () => {
+  it("Shows menu icon", async () => {
     renderTopBar(barProps);
-    expect(screen.getByRole("button", { name: /menu/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: /menu/i }),
+    ).toBeInTheDocument();
   });
 
   it("Menu button calls setOpen function when clicked", async () => {
     renderTopBar(barProps);
-    const menu = screen.getByRole("button", { name: /menu/i });
+    const menu = await screen.findByRole("button", { name: /menu/i });
 
     const user = userEvent.setup();
     await user.click(menu);
@@ -56,15 +62,22 @@ describe("TopBar", () => {
     expect(barProps.setOpen).toHaveBeenCalledWith(!barProps.open);
   });
 
-  it("Shows title", () => {
+  it("Shows title", async () => {
     renderTopBar(barProps);
-    expect(screen.getByText(barProps.title)).toBeVisible();
+    expect(await screen.findByText(barProps.title)).toBeVisible();
   });
 
-  it("Includes colour scheme switcher", () => {
+  it("Shows a user / login button", async () => {
     renderTopBar(barProps);
     expect(
-      screen.getByRole("button", { name: /Colour scheme switcher/i }),
+      await screen.findByRole("button", { name: /User Avatar/i }),
+    ).toBeVisible();
+  });
+
+  it("Includes colour scheme switcher", async () => {
+    renderTopBar(barProps);
+    expect(
+      await screen.findByRole("button", { name: /Colour scheme switcher/i }),
     ).toBeVisible();
   });
 });
