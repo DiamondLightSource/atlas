@@ -7,7 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { ChevronRight, Ellipsis, Send } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export type CommandPromptState = "ready" | "evaluating" | "continuation";
 
@@ -28,6 +28,8 @@ export const CommandPrompt = ({
 }: CommandPromptProps) => {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [shouldFocus, setShouldFocus] = useState(false);
   const isEvaluating = status === "evaluating";
   const isContinuation = status === "continuation";
 
@@ -51,6 +53,7 @@ export const CommandPrompt = ({
       case "Enter":
         event.preventDefault(); // prevent the browser's default behaviour for these events
         void submit();
+        setShouldFocus(true);
         break;
 
       case "Tab":
@@ -66,12 +69,18 @@ export const CommandPrompt = ({
         break;
     }
   };
+
+  useEffect(() => {
+    if (shouldFocus && !isEvaluating) {
+      inputRef.current?.focus();
+    }
+  }, [isEvaluating, shouldFocus]);
+
   const theme = useTheme();
 
   const PromptIcon = isContinuation ? Ellipsis : ChevronRight;
   return (
-    <Paper
-      square
+    <Box
       sx={{
         display: "flex",
         alignItems: "center",
@@ -113,10 +122,13 @@ export const CommandPrompt = ({
           aria-label="Run command"
           onClick={() => {}}
           disabled={isEvaluating}
+          sx={{
+            borderRadius: 1,
+          }}
         >
           <Send size={18} color={theme.palette.text.disabled} />
         </IconButton>
       </Box>
-    </Paper>
+    </Box>
   );
 };

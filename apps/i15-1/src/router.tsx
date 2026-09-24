@@ -18,7 +18,7 @@ import Pucks from "./routes/Pucks";
 import { QueueView } from "./routes/QueueView";
 import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
-import { PlanBrowser } from "@atlas/blueapi-ui";
+import { Console, PlanBrowser } from "@atlas/blueapi-ui";
 
 const navigation: SectionGroup[] = [
   {
@@ -31,6 +31,10 @@ const navigation: SectionGroup[] = [
           {
             name: "Dashboard",
             element: <Dashboard />,
+          },
+          {
+            name: "Console",
+            element: <Console />,
           },
         ],
       },
