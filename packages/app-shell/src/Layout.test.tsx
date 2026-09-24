@@ -6,6 +6,8 @@ import {
 import type { RouterProps } from "./Router";
 import { Layout } from "./Layout";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { AuthContextProvider } from "@atlas/auth";
+import { testAuthProvider } from "./TestUtils";
 
 // mock instrument session view which is out of scope of this test
 export function InstrumentSessionView() {
@@ -16,7 +18,7 @@ vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
 }));
 
 describe("Layout", () => {
-  it("shows title, nav section titles, and main content", () => {
+  it("shows title, nav section titles, and main content", async () => {
     const props: RouterProps = {
       title: "Test app",
       navigation: [
@@ -46,19 +48,21 @@ describe("Layout", () => {
     ]);
     render(
       <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
-        <RouterProvider router={router} />
+        <AuthContextProvider provider={testAuthProvider}>
+          <RouterProvider router={router} />
+        </AuthContextProvider>
       </ThemeProvider>,
     );
 
     // title
-    expect(screen.getByText(props.title)).toBeInTheDocument();
+    expect(await screen.findByText(props.title)).toBeInTheDocument();
 
     // each route name
-    props.navigation[0].sections.forEach((route) => {
-      expect(screen.getByText(route.name)).toBeInTheDocument();
+    props.navigation[0].sections.forEach(async (route) => {
+      expect(await screen.findByText(route.name)).toBeInTheDocument();
     });
 
     // default content
-    expect(screen.getByText("Outlet content")).toBeInTheDocument();
+    expect(await screen.findByText("Outlet content")).toBeInTheDocument();
   });
 });

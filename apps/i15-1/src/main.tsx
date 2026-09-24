@@ -21,7 +21,11 @@ const api = createApi("/api/blueapi", authProvider.login);
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <AppProviders api={api} theme={DiamondDSTheme}>
+      <AppProviders
+        authProvider={authProvider}
+        api={api}
+        theme={DiamondDSTheme}
+      >
         <RouterProvider router={router} />
       </AppProviders>
     </StrictMode>,
