@@ -6,25 +6,34 @@ import { SidebarNav, type Navigation } from "./SidebarNav";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
+import { useAuth } from "@atlas/auth";
 
-export function toNavItemGroups(routerProps: RouterProps): Navigation {
+export function toNavItemGroups(
+  routerProps: RouterProps,
+  isAuthenticated: boolean,
+): Navigation {
   return routerProps.navigation.map((group) => ({
     name: group.name,
-    navItems: group.sections.map((section) => ({
-      label: section.name,
-      icon: section.icon,
-      linkProps: {
-        to: routePath(section),
-        component: NavLink,
-      },
-    })),
+    navItems: group.sections
+      .filter((section) => isAuthenticated || !section.isProtected)
+      .map((section) => ({
+        label: section.name,
+        icon: section.icon,
+        linkProps: {
+          to: routePath(section),
+          component: NavLink,
+        },
+      })),
   }));
 }
 
 export function Layout(props: RouterProps) {
+  const { isLoading, isAuthenticated } = useAuth();
+  if (isLoading) return null;
+
   const { open, setOpen } = usePersistentDrawerState();
 
-  const navigation = toNavItemGroups(props);
+  const navigation = toNavItemGroups(props, isAuthenticated);
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>

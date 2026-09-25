@@ -18,34 +18,41 @@ vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
 }));
 
 describe("Layout", () => {
-  it("shows title, nav section titles, and main content", async () => {
-    const props: RouterProps = {
-      title: "Test app",
-      navigation: [
-        {
-          sections: [
-            {
-              name: "Dashboard",
-              icon: <div />,
-              pages: [],
-            },
-          ],
-        },
-      ],
-    };
-
-    const router = createMemoryRouter([
+  const props: RouterProps = {
+    title: "Test app",
+    navigation: [
       {
-        path: "/",
-        element: <Layout {...props} />,
-        children: [
+        sections: [
           {
-            index: true,
-            element: <div>Outlet content</div>,
+            name: "Dashboard",
+            icon: <div data-testid="dashboard-icon" />,
+            pages: [],
+          },
+          {
+            name: "Experiment",
+            isProtected: true,
+            icon: <div data-testid="experiment-icon" />,
+            pages: [],
           },
         ],
       },
-    ]);
+    ],
+  };
+
+  const router = createMemoryRouter([
+    {
+      path: "/",
+      element: <Layout {...props} />,
+      children: [
+        {
+          index: true,
+          element: <div>Outlet content</div>,
+        },
+      ],
+    },
+  ]);
+
+  const renderLayout = () => {
     render(
       <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
         <AuthContextProvider provider={testAuthProvider}>
@@ -53,6 +60,13 @@ describe("Layout", () => {
         </AuthContextProvider>
       </ThemeProvider>,
     );
+  };
+
+  it("shows title, nav section titles, and main content", async () => {
+    // we are authenticated
+    vi.mocked(testAuthProvider.getUser).mockResolvedValue({ id: "1234" });
+
+    renderLayout();
 
     // title
     expect(await screen.findByText(props.title)).toBeInTheDocument();
@@ -64,5 +78,18 @@ describe("Layout", () => {
 
     // default content
     expect(await screen.findByText("Outlet content")).toBeInTheDocument();
+  });
+
+  it("hides protected sections when unauthenticated", async () => {
+    // unauthenticated
+    vi.mocked(testAuthProvider.getUser).mockResolvedValue(null);
+
+    renderLayout();
+
+    // public section link rendered
+    expect(await screen.findByTestId("dashboard-icon")).toBeInTheDocument();
+
+    // but not protected one
+    expect(screen.queryByTestId("experiment-icon")).not.toBeInTheDocument();
   });
 });
