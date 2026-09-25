@@ -3,6 +3,7 @@ import { createDevicesApi } from "./devices";
 import { createPlansApi } from "./plans";
 import { createTasksApi } from "./tasks";
 import { createWorkerApi } from "./worker";
+import type { LoginFn } from "../../auth/src/loginRedirect";
 
 export type { Plan, PlansResponse } from "./plans";
 export type {
@@ -15,8 +16,8 @@ export type {
 export type { WorkerState, WorkerStateRequest } from "./worker";
 export type { Device, DeviceResponse } from "./devices";
 
-export function createApi(baseURL: string) {
-  const client = createApiClient(baseURL);
+export function createApi(baseURL: string, login: LoginFn) {
+  const client = createApiClient(baseURL, login);
 
   return {
     devices: createDevicesApi(client),
