@@ -37,6 +37,7 @@ const navigation: SectionGroup[] = [
         name: "Acquisition",
         icon: <ScanQrCode />,
         path: "acquisition",
+        isProtected: true,
         pages: [
           {
             name: "Robot",
@@ -56,6 +57,7 @@ const navigation: SectionGroup[] = [
         name: "Setup",
         icon: <SlidersHorizontal />,
         path: "setup",
+        isProtected: true,
         pages: [
           {
             name: "Pucks",
@@ -71,6 +73,7 @@ const navigation: SectionGroup[] = [
         name: "Queue",
         icon: <ListTodo />,
         path: "queue",
+        isProtected: true,
         pages: [
           {
             name: "All queue tasks",
