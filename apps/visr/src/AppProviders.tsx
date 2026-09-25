@@ -1,32 +1,35 @@
 import type { Api } from "@atlas/blueapi";
-import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
-import type { Theme } from "@mui/material";
+import {
+  DiamondDSTheme,
+  ThemeProvider,
+} from "@diamondlightsource/sci-react-ui";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import type { PropsWithChildren } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./RelayEnvironment";
 import { BlueapiProvider } from "@atlas/blueapi-query";
-import { InstrumentSessionLoader } from "./components/InstrumentSessionSelection/InstrumentSessionLoader";
+import { InstrumentSessionProvider } from "@atlas/app-shell";
+import type { Theme } from "@mui/material";
+
+interface Props extends PropsWithChildren {
+  queryClient: QueryClient;
+  api: Api;
+  theme: Theme;
+}
 
 export const AppProviders = ({
-  api,
   queryClient,
-  theme,
+  api: blueapi,
   children,
-}: {
-  api: Api;
-  queryClient: QueryClient;
-  theme: Theme;
-  children: ReactNode;
-}) => {
+}: Props) => {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
       <RelayEnvironmentProvider environment={RelayEnvironment}>
-        <InstrumentSessionLoader>
+        <InstrumentSessionProvider>
           <QueryClientProvider client={queryClient}>
-            <BlueapiProvider api={api}>{children}</BlueapiProvider>
+            <BlueapiProvider api={blueapi}>{children}</BlueapiProvider>
           </QueryClientProvider>
-        </InstrumentSessionLoader>
+        </InstrumentSessionProvider>
       </RelayEnvironmentProvider>
     </ThemeProvider>
   );
