@@ -1,3 +1,4 @@
+import { createFetchLoginRedirect } from "@atlas/auth";
 import {
   Environment,
   Network,
@@ -5,10 +6,12 @@ import {
   Store,
   type FetchFunction,
 } from "relay-runtime";
+import { authProvider } from "../../auth";
 
 const HTTP_ENDPOINT = "/api/supergraph";
+const fetchWithLoginRedirect = createFetchLoginRedirect(authProvider.login);
 const fetchFn: FetchFunction = async (request, variables) => {
-  const resp = await fetch(HTTP_ENDPOINT, {
+  const resp = await fetchWithLoginRedirect(HTTP_ENDPOINT, {
     method: "POST",
     credentials: "include",
     headers: {
