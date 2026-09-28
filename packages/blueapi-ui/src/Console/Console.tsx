@@ -16,6 +16,13 @@ export const Console = () => {
   const [status, setStatus] = useState<"connecting" | "ready" | "error">(
     "connecting",
   );
+  // prompt state, needs consolidating with the above
+  const [state, setState] = useState<CommandPromptState>("ready");
+  // log entries...
+  const [lines, setLines] = useState<LogEntry[]>([]);
+  // cached incomplete command
+  const incompleteCommandRef = useRef<string | null>(null);
+
   const kernelRef = useRef<Promise<Kernel.IKernelConnection> | null>(null);
   const getKernel = useCallback((): Promise<Kernel.IKernelConnection> => {
     if (!kernelRef.current) {
@@ -50,6 +57,10 @@ export const Console = () => {
         kind: category,
         timestamp: Date.now(),
         message,
+        // note that 'partial' for the log means something a little different than for me:
+        // for the log it will determine the prefix for a command (e.g. >>> vs ...),
+        // but the initial line of a multi-line block will still want to show >>>
+        partial: !(incompleteCommandRef.current === null),
       };
       setLines((prev) => [...prev, logEntry]);
     },
@@ -57,8 +68,7 @@ export const Console = () => {
   );
 
   const handleCommand: CommandHandler = useCallback(
-    async (command: string) => {
-      appendEntry(command, "command");
+    async (input: string) => {
       let kernel: Kernel.IKernelConnection;
       try {
         kernel = await getKernel();
@@ -67,8 +77,30 @@ export const Console = () => {
         return;
       }
 
+      // Build the complete piece of Python code that should be sent to the
+      // kernel. If we're continuing an incomplete command, append this line
+      // to the previously accumulated code.
+      const command = incompleteCommandRef.current
+        ? `${incompleteCommandRef.current}\n${input}`
+        : input;
+
+      const completion = await kernel.requestIsComplete({ code: command });
+      const partial = completion.content.status === "incomplete";
+
+      // We show what the user typed exactly
+      appendEntry(input, "command");
+
+      if (partial) {
+        incompleteCommandRef.current = command;
+        setState("continuation");
+        return;
+      }
+
+      // The command is complete; stop accumulating
+      incompleteCommandRef.current = null;
+
+      setState("evaluating");
       try {
-        setState("evaluating");
         await executeCode(kernel, command, (chunk) => {
           const cat = chunk.kind === "error" ? "error" : "result";
           console.log("Result", chunk);
@@ -85,9 +117,6 @@ export const Console = () => {
     },
     [appendEntry, getKernel],
   );
-
-  const [state, setState] = useState<CommandPromptState>("ready");
-  const [lines, setLines] = useState<LogEntry[]>([]);
 
   return (
     <Paper

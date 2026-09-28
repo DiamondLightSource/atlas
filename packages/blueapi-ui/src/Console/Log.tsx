@@ -1,13 +1,14 @@
 // This is the part of the console that shows timestamped commands with stdout/stderr.
 
-import { Box, Paper, Typography } from "@mui/material";
-import type React from "react";
+import { getPropPath } from "@jsonforms/core";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useRef } from "react";
 
 export type LogEntry = {
   timestamp?: number;
   message: string;
   kind: "command" | "result" | "error";
+  partial?: boolean;
 };
 
 type LogProps = {
@@ -32,8 +33,17 @@ function formatTimestamp(
 
   return `[${hh}:${mm}:${ss}]`;
 }
+
+const getPrefix = (entry: LogEntry) => {
+  if (entry.kind === "command") {
+    if (entry.partial) return "... ";
+    return ">>> ";
+  }
+  return "";
+};
+
 const LogLine = ({ entry, showTimestamps }: LogLineProps) => {
-  const prefix = entry.kind === "command" ? ">>> " : "";
+  const prefix = getPrefix(entry);
   return (
     <Typography variant="mono1" sx={{ display: "block" }}>
       {`${formatTimestamp(entry.timestamp, showTimestamps)} ${prefix}${entry.message}`}
