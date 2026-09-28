@@ -1,6 +1,5 @@
 // This is the part of the console that shows timestamped commands with stdout/stderr.
 
-import { getPropPath } from "@jsonforms/core";
 import { Box, Typography } from "@mui/material";
 import { useEffect, useRef } from "react";
 
@@ -31,7 +30,7 @@ function formatTimestamp(
   const mm = String(date.getMinutes()).padStart(2, "0");
   const ss = String(date.getSeconds()).padStart(2, "0");
 
-  return `[${hh}:${mm}:${ss}]`;
+  return `[${hh}:${mm}:${ss}] `;
 }
 
 const getPrefix = (entry: LogEntry) => {
@@ -46,7 +45,7 @@ const LogLine = ({ entry, showTimestamps }: LogLineProps) => {
   const prefix = getPrefix(entry);
   return (
     <Typography variant="mono1" sx={{ display: "block" }}>
-      {`${formatTimestamp(entry.timestamp, showTimestamps)} ${prefix}${entry.message}`}
+      {`${formatTimestamp(entry.timestamp, showTimestamps)}${prefix}${entry.message}`}
     </Typography>
   );
 };
@@ -54,12 +53,14 @@ const LogLine = ({ entry, showTimestamps }: LogLineProps) => {
 export const Log = ({ lines }: LogProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // this could be protected by a scrollLock flag
   useEffect(() => {
     contentRef.current?.scrollTo({
       top: contentRef.current.scrollHeight,
       behavior: "auto",
     });
   }, [lines]);
+
   return (
     <Box
       ref={contentRef}

@@ -67,6 +67,18 @@ export const Console = () => {
     [],
   );
 
+  async function interruptKernel() {
+    let kernel: Kernel.IKernelConnection;
+    try {
+      kernel = await getKernel();
+      kernel.interrupt();
+      incompleteCommandRef.current = null;
+    } catch {
+      appendEntry("Could not connect to kernel!", "error");
+      return;
+    }
+  }
+
   const handleCommand: CommandHandler = useCallback(
     async (input: string) => {
       let kernel: Kernel.IKernelConnection;
@@ -134,6 +146,7 @@ export const Console = () => {
           placeholder="Enter command..."
           onSubmit={handleCommand}
           status={state}
+          interrupt={interruptKernel}
         />
       </Box>
     </Paper>

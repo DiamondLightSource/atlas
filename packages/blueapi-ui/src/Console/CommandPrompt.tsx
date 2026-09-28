@@ -1,12 +1,5 @@
-import {
-  Box,
-  IconButton,
-  InputBase,
-  Paper,
-  SvgIcon,
-  useTheme,
-} from "@mui/material";
-import { ChevronRight, Ellipsis, Send } from "lucide-react";
+import { Box, IconButton, InputBase, useTheme } from "@mui/material";
+import { ChevronRight, Ellipsis, OctagonX, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 export type CommandPromptState = "ready" | "evaluating" | "continuation";
@@ -17,6 +10,7 @@ type CommandPromptProps = {
   placeholder: string;
   onSubmit: CommandHandler;
   status?: CommandPromptState;
+  interrupt: () => void;
 };
 
 const INDENT_SYMBOL = "    ";
@@ -25,6 +19,7 @@ export const CommandPrompt = ({
   placeholder,
   onSubmit,
   status = "ready",
+  interrupt,
 }: CommandPromptProps) => {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +41,6 @@ export const CommandPrompt = ({
    * Must handle:
    * Enter -> submit
    * Tab -> literal '\t' added to the prompt
-   * TODO: Ctrl+C/Cmd+C -> Interrupt
    */
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
@@ -59,13 +53,6 @@ export const CommandPrompt = ({
       case "Tab":
         event.preventDefault();
         setCommand((current) => current + INDENT_SYMBOL);
-        break;
-
-      case "c":
-        if (event.ctrlKey || event.metaKey) {
-          // TODO SIGINT
-          break;
-        }
         break;
     }
   };
@@ -116,17 +103,28 @@ export const CommandPrompt = ({
           px: 1,
         })}
       />
-      <Box sx={{ ml: "auto" }}>
+      <Box sx={{ ml: "auto", display: "flex" }}>
         <IconButton
           size="small"
           aria-label="Run command"
-          onClick={() => {}}
+          onClick={submit}
           disabled={isEvaluating}
           sx={{
             borderRadius: 1,
           }}
         >
-          <Send size={18} color={theme.palette.text.disabled} />
+          <Send size={18} color={theme.palette.text.secondary} />
+        </IconButton>
+        <IconButton
+          size="small"
+          aria-label="Interrupt"
+          onClick={interrupt}
+          disabled={!isEvaluating}
+          sx={{
+            borderRadius: 1,
+          }}
+        >
+          <OctagonX size={18} color={theme.palette.text.secondary} />
         </IconButton>
       </Box>
     </Box>
