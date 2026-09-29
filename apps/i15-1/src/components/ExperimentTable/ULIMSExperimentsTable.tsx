@@ -4,6 +4,7 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
@@ -123,9 +124,26 @@ export function ExperimentList() {
   const [msg, setMsg] = useState<string>("");
   const [severity, setSeverity] = useState<SeverityLevel>("info");
 
+  const diamondDSOptions = DiamondDSIntegrations.mrtOptions();
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
+    // MRT derives its own colours (e.g. dark-mode background) by running MUI's
+    // lighten/darken on theme.palette.background.default, which breaks against
+    // DiamondDS's CSS-variable tokens. DiamondDSIntegrations supplies literal
+    // token values instead, sidestepping that.
+    mrtTheme: DiamondDSIntegrations.mrtTheme,
+    ...diamondDSOptions,
+    muiTablePaperProps: {
+      ...diamondDSOptions.muiTablePaperProps,
+      // Horizontal breathing room so the table's own (now correctly painted)
+      // surface background doesn't sit flush against the page edges.
+      sx: { ...diamondDSOptions.muiTablePaperProps.sx, px: 2 },
+    },
+    // TODO: remove once sci-react-ui's DiamondDSIntegrations covers the bottom
+    // toolbar; MRT hardcodes an inset boxShadow there that isn't token-driven.
+    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
@@ -145,10 +163,12 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    // Rows aren't clickable here (only the select checkbox is), so no hover state.
     muiTableBodyRowProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
       return {
+        hover: false,
         sx: experimentErrorMessage
           ? { backgroundColor: theme.palette.warning.light }
           : undefined,

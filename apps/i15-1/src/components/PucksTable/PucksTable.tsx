@@ -10,6 +10,7 @@ import {
   Typography,
   type ChipProps,
 } from "@mui/material";
+import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -239,9 +240,28 @@ export function PucksTable() {
     [selectedPositions, positionOptions, robotTableId, mountPuck, unmountPuck],
   );
 
+  const diamondDSOptions = DiamondDSIntegrations.mrtOptions();
+
   const table = useMaterialReactTable({
     columns,
     data: tableData,
+    // MRT derives its own colours (e.g. dark-mode background) by running MUI's
+    // lighten/darken on theme.palette.background.default, which breaks against
+    // DiamondDS's CSS-variable tokens. DiamondDSIntegrations supplies literal
+    // token values instead, sidestepping that.
+    mrtTheme: DiamondDSIntegrations.mrtTheme,
+    ...diamondDSOptions,
+    muiTablePaperProps: {
+      ...diamondDSOptions.muiTablePaperProps,
+      // Horizontal breathing room so the table's own (now correctly painted)
+      // surface background doesn't sit flush against the page edges.
+      sx: { ...diamondDSOptions.muiTablePaperProps.sx, px: 2 },
+    },
+    // Rows aren't clickable here (only the position select / mount button are), so no hover state.
+    muiTableBodyRowProps: { hover: false },
+    // TODO: remove once sci-react-ui's DiamondDSIntegrations covers the bottom
+    // toolbar; MRT hardcodes an inset boxShadow there that isn't token-driven.
+    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableSorting: false,
@@ -254,6 +274,10 @@ export function PucksTable() {
         alignItems="center"
         justifyContent="space-between"
         width="100%"
+        // MRT's top-toolbar row uses alignItems: flex-start, so without this
+        // the title sits top-aligned against the (taller) toolbar icon buttons
+        // instead of centred against them.
+        sx={{ alignSelf: "center" }}
       >
         <Typography variant="h6" component="h1" textAlign="left">
           Pucks
