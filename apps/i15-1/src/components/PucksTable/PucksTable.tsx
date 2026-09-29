@@ -10,6 +10,7 @@ import {
   Typography,
   type ChipProps,
 } from "@mui/material";
+import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -239,9 +240,29 @@ export function PucksTable() {
     [selectedPositions, positionOptions, robotTableId, mountPuck, unmountPuck],
   );
 
+  const diamondDSOptions = DiamondDSIntegrations.mrtOptions({
+    fullWidth: true,
+  });
+
   const table = useMaterialReactTable({
     columns,
     data: tableData,
+    // MRT's lighten/darken breaks on DiamondDS CSS-variable tokens; use literal ones.
+    mrtTheme: DiamondDSIntegrations.mrtTheme,
+    ...diamondDSOptions,
+    muiTablePaperProps: {
+      ...diamondDSOptions.muiTablePaperProps,
+      // fullWidth squares the panel; restore its corners (2 × theme.shape.borderRadius) and clip the table to them.
+      sx: {
+        ...diamondDSOptions.muiTablePaperProps.sx,
+        borderRadius: 2,
+        overflow: "hidden",
+      },
+    },
+    // Rows aren't clickable; no hover state.
+    muiTableBodyRowProps: { hover: false },
+    // TODO: drop once DiamondDSIntegrations covers MRT's hardcoded toolbar boxShadow.
+    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableSorting: false,
@@ -254,6 +275,8 @@ export function PucksTable() {
         alignItems="center"
         justifyContent="space-between"
         width="100%"
+        // MRT top-aligns the toolbar row; centre the title against it.
+        sx={{ alignSelf: "center" }}
       >
         <Typography variant="h6" component="h1" textAlign="left">
           Pucks

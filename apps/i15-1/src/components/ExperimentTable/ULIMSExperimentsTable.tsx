@@ -4,6 +4,7 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
@@ -123,9 +124,27 @@ export function ExperimentList() {
   const [msg, setMsg] = useState<string>("");
   const [severity, setSeverity] = useState<SeverityLevel>("info");
 
+  const diamondDSOptions = DiamondDSIntegrations.mrtOptions({
+    fullWidth: true,
+  });
+
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
+    // MRT's lighten/darken breaks on DiamondDS CSS-variable tokens; use literal ones.
+    mrtTheme: DiamondDSIntegrations.mrtTheme,
+    ...diamondDSOptions,
+    muiTablePaperProps: {
+      ...diamondDSOptions.muiTablePaperProps,
+      // fullWidth squares the panel; restore its corners (2 × theme.shape.borderRadius) and clip the table to them.
+      sx: {
+        ...diamondDSOptions.muiTablePaperProps.sx,
+        borderRadius: 2,
+        overflow: "hidden",
+      },
+    },
+    // TODO: drop once DiamondDSIntegrations covers MRT's hardcoded toolbar boxShadow.
+    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
@@ -145,10 +164,12 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    // Rows aren't clickable; no hover state.
     muiTableBodyRowProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
       return {
+        hover: false,
         sx: experimentErrorMessage
           ? { backgroundColor: theme.palette.warning.light }
           : undefined,
