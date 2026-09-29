@@ -12,6 +12,7 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
+import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import {
   cancelTasks,
   clearHistory,
@@ -124,6 +125,10 @@ export function QueueView() {
     [],
   );
 
+  const diamondDSOptions = DiamondDSIntegrations.mrtOptions({
+    fullWidth: true,
+  });
+
   const table = useMaterialReactTable({
     columns: columns,
     data: tableData,
@@ -134,12 +139,29 @@ export function QueueView() {
     muiToolbarAlertBannerProps: error
       ? { color: "error", children: `Error: ${error.message}` }
       : undefined,
+    // MRT's lighten/darken breaks on DiamondDS CSS-variable tokens; use literal ones.
+    mrtTheme: DiamondDSIntegrations.mrtTheme,
+    ...diamondDSOptions,
+    ...fillParentTableProps,
+    muiTablePaperProps: {
+      ...diamondDSOptions.muiTablePaperProps,
+      // fullWidth squares the panel; restore its corners (2 × theme.shape.borderRadius) and clip the table to them.
+      sx: {
+        ...diamondDSOptions.muiTablePaperProps.sx,
+        ...fillParentTableProps.muiTablePaperProps.sx,
+        borderRadius: 2,
+        overflow: "hidden",
+      },
+    },
+    // Rows aren't clickable; no hover state.
+    muiTableBodyRowProps: { hover: false },
+    // TODO: drop once DiamondDSIntegrations covers MRT's hardcoded toolbar boxShadow.
+    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
-    ...fillParentTableProps,
     enableExpanding: true,
     muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
