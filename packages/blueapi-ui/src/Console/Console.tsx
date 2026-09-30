@@ -132,12 +132,13 @@ export const Console = () => {
 
   return (
     <Paper
+      square
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: 400,
-        border: "1px solid",
-        borderColor: "divider",
+        height: "100%",
+        // border: "1px solid",
+        // borderColor: "divider",
       }}
     >
       <Log lines={lines} />

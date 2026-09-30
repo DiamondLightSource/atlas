@@ -8,6 +8,7 @@ import { TabbedPanel, type TabDescription } from "./TabbedRoute";
 
 import type { ReactNode } from "react";
 import type React from "react";
+import type { LabelledContent } from "./OverlayedPanel";
 
 /** App title and navigational intent */
 export interface RouterProps {
@@ -19,6 +20,8 @@ export interface RouterProps {
 
   /** Add a footer to the bottom of the navigation panel */
   footer?: (props: { open: boolean }) => React.ReactNode;
+
+  panelComponents?: { components: LabelledContent[] };
 }
 
 /** A group within the main navigation tree */

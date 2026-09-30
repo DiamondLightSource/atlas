@@ -1,4 +1,4 @@
-import { GlobalStyles } from "@mui/material";
+import { Collapse, GlobalStyles, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { NavLink, Outlet } from "react-router-dom";
 import { routePath, type RouterProps } from "./Router";
@@ -6,6 +6,9 @@ import { SidebarNav, type Navigation } from "./SidebarNav";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
+import { StatusBar } from "./StatusBar";
+import { OverlayedPanel, type LabelledContent } from "./OverlayedPanel";
+import { useState } from "react";
 
 export function toNavItemGroups(routerProps: RouterProps): Navigation {
   return routerProps.navigation.map((group) => ({
@@ -22,9 +25,11 @@ export function toNavItemGroups(routerProps: RouterProps): Navigation {
 }
 
 export function Layout(props: RouterProps) {
-  const { open, setOpen } = usePersistentDrawerState();
+  const { sidebarOpen, setSidebarOpen } = usePersistentDrawerState();
 
   const navigation = toNavItemGroups(props);
+
+  const [panelOpen, setPanelOpen] = useState(false);
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -35,21 +40,46 @@ export function Layout(props: RouterProps) {
           "#root": { height: "100%" },
         }}
       />
-      <TopBar title={props.title} open={open} setOpen={setOpen} />
+      <TopBar title={props.title} open={sidebarOpen} setOpen={setSidebarOpen} />
       <SidebarNav
         navigation={navigation}
-        open={open}
-        setOpen={setOpen}
+        open={sidebarOpen}
+        setOpen={setSidebarOpen}
         footer={props.footer}
       />
       <Box
         component="main"
-        sx={{ display: "flex", flex: 1, flexDirection: "column", minWidth: 0 }}
+        sx={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          minWidth: 0,
+          position: "relative",
+        }}
       >
         {/* Spacer, same height as the fixed TopBar's Navbar */}
         <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
         <Outlet />
+        {props.panelComponents && (
+          <Collapse
+            in={panelOpen}
+            orientation="vertical"
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+            }}
+          >
+            <OverlayedPanel
+              children={props.panelComponents.components}
+              close={() => setPanelOpen(false)}
+            />
+          </Collapse>
+        )}
       </Box>
+      <StatusBar setOpen={setPanelOpen} />
     </Box>
   );
 }

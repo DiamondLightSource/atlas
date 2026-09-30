@@ -1,5 +1,5 @@
 import { Box, IconButton, InputBase, useTheme } from "@mui/material";
-import { ChevronRight, Ellipsis, OctagonX, Send } from "lucide-react";
+import { ChevronRight, Ellipsis, OctagonX, Send, Settings } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 export type CommandPromptState = "ready" | "evaluating" | "continuation";
@@ -113,7 +113,7 @@ export const CommandPrompt = ({
             borderRadius: 1,
           }}
         >
-          <Send size={18} color={theme.palette.text.secondary} />
+          <Send size={18} />
         </IconButton>
         <IconButton
           size="small"
@@ -124,7 +124,7 @@ export const CommandPrompt = ({
             borderRadius: 1,
           }}
         >
-          <OctagonX size={18} color={theme.palette.text.secondary} />
+          <OctagonX size={18} />
         </IconButton>
       </Box>
     </Box>

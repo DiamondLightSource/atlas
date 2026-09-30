@@ -19,6 +19,7 @@ import { QueueView } from "./routes/QueueView";
 import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
 import { Console, PlanBrowser } from "@atlas/blueapi-ui";
+import { Typography } from "@mui/material";
 
 const navigation: SectionGroup[] = [
   {
@@ -132,4 +133,18 @@ export const router = createRouter({
       <StopAllButton compact={!open} />
     </SystemControls>
   ),
+
+  panelComponents: {
+    components: [
+      { label: "Console", content: <Console /> },
+      {
+        label: "Live controls",
+        content: (
+          <Typography variant="h4Display">
+            Live controls could live here
+          </Typography>
+        ),
+      },
+    ],
+  },
 });

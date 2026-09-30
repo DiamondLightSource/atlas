@@ -92,12 +92,14 @@ function PermanentDrawer(props: NavProps) {
           width: width,
           boxSizing: "border-box",
           transition: drawerTransition(theme, open),
+          // pb: 6,
         },
       })}
     >
       <Toolbar /> {/* spacer equal to the AppBar's height*/}
       <NavigationItems {...props} />
       {props.footer?.({ open })}
+      <Box sx={{ height: "26px" }} />
     </Drawer>
   );
 }
