@@ -5,10 +5,11 @@ import { routePath, type RouterProps } from "./Router";
 import { SidebarNav, type Navigation } from "./SidebarNav";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
-import { topBarHeight } from "./layoutConstants";
+import { topBarHeight, statusBarHeight } from "./layoutConstants";
 import { StatusBar } from "./StatusBar";
 import { OverlayedPanel, type LabelledContent } from "./OverlayedPanel";
 import { useState } from "react";
+import { Resizable } from "re-resizable";
 
 export function toNavItemGroups(routerProps: RouterProps): Navigation {
   return routerProps.navigation.map((group) => ({
@@ -66,16 +67,18 @@ export function Layout(props: RouterProps) {
             orientation="vertical"
             sx={{
               position: "absolute",
-              bottom: 0,
+              bottom: statusBarHeight,
               left: 0,
               right: 0,
               zIndex: 1,
             }}
           >
-            <OverlayedPanel
-              children={props.panelComponents.components}
-              close={() => setPanelOpen(false)}
-            />
+            <Resizable defaultSize={{ height: 450 }}>
+              <OverlayedPanel
+                children={props.panelComponents.components}
+                close={() => setPanelOpen(false)}
+              />
+            </Resizable>
           </Collapse>
         )}
       </Box>

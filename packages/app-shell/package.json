@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mui/icons-material": "^7.0.0",
+    "re-resizable": "^6.11.2",
     "react-router-dom": "^7.13.1"
   },
   "peerDependencies": {

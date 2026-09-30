@@ -51,11 +51,10 @@ export const OverlayedPanel = ({ children, close }: Props) => {
     <Paper
       sx={{
         display: "flex",
-        flexDirection: "column",
         height: 450,
+        flexDirection: "column",
         borderTop: "1px solid",
         borderColor: "divider",
-        pb: 4,
       }}
     >
       <Paper
