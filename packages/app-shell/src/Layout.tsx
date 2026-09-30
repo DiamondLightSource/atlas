@@ -71,9 +71,17 @@ export function Layout(props: RouterProps) {
               left: 0,
               right: 0,
               zIndex: 1,
+              minWidth: 0,
             }}
           >
-            <Resizable defaultSize={{ height: 450 }}>
+            <Resizable
+              defaultSize={{ height: 450 }}
+              style={{
+                width: "100%",
+                maxWidth: "100%",
+                boxSizing: "border-box",
+              }}
+            >
               <OverlayedPanel
                 children={props.panelComponents.components}
                 close={() => setPanelOpen(false)}
