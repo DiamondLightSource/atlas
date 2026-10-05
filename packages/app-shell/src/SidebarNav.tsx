@@ -96,7 +96,8 @@ function PermanentDrawer(props: NavProps) {
         },
       })}
     >
-      <Toolbar /> {/* spacer equal to the AppBar's height*/}
+      {/* Spacer, same height as the fixed TopBar's Navbar */}
+      <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
       <NavigationItems {...props} />
       {props.footer?.({ open })}
       <Box sx={{ height: "26px" }} />

@@ -76,6 +76,8 @@ export function Layout(props: RouterProps) {
           >
             <Resizable
               defaultSize={{ height: 450 }}
+              minHeight={"20vh"}
+              maxHeight={"80vh"}
               style={{
                 width: "100%",
                 maxWidth: "100%",

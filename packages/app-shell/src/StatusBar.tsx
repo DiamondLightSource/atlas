@@ -12,7 +12,7 @@ export const StatusBar = ({ setOpen }: Props) => {
         <Box sx={{ ml: "auto" }}>
           <IconButton
             size="small"
-            aria-label="Run command"
+            aria-label="Open/close console"
             onClick={() => setOpen((current) => !current)}
             sx={{
               borderRadius: 1,
