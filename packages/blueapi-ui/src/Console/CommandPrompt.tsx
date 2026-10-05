@@ -24,7 +24,10 @@ export const CommandPrompt = ({
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [shouldFocus, setShouldFocus] = useState(false);
+  /** Some other control to focus on to avoid an accessibility trap */
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  const [shouldRetainFocus, setShouldRetainFocus] = useState(false);
   const isEvaluating = status === "evaluating";
   const isContinuation = status === "continuation";
 
@@ -41,27 +44,34 @@ export const CommandPrompt = ({
    * Must handle:
    * Enter -> submit
    * Tab -> literal '\t' added to the prompt
+   * Escape -> an escape hatch for accessibility
    */
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Enter":
         event.preventDefault(); // prevent the browser's default behaviour for these events
         void submit();
-        setShouldFocus(true);
+        setShouldRetainFocus(true);
         break;
 
       case "Tab":
         event.preventDefault();
         setCommand((current) => current + INDENT_SYMBOL);
         break;
+
+      case "Escape":
+        setShouldRetainFocus(false);
+        submitRef.current?.focus();
     }
   };
 
+  // For a better REPL feel, once we are focused on the prompt,
+  // focus stays on the prompt for the next command
   useEffect(() => {
-    if (shouldFocus && !isEvaluating) {
+    if (shouldRetainFocus && !isEvaluating) {
       inputRef.current?.focus();
     }
-  }, [isEvaluating, shouldFocus]);
+  }, [isEvaluating, shouldRetainFocus]);
 
   const theme = useTheme();
 
@@ -86,7 +96,7 @@ export const CommandPrompt = ({
           setCommand(event.target.value);
         }}
         onKeyDown={handleKeyDown}
-        sx={(theme) => ({
+        sx={{
           "& input": {
             ...theme.typography.mono1,
             color: "text.primary",
@@ -101,12 +111,13 @@ export const CommandPrompt = ({
             },
           },
           px: 1,
-        })}
+        }}
       />
       <Box sx={{ ml: "auto", display: "flex" }}>
         <IconButton
           size="small"
           aria-label="Run command"
+          ref={submitRef}
           onClick={submit}
           disabled={isEvaluating}
           sx={{

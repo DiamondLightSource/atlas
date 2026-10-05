@@ -7,7 +7,7 @@ import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight, statusBarHeight } from "./layoutConstants";
 import { StatusBar } from "./StatusBar";
-import { OverlayedPanel, type LabelledContent } from "./OverlayedPanel";
+import { OverlayedPanel } from "./OverlayedPanel";
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
@@ -80,6 +80,9 @@ export function Layout(props: RouterProps) {
                 width: "100%",
                 maxWidth: "100%",
                 boxSizing: "border-box",
+              }}
+              enable={{
+                top: true,
               }}
             >
               <OverlayedPanel

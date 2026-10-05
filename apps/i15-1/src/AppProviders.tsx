@@ -21,7 +21,7 @@ type Props = {
 export function AppProviders({ api, theme, children }: Props) {
   const config = useLoadPvwsConfig();
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} defaultMode="system">
       <ReduxProvider store={store(config)}>
         <QueryClientProvider client={new QueryClient()}>
           <UserAuthProvider>
