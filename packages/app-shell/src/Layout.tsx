@@ -28,11 +28,9 @@ export function toNavItemGroups(
 }
 
 export function Layout(props: RouterProps) {
+  const { open, setOpen } = usePersistentDrawerState();
   const { isLoading, isAuthenticated } = useAuth();
   if (isLoading) return null;
-
-  const { open, setOpen } = usePersistentDrawerState();
-
   const navigation = toNavItemGroups(props, isAuthenticated);
 
   return (

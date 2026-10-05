@@ -19,7 +19,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (returnTo?: string) => void;
   logout: (returnTo?: string) => void;
-  /** Re-run the auth check, e.g. after the tab regains focus. */
+  /** Re-run the auth check */
   refresh: () => Promise<void>;
 }
 

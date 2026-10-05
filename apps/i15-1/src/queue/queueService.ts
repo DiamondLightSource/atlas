@@ -107,7 +107,9 @@ export function useConnected() {
 }
 
 const getQueueState = async (): Promise<QueueState> => {
-  const response = await axios.get<QueueState>(QUEUE_URL + "/queue/state");
+  const response = await queueClient.get<QueueState>(
+    QUEUE_URL + "/queue/state",
+  );
   return response.data;
 };
 
@@ -123,9 +125,12 @@ export function useGetQueueState() {
 }
 
 export const patchQueueState = async (paused: boolean): Promise<QueueState> => {
-  const response = await axios.patch<QueueState>(QUEUE_URL + "/queue/state", {
-    paused: paused,
-  });
+  const response = await queueClient.patch<QueueState>(
+    QUEUE_URL + "/queue/state",
+    {
+      paused: paused,
+    },
+  );
   return response.data;
 };
 
@@ -162,7 +167,9 @@ export function useToggleQueueState() {
 }
 
 const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_URL + "/queue");
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/queue",
+  );
   return response.data;
 };
 
@@ -178,7 +185,9 @@ export function useGetQueuedTasks() {
 }
 
 const getAllTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_URL + "/tasks");
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/tasks",
+  );
   return response.data;
 };
 
@@ -194,7 +203,9 @@ export function useGetAllTasks() {
 }
 
 const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_URL + "/history");
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/history",
+  );
   return response.data;
 };
 
@@ -212,7 +223,7 @@ export function useGetHistoricTasks() {
 export const cancelTasks = async (
   taskIds: string[],
 ): Promise<TaskWithPosition[]> => {
-  const response = await axios.delete<TaskWithPosition[]>(
+  const response = await queueClient.delete<TaskWithPosition[]>(
     QUEUE_URL + "/queue/tasks",
     {
       data: {
@@ -241,12 +252,16 @@ export const moveTask = async ({
   taskId: string;
   newPosition: number;
 }): Promise<number> => {
-  const response = await axios.post<number>(QUEUE_URL + "/queue/move", null, {
-    params: {
-      task_id: taskId,
-      new_position: newPosition,
+  const response = await queueClient.post<number>(
+    QUEUE_URL + "/queue/move",
+    null,
+    {
+      params: {
+        task_id: taskId,
+        new_position: newPosition,
+      },
     },
-  });
+  );
 
   return response.data;
 };
@@ -262,7 +277,7 @@ export function useMoveTask() {
 }
 
 export const clearHistory = async (): Promise<number> => {
-  const response = await axios.delete<number>(QUEUE_URL + "/history");
+  const response = await queueClient.delete<number>(QUEUE_URL + "/history");
 
   return response.data;
 };
