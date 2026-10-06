@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import axios, { type AxiosInstance } from "axios";
+import { type AxiosInstance } from "axios";
 import { useEffect, useRef } from "react";
 import type {
   QueueState,
