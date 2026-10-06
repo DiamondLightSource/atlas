@@ -1,0 +1,31 @@
+{
+  "name": "@atlas/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./axios": "./src/axiosLoginRedirect.ts",
+    "./mock": "./src/mock/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "axios": "^1.20.0",
+    "msw": "^2.14.6"
+  },
+  "peerDependencies": {
+    "msw": ">=2",
+    "axios": ">=1"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    },
+    "axios": {
+      "optional": true
+    }
+  }
+}

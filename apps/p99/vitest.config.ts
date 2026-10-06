@@ -9,8 +9,7 @@ export default mergeConfig(
     plugins: [relay, react()],
     test: {
       coverage: {
-        // userAuth is a temporary feature that will be removed in future
-        exclude: ["**/context/userAuth/**"],
+        exclude: [],
       },
     },
   }),
