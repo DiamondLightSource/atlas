@@ -1,4 +1,5 @@
 import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
+import "@diamondlightsource/sci-react-ui/font-styles.css";
 import { RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
