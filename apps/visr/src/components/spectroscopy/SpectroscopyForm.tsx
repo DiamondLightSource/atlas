@@ -94,7 +94,7 @@ export function SpectroscopyForm() {
         />
         <VisitInput
           visit={
-            visitTextToVisit(instrumentSession) ??
+            visitTextToVisit(instrumentSession ?? undefined) ??
             visitTextToVisit("cm12345-1") ??
             undefined
           }

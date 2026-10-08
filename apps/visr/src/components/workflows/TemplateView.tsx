@@ -45,7 +45,7 @@ export default function TemplateView({
   >([]);
 
   const { instrumentSession } = useInstrumentSession();
-  const storedVisit = visitTextToVisit(instrumentSession);
+  const storedVisit = visitTextToVisit(instrumentSession ?? undefined);
 
   const submit = useSubmitWorkflow(templateName);
 

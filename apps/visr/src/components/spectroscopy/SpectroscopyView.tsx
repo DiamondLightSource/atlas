@@ -20,8 +20,6 @@ export type SpectroscopyFormData = {
 // Layout constants
 // ---------------------------------------------------------------------------
 
-const DRAWER_COLLAPSED_HEIGHT = 80;
-const NAVBAR_HEIGHT = 48;
 const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
@@ -60,9 +58,8 @@ function SpectroscopyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        flexGrow: 1,
+        flex: 1,
         minWidth: drawerOpen ? 600 : 400,
-        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
       }}
     >
       <SpectroscopyPlots
@@ -71,7 +68,6 @@ function SpectroscopyView() {
       />
       <ControlsDrawer
         open={drawerOpen}
-        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={<SpectroscopyForm />}
       />
