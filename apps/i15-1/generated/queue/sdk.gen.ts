@@ -19,19 +19,14 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Healthz
- */
-export const healthzHealthzGet = <ThrowOnError extends boolean = false>(options?: Options<HealthzHealthzGetData, ThrowOnError>): RequestResult<HealthzHealthzGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthzHealthzGetResponses, unknown, ThrowOnError>({ url: '/healthz', ...options });
-
-/**
  * Read Root
  */
 export const readRootGet = <ThrowOnError extends boolean = false>(options?: Options<ReadRootGetData, ThrowOnError>): RequestResult<ReadRootGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ReadRootGetResponses, unknown, ThrowOnError>({ url: '/', ...options });
 
 /**
- * Get Config
+ * Healthz
  */
-export const getConfigConfigGet = <ThrowOnError extends boolean = false>(options?: Options<GetConfigConfigGetData, ThrowOnError>): RequestResult<GetConfigConfigGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetConfigConfigGetResponses, unknown, ThrowOnError>({ url: '/config', ...options });
+export const healthzHealthzGet = <ThrowOnError extends boolean = false>(options?: Options<HealthzHealthzGetData, ThrowOnError>): RequestResult<HealthzHealthzGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthzHealthzGetResponses, unknown, ThrowOnError>({ url: '/healthz', ...options });
 
 /**
  * Get Queue State
@@ -49,6 +44,11 @@ export const updateQueueStateQueueStatePatch = <ThrowOnError extends boolean = f
     ...options.headers
   }
 });
+
+/**
+ * Get Config
+ */
+export const getConfigConfigGet = <ThrowOnError extends boolean = false>(options?: Options<GetConfigConfigGetData, ThrowOnError>): RequestResult<GetConfigConfigGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetConfigConfigGetResponses, unknown, ThrowOnError>({ url: '/config', ...options });
 
 /**
  * Cancel All Tasks

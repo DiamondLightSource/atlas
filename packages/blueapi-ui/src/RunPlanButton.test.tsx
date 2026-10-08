@@ -124,7 +124,7 @@ describe("RunPlanButton", () => {
     });
   });
 
-  it("shows submission failed message when button is pressed with failed response", async () => {
+  it("shows failed message when button is pressed with failed response", async () => {
     mockSubmitTask.mockResolvedValue(null);
 
     const user = userEvent.setup();
@@ -139,7 +139,9 @@ describe("RunPlanButton", () => {
     user.click(screen.getByText("Run"));
     await waitFor(() => {
       const alert = screen.getByRole("alert");
-      expect(alert).toHaveTextContent("Plan submission failed!");
+      expect(alert).toHaveTextContent(
+        "Failed to run plan test_plan, see console and blueapi logs for full error.",
+      );
     });
   });
 

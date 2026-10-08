@@ -4,7 +4,7 @@ import {
   SystemControls,
 } from "@atlas/app-shell";
 import {
-  ClipboardClock,
+  Activity,
   ListTodo,
   LucideLayoutDashboard,
   ScanQrCode,
@@ -15,6 +15,7 @@ import Dashboard from "./routes/Dashboard";
 import Playlist from "./routes/Playlist";
 import Pucks from "./routes/Pucks";
 import { QueueView } from "./routes/QueueView";
+import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
@@ -33,44 +34,36 @@ const navigation: SectionGroup[] = [
         ],
       },
       {
-        name: "Setup",
-        icon: <SlidersHorizontal />,
-        path: "setup",
-        pages: [
-          {
-            name: "Playlist",
-            element: <Playlist />,
-          },
-          {
-            name: "Samples",
-            element: <div />,
-          },
-          {
-            name: "Pucks",
-            element: <Pucks />,
-          },
-        ],
-      },
-      {
         name: "Acquisition",
         icon: <ScanQrCode />,
         path: "acquisition",
         pages: [
           {
-            name: "Home",
-            element: <div />,
-          },
-          {
             name: "Robot",
             element: <Robot />,
           },
           {
-            name: "Stage",
-            element: <div />,
-          },
-          {
             name: "Plans",
             element: <PlanBrowser />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    sections: [
+      {
+        name: "Setup",
+        icon: <SlidersHorizontal />,
+        path: "setup",
+        pages: [
+          {
+            name: "Pucks",
+            element: <Pucks />,
+          },
+          {
+            name: "Playlist",
+            element: <Playlist />,
           },
         ],
       },
@@ -93,15 +86,16 @@ const navigation: SectionGroup[] = [
           },
         ],
       },
-    ],
-  },
-  {
-    sections: [
       {
-        name: "Log",
-        icon: <ClipboardClock />,
-        path: "log",
-        pages: [{ name: "Log", element: <div /> }],
+        name: "DataVis",
+        icon: <Activity />,
+        path: "datavis",
+        pages: [
+          {
+            name: "DataVis",
+            element: <DataVisRedirect />,
+          },
+        ],
       },
     ],
   },
