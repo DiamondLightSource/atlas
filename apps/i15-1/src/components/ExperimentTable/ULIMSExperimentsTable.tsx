@@ -80,6 +80,7 @@ export function ExperimentList() {
     variables: {
       proposal: visit?.proposalNumber ?? 0,
       session: visit?.number ?? 0,
+      first: 50,
     },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
