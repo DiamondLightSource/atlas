@@ -4,7 +4,7 @@ import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
 
 // Not importing Plane in case we move SliceViewer somewhere else as a generic component
-export enum Plane {
+enum Plane {
   X,
   Y,
   Z,
