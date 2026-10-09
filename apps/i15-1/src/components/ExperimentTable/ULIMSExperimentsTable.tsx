@@ -235,7 +235,8 @@ export function ExperimentList() {
     },
 
     state: {
-      isLoading: loading,
+      showSkeletons: loading && !data,
+      showProgressBars: loading && !!data,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error
