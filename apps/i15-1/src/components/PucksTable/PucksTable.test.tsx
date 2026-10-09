@@ -24,7 +24,8 @@ type MockTableOptions = {
   data: MockRow[];
   columns?: MockColumn[];
   state?: {
-    isLoading?: boolean;
+    showSkeletons?: boolean;
+    showProgressBars?: boolean;
   };
   muiToolbarAlertBannerProps?: {
     children?: React.ReactNode;
@@ -76,7 +77,12 @@ vi.mock("material-react-table", () => ({
         ))}
       </div>
 
-      {table.options.state?.isLoading ? <div role="progressbar" /> : null}
+      {table.options.state?.showSkeletons ? (
+        <div className="MuiSkeleton-root" />
+      ) : null}
+      {table.options.state?.showProgressBars ? (
+        <div role="progressbar" />
+      ) : null}
       {table.options.muiToolbarAlertBannerProps?.children ? (
         <div>{table.options.muiToolbarAlertBannerProps.children}</div>
       ) : null}
@@ -270,9 +276,24 @@ describe("PucksTable", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    renderComponent();
+    const { container } = renderComponent();
+
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
+
+  it("shows a progress bar, not skeletons, when refetching with data", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: true,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const { container } = renderComponent();
 
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(
+      container.querySelector(".MuiSkeleton-root"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows error banner when query fails", () => {
