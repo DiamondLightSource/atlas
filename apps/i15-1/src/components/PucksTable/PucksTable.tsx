@@ -261,7 +261,8 @@ export function PucksTable() {
       </Stack>
     ),
     state: {
-      isLoading: loading && !data,
+      showSkeletons: loading && !data,
+      showProgressBars: loading && !!data,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error
