@@ -1,8 +1,14 @@
 import { Box } from "@mui/material";
-import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
+
+// Not importing Plane in case we move SliceViewer somewhere else as a generic component
+enum Plane {
+  X,
+  Y,
+  Z,
+}
 
 interface Props {
   volumeData: Uint8Array;
