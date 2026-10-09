@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import TomographyControls from "./TomographyControls";
 import { TomographyForm } from "./TomographyForm";
-import { Plane } from "./PlaneEnum";
+import { Plane } from "./plane";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
 
