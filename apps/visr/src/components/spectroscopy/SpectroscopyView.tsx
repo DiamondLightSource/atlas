@@ -73,7 +73,7 @@ function SpectroscopyView() {
         open={drawerOpen}
         collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
         onToggle={() => setDrawerOpen(prev => !prev)}
-        controls={<SpectroscopyForm />}
+        controls={[<SpectroscopyForm />, <SpectroscopyForm />]}
       />
     </Box>
   );

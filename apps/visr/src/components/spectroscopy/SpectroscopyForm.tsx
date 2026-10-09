@@ -4,8 +4,6 @@ import AbortButton from "../AbortButton";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { Box } from "@mui/material";
-import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
-import { visitTextToVisit } from "../../utils/common";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -16,7 +14,7 @@ export type SpectroscopyFormData = {
 };
 
 export function SpectroscopyForm() {
-  const { instrumentSession, setInstrumentSession } = useInstrumentSession();
+  const { instrumentSession } = useInstrumentSession();
   const [formData, setFormData] = useState<SpectroscopyFormData>({
     total_number_of_scan_points: 25,
     grid_size: 5.0,
@@ -28,88 +26,114 @@ export function SpectroscopyForm() {
   const maxValue = 14.5;
 
   return (
-    <Box>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 3 }}>
+      
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "1fr 1fr",
-            md: "1fr 1fr 1fr",
-          },
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
           gap: 3,
-          flexGrow: 1,
+          alignItems: "start",
         }}
       >
-        <NumberInput
-          label="Grid Origin x"
-          numberMode="scientific"
-          defaultValue={formData["grid_origin_x"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_origin_x"]: parsedValue });
+        {/* Line one */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 2,
+            alignItems: "start",
           }}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
-        <NumberInput
-          label="Grid Origin y"
-          numberMode="scientific"
-          defaultValue={formData["grid_origin_y"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_origin_y"]: parsedValue });
-          }}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
+        >
+          <NumberInput
+            label="Grid Origin x"
+            numberMode="scientific"
+            defaultValue={formData["grid_origin_x"]}
+            onCommit={parsedValue =>
+              setFormData(prev => ({ ...prev, grid_origin_x: parsedValue }))
+            }
+            minValue={minValue}
+            maxValue={maxValue}
+          />
+          <NumberInput
+            label="Grid Origin y"
+            numberMode="scientific"
+            defaultValue={formData["grid_origin_y"]}
+            onCommit={parsedValue =>
+              setFormData(prev => ({ ...prev, grid_origin_y: parsedValue }))
+            }
+            minValue={minValue}
+            maxValue={maxValue}
+          />
+        </Box>
+
         <NumberInput
           label="Grid Size"
           numberMode="scientific"
           defaultValue={formData["grid_size"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_size"]: parsedValue });
-          }}
+          onCommit={parsedValue =>
+            setFormData(prev => ({ ...prev, grid_size: parsedValue }))
+          }
           minValue={0.1}
           maxValue={15}
         />
+
+        {/* Line two */}
         <NumberInput
           label="Number of Points"
           numberMode="natural"
           defaultValue={formData["total_number_of_scan_points"]}
-          onCommit={parsedValue => {
-            setFormData({
-              ...formData,
-              ["total_number_of_scan_points"]: parsedValue,
-            });
-          }}
+          onCommit={parsedValue =>
+            setFormData(prev => ({
+              ...prev,
+              total_number_of_scan_points: parsedValue,
+            }))
+          }
           minValue={1}
         />
         <NumberInput
           label="Exposure Time"
           numberMode="scientific"
           defaultValue={formData["exposure_time"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["exposure_time"]: parsedValue });
-          }}
+          onCommit={parsedValue =>
+            setFormData(prev => ({ ...prev, exposure_time: parsedValue }))
+          }
           minValue={0.1}
         />
-        <VisitInput
-          visit={
-            visitTextToVisit(instrumentSession) ??
-            visitTextToVisit("cm12345-1") ??
-            undefined
-          }
-          onSubmit={visit => setInstrumentSession(visitToText(visit))}
-          submitButton={false}
-        />
       </Box>
-      <Box sx={{ mt: 4 }} display={"flex"} justifyContent={"center"}>
+
+      {/* Line three */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+          gap: 2,
+          pt: 3,
+          borderTop: 1,
+          borderColor: "divider",
+          "& .MuiButton-root": {
+            width: "100%",
+            height: 40,
+            whiteSpace: "nowrap",
+          },
+        }}
+      >
         <RunPlanButton
           name="demo_spectroscopy"
-          params={formData}
+          params={{ ...formData, fly: false }}
           instrumentSession={instrumentSession}
+          buttonText="Step Scan"
+        />
+        <RunPlanButton
+          name="demo_spectroscopy"
+          params={{ ...formData, fly: true }}
+          instrumentSession={instrumentSession}
+          buttonText="Fly Scan"
         />
       </Box>
-      <Box sx={{ mt: 4 }} display={"flex"} justifyContent={"center"}>
+
+      {/* Line four */}
+      <Box sx={{ "& .MuiButton-root": { width: "100%", height: 40 } }}>
         <AbortButton />
       </Box>
     </Box>
