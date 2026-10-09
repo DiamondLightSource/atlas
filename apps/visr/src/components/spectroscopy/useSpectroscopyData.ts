@@ -9,7 +9,7 @@ export type FetchMapFunction = (
   datapath: string,
   colour: RGBColour,
   snake: boolean,
-) => Promise<NDT>;
+) => Promise<NDT | null>;
 
 export interface DataChannels {
   red: NDT | null;

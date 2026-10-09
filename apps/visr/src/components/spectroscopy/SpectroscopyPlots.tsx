@@ -4,6 +4,7 @@ import ndarray from "ndarray";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
 import { useLayoutEffect, useState, type ComponentProps } from "react";
 import { useSpectroscopyData, type RGBColour } from "./useSpectroscopyData";
+import { DataSource } from "./dataSource";
 
 // ---------------------------------------------------------------------------
 // Helpers: data conversion
@@ -72,13 +73,31 @@ async function fetchMap(
   datapath: string,
   colour: RGBColour,
   snake: boolean,
-) {
+  dataSource: DataSource,
+): Promise<NDT | null> {
+  // while there is only one data source fake fetch
+  if (dataSource === DataSource.Diodes) return null;
+  // add data source string from enum ('camera' or 'diodes') when enz-locum data is available
   const url = `/api/data/map?filepath=${encodeURIComponent(filepath)}&datapath=${encodeURIComponent(datapath)}&snake=${encodeURIComponent(snake)}`;
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(resp.statusText);
   const mapResponse: MapResponse = await resp.json();
   return toNDT(mapResponse.values, colour);
 }
+
+const fetchCamera = (
+  filepath: string,
+  datapath: string,
+  colour: RGBColour,
+  snake: boolean,
+) => fetchMap(filepath, datapath, colour, snake, DataSource.Camera);
+
+const fetchDiodes = (
+  filepath: string,
+  datapath: string,
+  colour: RGBColour,
+  snake: boolean,
+) => fetchMap(filepath, datapath, colour, snake, DataSource.Diodes);
 
 // ---------------------------------------------------------------------------
 // Channel definitions
@@ -88,7 +107,7 @@ const CHANNELS = [
   { key: "red", label: "Red channel" },
   { key: "green", label: "Green channel" },
   { key: "blue", label: "Blue channel" },
-  //{ key: "gray", label: "Gray channel" },
+  //{ key: "gray?", label: "Composite" },
 ] as const;
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
@@ -100,15 +119,22 @@ export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 // ---------------------------------------------------------------------------
 
 interface SpectroscopyPlotsProps {
+  dataSource: DataSource;
   expanded: boolean;
   plotAspectRatio: number | "auto" | "equal";
 }
 
 function SpectroscopyPlots({
+  dataSource,
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
-  const { data: channels } = useSpectroscopyData(fetchMap);
+  const { data: cameraChannels } = useSpectroscopyData(fetchCamera);
+  const { data: diodeChannels } = useSpectroscopyData(fetchDiodes);
+
+  const channels =
+    dataSource === DataSource.Camera ? cameraChannels : diodeChannels;
+
   const { width, containerRef, mounted } = useContainerWidth();
 
   // -------------------------------------------------------------------------
@@ -143,7 +169,7 @@ function SpectroscopyPlots({
   const gridHeight = rowHeight * totalRows;
 
   // -------------------------------------------------------------------------
-  // Layout: 3x1 collapsed, 2x2 expanded
+  // Layout: 4x1 collapsed, 2x2 expanded
   // -------------------------------------------------------------------------
   const layout = [
     { i: "0", x: 0, y: 0, w: w, h: rowsPerPlot, static: true },
@@ -156,22 +182,36 @@ function SpectroscopyPlots({
       h: rowsPerPlot,
       static: true,
     },
+    {
+      i: "3",
+      x: expanded ? 1 : 3,
+      y: expanded ? rowsPerPlot : 0,
+      w: w,
+      h: rowsPerPlot,
+      static: true,
+    },
   ];
 
   // -------------------------------------------------------------------------
   // Views
   // -------------------------------------------------------------------------
-  const views = CHANNELS.map(({ key }) => (
-    <ImagePlot
-      aspect={plotAspectRatio}
-      plotConfig={{}}
-      customToolbarChildren={null}
-      values={channels[key] ?? EMPTY_NDT}
-      //tightAxes //requires Davidia 1.1.0
-    />
-  ));
+  const views = [
+    ...CHANNELS.map(({ key }) => {
+      const values = channels[key];
+      if (!values) return <EmptyPlot message="No data" />;
+      return (
+        <ImagePlot
+          aspect={plotAspectRatio}
+          plotConfig={{}}
+          customToolbarChildren={null}
+          values={values}
+        />
+      );
+    }),
+    <EmptyPlot message="Composite placeholder" />,
+  ];
 
-  const titles = CHANNELS.map(({ label }) => label);
+  const titles = [...CHANNELS.map(({ label }) => label), "Composite"];
 
   // -------------------------------------------------------------------------
   // Plot cells
@@ -217,6 +257,26 @@ function SpectroscopyPlots({
   ));
 
   // -------------------------------------------------------------------------
+  // Empty plot
+  // -------------------------------------------------------------------------
+  function EmptyPlot({ message }: { message: string }) {
+    return (
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          {message}
+        </Typography>
+      </Box>
+    );
+  }
+
+  // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
   return (
@@ -237,7 +297,7 @@ function SpectroscopyPlots({
           width={width}
           style={{ height: gridHeight }}
           gridConfig={{
-            cols: expanded ? 2 : 3,
+            cols: expanded ? 2 : 4,
             rowHeight: rowHeight,
             margin: [0, 0],
           }}
