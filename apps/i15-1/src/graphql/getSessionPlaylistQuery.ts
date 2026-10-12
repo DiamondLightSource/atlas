@@ -1,14 +1,22 @@
 import { gql } from "@apollo/client";
 
 export const getSessionPlaylistQuery = gql`
-  query GetSessionPlaylist($proposal: Int!, $session: Int!) {
+  query GetSessionPlaylist(
+    $proposal: Int!
+    $session: Int!
+    $first: Int!
+    $after: String
+  ) {
     experiments(
+      first: $first
+      after: $after
       instrumentSessions: {
         proposalNumber: $proposal
         instrumentSessionNumber: $session
       }
     ) {
       edges {
+        cursor
         node {
           name
           sample {
@@ -38,6 +46,10 @@ export const getSessionPlaylistQuery = gql`
             data
           }
         }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }
