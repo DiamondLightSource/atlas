@@ -154,7 +154,10 @@ export function TomographyForm() {
       >
         <RunPlanButton
           name="darks_flats"
-          params={{ light_source: formData.light_source }}
+          params={{
+            light_source: formData.light_source,
+            exposure_time: formData.exposure_time,
+          }}
           instrumentSession={instrumentSession}
           buttonText="Acquire Darks/Flats"
         />
