@@ -1,6 +1,7 @@
 import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
+import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import {
@@ -18,6 +19,7 @@ enum LightSource {
 }
 
 export type TomographyFormData = {
+  scan_type: ScanType;
   number_of_projections: number;
   light_source: LightSource;
   exposure_time: number;
@@ -26,6 +28,7 @@ export type TomographyFormData = {
 export function TomographyForm() {
   const { instrumentSession } = useInstrumentSession();
   const [formData, setFormData] = useState<TomographyFormData>({
+    scan_type: ScanType.STEP,
     number_of_projections: 360,
     light_source: LightSource.LED,
     exposure_time: 0.1,
@@ -33,16 +36,36 @@ export function TomographyForm() {
   const minProjections = 30;
   const maxProjections = 1440;
 
+  const setField = <K extends keyof typeof formData>(
+    key: K,
+    value: (typeof formData)[K],
+  ) => setFormData(prev => ({ ...prev, [key]: value }));
+
+  const sectionSx = { pt: 3, borderTop: 1, borderColor: "divider" };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 3 }}>
-      {/* Line one */}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        p: 3,
+        "& .MuiButton-root": {
+          width: "100%",
+          height: 56,
+          whiteSpace: "nowrap",
+        },
+        "& .MuiToggleButtonGroup-root": { height: 56 },
+      }}
+    >
+      {/* Parameters */}
       <Box
         sx={{
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
             sm: "1fr 1fr",
-            md: "1fr 1fr 1fr",
+            md: "repeat(3, 1fr)",
           },
           columnGap: 3,
           rowGap: 4,
@@ -52,24 +75,17 @@ export function TomographyForm() {
       >
         <NumberInput
           label="Number of Projections"
-          defaultValue={formData["number_of_projections"]}
           numberMode="natural"
-          onCommit={parsedValue =>
-            setFormData(prev => ({
-              ...prev,
-              number_of_projections: parsedValue,
-            }))
-          }
+          defaultValue={formData.number_of_projections}
+          onCommit={v => setField("number_of_projections", v)}
           minValue={minProjections}
           maxValue={maxProjections}
         />
         <NumberInput
           label="Exposure Time"
           numberMode="scientific"
-          defaultValue={formData["exposure_time"]}
-          onCommit={parsedValue =>
-            setFormData(prev => ({ ...prev, exposure_time: parsedValue }))
-          }
+          defaultValue={formData.exposure_time}
+          onCommit={v => setField("exposure_time", v)}
           minValue={0.1}
         />
         <FormControl fullWidth sx={{ position: "relative" }}>
@@ -89,10 +105,7 @@ export function TomographyForm() {
             fullWidth
             aria-labelledby="light-source-label"
             value={formData.light_source}
-            onChange={(_, value: LightSource | null) =>
-              value && setFormData(prev => ({ ...prev, light_source: value }))
-            }
-            sx={{ height: 56 }}
+            onChange={(_, v) => v && setField("light_source", v)}
           >
             <ToggleButton value={LightSource.LED}>LED</ToggleButton>
             <ToggleButton value={LightSource.SR}>Synchrotron</ToggleButton>
@@ -101,54 +114,50 @@ export function TomographyForm() {
         </FormControl>
       </Box>
 
-      {/* Line two */}
+      {/* Scan controls */}
       <Box
         sx={{
+          ...sectionSx,
           display: "grid",
           gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
           gap: 2,
-          pt: 3,
-          borderTop: 1,
-          borderColor: "divider",
+        }}
+      >
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          aria-label="Scan type"
+          value={formData.scan_type}
+          onChange={(_, v) => v && setField("scan_type", v)}
+        >
+          <ToggleButton value={ScanType.STEP}>Step</ToggleButton>
+          <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
+        </ToggleButtonGroup>
+        <RunPlanButton
+          name="tomography"
+          params={formData}
+          instrumentSession={instrumentSession}
+          buttonText="Run"
+        />
+        <AbortButton />
+      </Box>
+
+      {/* Darks/flats */}
+      <Box
+        sx={{
+          ...sectionSx,
           "& .MuiButton-root": {
-            width: "100%",
-            height: 40,
-            whiteSpace: "nowrap",
+            bgcolor: "secondary.main",
+            "&:hover": { bgcolor: "secondary.dark" },
           },
         }}
       >
         <RunPlanButton
-          name="tomography"
-          params={{ ...formData, fly: false }}
+          name="darks_flats"
+          params={{ light_source: formData.light_source }}
           instrumentSession={instrumentSession}
-          buttonText="Step Scan"
+          buttonText="Acquire Darks/Flats"
         />
-        <RunPlanButton
-          name="tomography"
-          params={{ ...formData, fly: true }}
-          instrumentSession={instrumentSession}
-          buttonText="Fly Scan"
-        />
-        <Box
-          sx={{
-            "& .MuiButton-root": {
-              backgroundColor: "secondary.main",
-              "&:hover": { backgroundColor: "secondary.dark" },
-            },
-          }}
-        >
-          <RunPlanButton
-            name="darks_flats"
-            params={{ light_source: formData.light_source }}
-            instrumentSession={instrumentSession}
-            buttonText="Acquire Darks/Flats"
-          />
-        </Box>
-      </Box>
-
-      {/* Line three */}
-      <Box sx={{ "& .MuiButton-root": { width: "100%", height: 40 } }}>
-        <AbortButton />
       </Box>
     </Box>
   );
