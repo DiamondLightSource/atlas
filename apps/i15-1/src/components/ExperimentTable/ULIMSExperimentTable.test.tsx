@@ -407,7 +407,9 @@ describe("ExperimentList", () => {
     // Initial render uses cm44163-3 → proposal 44163, session 3
     expect(mockedUseQuery).toHaveBeenLastCalledWith(
       expect.anything(),
-      expect.objectContaining({ variables: { proposal: 44163, session: 3 } }),
+      expect.objectContaining({
+        variables: { proposal: 44163, session: 3, first: 50 },
+      }),
     );
 
     // Switch to a different session
@@ -426,7 +428,9 @@ describe("ExperimentList", () => {
     // Query should now be called with the new session variables
     expect(mockedUseQuery).toHaveBeenLastCalledWith(
       expect.anything(),
-      expect.objectContaining({ variables: { proposal: 55555, session: 1 } }),
+      expect.objectContaining({
+        variables: { proposal: 55555, session: 1, first: 50 },
+      }),
     );
   });
 });

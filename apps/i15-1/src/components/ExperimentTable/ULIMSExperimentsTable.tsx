@@ -19,6 +19,7 @@ import type {
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
+import { fillParentTableProps } from "../fillParentTableProps";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
 import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
@@ -81,6 +82,7 @@ export function ExperimentList() {
     variables: {
       proposal: visit?.proposalNumber ?? 0,
       session: visit?.number ?? 0,
+      first: 50,
     },
     fetchPolicy: "cache-and-network",
     context: { pathname: location.pathname },
@@ -145,6 +147,7 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    ...fillParentTableProps,
     muiTableBodyRowProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
