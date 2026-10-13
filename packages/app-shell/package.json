@@ -11,8 +11,9 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "react-router-dom": "^7.13.1",
-    "@mui/icons-material": "^7.0.0"
+    "@atlas/auth": "workspace:*",
+    "@mui/icons-material": "^7.0.0",
+    "react-router-dom": "^7.13.1"
   },
   "peerDependencies": {
     "@diamondlightsource/sci-react-ui": "workspace:*",
