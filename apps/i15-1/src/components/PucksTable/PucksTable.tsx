@@ -219,6 +219,7 @@ export function PucksTable() {
                       puckId: [row.original.id],
                     },
                   });
+                  setSelectedPositions({});
                 } else {
                   void mountPuck({
                     variables: {
