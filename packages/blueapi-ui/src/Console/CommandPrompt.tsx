@@ -1,6 +1,8 @@
-import { Box, IconButton, InputBase, useTheme } from "@mui/material";
+import type { Kernel } from "@jupyterlab/services";
+import { Box, IconButton, InputBase, Paper, useTheme } from "@mui/material";
 import { ChevronRight, Ellipsis, OctagonX, Send, Settings } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { usePythonCompletion } from "./usePythonCompletion";
 
 export type CommandPromptState = "ready" | "evaluating" | "continuation";
 
@@ -22,6 +24,7 @@ type CommandPromptProps = {
   onSubmit: CommandHandler;
   status?: CommandPromptState;
   interrupt: () => void;
+  kernel: Kernel.IKernelConnection | null;
 };
 
 const INDENT_SYMBOL = "    ";
@@ -31,9 +34,33 @@ export const CommandPrompt = ({
   onSubmit,
   status = "ready",
   interrupt,
+  kernel,
 }: CommandPromptProps) => {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { completion, complete, dismiss } = usePythonCompletion(kernel);
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const acceptCompletion = (match: string) => {
+    if (!completion || !inputRef.current) return;
+
+    const { cursorStart, cursorEnd } = completion;
+
+    const updated =
+      command.slice(0, cursorStart) + match + command.slice(cursorEnd);
+
+    const cursor = cursorStart + match.length;
+
+    setCommand(updated);
+    dismiss();
+
+    requestAnimationFrame(() => {
+      inputRef.current?.setSelectionRange(cursor, cursor);
+      inputRef.current?.focus();
+    });
+  };
 
   /** Some other control to focus on to avoid an accessibility trap */
   const submitRef = useRef<HTMLButtonElement>(null);
@@ -67,6 +94,34 @@ export const CommandPrompt = ({
    */
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!inputRef.current) return; // these events should come from input element
+
+    if (completion && completion.matches.length > 0) {
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((i) => (i + 1) % completion.matches.length);
+          return;
+
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex(
+            (i) =>
+              (i - 1 + completion.matches.length) % completion.matches.length,
+          );
+          return;
+
+        case "Enter":
+        case "Tab":
+          event.preventDefault();
+          acceptCompletion(completion.matches[selectedIndex]!);
+          return;
+
+        case "Escape":
+          event.preventDefault();
+          dismiss();
+          return;
+      }
+    }
     switch (event.key) {
       case "Enter":
         event.preventDefault(); // prevent the browser's default behaviour for these events
@@ -94,6 +149,11 @@ export const CommandPrompt = ({
         historyIndex -= 1;
         writeCommand(getCommandFromHistory(historyIndex));
         break;
+      case " ":
+        if (event.ctrlKey || event.metaKey) {
+          complete(command, command.length);
+        }
+        return;
     }
   };
 
@@ -126,6 +186,7 @@ export const CommandPrompt = ({
         disabled={isEvaluating}
         onChange={(event) => {
           setCommand(event.target.value);
+          setSelectedIndex(0);
         }}
         onKeyDown={handleKeyDown}
         sx={{
@@ -145,6 +206,45 @@ export const CommandPrompt = ({
           px: 1,
         }}
       />
+      {completion && completion.matches.length > 0 && (
+        <Paper
+          elevation={6}
+          sx={{
+            position: "absolute",
+            bottom: 40,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            maxHeight: 200,
+            overflowY: "auto",
+            py: 0.5,
+          }}
+        >
+          {completion.matches.map((match, index) => (
+            <Box
+              key={match}
+              onMouseDown={(event) => {
+                // Keep focus in the input while selecting.
+                event.preventDefault();
+                acceptCompletion(match);
+              }}
+              sx={(theme) => ({
+                px: 1.5,
+                py: 0.5,
+                cursor: "pointer",
+                fontFamily: theme.typography.mono1,
+                bgcolor:
+                  index === selectedIndex ? "action.selected" : "transparent",
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              })}
+            >
+              {match}
+            </Box>
+          ))}
+        </Paper>
+      )}
       <Box sx={{ ml: "auto", display: "flex" }}>
         <IconButton
           size="small"

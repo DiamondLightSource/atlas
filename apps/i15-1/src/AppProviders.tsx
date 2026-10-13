@@ -27,7 +27,9 @@ export function AppProviders({ api, theme, children }: Props) {
           <UserAuthProvider>
             <BlueapiProvider api={api}>
               <ApolloProvider client={client}>
-                <InstrumentSessionProvider>
+                <InstrumentSessionProvider
+                  sessionsList={["cm12345-2", "mg1324-3"]}
+                >
                   {children}
                 </InstrumentSessionProvider>
               </ApolloProvider>

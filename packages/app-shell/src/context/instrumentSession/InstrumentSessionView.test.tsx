@@ -5,7 +5,6 @@ import {
   useInstrumentSession,
 } from "./InstrumentSessionProvider";
 import { describe, it, expect, vi } from "vitest";
-import { isValidElement } from "react";
 
 function renderComponentWithProvider() {
   return render(

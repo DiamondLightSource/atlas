@@ -24,10 +24,12 @@ export const Console = () => {
   const incompleteCommandRef = useRef<string | null>(null);
 
   const kernelRef = useRef<Promise<Kernel.IKernelConnection> | null>(null);
+  const [kernel, setKernel] = useState<Kernel.IKernelConnection | null>(null);
   const getKernel = useCallback((): Promise<Kernel.IKernelConnection> => {
     if (!kernelRef.current) {
       kernelRef.current = startKernel(kernelManager, "python3")
         .then((kernel) => {
+          setKernel(kernel);
           setStatus("ready");
           return kernel;
         })
@@ -137,8 +139,6 @@ export const Console = () => {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        // border: "1px solid",
-        // borderColor: "divider",
       }}
     >
       <Log lines={lines} />
@@ -148,6 +148,7 @@ export const Console = () => {
           onSubmit={handleCommand}
           status={state}
           interrupt={interruptKernel}
+          kernel={kernel}
         />
       </Box>
     </Paper>
