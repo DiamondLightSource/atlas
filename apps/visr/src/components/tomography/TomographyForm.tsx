@@ -146,10 +146,6 @@ export function TomographyForm() {
       <Box
         sx={{
           ...sectionSx,
-          "& .MuiButton-root": {
-            bgcolor: "secondary.main",
-            "&:hover": { bgcolor: "secondary.dark" },
-          },
         }}
       >
         <RunPlanButton
