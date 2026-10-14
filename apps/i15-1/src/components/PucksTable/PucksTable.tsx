@@ -141,9 +141,10 @@ export function PucksTable() {
 
   const columns = useMemo<MRT_ColumnDef<PuckTableData>[]>(
     () => [
-      { accessorKey: "barcode", header: "Puck ID" },
+      { accessorKey: "barcode", id: "puckId", header: "Puck ID" },
       {
         accessorKey: "parentPosition",
+        id: "puckPosition",
         header: "Puck Position",
         Cell: ({ row }) => {
           const rowId = row.original.id;
@@ -181,7 +182,7 @@ export function PucksTable() {
           );
         },
       },
-      { accessorKey: "session", header: "Session" },
+      { accessorKey: "session", id: "session", header: "Session" },
       {
         accessorKey: "status",
         id: "mountStatus",
@@ -251,6 +252,15 @@ export function PucksTable() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
+    initialState: {
+      columnOrder: [
+        "puckId",
+        "session",
+        "mountStatus",
+        "puckPosition",
+        "setMount",
+      ],
+    },
     renderTopToolbarCustomActions: () => (
       <Stack
         direction="row"
