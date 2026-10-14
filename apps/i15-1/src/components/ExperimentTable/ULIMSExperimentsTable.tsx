@@ -4,7 +4,6 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-import { DiamondDSIntegrations } from "@diamondlightsource/sci-react-ui";
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
@@ -20,7 +19,7 @@ import type {
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
-import { fillParentTableProps } from "../fillParentTableProps";
+import { diamondFillParentTableProps } from "../diamondTableProps";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
 import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
@@ -126,29 +125,10 @@ export function ExperimentList() {
   const [msg, setMsg] = useState<string>("");
   const [severity, setSeverity] = useState<SeverityLevel>("info");
 
-  const diamondDSOptions = DiamondDSIntegrations.mrtOptions({
-    fullWidth: true,
-  });
-
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
-    // MRT's lighten/darken breaks on DiamondDS CSS-variable tokens; use literal ones.
-    mrtTheme: DiamondDSIntegrations.mrtTheme,
-    ...diamondDSOptions,
-    ...fillParentTableProps,
-    muiTablePaperProps: {
-      ...diamondDSOptions.muiTablePaperProps,
-      // fullWidth squares the panel; restore its corners (2 × theme.shape.borderRadius) and clip the table to them.
-      sx: {
-        ...diamondDSOptions.muiTablePaperProps.sx,
-        ...fillParentTableProps.muiTablePaperProps.sx,
-        borderRadius: 2,
-        overflow: "hidden",
-      },
-    },
-    // TODO: drop once DiamondDSIntegrations covers MRT's hardcoded toolbar boxShadow.
-    muiBottomToolbarProps: { sx: { boxShadow: "none" } },
+    ...diamondFillParentTableProps,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
