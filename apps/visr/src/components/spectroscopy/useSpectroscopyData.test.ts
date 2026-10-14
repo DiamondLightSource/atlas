@@ -2,6 +2,7 @@ import {
   binEdgesToAxis,
   CELL_PIXELS,
   fetchData,
+  fetchRender,
   toChannels,
   EMPTY_STRIPE_GREYS,
   splitEdges,
@@ -183,6 +184,28 @@ describe("toChannels", () => {
       0, 2, 4,
     ]);
     expect(channels.red.shape).toEqual([2, 2, 3]);
+  });
+});
+
+describe("fetchRender", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("asks for just the region, when there is one", async () => {
+    const fetch = vi.fn<(url: string) => Promise<Response>>(
+      async () => new Response("{}"),
+    );
+    vi.stubGlobal("fetch", fetch);
+    await fetchRender("uid", "cells", { x0: 1, x1: 2, y0: -3, y1: 4.5 });
+    const url = new URL(fetch.mock.calls[0][0], "http://host");
+    expect(url.pathname).toBe("/api/data/render/uid");
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      kind: "cells",
+      size: "200",
+      x0: "1",
+      x1: "2",
+      y0: "-3",
+      y1: "4.5",
+    });
   });
 });
 

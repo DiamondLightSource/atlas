@@ -26,6 +26,9 @@ export type Progress = {
   offset: { x: number; y: number } | null;
 };
 
+/** A region of the scan to draw, in motor units */
+export type Region = { x0: number; x1: number; y0: number; y1: number };
+
 /** The fields both endpoints use for progress */
 type ProgressFields = {
   n_points?: number;
@@ -211,14 +214,19 @@ export function fetchData(uuid: string): Promise<SpectroscopyData | NotReady> {
   return fetchJson<SpectroscopyData>(`/api/data/binned/${uuid}`);
 }
 
-/** A run drawn by /render over the scan's extent, or NotReady */
+/** A run drawn by /render over `region` (default: the scan's extent), or NotReady */
 export function fetchRender(
   uuid: string,
-  kind: Exclude<PlotKind, "cells">,
+  kind: PlotKind,
+  region?: Region,
 ): Promise<RenderData | NotReady> {
-  return fetchJson<RenderData>(
-    `/api/data/render/${uuid}?kind=${kind}&size=${RENDER_SIZE}`,
-  );
+  const params = new URLSearchParams({ kind, size: String(RENDER_SIZE) });
+  if (region) {
+    for (const [key, value] of Object.entries(region)) {
+      params.set(key, String(value));
+    }
+  }
+  return fetchJson<RenderData>(`/api/data/render/${uuid}?${params}`);
 }
 
 /** Evenly spaced edges from `start` to `stop` for `count` pixels */
@@ -275,9 +283,19 @@ const FINAL_POLL_ATTEMPTS = 10;
 // initial axes must have min three points...
 const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
 
-export function useSpectroscopyData(kind: PlotKind = "cells"): {
+/**
+ * The latest images of the current scan, drawn as `kind`, polled while it
+ * runs and once more when it ends. With a `region`, only that part of the
+ * scan is drawn (by /render, at its full resolution).
+ */
+export function useSpectroscopyData(
+  kind: PlotKind = "cells",
+  region?: Region,
+): {
   data: DataChannels;
   running: boolean;
+  /** The scan being shown */
+  uuid: string | null;
 } {
   const scanEvent = useScanEvents();
   const [running, setRunning] = useState<boolean>(false);
@@ -316,9 +334,9 @@ export function useSpectroscopyData(kind: PlotKind = "cells"): {
     async function poll(): Promise<number> {
       if (!uuid) return 0;
       try {
-        const resp = await (kind === "cells"
+        const resp = await (kind === "cells" && !region
           ? fetchData(uuid)
-          : fetchRender(uuid, kind));
+          : fetchRender(uuid, kind, region));
         if ("notReady" in resp) return resp.retryAfterMs; // the next poll tries again
         setData(toChannels(resp));
       } catch (err) {
@@ -357,7 +375,7 @@ export function useSpectroscopyData(kind: PlotKind = "cells"): {
         pollInterval.current = null;
       }
     };
-  }, [running, uuid, kind]);
+  }, [running, uuid, kind, region]);
 
-  return { data, running };
+  return { data, running, uuid };
 }

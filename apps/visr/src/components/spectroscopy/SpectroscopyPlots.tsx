@@ -1,11 +1,27 @@
-import { ImagePlot } from "@diamondlightsource/davidia";
-import { useSpectroscopyData, type PlotKind } from "./useSpectroscopyData";
+import {
+  ImagePlot,
+  type SelectionsEventListener,
+} from "@diamondlightsource/davidia";
+import {
+  useSpectroscopyData,
+  type PlotKind,
+  type Region,
+} from "./useSpectroscopyData";
 import { beamWarning, PLOT_KINDS } from "./plotKinds";
+import { describeRegion, selectionToRegion } from "./region";
 import { describeOffset, describeProgress, percentDone } from "./progress";
-import { useMemo, useState, type ComponentProps } from "react";
+import RegionSelectMode from "./RegionSelectMode";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+} from "react";
 import {
   Alert,
   Box,
+  Chip,
   LinearProgress,
   Stack,
   ToggleButton,
@@ -13,6 +29,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import CropFreeIcon from "@mui/icons-material/CropFree";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -30,9 +47,34 @@ function SpectroscopyPlots({
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
   const [kind, setKind] = useState<PlotKind>("cells");
-  const { data: channels } = useSpectroscopyData(kind);
+  const [region, setRegion] = useState<Region | undefined>();
+  const [picking, setPicking] = useState(false);
+  const { data: channels, uuid } = useSpectroscopyData(kind, region);
   const progress = channels.progress;
   const percent = progress && percentDone(progress);
+
+  // a new scan starts on the whole of it
+  useEffect(() => {
+    setRegion(undefined);
+    setPicking(false);
+  }, [uuid]);
+
+  /** A rectangle drawn on any of the plots becomes the region all of them show */
+  const onSelection = useCallback<SelectionsEventListener>(
+    (type, dragging, selection) => {
+      // SelectionsEventType is only declared, not exported, so by its value
+      if (String(type) !== "created" || dragging || !selection) {
+        return;
+      }
+      const picked = selectionToRegion(selection);
+      // Davidia calls this while it renders, so update after that
+      queueMicrotask(() => {
+        if (picked) setRegion(picked);
+        setPicking(false);
+      });
+    },
+    [],
+  );
 
   const plots = useMemo(
     () =>
@@ -46,6 +88,8 @@ function SpectroscopyPlots({
             // davidia wraps every plot in a hardcoded <div> with no height,
             // which breaks the size chain. This gives it one.
             "& > div": { height: "100%" },
+            // The toolbar only carries RegionSelectMode, which draws nothing
+            "& > div > div:first-of-type:not(:last-child)": { display: "none" },
           }}
         >
           <ImagePlot
@@ -55,12 +99,14 @@ function SpectroscopyPlots({
               xValues: channels.xValues,
               yValues: channels.yValues,
             }}
-            customToolbarChildren={null}
+            customToolbarChildren={<RegionSelectMode active={picking} />}
+            selectionOptions={{ rectangle: 1 }}
+            selectionsListener={onSelection}
             values={channels[key]}
           />
         </Box>
       )),
-    [channels, plotAspectRatio],
+    [channels, plotAspectRatio, picking, onSelection],
   );
 
   return (
@@ -94,6 +140,28 @@ function SpectroscopyPlots({
             </Tooltip>
           ))}
         </ToggleButtonGroup>
+        <Tooltip
+          title="Drag a rectangle on any plot to show just that part of the scan, in full detail"
+          describeChild
+        >
+          <ToggleButton
+            size="small"
+            value="pick"
+            selected={picking}
+            onChange={() => setPicking(p => !p)}
+          >
+            <CropFreeIcon fontSize="small" sx={{ mr: 0.5 }} />
+            Pick region
+          </ToggleButton>
+        </Tooltip>
+        {region && (
+          <Tooltip title="Remove to show the whole scan again">
+            <Chip
+              label={`Showing ${describeRegion(region)}`}
+              onDelete={() => setRegion(undefined)}
+            />
+          </Tooltip>
+        )}
       </Stack>
       {progress && (
         <Stack
