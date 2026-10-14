@@ -1,5 +1,5 @@
 {
-  "PVWS_SOCKET": "pvws.diamond.ac.uk",
+  "PVWS_SOCKET": "pvws-test.diamond.ac.uk",
   "PVWS_SSL": true,
   "THROTTLE_PERIOD": 100
 }

@@ -151,7 +151,7 @@ export function useSpectroscopyData(): {
 
     if (running && uuid) {
       // start polling
-      pollInterval.current = setInterval(poll, 100); // 10 Hz
+      pollInterval.current = setInterval(poll, 500); // 2 Hz
     } else if (!running && pollInterval.current) {
       // poll once more then clear interval
       poll().finally(() => {
