@@ -110,19 +110,17 @@ export function toRgbNdt(matrix: (number | null)[][], colour: RGBColour): NDT {
 /** Placeholder empty gray dataset */
 const EMPTY_NDT = toRgbNdt([[null, null, null]], "gray");
 
-/** given array of edges size L, returns the centre points, size L-1, as NDT */
-export function binEdgesToCentrePoints(edges: number[]): NDT {
+/**
+ * Bin edges as plot axis values. The plot reads one more value than there are
+ * pixels as the pixels' edges, so each cell sits exactly between its own edges.
+ * (Given cell centres instead, it reads them as each pixel's leading edge and
+ * shifts the image by half a cell.)
+ */
+export function binEdgesToAxis(edges: number[]): NDT {
   if (edges.length < 2) {
     throw new Error("At least two bin edges are required");
   }
-
-  const centres = new Float64Array(edges.length - 1);
-
-  for (let i = 0; i < centres.length; i++) {
-    centres[i] = (edges[i] + edges[i + 1]) / 2;
-  }
-
-  return ndarray(centres, [centres.length]);
+  return ndarray(Float64Array.from(edges), [edges.length]) as NDT;
 }
 
 async function fetchData(uuid: string): Promise<SpectroscopyData> {
@@ -133,9 +131,7 @@ async function fetchData(uuid: string): Promise<SpectroscopyData> {
 }
 
 // initial axes must have min three points...
-const initialAxes = binEdgesToCentrePoints(
-  splitEdges([-0.25, 0.25, 0.5, 0.75]),
-);
+const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
 
 export function useSpectroscopyData(): {
   data: DataChannels;
@@ -180,8 +176,8 @@ export function useSpectroscopyData(): {
           red: toRgbNdt(resp.RedTotal, "red"),
           green: toRgbNdt(resp.GreenTotal, "green"),
           blue: toRgbNdt(resp.BlueTotal, "blue"),
-          xValues: binEdgesToCentrePoints(splitEdges(resp.x_limits)),
-          yValues: binEdgesToCentrePoints(splitEdges(resp.y_limits)),
+          xValues: binEdgesToAxis(splitEdges(resp.x_limits)),
+          yValues: binEdgesToAxis(splitEdges(resp.y_limits)),
         });
       } catch (err) {
         console.error("Polling error:", err);

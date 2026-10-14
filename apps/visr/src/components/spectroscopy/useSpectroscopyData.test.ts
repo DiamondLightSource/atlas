@@ -1,4 +1,5 @@
 import {
+  binEdgesToAxis,
   CELL_PIXELS,
   EMPTY_STRIPE_GREYS,
   splitEdges,
@@ -75,5 +76,17 @@ describe("splitEdges", () => {
     expect(edges[CELL_PIXELS]).toBe(4);
     expect(edges[edges.length - 1]).toBe(12);
     expect(edges[1] - edges[0]).toBeCloseTo(4 / CELL_PIXELS);
+  });
+});
+
+describe("binEdgesToAxis", () => {
+  it("gives the plot the edges themselves, one more than the cells", () => {
+    const axis = binEdgesToAxis([-0.5, 0.5, 1.5]);
+    expect(Array.from(axis.data as Float64Array)).toEqual([-0.5, 0.5, 1.5]);
+    expect(axis.shape).toEqual([3]);
+  });
+
+  it("needs at least two edges", () => {
+    expect(() => binEdgesToAxis([1])).toThrow("At least two bin edges");
   });
 });
