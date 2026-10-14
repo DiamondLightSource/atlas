@@ -185,3 +185,36 @@ describe("toChannels", () => {
     expect(channels.red.shape).toEqual([2, 2, 3]);
   });
 });
+
+describe("toChannels progress", () => {
+  it("passes on how far the scan has got", () => {
+    const channels = toChannels({
+      RedTotal: [[1]],
+      GreenTotal: [[1]],
+      BlueTotal: [[1]],
+      x_limits: [0, 1],
+      y_limits: [0, 1],
+      n_points: 3,
+      n_total: 9,
+      position_offset: { x: 0.1, y: 0 },
+    });
+    expect(channels.progress).toEqual({
+      nPoints: 3,
+      nTotal: 9,
+      offset: { x: 0.1, y: 0 },
+    });
+  });
+
+  it("has none when the server doesn't say", () => {
+    const rows = [[1]];
+    expect(
+      toChannels({
+        RedTotal: rows,
+        GreenTotal: rows,
+        BlueTotal: rows,
+        x_limits: [0, 1],
+        y_limits: [0, 1],
+      }).progress,
+    ).toBeUndefined();
+  });
+});

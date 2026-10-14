@@ -1,13 +1,17 @@
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { useSpectroscopyData, type PlotKind } from "./useSpectroscopyData";
 import { beamWarning, PLOT_KINDS } from "./plotKinds";
+import { describeOffset, describeProgress, percentDone } from "./progress";
 import { useMemo, useState, type ComponentProps } from "react";
 import {
   Alert,
   Box,
+  LinearProgress,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Typography,
 } from "@mui/material";
 
 const CHANNELS = [
@@ -27,6 +31,8 @@ function SpectroscopyPlots({
 }: SpectroscopyPlotsProps) {
   const [kind, setKind] = useState<PlotKind>("cells");
   const { data: channels } = useSpectroscopyData(kind);
+  const progress = channels.progress;
+  const percent = progress && percentDone(progress);
 
   const plots = useMemo(
     () =>
@@ -69,20 +75,51 @@ function SpectroscopyPlots({
         gap: 1,
       }}
     >
-      <ToggleButtonGroup
-        size="small"
-        exclusive
-        value={kind}
-        onChange={(_, value: PlotKind | null) => value && setKind(value)}
-        aria-label="How the scan is drawn"
-        sx={{ alignSelf: "center" }}
+      <Stack
+        direction="row"
+        spacing={1}
+        useFlexGap
+        sx={{ alignSelf: "center", alignItems: "center", flexWrap: "wrap" }}
       >
-        {PLOT_KINDS.map(({ kind, label, help }) => (
-          <Tooltip key={kind} title={help} describeChild>
-            <ToggleButton value={kind}>{label}</ToggleButton>
-          </Tooltip>
-        ))}
-      </ToggleButtonGroup>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          value={kind}
+          onChange={(_, value: PlotKind | null) => value && setKind(value)}
+          aria-label="How the scan is drawn"
+        >
+          {PLOT_KINDS.map(({ kind, label, help }) => (
+            <Tooltip key={kind} title={help} describeChild>
+              <ToggleButton value={kind}>{label}</ToggleButton>
+            </Tooltip>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
+      {progress && (
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: "center", px: 1 }}
+          aria-label="Scan progress"
+        >
+          {percent !== null && (
+            <LinearProgress
+              variant="determinate"
+              value={percent}
+              sx={{ flex: 1, maxWidth: 400 }}
+              aria-label={describeProgress(progress)}
+            />
+          )}
+          <Typography variant="body2" color="text.secondary">
+            {describeProgress(progress)}
+          </Typography>
+          {describeOffset(progress) && (
+            <Typography variant="body2" color="text.secondary">
+              · {describeOffset(progress)}
+            </Typography>
+          )}
+        </Stack>
+      )}
       {beamWarning(kind, channels.beam) && (
         <Alert severity="warning" sx={{ alignSelf: "center", py: 0 }}>
           {beamWarning(kind, channels.beam)}

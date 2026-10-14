@@ -12,7 +12,26 @@ export interface DataChannels {
   yValues: NDT;
   /** The beam size /render drew with, and where it came from (Gaussian and footprints) */
   beam?: Beam;
+  /** How far the scan has got, when the server says */
+  progress?: Progress;
 }
+
+/** How far a scan has got, from /binned's or /render's answer */
+export type Progress = {
+  /** Points recorded so far */
+  nPoints: number;
+  /** Points the scan will have, or null if the run has no spec */
+  nTotal: number | null;
+  /** How far the readbacks were shifted onto the setpoint grid, or null */
+  offset: { x: number; y: number } | null;
+};
+
+/** The fields both endpoints use for progress */
+type ProgressFields = {
+  n_points?: number;
+  n_total?: number | null;
+  position_offset?: { x: number; y: number } | null;
+};
 
 /** A beam size (FWHM, in motor units) and where /render took it from */
 export type Beam = {
@@ -30,7 +49,7 @@ type SpectroscopyData = {
   x_limits: number[];
   /** Y bin edges with size of the above datasets + 1 */
   y_limits: number[];
-};
+} & ProgressFields;
 
 export type RGBColour = "red" | "green" | "blue" | "gray";
 
@@ -166,7 +185,7 @@ type RenderData = {
   coverage: number[][];
   outline?: number[][];
   beam?: Beam;
-};
+} & ProgressFields;
 
 /** The JSON at `url`, or NotReady on a 503 (waiting as Retry-After asks, 1 s by default) */
 async function fetchJson<T>(url: string): Promise<T | NotReady> {
@@ -210,8 +229,19 @@ function pixelEdges(start: number, stop: number, count: number): number[] {
   );
 }
 
+/** The scan's progress from /binned's or /render's answer, if it has one */
+export function toProgress(resp: ProgressFields): Progress | undefined {
+  if (typeof resp.n_points !== "number") return undefined;
+  return {
+    nPoints: resp.n_points,
+    nTotal: resp.n_total ?? null,
+    offset: resp.position_offset ?? null,
+  };
+}
+
 /** The channels and axes to plot from /binned's or /render's answer */
 export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
+  const progress = toProgress(resp);
   if ("viewport" in resp) {
     const v = resp.viewport;
     const options = {
@@ -226,6 +256,7 @@ export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
       xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
       yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
       beam: resp.beam,
+      progress,
     };
   }
   return {
@@ -234,6 +265,7 @@ export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
     blue: toRgbNdt(resp.BlueTotal, "blue"),
     xValues: binEdgesToAxis(splitEdges(resp.x_limits)),
     yValues: binEdgesToAxis(splitEdges(resp.y_limits)),
+    progress,
   };
 }
 
