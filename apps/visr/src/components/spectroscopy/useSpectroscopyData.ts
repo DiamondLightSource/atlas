@@ -10,7 +10,16 @@ export interface DataChannels {
   blue: NDT;
   xValues: NDT;
   yValues: NDT;
+  /** The beam size /render drew with, and where it came from (Gaussian and footprints) */
+  beam?: Beam;
 }
+
+/** A beam size (FWHM, in motor units) and where /render took it from */
+export type Beam = {
+  x: number;
+  y: number;
+  source: "request" | "metadata" | "scan step";
+};
 
 /** Return type of `/api/data/binned` */
 type SpectroscopyData = {
@@ -156,6 +165,7 @@ type RenderData = {
   >;
   coverage: number[][];
   outline?: number[][];
+  beam?: Beam;
 };
 
 /** The JSON at `url`, or NotReady on a 503 (waiting as Retry-After asks, 1 s by default) */
@@ -215,6 +225,7 @@ export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
       blue: toRgbNdt(resp.channels.BlueTotal, "blue", options),
       xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
       yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
+      beam: resp.beam,
     };
   }
   return {

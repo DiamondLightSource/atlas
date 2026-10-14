@@ -1,37 +1,20 @@
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { useSpectroscopyData, type PlotKind } from "./useSpectroscopyData";
+import { beamWarning, PLOT_KINDS } from "./plotKinds";
 import { useMemo, useState, type ComponentProps } from "react";
-import { Box, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
+import {
+  Alert,
+  Box,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from "@mui/material";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
   { key: "green", label: "Green channel" },
   { key: "blue", label: "Blue channel" },
 ] as const;
-
-/** The ways a scan can be drawn, with what each shows */
-const PLOT_KINDS: { kind: PlotKind; label: string; help: string }[] = [
-  {
-    kind: "cells",
-    label: "Cells",
-    help: "The scan's grid cells, each the mean of the points in it",
-  },
-  {
-    kind: "rectangles",
-    label: "Rectangles",
-    help: "A step-sized rectangle on each recorded position",
-  },
-  {
-    kind: "gaussian",
-    label: "Gaussian",
-    help: "A beam-sized Gaussian on each point: gaps the beam didn't cover show",
-  },
-  {
-    kind: "ovals",
-    label: "Footprints",
-    help: "Each point's beam footprint, overlaps split between neighbours",
-  },
-];
 
 interface SpectroscopyPlotsProps {
   expanded: boolean;
@@ -100,6 +83,11 @@ function SpectroscopyPlots({
           </Tooltip>
         ))}
       </ToggleButtonGroup>
+      {beamWarning(kind, channels.beam) && (
+        <Alert severity="warning" sx={{ alignSelf: "center", py: 0 }}>
+          {beamWarning(kind, channels.beam)}
+        </Alert>
+      )}
       <Box
         sx={{
           flex: 1,
