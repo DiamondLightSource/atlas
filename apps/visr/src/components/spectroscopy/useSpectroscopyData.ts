@@ -50,63 +50,71 @@ export function splitEdges(edges: number[]): number[] {
   return out;
 }
 
+/** How to draw a matrix as an image */
+export type RgbOptions = {
+  /** Pixels per matrix cell on each axis (CELL_PIXELS for /binned's cells, 1 for /render's pixels) */
+  cellPixels?: number;
+  /** How much of each cell is drawn, 0 to 1 (/render): the rest shows the empty stripes */
+  coverage?: number[][];
+  /** Opacity of white outlines over each cell, 0 to 1 (/render's footprints) */
+  outline?: number[][];
+};
+
 /**
  * The matrix as an RGB image in one colour, scaled over its own range, each
- * cell CELL_PIXELS pixels square. Cells without a value are grey stripes. If
- * every value is the same (a single point, say), they are drawn at full
- * brightness rather than black.
+ * cell `cellPixels` pixels square. Cells without a value are grey stripes,
+ * and a partly covered cell fades into them. If every value is the same (a
+ * single point, say), they are drawn at full brightness rather than black.
  */
-export function toRgbNdt(matrix: (number | null)[][], colour: RGBColour): NDT {
+export function toRgbNdt(
+  matrix: (number | null)[][],
+  colour: RGBColour,
+  { cellPixels = CELL_PIXELS, coverage, outline }: RgbOptions = {},
+): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
     return EMPTY_NDT; // skip invalid input
   }
   const height = matrix.length;
   const width = matrix[0].length;
-
-  // Flatten and filter out nulls for normalisation
   const flat = matrix.flat();
-  const valid = flat.filter((v): v is number => v !== null && !isNaN(v));
 
-  // Avoid crashes when no valid values
-  const min = valid.length ? Math.min(...valid) : 0;
-  const max = valid.length ? Math.max(...valid) : 1;
+  let min = Infinity;
+  let max = -Infinity;
+  for (const v of flat) {
+    if (v !== null && !isNaN(v)) {
+      min = Math.min(min, v);
+      max = Math.max(max, v);
+    }
+  }
   const scale = max > min ? 255 / (max - min) : 0;
+  const channel = { red: [0], green: [1], blue: [2], gray: [0, 1, 2] }[colour];
 
-  const W = width * CELL_PIXELS;
-  const H = height * CELL_PIXELS;
+  const W = width * cellPixels;
+  const H = height * cellPixels;
   const rgb = new Uint8Array(W * H * 3);
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
-      const i = y * W + x;
-      const v =
-        flat[Math.floor(y / CELL_PIXELS) * width + Math.floor(x / CELL_PIXELS)];
-      if (v === null || isNaN(v)) {
-        rgb[i * 3] = rgb[i * 3 + 1] = rgb[i * 3 + 2] = emptyGrey(y, x);
-        continue;
-      }
-      const scaled = max > min ? Math.round((v - min) * scale) : 255;
-      switch (colour) {
-        case "red":
-          rgb[i * 3] = scaled;
-          break;
-        case "green":
-          rgb[i * 3 + 1] = scaled;
-          break;
-        case "blue":
-          rgb[i * 3 + 2] = scaled;
-          break;
-        case "gray":
-          rgb[i * 3] = scaled;
-          rgb[i * 3 + 1] = scaled;
-          rgb[i * 3 + 2] = scaled;
-          break;
+      const i = (y * W + x) * 3;
+      const r = Math.floor(y / cellPixels);
+      const c = Math.floor(x / cellPixels);
+      const v = flat[r * width + c];
+      const grey = emptyGrey(y, x);
+      const covered = v === null || isNaN(v) ? 0 : (coverage?.[r]?.[c] ?? 1);
+      const scaled = max > min ? (v! - min) * scale : 255;
+      for (let k = 0; k < 3; k++) {
+        const value = channel.includes(k) ? scaled : 0;
+        let out = covered * value + (1 - covered) * grey;
+        const line = outline?.[r]?.[c] ?? 0;
+        out = out * (1 - line) + 255 * line;
+        rgb[i + k] = Math.round(out);
       }
     }
   }
 
   return ndarray(rgb, [H, W, 3]) as NDT;
 }
+
 /** Placeholder empty gray dataset */
 const EMPTY_NDT = toRgbNdt([[null, null, null]], "gray");
 
@@ -123,18 +131,35 @@ export function binEdgesToAxis(edges: number[]): NDT {
   return ndarray(Float64Array.from(edges), [edges.length]) as NDT;
 }
 
-/** /binned answered 503: the data file is behind the catalog, try again shortly */
+/** /binned or /render answered 503: the data file is behind the catalog, try again shortly */
 export type NotReady = { notReady: true; retryAfterMs: number };
 
-/**
- * The binned images of a run, or NotReady when the server says the data isn't
- * written yet (503, waiting as long as its Retry-After asks, 1 s by default).
- * Any other failure throws.
- */
-export async function fetchData(
-  uuid: string,
-): Promise<SpectroscopyData | NotReady> {
-  const url = `/api/data/binned/${uuid}`;
+/** How the scan is drawn: /binned's cells, or one of /render's kinds */
+export type PlotKind = "cells" | "rectangles" | "gaussian" | "ovals";
+
+/** Longest side, in pixels, of the images /render draws */
+export const RENDER_SIZE = 200;
+
+/** Return type of `/api/data/render` (JSON) */
+type RenderData = {
+  viewport: {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+    width: number;
+    height: number;
+  };
+  channels: Record<
+    "RedTotal" | "GreenTotal" | "BlueTotal",
+    (number | null)[][]
+  >;
+  coverage: number[][];
+  outline?: number[][];
+};
+
+/** The JSON at `url`, or NotReady on a 503 (waiting as Retry-After asks, 1 s by default) */
+async function fetchJson<T>(url: string): Promise<T | NotReady> {
   const resp = await fetch(url);
   if (resp.status === 503) {
     const seconds = Number(resp.headers.get("Retry-After"));
@@ -148,13 +173,66 @@ export async function fetchData(
   return await resp.json(); // here we should use zod
 }
 
+/**
+ * The binned images of a run, or NotReady when the server says the data isn't
+ * written yet (503, waiting as long as its Retry-After asks, 1 s by default).
+ * Any other failure throws.
+ */
+export function fetchData(uuid: string): Promise<SpectroscopyData | NotReady> {
+  return fetchJson<SpectroscopyData>(`/api/data/binned/${uuid}`);
+}
+
+/** A run drawn by /render over the scan's extent, or NotReady */
+export function fetchRender(
+  uuid: string,
+  kind: Exclude<PlotKind, "cells">,
+): Promise<RenderData | NotReady> {
+  return fetchJson<RenderData>(
+    `/api/data/render/${uuid}?kind=${kind}&size=${RENDER_SIZE}`,
+  );
+}
+
+/** Evenly spaced edges from `start` to `stop` for `count` pixels */
+function pixelEdges(start: number, stop: number, count: number): number[] {
+  return Array.from(
+    { length: count + 1 },
+    (_, i) => start + ((stop - start) * i) / count,
+  );
+}
+
+/** The channels and axes to plot from /binned's or /render's answer */
+export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
+  if ("viewport" in resp) {
+    const v = resp.viewport;
+    const options = {
+      cellPixels: 1,
+      coverage: resp.coverage,
+      outline: resp.outline,
+    };
+    return {
+      red: toRgbNdt(resp.channels.RedTotal, "red", options),
+      green: toRgbNdt(resp.channels.GreenTotal, "green", options),
+      blue: toRgbNdt(resp.channels.BlueTotal, "blue", options),
+      xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
+      yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
+    };
+  }
+  return {
+    red: toRgbNdt(resp.RedTotal, "red"),
+    green: toRgbNdt(resp.GreenTotal, "green"),
+    blue: toRgbNdt(resp.BlueTotal, "blue"),
+    xValues: binEdgesToAxis(splitEdges(resp.x_limits)),
+    yValues: binEdgesToAxis(splitEdges(resp.y_limits)),
+  };
+}
+
 /** Tries for the final image of a scan, when a 503 isn't followed by another poll */
 const FINAL_POLL_ATTEMPTS = 10;
 
 // initial axes must have min three points...
 const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
 
-export function useSpectroscopyData(): {
+export function useSpectroscopyData(kind: PlotKind = "cells"): {
   data: DataChannels;
   running: boolean;
 } {
@@ -195,15 +273,11 @@ export function useSpectroscopyData(): {
     async function poll(): Promise<number> {
       if (!uuid) return 0;
       try {
-        const resp = await fetchData(uuid);
+        const resp = await (kind === "cells"
+          ? fetchData(uuid)
+          : fetchRender(uuid, kind));
         if ("notReady" in resp) return resp.retryAfterMs; // the next poll tries again
-        setData({
-          red: toRgbNdt(resp.RedTotal, "red"),
-          green: toRgbNdt(resp.GreenTotal, "green"),
-          blue: toRgbNdt(resp.BlueTotal, "blue"),
-          xValues: binEdgesToAxis(splitEdges(resp.x_limits)),
-          yValues: binEdgesToAxis(splitEdges(resp.y_limits)),
-        });
+        setData(toChannels(resp));
       } catch (err) {
         console.error("Polling error:", err);
       }
@@ -240,7 +314,7 @@ export function useSpectroscopyData(): {
         pollInterval.current = null;
       }
     };
-  }, [running, uuid]);
+  }, [running, uuid, kind]);
 
   return { data, running };
 }

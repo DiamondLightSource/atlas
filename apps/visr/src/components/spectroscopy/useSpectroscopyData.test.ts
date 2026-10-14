@@ -2,6 +2,7 @@ import {
   binEdgesToAxis,
   CELL_PIXELS,
   fetchData,
+  toChannels,
   EMPTY_STRIPE_GREYS,
   splitEdges,
   toRgbNdt,
@@ -132,5 +133,55 @@ describe("fetchData", () => {
   it("still throws for other errors", async () => {
     respond(500);
     await expect(fetchData("uid")).rejects.toThrow();
+  });
+});
+
+describe("toRgbNdt with /render's layers", () => {
+  const one = { cellPixels: 1 };
+
+  it("fades a partly covered pixel into the empty stripes", () => {
+    const [r, g, b] = [0, 1, 2].map(ch =>
+      toRgbNdt([[10, 20]], "red", { ...one, coverage: [[1, 0.5]] }).get(
+        0,
+        1,
+        ch,
+      ),
+    );
+    const grey = EMPTY_STRIPE_GREYS[0]; // pixel (0, 1) is on the first stripe
+    expect([r, g, b]).toEqual([
+      Math.round(0.5 * 255 + 0.5 * grey),
+      Math.round(0.5 * grey),
+      Math.round(0.5 * grey),
+    ]);
+  });
+
+  it("draws outlines in white over the colour", () => {
+    const image = toRgbNdt([[10, 20]], "red", { ...one, outline: [[0, 1]] });
+    expect([0, 1, 2].map(ch => image.get(0, 1, ch))).toEqual([255, 255, 255]);
+    expect([0, 1, 2].map(ch => image.get(0, 0, ch))).toEqual([0, 0, 0]);
+  });
+});
+
+describe("toChannels", () => {
+  it("gives /render's pixels axes spanning its viewport", () => {
+    const rows = [
+      [1, 2],
+      [3, 4],
+    ];
+    const channels = toChannels({
+      viewport: { x0: -1, x1: 1, y0: 0, y1: 4, width: 2, height: 2 },
+      channels: { RedTotal: rows, GreenTotal: rows, BlueTotal: rows },
+      coverage: [
+        [1, 1],
+        [1, 1],
+      ],
+    });
+    expect(Array.from(channels.xValues.data as Float64Array)).toEqual([
+      -1, 0, 1,
+    ]);
+    expect(Array.from(channels.yValues.data as Float64Array)).toEqual([
+      0, 2, 4,
+    ]);
+    expect(channels.red.shape).toEqual([2, 2, 3]);
   });
 });
