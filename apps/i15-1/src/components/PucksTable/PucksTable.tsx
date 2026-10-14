@@ -146,39 +146,72 @@ export function PucksTable() {
         accessorKey: "parentPosition",
         id: "puckPosition",
         header: "Puck Position",
+        size: 350,
         Cell: ({ row }) => {
           const rowId = row.original.id;
           const isMounted = row.original.status === "Mounted";
+          const isVisible = selectedPositions[rowId] != null;
+
+          const handleSelection = (nextValue: number) => {
+            setSelectedPositions((current) => ({
+              ...current,
+              [rowId]:
+                typeof nextValue === "string" && nextValue === ""
+                  ? null
+                  : Number(nextValue),
+            }));
+            void mountPuck({
+              variables: {
+                puckId: row.original.id,
+                tableId: robotTableId,
+                position: nextValue, // selectedPositions[rowId]!,
+              },
+            });
+          };
 
           return (
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                inputProps={{
-                  readOnly: isMounted,
-                }}
-                value={selectedPositions[rowId] ?? ""}
-                displayEmpty
-                onChange={(event) => {
-                  const nextValue = event.target.value;
-                  setSelectedPositions((current) => ({
-                    ...current,
-                    [rowId]:
-                      typeof nextValue === "string" && nextValue === ""
-                        ? null
-                        : Number(nextValue),
-                  }));
-                }}
-              >
-                <MenuItem value="" disabled>
-                  <em>Assign</em>
-                </MenuItem>
-                {positionOptions.map((position) => (
-                  <MenuItem key={position} value={position}>
-                    {position}
+            <Stack direction={"row"} spacing={5}>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <Select
+                  inputProps={{
+                    readOnly: isMounted,
+                  }}
+                  value={selectedPositions[rowId] ?? ""}
+                  displayEmpty
+                  onChange={(event) => handleSelection(event.target.value)}
+                >
+                  <MenuItem value="" disabled>
+                    <em>Assign</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {positionOptions.map((position) => (
+                    <MenuItem key={position} value={position}>
+                      {position}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {isVisible ? (
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    void unmountPuck({
+                      variables: {
+                        tableId: robotTableId,
+                        puckId: [row.original.id],
+                      },
+                    });
+                    setSelectedPositions((current) => {
+                      current[rowId] = null;
+                      return current;
+                    });
+                  }}
+                >
+                  Unmount
+                </Button>
+              ) : null}
+            </Stack>
           );
         },
       },
@@ -197,49 +230,6 @@ export function PucksTable() {
           ></Chip>
         ),
       },
-      {
-        accessorKey: "status",
-        id: "setMount",
-        header: "",
-        size: 200,
-        enableColumnActions: false,
-        Cell: ({ row }) => {
-          const rowId = row.original.id;
-          const isVisible = selectedPositions[rowId] != null;
-          const isMounted = row.original.status === "Mounted";
-          return isVisible ? (
-            <Button
-              variant={isMounted ? "outlined" : "contained"}
-              color={isMounted ? "inherit" : "success"}
-              size="small"
-              onClick={() => {
-                if (isMounted) {
-                  void unmountPuck({
-                    variables: {
-                      tableId: robotTableId,
-                      puckId: [row.original.id],
-                    },
-                  });
-                  setSelectedPositions((current) => {
-                    current[rowId] = null;
-                    return current;
-                  });
-                } else {
-                  void mountPuck({
-                    variables: {
-                      puckId: row.original.id,
-                      tableId: robotTableId,
-                      position: selectedPositions[rowId]!,
-                    },
-                  });
-                }
-              }}
-            >
-              {isMounted ? "Unmount" : "Mark as mounted"}
-            </Button>
-          ) : null;
-        },
-      },
     ],
     [selectedPositions, positionOptions, robotTableId, mountPuck, unmountPuck],
   );
@@ -253,13 +243,7 @@ export function PucksTable() {
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     initialState: {
-      columnOrder: [
-        "puckId",
-        "session",
-        "mountStatus",
-        "puckPosition",
-        "setMount",
-      ],
+      columnOrder: ["puckId", "session", "mountStatus", "puckPosition"],
     },
     renderTopToolbarCustomActions: () => (
       <Stack

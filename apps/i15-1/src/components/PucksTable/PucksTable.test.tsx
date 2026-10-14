@@ -299,7 +299,7 @@ describe("PucksTable", () => {
     // Puck 1234 is Mounted (parent = robot table) with positionInParent.position = 1
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /unmount/i }),
+        screen.getByRole("button", { name: /Unmount/i }),
       ).toBeInTheDocument();
     });
   });
@@ -314,67 +314,15 @@ describe("PucksTable", () => {
     renderComponent();
 
     // Puck 56789 has no positionInParent so its button should not appear
+    // However there is already one Unmount button in the document (for puck 1234)
     await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: /mark as mounted/i }),
-      ).not.toBeInTheDocument();
+      expect(screen.getAllByRole("button", { name: /Unmount/i }).length).toBe(
+        1,
+      );
     });
   });
 
-  it("shows Mark as mounted button for an unmounted puck that has a position", async () => {
-    mockedUseQuery.mockReturnValue({
-      data: mockContainersData,
-      loading: false,
-      error: undefined,
-    } as unknown as ReturnType<typeof apollo.useQuery>);
-
-    const user = userEvent.setup();
-    renderComponent();
-
-    // Set the position for puck 56789 to 3 in the dropdown
-    const comboboxes = await screen.findAllByRole("combobox");
-    const assignCombobox = comboboxes.find((el) =>
-      el.textContent?.includes("Assign"),
-    );
-    expect(assignCombobox).toBeDefined();
-
-    await user.click(assignCombobox!);
-    await user.click(screen.getByRole("option", { name: "3" }));
-
-    // Puck 56789 is Unmounted and now has a selected position
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /mark as mounted/i }),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("shows 'Assign' as a disabled placeholder option in the position dropdown", async () => {
-    mockedUseQuery.mockReturnValue({
-      data: mockContainersData,
-      loading: false,
-      error: undefined,
-    } as unknown as ReturnType<typeof apollo.useQuery>);
-
-    const user = userEvent.setup();
-    renderComponent();
-
-    // Open the position dropdown for the puck with no position (puck 56789)
-    // The select showing "Assign" belongs to that puck
-    const comboboxes = await screen.findAllByRole("combobox");
-    const assignCombobox = comboboxes.find((el) =>
-      el.textContent?.includes("Assign"),
-    );
-    expect(assignCombobox).toBeDefined();
-
-    await user.click(assignCombobox!);
-
-    // The "Assign" option must be present but disabled so it cannot be chosen
-    const assignOption = screen.getByRole("option", { name: /assign/i });
-    expect(assignOption).toHaveAttribute("aria-disabled", "true");
-  });
-
-  it("calls addPuckToTable mutation with correct variables when Mark as mounted is clicked", async () => {
+  it("calls addPuckToTable mutation with correct variables when a position is selected", async () => {
     const { byOperation } = setupMutationFixture([
       "AddPuckToTable",
       "RemovePuckFromTable",
@@ -401,11 +349,6 @@ describe("PucksTable", () => {
     await user.click(assignCombobox!);
     await user.click(screen.getByRole("option", { name: "3" }));
 
-    const button = await screen.findByRole("button", {
-      name: /mark as mounted/i,
-    });
-    await user.click(button);
-
     expect(mockMutate).toHaveBeenCalledWith({
       variables: {
         puckId: "019faee9-628d-7161-afe4-598a9c60534d",
@@ -414,6 +357,62 @@ describe("PucksTable", () => {
       },
     });
     expect(unmountMutate).not.toHaveBeenCalled();
+  });
+
+  it("shows puck as mounted upon selecting a puck position and shows unmount button", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    // Set the position for puck 56789 to 3 in the dropdown
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+    await user.click(screen.getByRole("option", { name: "3" }));
+
+    // Puck 56789 is Unmounted and now has a selected position
+    // Puck 56789 has a selected position and is now mounted
+    // The unmount button is now visible for both pucks, and both chips show as Mounted
+    await waitFor(() => {
+      expect(screen.getAllByRole("button", { name: /Unmount/i }).length).toBe(
+        2,
+      );
+      expect(screen.getAllByText("Mounted").length).toBe(2);
+    });
+  });
+
+  it("shows 'Assign' as a disabled placeholder option in the position dropdown", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    // Open the position dropdown for the puck with no position (puck 56789)
+    // The select showing "Assign" belongs to that puck
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+
+    // The "Assign" option must be present but disabled so it cannot be chosen
+    const assignOption = screen.getByRole("option", { name: /assign/i });
+    expect(assignOption).toHaveAttribute("aria-disabled", "true");
   });
 
   it("disables the position dropdown for a mounted puck", async () => {
