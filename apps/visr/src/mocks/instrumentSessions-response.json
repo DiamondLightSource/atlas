@@ -1,12 +1,11 @@
 {
   "data": {
-    "instrumentByName": {
+    "instrumentByKey": {
       "instrumentSessions": {
         "edges": [
           {
             "node": {
-              "instrumentSessionReference": "CM44191-3",
-              "state": "In Progress"
+              "instrumentSessionReference": "CM44191-4"
             }
           }
         ]

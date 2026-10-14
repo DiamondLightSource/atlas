@@ -1,4 +1,4 @@
-import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
+import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
 import { useState } from "react";
@@ -94,7 +94,7 @@ export function SpectroscopyForm() {
         />
         <VisitInput
           visit={
-            visitTextToVisit(instrumentSession) ??
+            visitTextToVisit(instrumentSession ?? undefined) ??
             visitTextToVisit("cm12345-1") ??
             undefined
           }

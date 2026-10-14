@@ -31,18 +31,16 @@ export function TabbedPanel({ tabs, basePath }: TabbedPanelProps) {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
-        width: "100%",
+        flex: 1,
         minHeight: 0,
+        width: "100%",
       }}
     >
       <Paper
         square
         elevation={0}
         sx={{
-          position: "sticky",
-          top: topBarHeight,
-          zIndex: (theme: Theme) => theme.zIndex.appBar,
+          flexShrink: 0,
           borderBottom: 1,
           borderColor: "divider",
         }}
@@ -66,6 +64,8 @@ export function TabbedPanel({ tabs, basePath }: TabbedPanelProps) {
           minWidth: 0,
           overflow: "auto",
           p: 3,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <Outlet />
