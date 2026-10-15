@@ -1,4 +1,4 @@
-import { type NDT } from "@diamondlightsource/davidia";
+import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useEffect, useRef, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents/useScanEvents";
@@ -10,97 +10,292 @@ export interface DataChannels {
   blue: NDT;
   xValues: NDT;
   yValues: NDT;
+  /** The beam size /render drew with, and where it came from (Gaussian and footprints) */
+  beam?: Beam;
+  /** How far the scan has got, when the server says */
+  progress?: Progress;
 }
+
+/** How far a scan has got, from /binned's or /render's answer */
+export type Progress = {
+  /** Points recorded so far */
+  nPoints: number;
+  /** Points the scan will have, or null if the run has no spec */
+  nTotal: number | null;
+  /** How far the readbacks were shifted onto the setpoint grid, or null */
+  offset: { x: number; y: number } | null;
+};
+
+/** A region of the scan to draw, in motor units */
+export type Region = { x0: number; x1: number; y0: number; y1: number };
+
+/** The fields both endpoints use for progress */
+type ProgressFields = {
+  n_points?: number;
+  n_total?: number | null;
+  position_offset?: { x: number; y: number } | null;
+};
+
+/** A beam size (FWHM, in motor units) and where /render took it from */
+export type Beam = {
+  x: number;
+  y: number;
+  source: "request" | "metadata" | "scan step";
+};
 
 /** Return type of `/api/data/binned` */
 type SpectroscopyData = {
-  RedTotal: number[][];
-  GreenTotal: number[][];
-  BlueTotal: number[][];
+  RedTotal: (number | null)[][];
+  GreenTotal: (number | null)[][];
+  BlueTotal: (number | null)[][];
   /** X bin edges with size of the above datasets + 1 */
   x_limits: number[];
   /** Y bin edges with size of the above datasets + 1 */
   y_limits: number[];
+} & ProgressFields;
+
+export type RGBColour = "red" | "green" | "blue" | "gray";
+
+/**
+ * Each cell is drawn as CELL_PIXELS x CELL_PIXELS pixels, so cells no point has
+ * landed in yet can carry a pattern: diagonal stripes in two greys, which can't
+ * be mistaken for a measured value (dark or not) and run on unbroken across
+ * the empty part of the scan. The axes are split to match.
+ */
+export const CELL_PIXELS = 4;
+export const EMPTY_STRIPE_GREYS = [142, 120] as const;
+
+function emptyGrey(row: number, col: number): number {
+  return EMPTY_STRIPE_GREYS[Math.floor(((row + col) % 4) / 2)];
+}
+
+/** Bin edges with each bin split into CELL_PIXELS equal parts, to match the image */
+export function splitEdges(edges: number[]): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < edges.length - 1; i++) {
+    for (let k = 0; k < CELL_PIXELS; k++) {
+      out.push(edges[i] + ((edges[i + 1] - edges[i]) * k) / CELL_PIXELS);
+    }
+  }
+  out.push(edges[edges.length - 1]);
+  return out;
+}
+
+/** How to draw a matrix as an image */
+export type RgbOptions = {
+  /** Pixels per matrix cell on each axis (CELL_PIXELS for /binned's cells, 1 for /render's pixels) */
+  cellPixels?: number;
+  /** How much of each cell is drawn, 0 to 1 (/render): the rest shows the empty stripes */
+  coverage?: number[][];
+  /** Opacity of white outlines over each cell, 0 to 1 (/render's footprints) */
+  outline?: number[][];
 };
 
-type RGBColour = "red" | "green" | "blue" | "gray";
-
-function toRgbNdt(matrix: (number | null)[][], colour: RGBColour): NDT {
+/**
+ * The matrix as an RGB image in one colour, scaled over its own range, each
+ * cell `cellPixels` pixels square. Cells without a value are grey stripes,
+ * and a partly covered cell fades into them. If every value is the same (a
+ * single point, say), they are drawn at full brightness rather than black.
+ */
+export function toRgbNdt(
+  matrix: (number | null)[][],
+  colour: RGBColour,
+  { cellPixels = CELL_PIXELS, coverage, outline }: RgbOptions = {},
+): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
     return EMPTY_NDT; // skip invalid input
   }
   const height = matrix.length;
   const width = matrix[0].length;
-
-  // Flatten and filter out nulls for normalisation
   const flat = matrix.flat();
-  const valid = flat.filter((v): v is number => v !== null && !isNaN(v));
 
-  // Avoid crashes when no valid values
-  const min = valid.length ? Math.min(...valid) : 0;
-  const max = valid.length ? Math.max(...valid) : 1;
-  const scale = max > min ? 255 / (max - min) : 1;
-
-  const rgb = new Uint8Array(width * height * 3);
-
-  for (let i = 0; i < flat.length; i++) {
-    const v = flat[i];
-    let scaled = 0;
+  let min = Infinity;
+  let max = -Infinity;
+  for (const v of flat) {
     if (v !== null && !isNaN(v)) {
-      scaled = Math.round((v - min) * scale);
-    } // else stays 0 (black)
+      min = Math.min(min, v);
+      max = Math.max(max, v);
+    }
+  }
+  const scale = max > min ? 255 / (max - min) : 0;
+  const channel = { red: [0], green: [1], blue: [2], gray: [0, 1, 2] }[colour];
 
-    switch (colour) {
-      case "red":
-        rgb[i * 3] = scaled;
-        break;
-      case "green":
-        rgb[i * 3 + 1] = scaled;
-        break;
-      case "blue":
-        rgb[i * 3 + 2] = scaled;
-        break;
-      case "gray":
-        rgb[i * 3] = scaled;
-        rgb[i * 3 + 1] = scaled;
-        rgb[i * 3 + 2] = scaled;
-        break;
+  const W = width * cellPixels;
+  const H = height * cellPixels;
+  const rgb = new Uint8Array(W * H * 3);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 3;
+      const r = Math.floor(y / cellPixels);
+      const c = Math.floor(x / cellPixels);
+      const v = flat[r * width + c];
+      const grey = emptyGrey(y, x);
+      const covered = v === null || isNaN(v) ? 0 : (coverage?.[r]?.[c] ?? 1);
+      const scaled = max > min ? (v! - min) * scale : 255;
+      for (let k = 0; k < 3; k++) {
+        const value = channel.includes(k) ? scaled : 0;
+        let out = covered * value + (1 - covered) * grey;
+        const line = outline?.[r]?.[c] ?? 0;
+        out = out * (1 - line) + 255 * line;
+        rgb[i + k] = Math.round(out);
+      }
     }
   }
 
-  return ndarray(rgb, [height, width, 3]) as NDT;
+  return ndarray(rgb, [H, W, 3]) as NDT;
 }
-/** Placeholder empty gray dataset */
-const EMPTY_NDT = toRgbNdt([[0, 0, 0]], "gray");
 
-/** given array of edges size L, returns the centre points, size L-1, as NDT */
-export function binEdgesToCentrePoints(edges: number[]): NDT {
+/** Placeholder empty gray dataset */
+const EMPTY_NDT = toRgbNdt([[null, null, null]], "gray");
+
+/**
+ * Bin edges as plot axis values. The plot reads one more value than there are
+ * pixels as the pixels' edges, so each cell sits exactly between its own edges.
+ * (Given cell centres instead, it reads them as each pixel's leading edge and
+ * shifts the image by half a cell.)
+ */
+export function binEdgesToAxis(edges: number[]): NDT {
   if (edges.length < 2) {
     throw new Error("At least two bin edges are required");
   }
-
-  const centres = new Float64Array(edges.length - 1);
-
-  for (let i = 0; i < centres.length; i++) {
-    centres[i] = (edges[i] + edges[i + 1]) / 2;
-  }
-
-  return ndarray(centres, [centres.length]);
+  return ndarray(Float64Array.from(edges), [edges.length]) as NDT;
 }
 
-async function fetchData(uuid: string): Promise<SpectroscopyData> {
-  const url = `/api/data/binned/${uuid}`;
+/** /binned or /render answered 503: the data file is behind the catalog, try again shortly */
+export type NotReady = { notReady: true; retryAfterMs: number };
+
+/** How the scan is drawn: /binned's cells, or one of /render's kinds */
+export type PlotKind = "cells" | "rectangles" | "gaussian" | "ovals";
+
+/** Longest side, in pixels, of the images /render draws */
+export const RENDER_SIZE = 200;
+
+/** Return type of `/api/data/render` (JSON) */
+type RenderData = {
+  viewport: {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+    width: number;
+    height: number;
+  };
+  channels: Record<
+    "RedTotal" | "GreenTotal" | "BlueTotal",
+    (number | null)[][]
+  >;
+  coverage: number[][];
+  outline?: number[][];
+  beam?: Beam;
+} & ProgressFields;
+
+/** The JSON at `url`, or NotReady on a 503 (waiting as Retry-After asks, 1 s by default) */
+async function fetchJson<T>(url: string): Promise<T | NotReady> {
   const resp = await fetch(url);
+  if (resp.status === 503) {
+    const seconds = Number(resp.headers.get("Retry-After"));
+    return {
+      notReady: true,
+      retryAfterMs:
+        (Number.isFinite(seconds) && seconds > 0 ? seconds : 1) * 1000,
+    };
+  }
   if (!resp.ok) throw new Error(resp.statusText);
   return await resp.json(); // here we should use zod
 }
 
-// initial axes must have min three points...
-const initialAxes = binEdgesToCentrePoints([-0.25, 0.25, 0.5, 0.75]);
+/**
+ * The binned images of a run, or NotReady when the server says the data isn't
+ * written yet (503, waiting as long as its Retry-After asks, 1 s by default).
+ * Any other failure throws.
+ */
+export function fetchData(uuid: string): Promise<SpectroscopyData | NotReady> {
+  return fetchJson<SpectroscopyData>(`/api/data/binned/${uuid}`);
+}
 
-export function useSpectroscopyData(): {
+/** A run drawn by /render over `region` (default: the scan's extent), or NotReady */
+export function fetchRender(
+  uuid: string,
+  kind: PlotKind,
+  region?: Region,
+): Promise<RenderData | NotReady> {
+  const params = new URLSearchParams({ kind, size: String(RENDER_SIZE) });
+  if (region) {
+    for (const [key, value] of Object.entries(region)) {
+      params.set(key, String(value));
+    }
+  }
+  return fetchJson<RenderData>(`/api/data/render/${uuid}?${params}`);
+}
+
+/** Evenly spaced edges from `start` to `stop` for `count` pixels */
+function pixelEdges(start: number, stop: number, count: number): number[] {
+  return Array.from(
+    { length: count + 1 },
+    (_, i) => start + ((stop - start) * i) / count,
+  );
+}
+
+/** The scan's progress from /binned's or /render's answer, if it has one */
+export function toProgress(resp: ProgressFields): Progress | undefined {
+  if (typeof resp.n_points !== "number") return undefined;
+  return {
+    nPoints: resp.n_points,
+    nTotal: resp.n_total ?? null,
+    offset: resp.position_offset ?? null,
+  };
+}
+
+/** The channels and axes to plot from /binned's or /render's answer */
+export function toChannels(resp: SpectroscopyData | RenderData): DataChannels {
+  const progress = toProgress(resp);
+  if ("viewport" in resp) {
+    const v = resp.viewport;
+    const options = {
+      cellPixels: 1,
+      coverage: resp.coverage,
+      outline: resp.outline,
+    };
+    return {
+      red: toRgbNdt(resp.channels.RedTotal, "red", options),
+      green: toRgbNdt(resp.channels.GreenTotal, "green", options),
+      blue: toRgbNdt(resp.channels.BlueTotal, "blue", options),
+      xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
+      yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
+      beam: resp.beam,
+      progress,
+    };
+  }
+  return {
+    red: toRgbNdt(resp.RedTotal, "red"),
+    green: toRgbNdt(resp.GreenTotal, "green"),
+    blue: toRgbNdt(resp.BlueTotal, "blue"),
+    xValues: binEdgesToAxis(splitEdges(resp.x_limits)),
+    yValues: binEdgesToAxis(splitEdges(resp.y_limits)),
+    progress,
+  };
+}
+
+/** Tries for the final image of a scan, when a 503 isn't followed by another poll */
+const FINAL_POLL_ATTEMPTS = 10;
+
+// initial axes must have min three points...
+const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
+
+/**
+ * The latest images of the current scan, drawn as `kind`, polled while it
+ * runs and once more when it ends. With a `region`, only that part of the
+ * scan is drawn (by /render, at its full resolution).
+ */
+export function useSpectroscopyData(
+  kind: PlotKind = "cells",
+  region?: Region,
+): {
   data: DataChannels;
   running: boolean;
+  /** The scan being shown */
+  uuid: string | null;
 } {
   const scanEvent = useScanEvents();
   const [running, setRunning] = useState<boolean>(false);
@@ -133,40 +328,54 @@ export function useSpectroscopyData(): {
 
   // Poll during scan + once more afterwards
   useEffect(() => {
-    async function poll() {
-      if (!uuid) return;
+    let cancelled = false;
+
+    /** One poll: the wait the server asks for if it isn't ready, else 0 */
+    async function poll(): Promise<number> {
+      if (!uuid) return 0;
       try {
-        const resp: SpectroscopyData = await fetchData(uuid);
-        setData({
-          red: toRgbNdt(resp.RedTotal, "red"),
-          green: toRgbNdt(resp.GreenTotal, "green"),
-          blue: toRgbNdt(resp.BlueTotal, "blue"),
-          xValues: binEdgesToCentrePoints(resp.x_limits),
-          yValues: binEdgesToCentrePoints(resp.y_limits),
-        });
+        const resp = await (kind === "cells" && !region
+          ? fetchData(uuid)
+          : fetchRender(uuid, kind, region));
+        if ("notReady" in resp) return resp.retryAfterMs; // the next poll tries again
+        setData(toChannels(resp));
       } catch (err) {
         console.error("Polling error:", err);
+      }
+      return 0;
+    }
+
+    /** The last poll after a scan ends: no later poll will follow a 503, so retry */
+    async function finalPoll() {
+      for (
+        let attempt = 0;
+        attempt < FINAL_POLL_ATTEMPTS && !cancelled;
+        attempt++
+      ) {
+        const wait = await poll();
+        if (!wait) return;
+        await new Promise(resolve => setTimeout(resolve, wait));
       }
     }
 
     if (running && uuid) {
       // start polling
       pollInterval.current = setInterval(poll, 500); // 2 Hz
-    } else if (!running && pollInterval.current) {
-      // poll once more then clear interval
-      poll().finally(() => {
-        clearInterval(pollInterval.current!);
-        pollInterval.current = null;
-      });
+    } else if (!running && uuid) {
+      // The scan has ended: poll once more for its last points. (The previous
+      // run of this effect has already cleared the interval, so this can't
+      // depend on the interval still being set.)
+      void finalPoll();
     }
 
     return () => {
+      cancelled = true;
       if (pollInterval.current) {
         clearInterval(pollInterval.current);
         pollInterval.current = null;
       }
     };
-  }, [running, uuid]);
+  }, [running, uuid, kind, region]);
 
-  return { data, running };
+  return { data, running, uuid };
 }

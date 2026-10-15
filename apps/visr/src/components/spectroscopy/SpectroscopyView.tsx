@@ -1,11 +1,12 @@
 import { Box } from "@mui/material";
 import SpectroscopyPlots from "./SpectroscopyPlots";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 import { useInstrumentSession } from "@atlas/app-shell";
 import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
+import HeightHandle from "../HeightHandle";
 import { SpectroscopyForm } from "./SpectroscopyForm";
 
 export type SpectroscopyFormData = {
@@ -22,8 +23,31 @@ export type SpectroscopyFormData = {
 
 const PLOT_ASPECT_RATIO = "equal";
 
+/** Where this browser remembers the plots' dragged height */
+const PLOTS_HEIGHT_KEY = "visr.spectroscopy.plotsHeight";
+
+function storedPlotsHeight(): number | null {
+  try {
+    const value = Number(localStorage.getItem(PLOTS_HEIGHT_KEY));
+    return value > 0 ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function storePlotsHeight(height: number | null) {
+  try {
+    if (height) localStorage.setItem(PLOTS_HEIGHT_KEY, String(height));
+    else localStorage.removeItem(PLOTS_HEIGHT_KEY);
+  } catch {
+    // not remembered, which is fine
+  }
+}
+
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [plotsHeight, setPlotsHeight] = useState(storedPlotsHeight);
+  const plotsRef = useRef<HTMLDivElement>(null);
 
   // -------------------------------------------------------------------------
   // Set off workflow when scan ends
@@ -65,6 +89,17 @@ function SpectroscopyView() {
       <SpectroscopyPlots
         expanded={!drawerOpen}
         plotAspectRatio={PLOT_ASPECT_RATIO}
+        height={plotsHeight}
+        containerRef={plotsRef}
+      />
+      <HeightHandle
+        target={plotsRef}
+        value={plotsHeight}
+        onChange={height => {
+          setPlotsHeight(height);
+          storePlotsHeight(height);
+        }}
+        label="Height of the plots"
       />
       <ControlsDrawer
         open={drawerOpen}
