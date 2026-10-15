@@ -44,6 +44,9 @@ export function QueueView() {
   const isLoading = showHistoric
     ? allTasks.isPending
     : queuedTasks.isPending || historicTasks.isPending;
+  const isFetching = showHistoric
+    ? allTasks.isFetching
+    : queuedTasks.isFetching || historicTasks.isFetching;
   const error = showHistoric
     ? allTasks.error
     : (queuedTasks.error ?? historicTasks.error);
@@ -129,6 +132,7 @@ export function QueueView() {
     data: tableData,
     state: {
       showSkeletons: isLoading,
+      showProgressBars: isFetching && !isLoading,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error

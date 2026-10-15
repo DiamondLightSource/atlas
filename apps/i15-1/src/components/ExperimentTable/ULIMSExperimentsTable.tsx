@@ -115,6 +115,12 @@ export function ExperimentList() {
     return "";
   };
 
+  // Skeleton placeholder rows have no data, so would all read as invalid;
+  // don't flag them. They stay unqueueable so they can't be selected/submitted.
+  const isPlaceholderRow = loading && !data;
+  const experimentWarning = (experiment: ExperimentTableData) =>
+    isPlaceholderRow ? "" : experimentNotQueueable(experiment);
+
   const isExperimentQueueable = (experiment: ExperimentTableData): boolean => {
     return experimentNotQueueable(experiment) ? false : true;
   };
@@ -132,8 +138,10 @@ export function ExperimentList() {
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
+    // Nothing to select while loading or when there are no rows.
+    muiSelectAllCheckboxProps: { disabled: flatExperiments.length === 0 },
     muiSelectCheckboxProps: ({ row }) => {
-      const experimentErrorMessage = experimentNotQueueable(row.original);
+      const experimentErrorMessage = experimentWarning(row.original);
 
       if (experimentErrorMessage === "") {
         return {};
@@ -149,7 +157,7 @@ export function ExperimentList() {
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     muiTableBodyRowProps: ({ row }) => {
-      const experimentErrorMessage = experimentNotQueueable(row.original);
+      const experimentErrorMessage = experimentWarning(row.original);
 
       return {
         hover: false,
@@ -220,6 +228,7 @@ export function ExperimentList() {
             <Button
               variant="contained"
               startIcon={<QueueIcon />}
+              disabled={flatExperiments.length === 0}
               onClick={async () => handleClick(selectedCount)}
             >
               Add all to queue
