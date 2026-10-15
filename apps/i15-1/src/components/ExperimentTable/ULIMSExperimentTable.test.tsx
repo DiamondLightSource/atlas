@@ -162,10 +162,27 @@ describe("ExperimentList", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    renderComponent();
+    const { container } = renderComponent();
 
-    // MRT uses progress UI, so check for generic loading indicator
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    // MRT shows skeleton rows (and no spinner) while loading
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("shows a progress bar, not skeletons, when refetching with data", () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: true,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const { container } = renderComponent();
+
+    expect(screen.getAllByRole("progressbar").length).toBeGreaterThan(0);
+    expect(
+      container.querySelector(".MuiSkeleton-root"),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Exp 1")).toBeInTheDocument();
   });
 
   it("shows error banner when query fails", () => {
