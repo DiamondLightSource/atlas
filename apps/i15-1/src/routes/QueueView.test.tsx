@@ -17,7 +17,7 @@ type MockRow = {
 
 type MockTableOptions = {
   data: MockRow[];
-  state?: { showSkeletons?: boolean };
+  state?: { showSkeletons?: boolean; showProgressBars?: boolean };
   muiToolbarAlertBannerProps?: { children?: React.ReactNode };
   renderTopToolbarCustomActions?: () => React.ReactNode;
   renderDetailPanel?: (props: {
@@ -45,6 +45,9 @@ vi.mock("material-react-table", () => ({
 
       {table.options.state?.showSkeletons ? (
         <div className="MuiSkeleton-root" />
+      ) : null}
+      {table.options.state?.showProgressBars ? (
+        <div role="progressbar" />
       ) : null}
       {table.options.muiToolbarAlertBannerProps?.children}
       {table.options.renderTopToolbarCustomActions?.()}
@@ -384,6 +387,24 @@ describe("QueueView", () => {
     const { container } = render(<QueueView />);
 
     expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
+
+  it("shows a progress bar, not skeletons, when refetching with data", () => {
+    vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue({
+      data: [],
+      isPending: false,
+      isFetching: true,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+
+    const { container } = render(<QueueView />);
+
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(
+      container.querySelector(".MuiSkeleton-root"),
+    ).not.toBeInTheDocument();
   });
 
   it("gates skeletons on the all-tasks query when showing historic", () => {
