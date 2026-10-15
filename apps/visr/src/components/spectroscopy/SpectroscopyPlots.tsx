@@ -1,7 +1,8 @@
+import { Box, Typography } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
+import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
+import { useLayoutEffect, useState, type ComponentProps } from "react";
 import { useSpectroscopyData } from "./useSpectroscopyData";
-import { useMemo, type ComponentProps } from "react";
-import { Box } from "@mui/material";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -9,9 +10,17 @@ const CHANNELS = [
   { key: "blue", label: "Blue channel" },
 ] as const;
 
+type ChannelKey = (typeof CHANNELS)[number]["key"];
+type PlotValues = ComponentProps<typeof ImagePlot>["values"];
+export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 interface SpectroscopyPlotsProps {
   expanded: boolean;
-  plotAspectRatio: ComponentProps<typeof ImagePlot>["aspect"];
+  plotAspectRatio: number | "auto" | "equal";
 }
 
 function SpectroscopyPlots({
@@ -19,51 +28,144 @@ function SpectroscopyPlots({
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
   const { data: channels } = useSpectroscopyData();
+  const { width, containerRef, mounted } = useContainerWidth();
 
-  const plots = useMemo(
-    () =>
-      CHANNELS.map(({ key, label }) => (
-        <Box
-          key={key}
-          sx={{
-            minWidth: 0,
-            minHeight: 0,
-            overflow: "hidden",
-            // davidia wraps every plot in a hardcoded <div> with no height,
-            // which breaks the size chain. This gives it one.
-            "& > div": { height: "100%" },
-          }}
-        >
-          <ImagePlot
-            aspect={plotAspectRatio}
-            plotConfig={{
-              title: label,
-              xValues: channels.xValues,
-              yValues: channels.yValues,
-            }}
-            customToolbarChildren={null}
-            values={channels[key]}
-          />
-        </Box>
-      )),
-    [channels, plotAspectRatio],
-  );
+  // -------------------------------------------------------------------------
+  // Grid sizing
+  // -------------------------------------------------------------------------
 
-  return (
+  const totalRows = 10;
+  const rowsPerPlot = expanded ? totalRows / 2 : totalRows;
+  const w = 1;
+  const minimumRowHeight = 20;
+  const minimumGridHeight = minimumRowHeight * totalRows;
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      setContainerHeight(entry.contentRect.height);
+    });
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, [containerRef]);
+
+  const rowHeight =
+    containerHeight > 0
+      ? Math.max(containerHeight / totalRows, minimumRowHeight)
+      : expanded
+        ? minimumRowHeight
+        : 50;
+  const gridHeight = rowHeight * totalRows;
+
+  // -------------------------------------------------------------------------
+  // Layout: 3x1 collapsed, 2x2 expanded
+  // -------------------------------------------------------------------------
+  const layout = [
+    { i: "0", x: 0, y: 0, w: w, h: rowsPerPlot, static: true },
+    { i: "1", x: 1, y: 0, w: w, h: rowsPerPlot, static: true },
+    {
+      i: "2",
+      x: expanded ? 0 : 2,
+      y: expanded ? rowsPerPlot : 0,
+      w: w,
+      h: rowsPerPlot,
+      static: true,
+    },
+  ];
+
+  // -------------------------------------------------------------------------
+  // Views
+  // -------------------------------------------------------------------------
+  const views = CHANNELS.map(({ key }) => (
+    <ImagePlot
+      aspect={plotAspectRatio}
+      plotConfig={{}}
+      customToolbarChildren={null}
+      values={channels[key]}
+      //tightAxes //requires Davidia 1.1.0
+    />
+  ));
+
+  const titles = CHANNELS.map(({ label }) => label);
+
+  // -------------------------------------------------------------------------
+  // Plot cells
+  // -------------------------------------------------------------------------
+  const plots = views.map((view, i) => (
     <Box
+      key={i}
       sx={{
-        flex: 1,
-        minWidth: 0,
-        // below this the TabbedPanel scroller takes over
-        minHeight: expanded ? 500 : 250,
-        display: "grid",
-        // open: 3 across. Closed: 2 on top, the third wraps underneath.
-        gridTemplateColumns: `repeat(${expanded ? 2 : 3}, minmax(0, 1fr))`,
-        gridAutoRows: "minmax(0, 1fr)", // rows share our height equally
-        gap: 1,
+        width: "100%",
+        // height: "100%",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        borderRight: 1,
+        borderColor: "divider",
       }}
     >
-      {plots}
+      <Typography
+        variant="overline"
+        color="primary"
+        borderBottom={1}
+        borderColor={"divider"}
+        marginLeft={2}
+        flexShrink={0}
+      >
+        {titles[i]}
+      </Typography>
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+          // davidia wraps every plot in a hardcoded
+          // <div style="display:grid;position:relative"> with no height,
+          // which breaks the size chain. This gives it one.
+          "& > div": { height: "100%" },
+        }}
+      >
+        {view}
+      </Box>
+    </Box>
+  ));
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+  return (
+    <Box
+      ref={containerRef! as React.RefObject<HTMLDivElement>}
+      sx={{
+        flex: "1 1 0",
+        width: "100%",
+        minWidth: 0,
+        height: gridHeight,
+        minHeight: minimumGridHeight,
+        overflow: "visible",
+      }}
+    >
+      {mounted && (
+        <ReactGridLayout
+          layout={layout}
+          width={width}
+          style={{ height: gridHeight }}
+          gridConfig={{
+            cols: expanded ? 2 : 3,
+            rowHeight: rowHeight,
+            margin: [0, 0],
+          }}
+          autoSize
+          onLayoutChange={() => {}}
+        >
+          {plots}
+        </ReactGridLayout>
+      )}
     </Box>
   );
 }

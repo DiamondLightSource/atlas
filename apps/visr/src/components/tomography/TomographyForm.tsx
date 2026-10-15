@@ -64,7 +64,7 @@ export function TomographyForm() {
         />
         <VisitInput
           visit={
-            visitTextToVisit(instrumentSession ?? undefined) ??
+            visitTextToVisit(instrumentSession!) ??
             visitTextToVisit("cm12345-1") ??
             undefined
           }

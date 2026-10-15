@@ -107,9 +107,8 @@ function TomographyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        flex: 1, // fill whatever TabbedPanel gives us
-        minHeight: 480, // below this, the TabbedPanel scroller takes over
         minWidth: 260 * 3,
+        height: "100%",
       }}
     >
       <TomographyPlots
@@ -118,6 +117,7 @@ function TomographyView() {
         plane={plane}
         slice={slice}
         volumeShape={volume.volumeShape}
+        drawerOpen={drawerOpen}
       />
       <ControlsDrawer
         open={drawerOpen}
