@@ -17,6 +17,7 @@ import {
   useMemo,
   useState,
   type ComponentProps,
+  type Ref,
 } from "react";
 import {
   Alert,
@@ -40,11 +41,17 @@ const CHANNELS = [
 interface SpectroscopyPlotsProps {
   expanded: boolean;
   plotAspectRatio: ComponentProps<typeof ImagePlot>["aspect"];
+  /** A height chosen by dragging (px), else the plots take the space left */
+  height?: number | null;
+  /** The plots' outer box, for measuring it */
+  containerRef?: Ref<HTMLDivElement>;
 }
 
 function SpectroscopyPlots({
   expanded,
   plotAspectRatio,
+  height,
+  containerRef,
 }: SpectroscopyPlotsProps) {
   const [kind, setKind] = useState<PlotKind>("cells");
   const [region, setRegion] = useState<Region | undefined>();
@@ -111,11 +118,13 @@ function SpectroscopyPlots({
 
   return (
     <Box
+      ref={containerRef}
       sx={{
-        flex: 1,
+        // a dragged height, else whatever space the controls leave
+        ...(height ? { flex: "none", height } : { flex: 1 }),
         minWidth: 0,
         // below this the TabbedPanel scroller takes over
-        minHeight: expanded ? 500 : 250,
+        minHeight: height ? 0 : expanded ? 500 : 250,
         display: "flex",
         flexDirection: "column",
         gap: 1,
