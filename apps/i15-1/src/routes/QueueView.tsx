@@ -28,7 +28,7 @@ import type { Status, TaskWithPosition } from "../../generated/queue";
 import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
-import { fillParentTableProps } from "../components/fillParentTableProps";
+import { diamondFillParentTableProps } from "../components/diamondTableProps";
 
 export function QueueView() {
   useQueueEvents();
@@ -134,12 +134,14 @@ export function QueueView() {
     muiToolbarAlertBannerProps: error
       ? { color: "error", children: `Error: ${error.message}` }
       : undefined,
+    ...diamondFillParentTableProps,
+    // Rows aren't clickable; no hover state.
+    muiTableBodyRowProps: { hover: false },
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
-    ...fillParentTableProps,
     enableExpanding: true,
     muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
