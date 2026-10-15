@@ -1,4 +1,4 @@
-import { http, HttpResponse, graphql } from "msw";
+import { http, HttpResponse, graphql, bypass } from "msw";
 import workflowsResponse from "./workflows-response.json";
 import plansResponse from "./plans-response.json";
 import { binnedReadback, binnedSetpoint, mapData } from "./mock_data";
@@ -125,6 +125,37 @@ export const handlers = [
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
+    });
+  }),
+  // Tomography: Tiled's analysis container holds one reconstruction, the test volume
+  http.get("/api/data/search/analysis", () =>
+    HttpResponse.json({
+      data: [
+        {
+          id: "test-volume",
+          attributes: {
+            structure_family: "array",
+            metadata: {
+              visr: {
+                kind: "tomography-reconstruction",
+                created: "2026-10-15T00:00:00+00:00",
+              },
+            },
+            // the shape in public/test-data/volume.json
+            structure: {
+              shape: [128, 91, 91],
+              data_type: { kind: "u", itemsize: 1 },
+            },
+          },
+        },
+      ],
+    }),
+  ),
+
+  http.get("/api/data/array/full/analysis/test-volume", async () => {
+    const raw = await fetch(bypass("/test-data/volume.raw"));
+    return new HttpResponse(await raw.arrayBuffer(), {
+      headers: { "Content-Type": "application/octet-stream" },
     });
   }),
 ];

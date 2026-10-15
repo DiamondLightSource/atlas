@@ -1,10 +1,16 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import TomographyControls from "./TomographyControls";
 import { TomographyForm } from "./TomographyForm";
 import { Plane } from "./PlaneEnum";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
+import ReconstructionSelect from "./ReconstructionSelect";
+import {
+  fetchVolume,
+  listReconstructions,
+  type Reconstruction,
+} from "./reconstruction";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -27,27 +33,40 @@ function TomographyView() {
   const [plane, setPlane] = useState<Plane>(Plane.Z);
   const [drawerOpen, setDrawerOpen] = useState(true);
 
+  const [reconstructions, setReconstructions] = useState<Reconstruction[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [status, setStatus] = useState("Looking for reconstructions…");
+
   // -------------------------------------------------------------------------
-  // Load test volume
+  // Find the reconstructions in Tiled, and show the newest
   // -------------------------------------------------------------------------
   useEffect(() => {
-    async function loadTestVolume() {
-      const [metaRes, rawRes] = await Promise.all([
-        fetch("/test-data/volume.json"),
-        fetch("/test-data/volume.raw"),
-      ]);
-      const meta = (await metaRes.json()) as {
-        shape: [number, number, number];
-      };
-      const buffer = await rawRes.arrayBuffer();
-      setVolume({
-        volumeData: new Uint8Array(buffer),
-        volumeShape: meta.shape,
-      });
-    }
-
-    loadTestVolume();
+    listReconstructions()
+      .then(found => {
+        setReconstructions(found);
+        if (found.length === 0) setStatus("No reconstructions in Tiled yet");
+        else setSelected(found[0].path);
+      })
+      .catch((e: Error) => setStatus(e.message));
   }, []);
+
+  useEffect(() => {
+    const reconstruction = reconstructions.find(r => r.path === selected);
+    if (!reconstruction) return;
+    let current = true;
+    setStatus(`Loading ${reconstruction.label}…`);
+    fetchVolume(reconstruction)
+      .then(volumeData => {
+        if (!current) return;
+        setVolume({ volumeData, volumeShape: reconstruction.shape });
+        // the old slice may be past the end of this volume
+        setSlice(s => Math.min(s, Math.min(...reconstruction.shape) - 1));
+      })
+      .catch((e: Error) => current && setStatus(e.message));
+    return () => {
+      current = false;
+    };
+  }, [reconstructions, selected]);
 
   // -------------------------------------------------------------------------
   // Persist values across multiple open tabs
@@ -97,7 +116,13 @@ function TomographyView() {
 
   // revolve to be implemented
 
-  if (!volume) return <Box />;
+  if (!volume) {
+    return (
+      <Typography sx={{ p: 3 }} color="text.secondary">
+        {status}
+      </Typography>
+    );
+  }
 
   // -------------------------------------------------------------------------
   // Render
@@ -124,6 +149,11 @@ function TomographyView() {
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={[
           <TomographyForm />,
+          <ReconstructionSelect
+            reconstructions={reconstructions}
+            selected={selected}
+            onSelect={setSelected}
+          />,
           <TomographyControls
             onSlide={handleSlider}
             onSetDirection={handlePlane}
