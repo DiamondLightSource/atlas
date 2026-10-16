@@ -3,10 +3,10 @@ import SpectroscopyPlots from "./SpectroscopyPlots";
 import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
-import { useInstrumentSession } from "@atlas/app-shell";
 import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
 import { SpectroscopyForm } from "./SpectroscopyForm";
+import { useInstrumentSession } from "@atlas/app-shell";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -58,8 +58,9 @@ function SpectroscopyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        flex: 1,
+        flexGrow: 1,
         minWidth: drawerOpen ? 600 : 400,
+        height: "100%",
       }}
     >
       <SpectroscopyPlots
