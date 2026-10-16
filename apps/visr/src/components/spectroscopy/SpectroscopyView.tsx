@@ -6,7 +6,9 @@ import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
 import { SpectroscopyForm } from "./SpectroscopyForm";
+import SpectroscopyControls from "./SpectroscopyControls";
 import { useInstrumentSession } from "@atlas/app-shell";
+import { DataSource } from "./dataSource";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -24,6 +26,7 @@ const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [dataSource, setDataSource] = useState(DataSource.Camera);
 
   // -------------------------------------------------------------------------
   // Set off workflow when scan ends
@@ -47,6 +50,9 @@ function SpectroscopyView() {
     }
   }, [scanEvent, instrumentSession, submitWorkflow]);
 
+  const handleSetDataSource = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setDataSource(event.target.value as DataSource);
+
   // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
@@ -64,13 +70,20 @@ function SpectroscopyView() {
       }}
     >
       <SpectroscopyPlots
+        dataSource={dataSource}
         expanded={!drawerOpen}
         plotAspectRatio={PLOT_ASPECT_RATIO}
       />
       <ControlsDrawer
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
-        controls={<SpectroscopyForm />}
+        controls={[
+          <SpectroscopyForm />,
+          <SpectroscopyControls
+            dataSource={dataSource}
+            onSetDataSource={handleSetDataSource}
+          />,
+        ]}
       />
     </Box>
   );

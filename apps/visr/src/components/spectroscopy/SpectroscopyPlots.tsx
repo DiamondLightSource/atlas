@@ -1,8 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useState, type ComponentProps } from "react";
-import { useSpectroscopyData } from "./useSpectroscopyData";
+import { useLayoutEffect, useMemo, useState, type ComponentProps } from "react";
+import { useSpectroscopyData, type DataChannels } from "./useSpectroscopyData";
+import { DataSource } from "./dataSource";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -15,19 +16,58 @@ type PlotValues = ComponentProps<typeof ImagePlot>["values"];
 export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 // ---------------------------------------------------------------------------
+// Data source -> channel mapping
+// ---------------------------------------------------------------------------
+
+const SOURCE_CHANNELS: Record<
+  DataSource,
+  Record<ChannelKey, keyof DataChannels>
+> = {
+  [DataSource.Camera]: {
+    red: "cameraRed",
+    green: "cameraGreen",
+    blue: "cameraBlue",
+  },
+  [DataSource.Diodes]: {
+    red: "diodesRed",
+    green: "diodesGreen",
+    blue: "diodesBlue",
+  },
+};
+
+function selectChannels(
+  data: DataChannels | null | undefined,
+  dataSource: DataSource,
+): SpectroscopyData {
+  if (!data) return {};
+  const mapping = SOURCE_CHANNELS[dataSource];
+  return {
+    red: data[mapping.red],
+    green: data[mapping.green],
+    blue: data[mapping.blue],
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 interface SpectroscopyPlotsProps {
+  dataSource: DataSource;
   expanded: boolean;
   plotAspectRatio: number | "auto" | "equal";
 }
 
 function SpectroscopyPlots({
+  dataSource,
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
-  const { data: channels } = useSpectroscopyData();
+  const { data } = useSpectroscopyData();
+  const channels = useMemo(
+    () => selectChannels(data, dataSource),
+    [data, dataSource],
+  );
   const { width, containerRef, mounted } = useContainerWidth();
 
   // -------------------------------------------------------------------------
@@ -80,15 +120,19 @@ function SpectroscopyPlots({
   // -------------------------------------------------------------------------
   // Views
   // -------------------------------------------------------------------------
-  const views = CHANNELS.map(({ key }) => (
-    <ImagePlot
-      aspect={plotAspectRatio}
-      plotConfig={{}}
-      customToolbarChildren={null}
-      values={channels[key]}
-      //tightAxes //requires Davidia 1.1.0
-    />
-  ));
+  const views = CHANNELS.map(({ key }) => {
+    const values = channels[key];
+    if (!values) return null;
+    return (
+      <ImagePlot
+        aspect={plotAspectRatio}
+        plotConfig={{}}
+        customToolbarChildren={null}
+        values={values}
+        //tightAxes //requires Davidia 1.1.0
+      />
+    );
+  });
 
   const titles = CHANNELS.map(({ label }) => label);
 
@@ -100,7 +144,6 @@ function SpectroscopyPlots({
       key={i}
       sx={{
         width: "100%",
-        // height: "100%",
         minHeight: 0,
         display: "flex",
         flexDirection: "column",

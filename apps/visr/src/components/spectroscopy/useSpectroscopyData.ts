@@ -5,9 +5,12 @@ import { useScanEvents } from "../../hooks/scanEvents/useScanEvents";
 
 /** SpectroscopyData wrapped as NDT for ease of Davidia plotting */
 export interface DataChannels {
-  red: NDT;
-  green: NDT;
-  blue: NDT;
+  cameraRed: NDT;
+  cameraGreen: NDT;
+  cameraBlue: NDT;
+  diodesRed: NDT;
+  diodesGreen: NDT;
+  diodesBlue: NDT;
   xValues: NDT;
   yValues: NDT;
 }
@@ -17,6 +20,9 @@ type SpectroscopyData = {
   RedTotal: number[][];
   GreenTotal: number[][];
   BlueTotal: number[][];
+  DiodesRed: number[][];
+  DiodesGreen: number[][];
+  DiodesBlue: number[][];
   /** X bin edges with size of the above datasets + 1 */
   x_limits: number[];
   /** Y bin edges with size of the above datasets + 1 */
@@ -106,9 +112,13 @@ export function useSpectroscopyData(): {
   const [running, setRunning] = useState<boolean>(false);
   const [uuid, setUuid] = useState<string | null>(null);
   const [data, setData] = useState<DataChannels>({
-    red: EMPTY_NDT,
-    green: EMPTY_NDT,
-    blue: EMPTY_NDT,
+    cameraRed: EMPTY_NDT,
+    cameraGreen: EMPTY_NDT,
+    cameraBlue: EMPTY_NDT,
+    diodesRed: EMPTY_NDT,
+    diodesGreen: EMPTY_NDT,
+    diodesBlue: EMPTY_NDT,
+
     xValues: initialAxes,
     yValues: initialAxes,
   });
@@ -138,9 +148,12 @@ export function useSpectroscopyData(): {
       try {
         const resp: SpectroscopyData = await fetchData(uuid);
         setData({
-          red: toRgbNdt(resp.RedTotal, "red"),
-          green: toRgbNdt(resp.GreenTotal, "green"),
-          blue: toRgbNdt(resp.BlueTotal, "blue"),
+          cameraRed: toRgbNdt(resp.RedTotal, "red"),
+          cameraGreen: toRgbNdt(resp.GreenTotal, "green"),
+          cameraBlue: toRgbNdt(resp.BlueTotal, "blue"),
+          diodesRed: toRgbNdt(resp.DiodesRed, "red"),
+          diodesGreen: toRgbNdt(resp.DiodesGreen, "green"),
+          diodesBlue: toRgbNdt(resp.DiodesBlue, "blue"),
           xValues: binEdgesToCentrePoints(resp.x_limits),
           yValues: binEdgesToCentrePoints(resp.y_limits),
         });
