@@ -122,7 +122,7 @@ export function SpectroscopyForm() {
           <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
         </ToggleButtonGroup>
         <RunPlanButton
-          name="demo_spectroscopy"
+          name="spectroscopy"
           params={formData}
           instrumentSession={instrumentSession}
           buttonText="Run"
