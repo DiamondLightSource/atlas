@@ -16,7 +16,6 @@ interface Props {
   volumeVisible: boolean;
   slice: number;
   plane: Plane;
-  // revolve?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -97,11 +96,7 @@ function TomographyPlots({
   // -------------------------------------------------------------------------
   const views = [
     <CamPva />,
-    <VolumeRenderer
-      volumeData={volumeData}
-      volumeShape={volumeShape}
-      // revolve={revolve}
-    />,
+    <VolumeRenderer volumeData={volumeData} volumeShape={volumeShape} />,
     <SliceViewer
       volumeData={volumeData}
       volumeShape={volumeShape}

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<884fd4b9106f6a2bb765d31609ddc5b7>>
+ * @generated SignedSource<<5dff2581ece7924613793b9f78265aeb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,15 +10,14 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type InstrumentSessionQuery$variables = {
-  instrumentName: string;
+  instrumentKey: string;
 };
 export type InstrumentSessionQuery$data = {
-  readonly instrumentByName: {
+  readonly instrumentByKey: {
     readonly instrumentSessions: {
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly instrumentSessionReference: string | null | undefined;
-          readonly state: string | null | undefined;
         };
       }>;
     };
@@ -34,7 +33,7 @@ var v0 = [
   {
     "defaultValue": null,
     "kind": "LocalArgument",
-    "name": "instrumentName"
+    "name": "instrumentKey"
   }
 ],
 v1 = [
@@ -43,13 +42,13 @@ v1 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "name",
-        "variableName": "instrumentName"
+        "name": "key",
+        "variableName": "instrumentKey"
       }
     ],
     "concreteType": "Instrument",
     "kind": "LinkedField",
-    "name": "instrumentByName",
+    "name": "instrumentByKey",
     "plural": false,
     "selections": [
       {
@@ -92,13 +91,6 @@ v1 = [
                     "kind": "ScalarField",
                     "name": "instrumentSessionReference",
                     "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "state",
-                    "storageKey": null
                   }
                 ],
                 "storageKey": null
@@ -131,16 +123,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "bab6e35bf24e1dc8d524a73fdc23c1c6",
+    "cacheID": "1945deec11f4074111def5152412e3ae",
     "id": null,
     "metadata": {},
     "name": "InstrumentSessionQuery",
     "operationKind": "query",
-    "text": "query InstrumentSessionQuery(\n  $instrumentName: String!\n) {\n  instrumentByName(name: $instrumentName) {\n    instrumentSessions(filterBy: {state: {eq: IN_PROGRESS}}) {\n      edges {\n        node {\n          instrumentSessionReference\n          state\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query InstrumentSessionQuery(\n  $instrumentKey: String!\n) {\n  instrumentByKey(key: $instrumentKey) {\n    instrumentSessions(filterBy: {state: {eq: IN_PROGRESS}}) {\n      edges {\n        node {\n          instrumentSessionReference\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f0e5cfab393260f9e9c4cd50d10a2f19";
+(node as any).hash = "6a0018996dc6aa614a92c4446328e1b8";
 
 export default node;

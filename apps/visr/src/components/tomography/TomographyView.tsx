@@ -16,13 +16,6 @@ interface Volume {
 }
 
 // ---------------------------------------------------------------------------
-// Layout constants
-// ---------------------------------------------------------------------------
-
-const DRAWER_COLLAPSED_HEIGHT = 80;
-const NAVBAR_HEIGHT = 32;
-
-// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -114,9 +107,8 @@ function TomographyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        flexGrow: 1,
         minWidth: 260 * 3,
-        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
+        height: "100%",
       }}
     >
       <TomographyPlots
@@ -129,7 +121,6 @@ function TomographyView() {
       />
       <ControlsDrawer
         open={drawerOpen}
-        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={[
           <TomographyForm />,

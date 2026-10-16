@@ -44,9 +44,15 @@ export function Layout(props: RouterProps) {
       />
       <Box
         component="main"
-        sx={{ display: "flex", flex: 1, flexDirection: "column", minWidth: 0 }}
+        sx={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          minWidth: 0,
+          minHeight: 0,
+          overflow: "hidden",
+        }}
       >
-        {/* Spacer, same height as the fixed TopBar's Navbar */}
         <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
         <Outlet />
       </Box>

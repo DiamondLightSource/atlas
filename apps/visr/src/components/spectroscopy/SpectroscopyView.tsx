@@ -3,10 +3,10 @@ import SpectroscopyPlots from "./SpectroscopyPlots";
 import { useEffect, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
-import { useInstrumentSession } from "../../context/instrumentSession/useInstrumentSession";
 import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
 import { SpectroscopyForm } from "./SpectroscopyForm";
+import { useInstrumentSession } from "@atlas/app-shell";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -20,8 +20,6 @@ export type SpectroscopyFormData = {
 // Layout constants
 // ---------------------------------------------------------------------------
 
-const DRAWER_COLLAPSED_HEIGHT = 80;
-const NAVBAR_HEIGHT = 48;
 const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
@@ -62,7 +60,7 @@ function SpectroscopyView() {
         flexDirection: "column",
         flexGrow: 1,
         minWidth: drawerOpen ? 600 : 400,
-        height: `calc(100vh - ${DRAWER_COLLAPSED_HEIGHT + NAVBAR_HEIGHT}px)`,
+        height: "100%",
       }}
     >
       <SpectroscopyPlots
@@ -71,7 +69,6 @@ function SpectroscopyView() {
       />
       <ControlsDrawer
         open={drawerOpen}
-        collapsedHeight={DRAWER_COLLAPSED_HEIGHT}
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={<SpectroscopyForm />}
       />

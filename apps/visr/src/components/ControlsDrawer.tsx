@@ -1,38 +1,22 @@
-import { Drawer, Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { Children, Fragment, type ReactNode } from "react";
 
 interface ControlsDrawerProps {
   open: boolean;
-  collapsedHeight: number;
   onToggle: () => void;
   controls: ReactNode | ReactNode[];
 }
 
-function ControlsDrawer({
-  open,
-  collapsedHeight,
-  onToggle,
-  controls,
-}: ControlsDrawerProps) {
+function ControlsDrawer({ open, onToggle, controls }: ControlsDrawerProps) {
   const items = Children.toArray(controls);
 
   return (
-    <Drawer
-      anchor="bottom"
-      variant="permanent"
+    <Box
       sx={{
-        "& .MuiDrawer-paper": {
-          position: "relative",
-          height: open ? "auto" : collapsedHeight,
-          flexGrow: open ? 1 : 0,
-          transition: "flex-grow 0.4s ease, height 0.4s ease",
-          boxSizing: "border-box",
-          bgcolor: "transparent",
-          overflowY: "auto",
-          flexShrink: 0,
-        },
+        borderTop: "1px solid",
+        borderColor: "divider",
       }}
     >
       <Box
@@ -83,7 +67,7 @@ function ControlsDrawer({
           </Fragment>
         ))}
       </Box>
-    </Drawer>
+    </Box>
   );
 }
 
