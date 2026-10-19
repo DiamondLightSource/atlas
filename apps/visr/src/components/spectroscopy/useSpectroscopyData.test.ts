@@ -1,4 +1,152 @@
-import { fetchData } from "./useSpectroscopyData";
+import {
+  binEdgesToAxis,
+  CELL_PIXELS,
+  fetchData,
+  orEmptyLike,
+  splitEdges,
+  DEFAULT_STRIPES,
+  stripesOn,
+  toRgbNdt,
+} from "./useSpectroscopyData";
+
+/** Every pixel of one cell as [r, g, b] */
+function cell(
+  matrix: (number | null)[][],
+  row: number,
+  col: number,
+  colour: "red" | "green" = "red",
+) {
+  const image = toRgbNdt(matrix, colour);
+  const out: number[][] = [];
+  for (let y = 0; y < CELL_PIXELS; y++) {
+    for (let x = 0; x < CELL_PIXELS; x++) {
+      const py = row * CELL_PIXELS + y;
+      const px = col * CELL_PIXELS + x;
+      out.push([0, 1, 2].map(ch => image.get(py, px, ch)));
+    }
+  }
+  return out;
+}
+
+/** The single colour a measured cell is filled with */
+function fill(matrix: (number | null)[][], row: number, col: number) {
+  const pixels = cell(matrix, row, col);
+  expect(new Set(pixels.map(p => p.join()))).toHaveLength(1);
+  return pixels[0];
+}
+
+describe("toRgbNdt", () => {
+  it("scales each value over the matrix's range in its own colour", () => {
+    expect([0, 1, 2].map(c => fill([[10, 15, 20]], 0, c))).toEqual([
+      [0, 0, 0],
+      [128, 0, 0],
+      [255, 0, 0],
+    ]);
+    expect(cell([[0, 4]], 0, 1, "green")[0]).toEqual([0, 255, 0]);
+  });
+
+  it("draws cells without a value as grey stripes, unlike any measured value", () => {
+    const empty = cell([[0, null, 10]], 0, 1);
+    const colours = new Set(empty.map(p => p.join()));
+    expect([...colours].sort()).toEqual(
+      DEFAULT_STRIPES.map(c => c.join()).sort(),
+    );
+    expect(fill([[0, null, 10]], 0, 0)).toEqual([0, 0, 0]); // measured dark stays black
+  });
+
+  it("draws a single point, or equal values, at full brightness", () => {
+    expect(fill([[42]], 0, 0)).toEqual([255, 0, 0]);
+    expect(fill([[7, null, 7]], 0, 2)).toEqual([255, 0, 0]);
+  });
+
+  it("is laid out as rows of height x width x RGB, CELL_PIXELS per cell", () => {
+    const image = toRgbNdt(
+      [
+        [1, 2, 3],
+        [4, 5, 6],
+      ],
+      "green",
+    );
+    expect(image.shape).toEqual([2 * CELL_PIXELS, 3 * CELL_PIXELS, 3]);
+  });
+
+  it("draws a missing channel as the empty placeholder", () => {
+    expect(toRgbNdt(null, "red").shape).toEqual([
+      3 * CELL_PIXELS,
+      3 * CELL_PIXELS,
+      3,
+    ]);
+  });
+});
+
+describe("stripesOn", () => {
+  it("is the background and a slightly darker shade on a light page", () => {
+    expect(stripesOn([246, 246, 249])).toEqual([
+      [246, 246, 249],
+      [236, 236, 239],
+    ]);
+  });
+
+  it("is the background and a slightly lighter shade on a dark page", () => {
+    expect(stripesOn([14, 16, 23])).toEqual([
+      [14, 16, 23],
+      [24, 26, 33],
+    ]);
+  });
+
+  it("colours toRgbNdt's empty cells", () => {
+    const stripes = stripesOn([14, 16, 23]);
+    const image = toRgbNdt([[null]], "red", stripes);
+    const colours = new Set<string>();
+    for (let y = 0; y < CELL_PIXELS; y++) {
+      for (let x = 0; x < CELL_PIXELS; x++) {
+        colours.add([0, 1, 2].map(ch => image.get(y, x, ch)).join());
+      }
+    }
+    expect([...colours].sort()).toEqual(stripes.map(c => c.join()).sort());
+  });
+});
+
+describe("orEmptyLike", () => {
+  it("keeps a channel that is there", () => {
+    expect(orEmptyLike([[1, 2]], [[3, 4]])).toEqual([[1, 2]]);
+  });
+
+  it("gives a missing channel empty cells the shape of another", () => {
+    expect(
+      orEmptyLike(null, [
+        [1, null],
+        [3, 4],
+      ]),
+    ).toEqual([
+      [null, null],
+      [null, null],
+    ]);
+  });
+});
+
+describe("splitEdges", () => {
+  it("splits each bin into CELL_PIXELS equal parts, keeping the outer edges", () => {
+    const edges = splitEdges([0, 4, 12]);
+    expect(edges).toHaveLength(2 * CELL_PIXELS + 1);
+    expect(edges[0]).toBe(0);
+    expect(edges[CELL_PIXELS]).toBe(4);
+    expect(edges[edges.length - 1]).toBe(12);
+    expect(edges[1] - edges[0]).toBeCloseTo(4 / CELL_PIXELS);
+  });
+});
+
+describe("binEdgesToAxis", () => {
+  it("gives the plot the edges themselves, one more than the cells", () => {
+    const axis = binEdgesToAxis([-0.5, 0.5, 1.5]);
+    expect(Array.from(axis.data as Float64Array)).toEqual([-0.5, 0.5, 1.5]);
+    expect(axis.shape).toEqual([3]);
+  });
+
+  it("needs at least two edges", () => {
+    expect(() => binEdgesToAxis([1])).toThrow("At least two bin edges");
+  });
+});
 
 describe("fetchData", () => {
   afterEach(() => vi.unstubAllGlobals());

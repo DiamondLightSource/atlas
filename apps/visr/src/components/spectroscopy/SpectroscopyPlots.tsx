@@ -1,4 +1,10 @@
-import { Box, CircularProgress, Fade, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Fade,
+  Typography,
+  useColorScheme,
+} from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
 import {
@@ -8,7 +14,14 @@ import {
   useState,
   type ComponentProps,
 } from "react";
-import { useSpectroscopyData, type DataChannels } from "./useSpectroscopyData";
+import {
+  DEFAULT_STRIPES,
+  stripesOn,
+  useSpectroscopyData,
+  type DataChannels,
+  type Rgb,
+  type StripeColours,
+} from "./useSpectroscopyData";
 import { DataSource } from "./dataSource";
 import {
   SCAN_STATUS_BUSY,
@@ -116,6 +129,47 @@ function ScanStatusLine({ status }: { status: ScanStatus | null }) {
 }
 
 // ---------------------------------------------------------------------------
+// Empty-cell stripes in the colours of the page behind the plots
+// ---------------------------------------------------------------------------
+
+/** The first opaque background colour at or above `element`, if any */
+function backgroundBehind(element: HTMLElement | null): Rgb | null {
+  for (let el = element; el; el = el.parentElement) {
+    const parts = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+    if (parts && parts.length >= 3 && (parts.length < 4 || +parts[3] > 0)) {
+      return [+parts[0], +parts[1], +parts[2]];
+    }
+  }
+  return null;
+}
+
+/**
+ * Stripes matching the background behind `element`, read again when the
+ * colour scheme changes (after the browser has applied it)
+ */
+function useStripesBehind(
+  element: React.RefObject<HTMLElement | null>,
+): StripeColours {
+  const { mode, systemMode } = useColorScheme();
+  const scheme = mode === "system" ? systemMode : mode;
+  const [background, setBackground] = useState<string | null>(null);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const found = backgroundBehind(element.current);
+      if (found) setBackground(found.join(","));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [element, scheme]);
+  return useMemo(
+    () =>
+      background
+        ? stripesOn(background.split(",").map(Number) as unknown as Rgb)
+        : DEFAULT_STRIPES,
+    [background],
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -130,12 +184,15 @@ function SpectroscopyPlots({
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
-  const { data, status } = useSpectroscopyData();
+  const { width, containerRef, mounted } = useContainerWidth();
+  const stripes = useStripesBehind(
+    containerRef as React.RefObject<HTMLElement | null>,
+  );
+  const { data, status } = useSpectroscopyData(stripes);
   const channels = useMemo(
     () => selectChannels(data, dataSource),
     [data, dataSource],
   );
-  const { width, containerRef, mounted } = useContainerWidth();
 
   // -------------------------------------------------------------------------
   // Grid sizing
@@ -193,7 +250,7 @@ function SpectroscopyPlots({
     return (
       <ImagePlot
         aspect={plotAspectRatio}
-        plotConfig={{}}
+        plotConfig={{ xValues: data.xValues, yValues: data.yValues }}
         customToolbarChildren={null}
         values={values}
         //tightAxes //requires Davidia 1.1.0
