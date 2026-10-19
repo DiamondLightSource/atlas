@@ -75,26 +75,39 @@ export const RENDER_SIZE = 200;
 export type RGBColour = "red" | "green" | "blue" | "gray";
 
 /**
- * Each cell is drawn as CELL_PIXELS x CELL_PIXELS pixels, so cells no point has
- * landed in yet can carry a pattern: faint diagonal stripes, which can't be
- * mistaken for a measured value (dark or not) and run on unbroken across the
- * empty part of the scan. The axes are split to match.
+ * Cells no point has landed in yet are drawn as the page's background crossed
+ * by thin diagonal lines, which can't be mistaken for a measured value (dark
+ * or not) and run on unbroken across the empty part of the scan. For lines
+ * that thin, each of /binned's cells is drawn as several pixels square, so the
+ * whole grid is at least MIN_IMAGE_PIXELS on its longer side (and at least
+ * CELL_PIXELS per cell); the axes are split to match.
  */
 export const CELL_PIXELS = 4;
+export const MIN_IMAGE_PIXELS = 240;
+
+/** Pixels between the empty cells' lines, along a row */
+export const LINE_SPACING = 6;
+
+/** Pixels per cell, on each axis, for a grid of width x height cells */
+export function cellPixelsFor(width: number, height: number): number {
+  return Math.max(
+    CELL_PIXELS,
+    Math.ceil(MIN_IMAGE_PIXELS / Math.max(width, height, 1)),
+  );
+}
 
 /** An RGB colour, 0-255 each */
 export type Rgb = readonly [number, number, number];
 
-/** The two colours of the empty cells' stripes */
+/** The empty cells' colours: the background, and its lines */
 export type StripeColours = readonly [Rgb, Rgb];
 
-/** How far the second stripe is from the background, 0-255 per channel */
-export const STRIPE_CONTRAST = 10;
+/** How far the lines are from the background, 0-255 per channel */
+export const STRIPE_CONTRAST = 48;
 
 /**
- * Stripes that barely stand out from the background they sit on: one in the
- * background's own colour, the other slightly darker on a light background,
- * slightly lighter on a dark one
+ * The empty cells' colours on a background: the background itself, and thin
+ * lines a shade darker on a light background, lighter on a dark one
  */
 export function stripesOn(background: Rgb): StripeColours {
   const luminance =
@@ -110,15 +123,15 @@ export function stripesOn(background: Rgb): StripeColours {
 export const DEFAULT_STRIPES = stripesOn([246, 246, 249]);
 
 function emptyColour(row: number, col: number, stripes: StripeColours): Rgb {
-  return stripes[Math.floor(((row + col) % 4) / 2)];
+  return stripes[(row + col) % LINE_SPACING === 0 ? 1 : 0];
 }
 
-/** Bin edges with each bin split into CELL_PIXELS equal parts, to match the image */
-export function splitEdges(edges: number[]): number[] {
+/** Bin edges with each bin split into `parts` equal parts, to match the image */
+export function splitEdges(edges: number[], parts: number): number[] {
   const out: number[] = [];
   for (let i = 0; i < edges.length - 1; i++) {
-    for (let k = 0; k < CELL_PIXELS; k++) {
-      out.push(edges[i] + ((edges[i + 1] - edges[i]) * k) / CELL_PIXELS);
+    for (let k = 0; k < parts; k++) {
+      out.push(edges[i] + ((edges[i + 1] - edges[i]) * k) / parts);
     }
   }
   out.push(edges[edges.length - 1]);
@@ -127,7 +140,7 @@ export function splitEdges(edges: number[]): number[] {
 
 /** How to draw a matrix as an image */
 export type RgbOptions = {
-  /** Pixels per matrix cell on each axis (CELL_PIXELS for /binned's cells, 1 for /render's pixels) */
+  /** Pixels per matrix cell on each axis (default cellPixelsFor the matrix; 1 for /render's pixels) */
   cellPixels?: number;
   /** How much of each cell is drawn, 0 to 1 (/render): the rest shows the stripes */
   coverage?: number[][];
@@ -146,13 +159,14 @@ export function toRgbNdt(
   matrix: (number | null)[][] | null,
   colour: RGBColour,
   stripes: StripeColours = DEFAULT_STRIPES,
-  { cellPixels = CELL_PIXELS, coverage, outline }: RgbOptions = {},
+  { cellPixels, coverage, outline }: RgbOptions = {},
 ): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
     return emptyNdt(stripes); // skip invalid input
   }
   const height = matrix.length;
   const width = matrix[0].length;
+  cellPixels ??= cellPixelsFor(width, height);
   const flat = matrix.flat();
 
   // the range of the values, ignoring empty cells (a loop: /render's images
@@ -282,7 +296,10 @@ const FINAL_POLL_ATTEMPTS = 10;
 type PollResult = "done" | "error" | { retryAfterMs: number };
 
 // initial axes must have min three points...
-const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
+const INITIAL_EDGES = [-0.25, 0.25, 0.5, 0.75];
+const initialAxes = binEdgesToAxis(
+  splitEdges(INITIAL_EDGES, cellPixelsFor(3, 3)),
+);
 
 /**
  * /binned's or /render's answer as plot images, empty cells in the given
@@ -328,8 +345,15 @@ export function toChannels(
       yValues: initialAxes,
     };
   }
+  // every channel and both axes split each cell into the same number of pixels
+  const parts = cellPixelsFor(
+    binned.RedTotal[0]?.length ?? 1,
+    binned.RedTotal.length,
+  );
   const image = (matrix: (number | null)[][] | null, colour: RGBColour) =>
-    toRgbNdt(orEmptyLike(matrix, binned.RedTotal), colour, stripes);
+    toRgbNdt(orEmptyLike(matrix, binned.RedTotal), colour, stripes, {
+      cellPixels: parts,
+    });
   return {
     cameraRed: image(binned.RedTotal, "red"),
     cameraGreen: image(binned.GreenTotal, "green"),
@@ -337,8 +361,8 @@ export function toChannels(
     diodesRed: image(binned.DiodesRed, "red"),
     diodesGreen: image(binned.DiodesGreen, "green"),
     diodesBlue: image(binned.DiodesBlue, "blue"),
-    xValues: binEdgesToAxis(splitEdges(binned.x_limits)),
-    yValues: binEdgesToAxis(splitEdges(binned.y_limits)),
+    xValues: binEdgesToAxis(splitEdges(binned.x_limits, parts)),
+    yValues: binEdgesToAxis(splitEdges(binned.y_limits, parts)),
   };
 }
 

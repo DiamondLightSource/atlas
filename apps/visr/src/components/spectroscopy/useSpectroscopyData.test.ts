@@ -1,6 +1,7 @@
 import {
   binEdgesToAxis,
-  CELL_PIXELS,
+  cellPixelsFor,
+  LINE_SPACING,
   fetchData,
   orEmptyLike,
   splitEdges,
@@ -18,11 +19,12 @@ function cell(
   colour: "red" | "green" = "red",
 ) {
   const image = toRgbNdt(matrix, colour);
+  const size = cellPixelsFor(matrix[0].length, matrix.length);
   const out: number[][] = [];
-  for (let y = 0; y < CELL_PIXELS; y++) {
-    for (let x = 0; x < CELL_PIXELS; x++) {
-      const py = row * CELL_PIXELS + y;
-      const px = col * CELL_PIXELS + x;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const py = row * size + y;
+      const px = col * size + x;
       out.push([0, 1, 2].map(ch => image.get(py, px, ch)));
     }
   }
@@ -46,12 +48,12 @@ describe("toRgbNdt", () => {
     expect(cell([[0, 4]], 0, 1, "green")[0]).toEqual([0, 255, 0]);
   });
 
-  it("draws cells without a value as grey stripes, unlike any measured value", () => {
-    const empty = cell([[0, null, 10]], 0, 1);
-    const colours = new Set(empty.map(p => p.join()));
-    expect([...colours].sort()).toEqual(
-      DEFAULT_STRIPES.map(c => c.join()).sort(),
-    );
+  it("draws cells without a value as the background crossed by thin lines", () => {
+    const empty = cell([[0, null, 10]], 0, 1).map(p => p.join());
+    const [background, line] = DEFAULT_STRIPES.map(c => c.join());
+    expect(new Set(empty)).toEqual(new Set([background, line]));
+    const lines = empty.filter(p => p === line).length;
+    expect(lines / empty.length).toBeCloseTo(1 / LINE_SPACING, 1);
     expect(fill([[0, null, 10]], 0, 0)).toEqual([0, 0, 0]); // measured dark stays black
   });
 
@@ -60,7 +62,7 @@ describe("toRgbNdt", () => {
     expect(fill([[7, null, 7]], 0, 2)).toEqual([255, 0, 0]);
   });
 
-  it("is laid out as rows of height x width x RGB, CELL_PIXELS per cell", () => {
+  it("is laid out as rows of height x width x RGB, cellPixelsFor per cell", () => {
     const image = toRgbNdt(
       [
         [1, 2, 3],
@@ -68,30 +70,39 @@ describe("toRgbNdt", () => {
       ],
       "green",
     );
-    expect(image.shape).toEqual([2 * CELL_PIXELS, 3 * CELL_PIXELS, 3]);
+    const size = cellPixelsFor(3, 2);
+    expect(image.shape).toEqual([2 * size, 3 * size, 3]);
   });
 
   it("draws a missing channel as the empty placeholder", () => {
-    expect(toRgbNdt(null, "red").shape).toEqual([
-      3 * CELL_PIXELS,
-      3 * CELL_PIXELS,
-      3,
-    ]);
+    const size = cellPixelsFor(3, 3);
+    expect(toRgbNdt(null, "red").shape).toEqual([3 * size, 3 * size, 3]);
+  });
+});
+
+describe("cellPixelsFor", () => {
+  it("draws a small grid at least MIN_IMAGE_PIXELS across", () => {
+    expect(cellPixelsFor(3, 3)).toBe(80);
+    expect(cellPixelsFor(17, 5)).toBe(15);
+  });
+
+  it("draws a large grid at least CELL_PIXELS per cell", () => {
+    expect(cellPixelsFor(100, 80)).toBe(4);
   });
 });
 
 describe("stripesOn", () => {
-  it("is the background and a slightly darker shade on a light page", () => {
+  it("is the background and darker lines on a light page", () => {
     expect(stripesOn([246, 246, 249])).toEqual([
       [246, 246, 249],
-      [236, 236, 239],
+      [198, 198, 201],
     ]);
   });
 
-  it("is the background and a slightly lighter shade on a dark page", () => {
+  it("is the background and lighter lines on a dark page", () => {
     expect(stripesOn([14, 16, 23])).toEqual([
       [14, 16, 23],
-      [24, 26, 33],
+      [62, 64, 71],
     ]);
   });
 
@@ -99,8 +110,8 @@ describe("stripesOn", () => {
     const stripes = stripesOn([14, 16, 23]);
     const image = toRgbNdt([[null]], "red", stripes);
     const colours = new Set<string>();
-    for (let y = 0; y < CELL_PIXELS; y++) {
-      for (let x = 0; x < CELL_PIXELS; x++) {
+    for (let y = 0; y < image.shape[0]; y++) {
+      for (let x = 0; x < image.shape[1]; x++) {
         colours.add([0, 1, 2].map(ch => image.get(y, x, ch)).join());
       }
     }
@@ -127,13 +138,13 @@ describe("orEmptyLike", () => {
 });
 
 describe("splitEdges", () => {
-  it("splits each bin into CELL_PIXELS equal parts, keeping the outer edges", () => {
-    const edges = splitEdges([0, 4, 12]);
-    expect(edges).toHaveLength(2 * CELL_PIXELS + 1);
+  it("splits each bin into equal parts, keeping the outer edges", () => {
+    const edges = splitEdges([0, 4, 12], 4);
+    expect(edges).toHaveLength(2 * 4 + 1);
     expect(edges[0]).toBe(0);
-    expect(edges[CELL_PIXELS]).toBe(4);
+    expect(edges[4]).toBe(4);
     expect(edges[edges.length - 1]).toBe(12);
-    expect(edges[1] - edges[0]).toBeCloseTo(4 / CELL_PIXELS);
+    expect(edges[1] - edges[0]).toBeCloseTo(1);
   });
 });
 
@@ -238,9 +249,10 @@ describe("toChannels of /render's answer", () => {
     expect(pixel(image, 1)).toEqual([255, 255, 255]);
   });
 
-  it("draws a channel the run lacks, and empty pixels, as stripes", () => {
+  it("draws a channel the run lacks, and empty pixels, as the empty pattern", () => {
     const channels = toChannels({ ...answer, outline: undefined }, stripes);
-    expect(pixel(channels.diodesGreen, 0)).toEqual([...stripes[0]]);
-    expect(pixel(channels.cameraBlue, 0)).toEqual([...stripes[0]]);
+    expect(pixel(channels.diodesGreen, 0)).toEqual([...stripes[1]]); // on a line
+    expect(pixel(channels.cameraBlue, 0)).toEqual([...stripes[1]]);
+    expect(pixel(channels.diodesGreen, 1)).toEqual([...stripes[0]]); // between lines
   });
 });
