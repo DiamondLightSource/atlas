@@ -14,7 +14,16 @@ export interface DataChannels {
   diodesBlue: NDT;
   xValues: NDT;
   yValues: NDT;
+  /** The beam size /render drew with, and where it came from (Gaussian and footprints) */
+  beam?: Beam;
 }
+
+/** A beam size (FWHM, in motor units) and where /render took it from */
+export type Beam = {
+  x: number;
+  y: number;
+  source: "request" | "metadata" | "scan step";
+};
 
 /** Return type of `/api/data/binned` */
 type SpectroscopyData = {
@@ -30,6 +39,38 @@ type SpectroscopyData = {
   /** Y bin edges with size of the above datasets + 1 */
   y_limits: number[];
 };
+
+type Matrix = (number | null)[][];
+
+/** Return type of `/api/data/render` (JSON) */
+type RenderData = {
+  viewport: {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+    width: number;
+    height: number;
+  };
+  channels: Record<"RedTotal" | "GreenTotal" | "BlueTotal", Matrix> &
+    /** Null for a run without diodes */
+    Record<"DiodesRed" | "DiodesGreen" | "DiodesBlue", Matrix | null>;
+  coverage: number[][];
+  outline?: number[][];
+  beam?: Beam;
+};
+
+/** How the scan is drawn: /binned's cells, or one of /render's kinds */
+export type PlotKind = "cells" | "rectangles" | "gaussian" | "ovals";
+
+/**
+ * Whether footprints are drawn with /render's white outlines; without them
+ * the footprints meet edge to edge
+ */
+export const DRAW_OUTLINES = false;
+
+/** Longest side, in pixels, of the images /render draws */
+export const RENDER_SIZE = 200;
 
 export type RGBColour = "red" | "green" | "blue" | "gray";
 
@@ -84,68 +125,74 @@ export function splitEdges(edges: number[]): number[] {
   return out;
 }
 
+/** How to draw a matrix as an image */
+export type RgbOptions = {
+  /** Pixels per matrix cell on each axis (CELL_PIXELS for /binned's cells, 1 for /render's pixels) */
+  cellPixels?: number;
+  /** How much of each cell is drawn, 0 to 1 (/render): the rest shows the stripes */
+  coverage?: number[][];
+  /** Opacity of white outlines over each cell, 0 to 1 (/render's footprints) */
+  outline?: number[][];
+};
+
 /**
  * The matrix as an RGB image in one colour, scaled over its own range, each
- * cell CELL_PIXELS pixels square. Cells without a value are stripes in the
- * given colours. If
- * every value is the same (a single point, say), they are drawn at full
- * brightness rather than black.
+ * cell `cellPixels` pixels square. Cells without a value are stripes in the
+ * given colours, and a partly covered cell fades into them. If every value is
+ * the same (a single point, say), they are drawn at full brightness rather
+ * than black.
  */
 export function toRgbNdt(
   matrix: (number | null)[][] | null,
   colour: RGBColour,
   stripes: StripeColours = DEFAULT_STRIPES,
+  { cellPixels = CELL_PIXELS, coverage, outline }: RgbOptions = {},
 ): NDT {
   if (!matrix?.length || !matrix[0]?.length) {
     return emptyNdt(stripes); // skip invalid input
   }
   const height = matrix.length;
   const width = matrix[0].length;
-
-  // Flatten and filter out nulls for normalisation
   const flat = matrix.flat();
-  const valid = flat.filter((v): v is number => v !== null && !isNaN(v));
 
-  // Avoid crashes when no valid values
-  const min = valid.length ? Math.min(...valid) : 0;
-  const max = valid.length ? Math.max(...valid) : 1;
+  // the range of the values, ignoring empty cells (a loop: /render's images
+  // are too large to spread into Math.min)
+  let min = Infinity;
+  let max = -Infinity;
+  for (const v of flat) {
+    if (v !== null && !isNaN(v)) {
+      min = Math.min(min, v);
+      max = Math.max(max, v);
+    }
+  }
   const scale = max > min ? 255 / (max - min) : 0;
+  const lit = { red: [0], green: [1], blue: [2], gray: [0, 1, 2] }[colour];
 
-  const W = width * CELL_PIXELS;
-  const H = height * CELL_PIXELS;
+  const W = width * cellPixels;
+  const H = height * cellPixels;
   const rgb = new Uint8Array(W * H * 3);
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
-      const i = y * W + x;
-      const v =
-        flat[Math.floor(y / CELL_PIXELS) * width + Math.floor(x / CELL_PIXELS)];
-      if (v === null || isNaN(v)) {
-        rgb.set(emptyColour(y, x, stripes), i * 3);
-        continue;
-      }
-      const scaled = max > min ? Math.round((v - min) * scale) : 255;
-      switch (colour) {
-        case "red":
-          rgb[i * 3] = scaled;
-          break;
-        case "green":
-          rgb[i * 3 + 1] = scaled;
-          break;
-        case "blue":
-          rgb[i * 3 + 2] = scaled;
-          break;
-        case "gray":
-          rgb[i * 3] = scaled;
-          rgb[i * 3 + 1] = scaled;
-          rgb[i * 3 + 2] = scaled;
-          break;
+      const i = (y * W + x) * 3;
+      const r = Math.floor(y / cellPixels);
+      const c = Math.floor(x / cellPixels);
+      const v = flat[r * width + c];
+      const empty = emptyColour(y, x, stripes);
+      const covered = v === null || isNaN(v) ? 0 : (coverage?.[r]?.[c] ?? 1);
+      const scaled = covered && max > min ? (v! - min) * scale : 255;
+      const line = outline?.[r]?.[c] ?? 0;
+      for (let k = 0; k < 3; k++) {
+        const value = lit.includes(k) ? scaled : 0;
+        const out = covered * value + (1 - covered) * empty[k];
+        rgb[i + k] = Math.round(out * (1 - line) + 255 * line);
       }
     }
   }
 
   return ndarray(rgb, [H, W, 3]) as NDT;
 }
+
 /** Placeholder before any data: 3x3 empty cells, matching initialAxes */
 function emptyNdt(stripes: StripeColours): NDT {
   return toRgbNdt(
@@ -183,18 +230,15 @@ export function binEdgesToAxis(edges: number[]): NDT {
   return ndarray(Float64Array.from(edges), [edges.length]) as NDT;
 }
 
-/** /binned answered 503: the data file is behind the catalog, try again shortly */
+/** /binned or /render answered 503: the data file is behind the catalog, try again shortly */
 export type NotReady = { notReady: true; retryAfterMs: number };
 
 /**
- * The binned images of a run, or NotReady when the server says the data isn't
- * written yet (503, waiting as long as its Retry-After asks, 1 s by default).
- * Any other failure throws.
+ * The JSON at `url`, or NotReady when the server says the data isn't written
+ * yet (503, waiting as long as its Retry-After asks, 1 s by default). Any
+ * other failure throws.
  */
-export async function fetchData(
-  uuid: string,
-): Promise<SpectroscopyData | NotReady> {
-  const url = `/api/data/binned/${uuid}`;
+async function fetchJson<T>(url: string): Promise<T | NotReady> {
   const resp = await fetch(url);
   if (resp.status === 503) {
     const seconds = Number(resp.headers.get("Retry-After"));
@@ -208,6 +252,29 @@ export async function fetchData(
   return await resp.json(); // here we should use zod
 }
 
+/** The binned images of a run, or NotReady */
+export function fetchData(uuid: string): Promise<SpectroscopyData | NotReady> {
+  return fetchJson<SpectroscopyData>(`/api/data/binned/${uuid}`);
+}
+
+/** A run drawn by /render over the scan's extent, or NotReady */
+export function fetchRender(
+  uuid: string,
+  kind: Exclude<PlotKind, "cells">,
+): Promise<RenderData | NotReady> {
+  return fetchJson<RenderData>(
+    `/api/data/render/${uuid}?kind=${kind}&size=${RENDER_SIZE}`,
+  );
+}
+
+/** Evenly spaced edges from `start` to `stop` for `count` pixels */
+function pixelEdges(start: number, stop: number, count: number): number[] {
+  return Array.from(
+    { length: count + 1 },
+    (_, i) => start + ((stop - start) * i) / count,
+  );
+}
+
 /** Tries for the final image of a scan, when a 503 isn't followed by another poll */
 const FINAL_POLL_ATTEMPTS = 10;
 
@@ -217,11 +284,37 @@ type PollResult = "done" | "error" | { retryAfterMs: number };
 // initial axes must have min three points...
 const initialAxes = binEdgesToAxis(splitEdges([-0.25, 0.25, 0.5, 0.75]));
 
-/** /binned's answer as plot images, empty cells in the given stripes */
-function toChannels(
-  binned: SpectroscopyData | null,
+/**
+ * /binned's or /render's answer as plot images, empty cells in the given
+ * stripes. A channel the run lacks (the diodes) is drawn all empty.
+ */
+export function toChannels(
+  answer: SpectroscopyData | RenderData | null,
   stripes: StripeColours,
 ): DataChannels {
+  if (answer && "viewport" in answer) {
+    const v = answer.viewport;
+    const ch = answer.channels;
+    const options = {
+      cellPixels: 1,
+      coverage: answer.coverage,
+      outline: DRAW_OUTLINES ? answer.outline : undefined,
+    };
+    const image = (matrix: Matrix | null, colour: RGBColour) =>
+      toRgbNdt(orEmptyLike(matrix, ch.RedTotal), colour, stripes, options);
+    return {
+      cameraRed: image(ch.RedTotal, "red"),
+      cameraGreen: image(ch.GreenTotal, "green"),
+      cameraBlue: image(ch.BlueTotal, "blue"),
+      diodesRed: image(ch.DiodesRed, "red"),
+      diodesGreen: image(ch.DiodesGreen, "green"),
+      diodesBlue: image(ch.DiodesBlue, "blue"),
+      xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
+      yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
+      beam: answer.beam,
+    };
+  }
+  const binned = answer;
   if (!binned) {
     const empty = emptyNdt(stripes);
     return {
@@ -249,8 +342,14 @@ function toChannels(
   };
 }
 
-/** The scan's binned images, polled while it runs, with empty cells in `stripes` */
-export function useSpectroscopyData(stripes: StripeColours = DEFAULT_STRIPES): {
+/**
+ * The scan drawn as `kind`, polled while it runs, with empty cells in
+ * `stripes`
+ */
+export function useSpectroscopyData(
+  kind: PlotKind = "cells",
+  stripes: StripeColours = DEFAULT_STRIPES,
+): {
   data: DataChannels;
   running: boolean;
   status: ScanStatus | null;
@@ -259,9 +358,11 @@ export function useSpectroscopyData(stripes: StripeColours = DEFAULT_STRIPES): {
   const [running, setRunning] = useState<boolean>(false);
   const [status, setStatus] = useState<ScanStatus | null>(null);
   const [uuid, setUuid] = useState<string | null>(null);
-  // kept as /binned answered, so a theme change redraws it without a poll
-  const [binned, setBinned] = useState<SpectroscopyData | null>(null);
-  const data = useMemo(() => toChannels(binned, stripes), [binned, stripes]);
+  // kept as the server answered, so a theme change redraws it without a poll
+  const [answer, setAnswer] = useState<SpectroscopyData | RenderData | null>(
+    null,
+  );
+  const data = useMemo(() => toChannels(answer, stripes), [answer, stripes]);
 
   /** Cached interval id */
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -290,9 +391,12 @@ export function useSpectroscopyData(stripes: StripeColours = DEFAULT_STRIPES): {
     async function poll(): Promise<PollResult> {
       if (!uuid) return "error";
       try {
-        const resp = await fetchData(uuid);
+        const resp = await (kind === "cells"
+          ? fetchData(uuid)
+          : fetchRender(uuid, kind));
+        if (cancelled) return "done"; // the kind or scan changed meanwhile
         if ("notReady" in resp) return resp; // the next poll tries again
-        setBinned(resp);
+        setAnswer(resp);
       } catch (err) {
         console.error("Polling error:", err);
         return "error";
@@ -337,7 +441,7 @@ export function useSpectroscopyData(stripes: StripeColours = DEFAULT_STRIPES): {
         pollInterval.current = null;
       }
     };
-  }, [running, uuid]);
+  }, [running, uuid, kind]);
 
   return { data, running, status };
 }

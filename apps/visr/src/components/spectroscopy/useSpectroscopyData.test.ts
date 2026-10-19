@@ -6,6 +6,7 @@ import {
   splitEdges,
   DEFAULT_STRIPES,
   stripesOn,
+  toChannels,
   toRgbNdt,
 } from "./useSpectroscopyData";
 
@@ -188,5 +189,58 @@ describe("fetchData", () => {
   it("still throws for other errors", async () => {
     respond(500);
     await expect(fetchData("uid")).rejects.toThrow();
+  });
+});
+
+describe("toChannels of /render's answer", () => {
+  const stripes = stripesOn([246, 246, 249]);
+  const answer = {
+    viewport: { x0: 0, x1: 2, y0: 10, y1: 11, width: 2, height: 1 },
+    channels: {
+      RedTotal: [[0, 4]],
+      GreenTotal: [[1, 1]],
+      BlueTotal: [[null, 2]],
+      DiodesRed: [[3, null]],
+      DiodesGreen: null,
+      DiodesBlue: null,
+    },
+    coverage: [[1, 0.5]],
+    outline: [[0, 1]],
+    beam: { x: 1, y: 1, source: "scan step" as const },
+  };
+  const pixel = (image: ReturnType<typeof toRgbNdt>, x: number) =>
+    [0, 1, 2].map(ch => image.get(0, x, ch));
+
+  it("draws one pixel per value, over the viewport's pixel edges", () => {
+    const channels = toChannels(answer, stripes);
+    expect(channels.cameraRed.shape).toEqual([1, 2, 3]);
+    expect(Array.from(channels.xValues.data as Float64Array)).toEqual([
+      0, 1, 2,
+    ]);
+    expect(Array.from(channels.yValues.data as Float64Array)).toEqual([10, 11]);
+    expect(channels.beam).toEqual(answer.beam);
+  });
+
+  it("fades partly covered pixels into the stripes", () => {
+    const channels = toChannels({ ...answer, outline: undefined }, stripes);
+    expect(pixel(channels.cameraRed, 0)).toEqual([0, 0, 0]); // fully covered
+    const [r, g] = pixel(channels.cameraRed, 1); // half 255, half its stripe
+    expect(r).toBe(Math.round(0.5 * 255 + 0.5 * stripes[0][0]));
+    expect(g).toBe(Math.round(0.5 * stripes[0][1]));
+  });
+
+  it("draws outlines in white over the pixels, if asked", () => {
+    const image = toRgbNdt([[0, 4]], "red", stripes, {
+      cellPixels: 1,
+      outline: answer.outline,
+    });
+    expect(pixel(image, 0)).toEqual([0, 0, 0]);
+    expect(pixel(image, 1)).toEqual([255, 255, 255]);
+  });
+
+  it("draws a channel the run lacks, and empty pixels, as stripes", () => {
+    const channels = toChannels({ ...answer, outline: undefined }, stripes);
+    expect(pixel(channels.diodesGreen, 0)).toEqual([...stripes[0]]);
+    expect(pixel(channels.cameraBlue, 0)).toEqual([...stripes[0]]);
   });
 });

@@ -19,9 +19,11 @@ import {
   stripesOn,
   useSpectroscopyData,
   type DataChannels,
+  type PlotKind,
   type Rgb,
   type StripeColours,
 } from "./useSpectroscopyData";
+import { beamWarning } from "./plotKinds";
 import { DataSource } from "./dataSource";
 import {
   SCAN_STATUS_BUSY,
@@ -45,7 +47,7 @@ export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 const SOURCE_CHANNELS: Record<
   DataSource,
-  Record<ChannelKey, keyof DataChannels>
+  Record<ChannelKey, `${"camera" | "diodes"}${"Red" | "Green" | "Blue"}`>
 > = {
   [DataSource.Camera]: {
     red: "cameraRed",
@@ -110,7 +112,14 @@ function ScanStatusText({ status }: { status: ScanStatus }) {
   );
 }
 
-function ScanStatusLine({ status }: { status: ScanStatus | null }) {
+function ScanStatusLine({
+  status,
+  note,
+}: {
+  status: ScanStatus | null;
+  /** A remark about the plots themselves, on the left */
+  note?: string | null;
+}) {
   return (
     <Box
       role="status"
@@ -123,6 +132,15 @@ function ScanStatusLine({ status }: { status: ScanStatus | null }) {
         flexShrink: 0,
       }}
     >
+      {note && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mr: "auto", pr: 2 }}
+        >
+          {note}
+        </Typography>
+      )}
       {status && <ScanStatusText key={status} status={status} />}
     </Box>
   );
@@ -175,12 +193,14 @@ function useStripesBehind(
 
 interface SpectroscopyPlotsProps {
   dataSource: DataSource;
+  plotKind: PlotKind;
   expanded: boolean;
   plotAspectRatio: number | "auto" | "equal";
 }
 
 function SpectroscopyPlots({
   dataSource,
+  plotKind,
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
@@ -188,7 +208,7 @@ function SpectroscopyPlots({
   const stripes = useStripesBehind(
     containerRef as React.RefObject<HTMLElement | null>,
   );
-  const { data, status } = useSpectroscopyData(stripes);
+  const { data, status } = useSpectroscopyData(plotKind, stripes);
   const channels = useMemo(
     () => selectChannels(data, dataSource),
     [data, dataSource],
@@ -344,7 +364,7 @@ function SpectroscopyPlots({
           </ReactGridLayout>
         )}
       </Box>
-      <ScanStatusLine status={status} />
+      <ScanStatusLine status={status} note={beamWarning(plotKind, data.beam)} />
     </Box>
   );
 }

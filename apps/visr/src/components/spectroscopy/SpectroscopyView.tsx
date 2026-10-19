@@ -9,6 +9,7 @@ import { SpectroscopyForm } from "./SpectroscopyForm";
 import SpectroscopyControls from "./SpectroscopyControls";
 import { useInstrumentSession } from "@atlas/app-shell";
 import { DataSource } from "./dataSource";
+import type { PlotKind } from "./useSpectroscopyData";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -27,6 +28,7 @@ const PLOT_ASPECT_RATIO = "equal";
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [dataSource, setDataSource] = useState(DataSource.Camera);
+  const [plotKind, setPlotKind] = useState<PlotKind>("cells");
 
   // -------------------------------------------------------------------------
   // Set off workflow when scan ends
@@ -71,6 +73,7 @@ function SpectroscopyView() {
     >
       <SpectroscopyPlots
         dataSource={dataSource}
+        plotKind={plotKind}
         expanded={!drawerOpen}
         plotAspectRatio={PLOT_ASPECT_RATIO}
       />
@@ -82,6 +85,8 @@ function SpectroscopyView() {
           <SpectroscopyControls
             dataSource={dataSource}
             onSetDataSource={handleSetDataSource}
+            plotKind={plotKind}
+            onSetPlotKind={setPlotKind}
           />,
         ]}
       />
