@@ -1,4 +1,4 @@
-import { type NDT } from "@diamondlightsource/davidia";
+import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useEffect, useRef, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents/useScanEvents";
@@ -94,12 +94,33 @@ export function binEdgesToCentrePoints(edges: number[]): NDT {
   return ndarray(centres, [centres.length]);
 }
 
-async function fetchData(uuid: string): Promise<SpectroscopyData> {
+/** /binned answered 503: the data file is behind the catalog, try again shortly */
+export type NotReady = { notReady: true; retryAfterMs: number };
+
+/**
+ * The binned images of a run, or NotReady when the server says the data isn't
+ * written yet (503, waiting as long as its Retry-After asks, 1 s by default).
+ * Any other failure throws.
+ */
+export async function fetchData(
+  uuid: string,
+): Promise<SpectroscopyData | NotReady> {
   const url = `/api/data/binned/${uuid}`;
   const resp = await fetch(url);
+  if (resp.status === 503) {
+    const seconds = Number(resp.headers.get("Retry-After"));
+    return {
+      notReady: true,
+      retryAfterMs:
+        (Number.isFinite(seconds) && seconds > 0 ? seconds : 1) * 1000,
+    };
+  }
   if (!resp.ok) throw new Error(resp.statusText);
   return await resp.json(); // here we should use zod
 }
+
+/** Tries for the final image of a scan, when a 503 isn't followed by another poll */
+const FINAL_POLL_ATTEMPTS = 10;
 
 // initial axes must have min three points...
 const initialAxes = binEdgesToCentrePoints([-0.25, 0.25, 0.5, 0.75]);
@@ -143,10 +164,14 @@ export function useSpectroscopyData(): {
 
   // Poll during scan + once more afterwards
   useEffect(() => {
-    async function poll() {
-      if (!uuid) return;
+    let cancelled = false;
+
+    /** One poll: the wait the server asks for if it isn't ready, else 0 */
+    async function poll(): Promise<number> {
+      if (!uuid) return 0;
       try {
-        const resp: SpectroscopyData = await fetchData(uuid);
+        const resp = await fetchData(uuid);
+        if ("notReady" in resp) return resp.retryAfterMs; // the next poll tries again
         setData({
           cameraRed: toRgbNdt(resp.RedTotal, "red"),
           cameraGreen: toRgbNdt(resp.GreenTotal, "green"),
@@ -160,20 +185,34 @@ export function useSpectroscopyData(): {
       } catch (err) {
         console.error("Polling error:", err);
       }
+      return 0;
+    }
+
+    /** The last poll after a scan ends: no later poll will follow a 503, so retry */
+    async function finalPoll() {
+      for (
+        let attempt = 0;
+        attempt < FINAL_POLL_ATTEMPTS && !cancelled;
+        attempt++
+      ) {
+        const wait = await poll();
+        if (!wait) return;
+        await new Promise(resolve => setTimeout(resolve, wait));
+      }
     }
 
     if (running && uuid) {
       // start polling
       pollInterval.current = setInterval(poll, 500); // 2 Hz
-    } else if (!running && pollInterval.current) {
-      // poll once more then clear interval
-      poll().finally(() => {
-        clearInterval(pollInterval.current!);
-        pollInterval.current = null;
-      });
+    } else if (!running && uuid) {
+      // The scan has ended: poll once more for its last points. (The previous
+      // run of this effect has already cleared the interval, so this can't
+      // depend on the interval still being set.)
+      void finalPoll();
     }
 
     return () => {
+      cancelled = true;
       if (pollInterval.current) {
         clearInterval(pollInterval.current);
         pollInterval.current = null;
