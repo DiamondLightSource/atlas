@@ -134,7 +134,7 @@ export function TomographyForm() {
           <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
         </ToggleButtonGroup>
         <RunPlanButton
-          name="tomography"
+          name="demo_tomography"
           params={formData}
           instrumentSession={instrumentSession}
           buttonText="Run"
