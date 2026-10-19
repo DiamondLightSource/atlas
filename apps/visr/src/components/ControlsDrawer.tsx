@@ -17,6 +17,9 @@ function ControlsDrawer({ open, onToggle, controls }: ControlsDrawerProps) {
       sx={{
         borderTop: "1px solid",
         borderColor: "divider",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
       }}
     >
       <Box
@@ -47,6 +50,8 @@ function ControlsDrawer({ open, onToggle, controls }: ControlsDrawerProps) {
           alignItems: "flex-start",
           px: { xs: 3, md: 6 },
           pb: 3,
+          overflow: "scroll",
+          padding: 1,
         }}
       >
         {items.map((control, index) => (
