@@ -1,4 +1,4 @@
-import { beamWarning } from "./plotKinds";
+import { beamWarning, plotKindFor } from "./plotKinds";
 
 describe("beamWarning", () => {
   const step = { x: 0.25, y: 0.25, source: "scan step" } as const;
@@ -20,5 +20,18 @@ describe("beamWarning", () => {
     expect(beamWarning("cells", step)).toBeNull();
     expect(beamWarning("rectangles", step)).toBeNull();
     expect(beamWarning("ovals")).toBeNull();
+  });
+});
+
+describe("plotKindFor", () => {
+  it("draws the setpoint grid whatever the shape", () => {
+    expect(plotKindFor("setpoints", "rectangles")).toBe("cells");
+    expect(plotKindFor("setpoints", "ovals")).toBe("cells");
+  });
+
+  it("draws readbacks in the chosen shape", () => {
+    expect(plotKindFor("readbacks", "rectangles")).toBe("rectangles");
+    expect(plotKindFor("readbacks", "gaussian")).toBe("gaussian");
+    expect(plotKindFor("readbacks", "ovals")).toBe("ovals");
   });
 });

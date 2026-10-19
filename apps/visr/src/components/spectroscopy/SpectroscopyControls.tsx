@@ -7,22 +7,33 @@ import {
   Typography,
 } from "@mui/material";
 import { DataSource } from "./dataSource";
-import { PLOT_KINDS } from "./plotKinds";
-import type { PlotKind } from "./useSpectroscopyData";
+import {
+  POSITIONS,
+  READBACK_ONLY_HELP,
+  SHAPES,
+  type Positions,
+  type Shape,
+} from "./plotKinds";
 
 interface Props {
   onSetDataSource: (event: React.ChangeEvent<HTMLInputElement>) => void;
   dataSource: DataSource;
-  onSetPlotKind: (kind: PlotKind) => void;
-  plotKind: PlotKind;
+  positions: Positions;
+  onSetPositions: (positions: Positions) => void;
+  /** The shape for readbacks, kept while the setpoint grid is shown */
+  shape: Shape;
+  onSetShape: (shape: Shape) => void;
 }
 
 export default function Controls({
   onSetDataSource,
   dataSource,
-  onSetPlotKind,
-  plotKind,
+  positions,
+  onSetPositions,
+  shape,
+  onSetShape,
 }: Props) {
+  const onGrid = positions === "setpoints";
   return (
     <Box
       sx={{
@@ -56,21 +67,55 @@ export default function Controls({
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="body2" color="primary">
-          Plot Type
+          Positions
         </Typography>
         <RadioGroup
-          value={plotKind}
-          onChange={event => onSetPlotKind(event.target.value as PlotKind)}
+          row
+          value={positions}
+          onChange={event => onSetPositions(event.target.value as Positions)}
         >
-          {PLOT_KINDS.map(({ kind, label, help }) => (
-            <Tooltip key={kind} title={help} placement="left" describeChild>
+          {POSITIONS.map(({ value, label, help }) => (
+            <Tooltip key={value} title={help} describeChild>
               <FormControlLabel
-                value={kind}
+                value={value}
                 control={<Radio />}
                 label={label}
               />
             </Tooltip>
           ))}
+        </RadioGroup>
+      </Box>
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="body2" color="primary">
+          Plot Type
+        </Typography>
+        <RadioGroup
+          row
+          // the setpoint grid's cells are rectangles
+          value={onGrid ? "rectangles" : shape}
+          onChange={event => onSetShape(event.target.value as Shape)}
+        >
+          {SHAPES.map(({ value, label, help }) => {
+            const disabled = onGrid && value !== "rectangles";
+            return (
+              <Tooltip
+                key={value}
+                title={disabled ? READBACK_ONLY_HELP : help}
+                describeChild
+              >
+                {/* a span, so the tooltip still shows on a disabled option */}
+                <span>
+                  <FormControlLabel
+                    value={value}
+                    control={<Radio />}
+                    label={label}
+                    disabled={disabled}
+                  />
+                </span>
+              </Tooltip>
+            );
+          })}
         </RadioGroup>
       </Box>
     </Box>
