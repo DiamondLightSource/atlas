@@ -2,6 +2,7 @@ import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useEffect, useRef, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents/useScanEvents";
+import type { ScanStatus } from "./scanStatus";
 
 /** SpectroscopyData wrapped as NDT for ease of Davidia plotting */
 export interface DataChannels {
@@ -122,15 +123,20 @@ export async function fetchData(
 /** Tries for the final image of a scan, when a 503 isn't followed by another poll */
 const FINAL_POLL_ATTEMPTS = 10;
 
+/** What one poll got: the data, a failure, or the wait the server asked for */
+type PollResult = "done" | "error" | { retryAfterMs: number };
+
 // initial axes must have min three points...
 const initialAxes = binEdgesToCentrePoints([-0.25, 0.25, 0.5, 0.75]);
 
 export function useSpectroscopyData(): {
   data: DataChannels;
   running: boolean;
+  status: ScanStatus | null;
 } {
   const scanEvent = useScanEvents();
   const [running, setRunning] = useState<boolean>(false);
+  const [status, setStatus] = useState<ScanStatus | null>(null);
   const [uuid, setUuid] = useState<string | null>(null);
   const [data, setData] = useState<DataChannels>({
     cameraRed: EMPTY_NDT,
@@ -154,11 +160,13 @@ export function useSpectroscopyData(): {
     if (scanEvent.status === "running") {
       setRunning(true);
       setUuid(scanEvent.uuid);
+      setStatus("scanning");
     } else if (
       scanEvent.status === "finished" ||
       scanEvent.status === "failed"
     ) {
       setRunning(false); // triggers final poll below
+      if (scanEvent.status === "failed") setStatus("failed");
     }
   }, [scanEvent]);
 
@@ -166,12 +174,11 @@ export function useSpectroscopyData(): {
   useEffect(() => {
     let cancelled = false;
 
-    /** One poll: the wait the server asks for if it isn't ready, else 0 */
-    async function poll(): Promise<number> {
-      if (!uuid) return 0;
+    async function poll(): Promise<PollResult> {
+      if (!uuid) return "error";
       try {
         const resp = await fetchData(uuid);
-        if ("notReady" in resp) return resp.retryAfterMs; // the next poll tries again
+        if ("notReady" in resp) return resp; // the next poll tries again
         setData({
           cameraRed: toRgbNdt(resp.RedTotal, "red"),
           cameraGreen: toRgbNdt(resp.GreenTotal, "green"),
@@ -184,21 +191,29 @@ export function useSpectroscopyData(): {
         });
       } catch (err) {
         console.error("Polling error:", err);
+        return "error";
       }
-      return 0;
+      return "done";
     }
 
     /** The last poll after a scan ends: no later poll will follow a 503, so retry */
     async function finalPoll() {
+      // a failed scan stays "failed", whatever its last points do
+      const settle = (next: ScanStatus) =>
+        setStatus(current => (current === "failed" ? current : next));
       for (
         let attempt = 0;
         attempt < FINAL_POLL_ATTEMPTS && !cancelled;
         attempt++
       ) {
-        const wait = await poll();
-        if (!wait) return;
-        await new Promise(resolve => setTimeout(resolve, wait));
+        const result = await poll();
+        if (cancelled) return;
+        if (result === "done") return settle("complete");
+        if (result === "error") return settle("lastPointsMissing");
+        settle("loadingLastPoints");
+        await new Promise(resolve => setTimeout(resolve, result.retryAfterMs));
       }
+      if (!cancelled) settle("lastPointsMissing");
     }
 
     if (running && uuid) {
@@ -220,5 +235,5 @@ export function useSpectroscopyData(): {
     };
   }, [running, uuid]);
 
-  return { data, running };
+  return { data, running, status };
 }

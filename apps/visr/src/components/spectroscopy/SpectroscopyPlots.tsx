@@ -1,9 +1,20 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Fade, Typography } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useMemo, useState, type ComponentProps } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+} from "react";
 import { useSpectroscopyData, type DataChannels } from "./useSpectroscopyData";
 import { DataSource } from "./dataSource";
+import {
+  SCAN_STATUS_BUSY,
+  SCAN_STATUS_TEXT,
+  type ScanStatus,
+} from "./scanStatus";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -49,6 +60,62 @@ function selectChannels(
 }
 
 // ---------------------------------------------------------------------------
+// Scan status: one quiet line under the plots, at the right
+// ---------------------------------------------------------------------------
+
+const STATUS_COLOUR: Record<ScanStatus, string> = {
+  scanning: "text.secondary",
+  loadingLastPoints: "text.secondary",
+  complete: "text.secondary",
+  lastPointsMissing: "warning.main",
+  failed: "error.main",
+};
+
+/** "Scan complete" fades out after this long; problems stay */
+const COMPLETE_SHOWN_MS = 3000;
+const FADE_MS = 1000;
+
+/** One status's text; remounted when the status changes, so a fade starts afresh */
+function ScanStatusText({ status }: { status: ScanStatus }) {
+  const [shown, setShown] = useState(true);
+  useEffect(() => {
+    if (status !== "complete") return;
+    const timer = setTimeout(() => setShown(false), COMPLETE_SHOWN_MS);
+    return () => clearTimeout(timer);
+  }, [status]);
+  return (
+    <Fade in={shown} timeout={FADE_MS} appear={false}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+        {SCAN_STATUS_BUSY.has(status) && (
+          <CircularProgress size={10} thickness={5} color="inherit" />
+        )}
+        <Typography variant="caption" color={STATUS_COLOUR[status]}>
+          {SCAN_STATUS_TEXT[status]}
+        </Typography>
+      </Box>
+    </Fade>
+  );
+}
+
+function ScanStatusLine({ status }: { status: ScanStatus | null }) {
+  return (
+    <Box
+      role="status"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        minHeight: 20,
+        px: 1,
+        flexShrink: 0,
+      }}
+    >
+      {status && <ScanStatusText key={status} status={status} />}
+    </Box>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -63,7 +130,7 @@ function SpectroscopyPlots({
   expanded,
   plotAspectRatio,
 }: SpectroscopyPlotsProps) {
-  const { data } = useSpectroscopyData();
+  const { data, status } = useSpectroscopyData();
   const channels = useMemo(
     () => selectChannels(data, dataSource),
     [data, dataSource],
@@ -183,32 +250,44 @@ function SpectroscopyPlots({
   // -------------------------------------------------------------------------
   return (
     <Box
-      ref={containerRef! as React.RefObject<HTMLDivElement>}
       sx={{
         flex: "1 1 0",
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
         minWidth: 0,
-        height: gridHeight,
-        minHeight: minimumGridHeight,
-        overflow: "visible",
+        minHeight: 0,
       }}
     >
-      {mounted && (
-        <ReactGridLayout
-          layout={layout}
-          width={width}
-          style={{ height: gridHeight }}
-          gridConfig={{
-            cols: expanded ? 2 : 3,
-            rowHeight: rowHeight,
-            margin: [0, 0],
-          }}
-          autoSize
-          onLayoutChange={() => {}}
-        >
-          {plots}
-        </ReactGridLayout>
-      )}
+      <Box
+        ref={containerRef! as React.RefObject<HTMLDivElement>}
+        sx={{
+          flex: "1 1 0",
+          width: "100%",
+          minWidth: 0,
+          height: gridHeight,
+          minHeight: minimumGridHeight,
+          overflow: "visible",
+        }}
+      >
+        {mounted && (
+          <ReactGridLayout
+            layout={layout}
+            width={width}
+            style={{ height: gridHeight }}
+            gridConfig={{
+              cols: expanded ? 2 : 3,
+              rowHeight: rowHeight,
+              margin: [0, 0],
+            }}
+            autoSize
+            onLayoutChange={() => {}}
+          >
+            {plots}
+          </ReactGridLayout>
+        )}
+      </Box>
+      <ScanStatusLine status={status} />
     </Box>
   );
 }
