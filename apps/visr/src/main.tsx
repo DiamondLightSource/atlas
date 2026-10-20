@@ -1,17 +1,18 @@
 import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
+import "@diamondlightsource/sci-react-ui/font-styles.css";
 import { RouterProvider } from "react-router-dom";
 
-import Spectroscopy from "./routes/Spectroscopy.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient } from "@tanstack/react-query";
-import Workflows from "./routes/Workflows.tsx";
 import { createApi } from "@atlas/blueapi";
-import Tomography from "./routes/Tomography.tsx";
 import { createRouter, type SectionGroup } from "@atlas/app-shell";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
 import { AppProviders } from "./AppProviders.tsx";
+import TomographyView from "./components/tomography/TomographyView.tsx";
+import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
+import Workflows from "./components/workflows/Workflows.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -28,8 +29,8 @@ const navigation: SectionGroup[] = [
         icon: <ScanQrCode />,
         path: "acquisition",
         pages: [
-          { name: "Spectroscopy", element: <Spectroscopy /> },
-          { name: "Tomography", element: <Tomography /> },
+          { name: "Spectroscopy", element: <SpectroscopyView /> },
+          { name: "Tomography", element: <TomographyView /> },
           { name: "Plans", element: <PlanBrowser /> },
         ],
       },

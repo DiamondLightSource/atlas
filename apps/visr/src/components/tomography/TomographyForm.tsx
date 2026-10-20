@@ -1,6 +1,7 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
+import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import {
@@ -10,8 +11,6 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
-import { visitTextToVisit } from "../../utils/common";
 
 enum LightSource {
   LED = "led",
@@ -20,18 +19,29 @@ enum LightSource {
 }
 
 export type TomographyFormData = {
+  scan_type: ScanType;
   number_of_projections: number;
   light_source: LightSource;
+  exposure_time: number;
 };
 
 export function TomographyForm() {
-  const { instrumentSession, setInstrumentSession } = useInstrumentSession();
+  const { instrumentSession } = useInstrumentSession();
   const [formData, setFormData] = useState<TomographyFormData>({
+    scan_type: ScanType.STEP,
     number_of_projections: 360,
     light_source: LightSource.LED,
+    exposure_time: 0.1,
   });
   const minProjections = 30;
   const maxProjections = 1440;
+
+  const setField = <K extends keyof typeof formData>(
+    key: K,
+    value: (typeof formData)[K],
+  ) => setFormData(prev => ({ ...prev, [key]: value }));
+
+  const sectionSx = { pt: 3, borderTop: 1, borderColor: "divider" };
 
   return (
     <Box
@@ -40,48 +50,62 @@ export function TomographyForm() {
         flexDirection: "column",
         gap: 3,
         p: 3,
+        "& .MuiButton-root": {
+          width: "100%",
+          height: 56,
+          whiteSpace: "nowrap",
+        },
+        "& .MuiToggleButtonGroup-root": { height: 56 },
       }}
     >
+      {/* Parameters */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "repeat(3, 1fr)",
+          },
+          columnGap: 3,
+          rowGap: 4,
+          alignItems: "start",
+          pt: 2,
         }}
       >
         <NumberInput
           label="Number of Projections"
-          defaultValue={formData["number_of_projections"]}
           numberMode="natural"
-          onCommit={parsedValue => {
-            setFormData({
-              ...formData,
-              ["number_of_projections"]: parsedValue,
-            });
-          }}
+          defaultValue={formData.number_of_projections}
+          onCommit={v => setField("number_of_projections", v)}
           minValue={minProjections}
           maxValue={maxProjections}
         />
-        <VisitInput
-          visit={
-            visitTextToVisit(instrumentSession ?? undefined) ??
-            visitTextToVisit("cm12345-1") ??
-            undefined
-          }
-          onSubmit={visit => setInstrumentSession(visitToText(visit))}
-          submitButton={false}
+        <NumberInput
+          label="Exposure Time"
+          numberMode="scientific"
+          defaultValue={formData.exposure_time}
+          onCommit={v => setField("exposure_time", v)}
+          minValue={0.1}
         />
-        <FormControl>
-          <FormLabel id="light-source-label" sx={{ mb: 1 }}>
+        <FormControl fullWidth sx={{ position: "relative" }}>
+          <FormLabel
+            id="light-source-label"
+            sx={{
+              position: "absolute",
+              top: -24,
+              left: 0,
+              fontSize: "0.875rem",
+            }}
+          >
             Light Source
           </FormLabel>
           <ToggleButtonGroup
             exclusive
+            fullWidth
             aria-labelledby="light-source-label"
             value={formData.light_source}
-            onChange={(_, value: LightSource | null) =>
-              value && setFormData({ ...formData, light_source: value })
-            }
+            onChange={(_, v) => v && setField("light_source", v)}
           >
             <ToggleButton value={LightSource.LED}>LED</ToggleButton>
             <ToggleButton value={LightSource.SR}>Synchrotron</ToggleButton>
@@ -89,52 +113,50 @@ export function TomographyForm() {
           </ToggleButtonGroup>
         </FormControl>
       </Box>
+
+      {/* Scan controls */}
       <Box
         sx={{
-          display: "flex",
-          flexWrap: "wrap",
+          ...sectionSx,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
           gap: 2,
-          pt: 1,
-          borderTop: 1,
-          borderColor: "divider",
         }}
       >
-        <RunPlanButton
-          name="tomography"
-          params={{ ...formData, fly: false }}
-          instrumentSession={instrumentSession}
-          buttonText="Step Scan"
-        />
-        <RunPlanButton
-          name="tomography"
-          params={{ ...formData, fly: true }}
-          instrumentSession={instrumentSession}
-          buttonText="Fly Scan"
-        />
-        <Box
-          sx={{
-            ml: "auto",
-            "& .MuiButton-root": {
-              backgroundColor: "secondary.main",
-              "&:hover": { backgroundColor: "secondary.dark" },
-            },
-          }}
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          aria-label="Scan type"
+          value={formData.scan_type}
+          onChange={(_, v) => v && setField("scan_type", v)}
         >
-          <RunPlanButton
-            name="darks_flats"
-            params={{ light_source: formData.light_source }}
-            instrumentSession={instrumentSession}
-            buttonText="Acquire Darks/Flats"
-          />
-        </Box>
+          <ToggleButton value={ScanType.STEP}>Step</ToggleButton>
+          <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
+        </ToggleButtonGroup>
+        <RunPlanButton
+          name="demo_tomography"
+          params={formData}
+          instrumentSession={instrumentSession}
+          buttonText="Run"
+        />
+        <AbortButton />
       </Box>
 
+      {/* Darks/flats */}
       <Box
         sx={{
-          display: "flex",
+          ...sectionSx,
         }}
       >
-        <AbortButton />
+        <RunPlanButton
+          name="darks_flats"
+          params={{
+            light_source: formData.light_source,
+            exposure_time: formData.exposure_time,
+          }}
+          instrumentSession={instrumentSession}
+          buttonText="Acquire Darks/Flats"
+        />
       </Box>
     </Box>
   );

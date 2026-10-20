@@ -19,7 +19,7 @@ import type {
 } from "../../graphql/getSessionPlaylistQuery.generated";
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
-import { fillParentTableProps } from "../fillParentTableProps";
+import { diamondFillParentTableProps } from "../diamondTableProps";
 import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
 import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
@@ -128,6 +128,7 @@ export function ExperimentList() {
   const table = useMaterialReactTable({
     columns,
     data: flatExperiments,
+    ...diamondFillParentTableProps,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
@@ -147,11 +148,11 @@ export function ExperimentList() {
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
-    ...fillParentTableProps,
     muiTableBodyRowProps: ({ row }) => {
       const experimentErrorMessage = experimentNotQueueable(row.original);
 
       return {
+        hover: false,
         sx: experimentErrorMessage
           ? { backgroundColor: theme.palette.warning.light }
           : undefined,
@@ -235,7 +236,8 @@ export function ExperimentList() {
     },
 
     state: {
-      isLoading: loading,
+      showSkeletons: loading && !data,
+      showProgressBars: loading && !!data,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error

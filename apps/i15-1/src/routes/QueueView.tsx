@@ -28,7 +28,7 @@ import type { Status, TaskWithPosition } from "../../generated/queue";
 import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
-import { fillParentTableProps } from "../components/fillParentTableProps";
+import { diamondFillParentTableProps } from "../components/diamondTableProps";
 
 export function QueueView() {
   useQueueEvents();
@@ -39,8 +39,19 @@ export function QueueView() {
   const moveTaskMutation = useMoveTask();
   const [showHistoric, setShowHistoric] = useState(false);
 
+  // The latest historic task is prepended to the queue, so wait for both to
+  // avoid briefly showing it on its own.
+  const isLoading = showHistoric
+    ? allTasks.isPending
+    : queuedTasks.isPending || historicTasks.isPending;
+  const error = showHistoric
+    ? allTasks.error
+    : (queuedTasks.error ?? historicTasks.error);
+
   const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
     if (showHistoric) return allTasks.data ?? [];
+
+    if (isLoading) return [];
 
     const queued = queuedTasks.data ?? [];
     const latestHistoricTask = historicTasks.data?.at(-1);
@@ -50,7 +61,13 @@ export function QueueView() {
     }
 
     return [latestHistoricTask, ...queued];
-  }, [historicTasks.data, queuedTasks.data, allTasks.data, showHistoric]);
+  }, [
+    historicTasks.data,
+    isLoading,
+    queuedTasks.data,
+    allTasks.data,
+    showHistoric,
+  ]);
 
   const tableData = useMemo<QueueTableData[]>(() => {
     return getTableData(tasksToDisplay ?? []);
@@ -110,12 +127,21 @@ export function QueueView() {
   const table = useMaterialReactTable({
     columns: columns,
     data: tableData,
+    state: {
+      showSkeletons: isLoading,
+      showAlertBanner: !!error,
+    },
+    muiToolbarAlertBannerProps: error
+      ? { color: "error", children: `Error: ${error.message}` }
+      : undefined,
+    ...diamondFillParentTableProps,
+    // Rows aren't clickable; no hover state.
+    muiTableBodyRowProps: { hover: false },
     enableRowOrdering: true,
     enableRowDragging: true,
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
-    ...fillParentTableProps,
     enableExpanding: true,
     muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
     muiRowDragHandleProps: ({ row, table }) => {
@@ -180,6 +206,9 @@ export function QueueView() {
     ),
 
     renderDetailPanel: ({ row }) => {
+      // Skeleton rows shown while loading have no task
+      if (!row.original.task) return null;
+
       const blueapi_calls = row.original.task.blueapi_calls;
 
       return (

@@ -25,6 +25,7 @@ function TomographyView() {
   // const [revolve, setRevolve] = useState(false);
   const [slice, setSlice] = useState<number>(0);
   const [plane, setPlane] = useState<Plane>(Plane.Z);
+  const [threshold, setThreshold] = useState<number>(38); // 38/255 ≈ 0.15, the renderer's old default
   const [drawerOpen, setDrawerOpen] = useState(true);
 
   // -------------------------------------------------------------------------
@@ -95,6 +96,10 @@ function TomographyView() {
     setPlane(radioValue);
   };
 
+  const handleThreshold = (event: Event, newValue: number | number[]) => {
+    setThreshold(typeof newValue == "number" ? newValue : newValue[0]);
+  };
+
   // revolve to be implemented
 
   if (!volume) return <Box />;
@@ -107,9 +112,8 @@ function TomographyView() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        flex: 1, // fill whatever TabbedPanel gives us
-        minHeight: 480, // below this, the TabbedPanel scroller takes over
         minWidth: 260 * 3,
+        height: "100%",
       }}
     >
       <TomographyPlots
@@ -117,7 +121,9 @@ function TomographyView() {
         volumeVisible={volumeVisible}
         plane={plane}
         slice={slice}
+        threshold={threshold}
         volumeShape={volume.volumeShape}
+        drawerOpen={drawerOpen}
       />
       <ControlsDrawer
         open={drawerOpen}
@@ -127,8 +133,10 @@ function TomographyView() {
           <TomographyControls
             onSlide={handleSlider}
             onSetDirection={handlePlane}
+            onThreshold={handleThreshold}
             plane={plane}
             slice={slice}
+            threshold={threshold}
             volumeShape={volume.volumeShape}
           />,
         ]}

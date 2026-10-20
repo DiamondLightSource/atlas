@@ -41,12 +41,15 @@ function VolumeMesh({
   // Sync scalar uniforms when props change
   useEffect(() => {
     uniforms.threshold.value = threshold;
+    invalidate();
   }, [threshold, uniforms]);
   useEffect(() => {
     uniforms.opacityScale.value = opacityScale;
+    invalidate();
   }, [opacityScale, uniforms]);
   useEffect(() => {
     uniforms.steps.value = steps;
+    invalidate();
   }, [steps, uniforms]);
 
   // Upload volume data to GPU texture

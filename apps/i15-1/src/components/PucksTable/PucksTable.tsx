@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { diamondTableProps } from "../diamondTableProps";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -237,6 +238,9 @@ export function PucksTable() {
   const table = useMaterialReactTable({
     columns,
     data: tableData,
+    ...diamondTableProps,
+    // Rows aren't clickable; no hover state.
+    muiTableBodyRowProps: { hover: false },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableSorting: false,
@@ -252,6 +256,8 @@ export function PucksTable() {
         alignItems="center"
         justifyContent="space-between"
         width="100%"
+        // MRT top-aligns the toolbar row; centre the title against it.
+        sx={{ alignSelf: "center" }}
       >
         <Typography variant="h6" component="h1" textAlign="left">
           Pucks
@@ -259,7 +265,8 @@ export function PucksTable() {
       </Stack>
     ),
     state: {
-      isLoading: loading && !data,
+      showSkeletons: loading && !data,
+      showProgressBars: loading && !!data,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error

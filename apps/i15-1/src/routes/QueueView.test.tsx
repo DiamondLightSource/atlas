@@ -17,6 +17,8 @@ type MockRow = {
 
 type MockTableOptions = {
   data: MockRow[];
+  state?: { showSkeletons?: boolean };
+  muiToolbarAlertBannerProps?: { children?: React.ReactNode };
   renderTopToolbarCustomActions?: () => React.ReactNode;
   renderDetailPanel?: (props: {
     row: { original: MockRow };
@@ -41,6 +43,10 @@ vi.mock("material-react-table", () => ({
         ))}
       </div>
 
+      {table.options.state?.showSkeletons ? (
+        <div className="MuiSkeleton-root" />
+      ) : null}
+      {table.options.muiToolbarAlertBannerProps?.children}
       {table.options.renderTopToolbarCustomActions?.()}
     </div>
   ),
@@ -364,5 +370,66 @@ describe("QueueView", () => {
 
     expect(screen.queryByText("PlanStatusPanel")).not.toBeInTheDocument();
     expect(screen.getByText("JsonView")).toBeInTheDocument();
+  });
+
+  it("shows skeletons while either queue query is pending", () => {
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: undefined,
+      isPending: true,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+
+    const { container } = render(<QueueView />);
+
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
+
+  it("gates skeletons on the all-tasks query when showing historic", () => {
+    vi.spyOn(queueService, "useGetAllTasks").mockReturnValue({
+      data: undefined,
+      isPending: true,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+    vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue({
+      data: [],
+      isPending: false,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
+      data: [],
+      isPending: false,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+
+    const { container } = render(<QueueView />);
+    expect(
+      container.querySelector(".MuiSkeleton-root"),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText(/Show historic tasks/));
+    expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
+
+  it("shows an error banner when a query fails", () => {
+    vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue({
+      data: undefined,
+      isPending: false,
+      error: new Error("boom"),
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+
+    render(<QueueView />);
+
+    expect(screen.getByText("Error: boom")).toBeInTheDocument();
   });
 });
