@@ -1,13 +1,13 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
+import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
-import { Box } from "@mui/material";
-import { visitToText, VisitInput } from "@diamondlightsource/sci-react-ui";
-import { visitTextToVisit } from "../../utils/common";
+import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 export type SpectroscopyFormData = {
+  scan_type: ScanType;
   total_number_of_scan_points: number;
   grid_size: number;
   grid_origin_x: number;
@@ -16,8 +16,9 @@ export type SpectroscopyFormData = {
 };
 
 export function SpectroscopyForm() {
-  const { instrumentSession, setInstrumentSession } = useInstrumentSession();
+  const { instrumentSession } = useInstrumentSession();
   const [formData, setFormData] = useState<SpectroscopyFormData>({
+    scan_type: ScanType.STEP,
     total_number_of_scan_points: 25,
     grid_size: 5.0,
     grid_origin_x: 0.0,
@@ -27,89 +28,105 @@ export function SpectroscopyForm() {
   const minValue = -14.5;
   const maxValue = 14.5;
 
+  const setField = <K extends keyof typeof formData>(
+    key: K,
+    value: (typeof formData)[K],
+  ) => setFormData(prev => ({ ...prev, [key]: value }));
+
+  const sectionSx = { pt: 3, borderTop: 1, borderColor: "divider" };
+
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        p: 3,
+        "& .MuiButton-root": {
+          width: "100%",
+          height: 56,
+          whiteSpace: "nowrap",
+        },
+        "& .MuiToggleButtonGroup-root": { height: 56 },
+      }}
+    >
+      {/* Parameters */}
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "1fr 1fr",
-            md: "1fr 1fr 1fr",
-          },
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
           gap: 3,
-          flexGrow: 1,
+          alignItems: "start",
         }}
       >
-        <NumberInput
-          label="Grid Origin x"
-          numberMode="scientific"
-          defaultValue={formData["grid_origin_x"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_origin_x"]: parsedValue });
-          }}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
-        <NumberInput
-          label="Grid Origin y"
-          numberMode="scientific"
-          defaultValue={formData["grid_origin_y"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_origin_y"]: parsedValue });
-          }}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
+        {/* x and y share one cell */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <NumberInput
+            label="Grid Origin x"
+            numberMode="scientific"
+            defaultValue={formData.grid_origin_x}
+            onCommit={v => setField("grid_origin_x", v)}
+            minValue={minValue}
+            maxValue={maxValue}
+          />
+          <NumberInput
+            label="Grid Origin y"
+            numberMode="scientific"
+            defaultValue={formData.grid_origin_y}
+            onCommit={v => setField("grid_origin_y", v)}
+            minValue={minValue}
+            maxValue={maxValue}
+          />
+        </Box>
         <NumberInput
           label="Grid Size"
           numberMode="scientific"
-          defaultValue={formData["grid_size"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["grid_size"]: parsedValue });
-          }}
+          defaultValue={formData.grid_size}
+          onCommit={v => setField("grid_size", v)}
           minValue={0.1}
           maxValue={15}
         />
         <NumberInput
           label="Number of Points"
           numberMode="natural"
-          defaultValue={formData["total_number_of_scan_points"]}
-          onCommit={parsedValue => {
-            setFormData({
-              ...formData,
-              ["total_number_of_scan_points"]: parsedValue,
-            });
-          }}
+          defaultValue={formData.total_number_of_scan_points}
+          onCommit={v => setField("total_number_of_scan_points", v)}
           minValue={1}
         />
         <NumberInput
           label="Exposure Time"
           numberMode="scientific"
-          defaultValue={formData["exposure_time"]}
-          onCommit={parsedValue => {
-            setFormData({ ...formData, ["exposure_time"]: parsedValue });
-          }}
+          defaultValue={formData.exposure_time}
+          onCommit={v => setField("exposure_time", v)}
           minValue={0.1}
         />
-        <VisitInput
-          visit={
-            visitTextToVisit(instrumentSession!) ??
-            visitTextToVisit("cm12345-1") ??
-            undefined
-          }
-          onSubmit={visit => setInstrumentSession(visitToText(visit))}
-          submitButton={false}
-        />
       </Box>
-      <Box sx={{ mt: 4 }} display={"flex"} justifyContent={"center"}>
+
+      {/* Scan controls */}
+      <Box
+        sx={{
+          ...sectionSx,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+          gap: 2,
+        }}
+      >
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          aria-label="Scan type"
+          value={formData.scan_type}
+          onChange={(_, v) => v && setField("scan_type", v)}
+        >
+          <ToggleButton value={ScanType.STEP}>Step</ToggleButton>
+          <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
+        </ToggleButtonGroup>
         <RunPlanButton
           name="demo_spectroscopy"
           params={formData}
           instrumentSession={instrumentSession}
+          buttonText="Run"
         />
-      </Box>
-      <Box sx={{ mt: 4 }} display={"flex"} justifyContent={"center"}>
         <AbortButton />
       </Box>
     </Box>

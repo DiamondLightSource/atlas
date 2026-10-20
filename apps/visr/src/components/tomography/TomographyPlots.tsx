@@ -16,6 +16,7 @@ interface Props {
   volumeVisible: boolean;
   slice: number;
   plane: Plane;
+  threshold: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ function TomographyPlots({
   volumeShape,
   plane,
   slice,
+  threshold,
   drawerOpen,
 }: Props) {
   const { width, containerRef, mounted } = useContainerWidth();
@@ -96,12 +98,17 @@ function TomographyPlots({
   // -------------------------------------------------------------------------
   const views = [
     <CamPva />,
-    <VolumeRenderer volumeData={volumeData} volumeShape={volumeShape} />,
+    <VolumeRenderer
+      volumeData={volumeData}
+      volumeShape={volumeShape}
+      threshold={threshold / 255}
+    />,
     <SliceViewer
       volumeData={volumeData}
       volumeShape={volumeShape}
       slice={slice}
       plane={plane}
+      threshold={threshold}
     />,
   ];
 

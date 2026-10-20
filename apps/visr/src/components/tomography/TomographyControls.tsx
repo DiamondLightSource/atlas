@@ -11,16 +11,20 @@ import { Plane } from "./plane";
 interface Props {
   onSlide: (event: Event, newValue: number | number[]) => void;
   onSetDirection: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onThreshold: (event: Event, newValue: number | number[]) => void;
   plane: Plane;
   slice: number;
+  threshold: number;
   volumeShape: [number, number, number];
 }
 
 export default function Controls({
   onSlide,
   onSetDirection,
+  onThreshold,
   plane,
   slice,
+  threshold,
   volumeShape,
 }: Props) {
   const maxSlice: Record<Plane, number> = {
@@ -38,6 +42,21 @@ export default function Controls({
         p: 3,
       }}
     >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="body2" color="primary">
+          Threshold
+        </Typography>
+        <Slider
+          min={0}
+          max={254}
+          step={1}
+          value={threshold}
+          onChange={onThreshold}
+          valueLabelDisplay="auto"
+          aria-label="Threshold"
+        />
+      </Box>
+
       <Typography variant="overline" color="primary">
         Slice View
       </Typography>
