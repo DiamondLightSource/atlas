@@ -11,8 +11,8 @@ vi.mock("../components/JsonView", () => ({
 }));
 
 vi.mock("./TaskStatusIcon", () => ({
-  TaskStatusIcon: ({ status }: { status: string }) => (
-    <div data-testid="status-icon">{status}</div>
+  TaskStatusIcon: ({ blueapi_call }: { blueapi_call: BlueapiCallResponse }) => (
+    <div data-testid="status-icon">{blueapi_call.status}</div>
   ),
 }));
 
@@ -77,7 +77,7 @@ describe("PlanStatusPanel", () => {
     });
   });
 
-  it("passes status to TaskStatusIcon", () => {
+  it("passes blueapi call to TaskStatusIcon", () => {
     render(<PlanStatusPanel instrument="i15-1" data={data} />);
 
     const icons = screen.getAllByTestId("status-icon");

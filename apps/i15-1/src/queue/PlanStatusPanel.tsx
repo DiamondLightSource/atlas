@@ -78,7 +78,7 @@ function PlanStatusRow({
             color: "action.active",
           }}
         />
-        <TaskStatusIcon status={blueapi_call.status} />
+        <TaskStatusIcon blueapi_call={blueapi_call} />
         <Typography>{blueapi_call.task_request.name}</Typography>
 
         <TiledLinks

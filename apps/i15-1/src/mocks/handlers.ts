@@ -485,6 +485,7 @@ const fakeHistory = [
             message:
               "<AsyncStatus, device: zebra-inputs-soft_in_1, task: <coroutine object AsyncStatusBase.__init__.<locals>.wait_with_error_message at 0x7f675513d640>, errored: ValueError('0 is not a valid SoftInState')>",
           },
+          "Another error",
         ],
         blueapi_id: "2559ed0a-034e-43df-bf3f-2fe8b525669b",
         tiled_ids: [
