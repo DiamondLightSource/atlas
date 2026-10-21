@@ -84,7 +84,15 @@ export function QueueView({ displayMode = "future" }: QueueViewProps) {
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
-      { accessorKey: "position", header: "Position", size: 100 },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "position",
+              header: "Position",
+              size: 100,
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
       { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
@@ -105,32 +113,37 @@ export function QueueView({ displayMode = "future" }: QueueViewProps) {
             label={cell.getValue<string>()}
             variant="outlined"
             color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
-          ></Chip>
+          />
         ),
       },
-      {
-        accessorKey: "cancel",
-        header: "",
-        size: 150,
-        enableColumnActions: false,
-        Cell: ({ row }) => {
-          const task = row.original;
-          const isDisabled = task.status != "Queued";
-          return (
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              disabled={isDisabled}
-              onClick={() => cancelTasks([task.id])}
-            >
-              Cancel
-            </Button>
-          );
-        },
-      },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "cancel",
+              header: "",
+              size: 150,
+              enableColumnActions: false,
+              Cell: ({ row }) => {
+                const task = row.original;
+                const isDisabled = task.status !== "Queued";
+
+                return (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    disabled={isDisabled}
+                    onClick={() => cancelTasks([task.id])}
+                  >
+                    Cancel
+                  </Button>
+                );
+              },
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
     ],
-    [],
+    [displayMode],
   );
 
   const table = useMaterialReactTable({
@@ -146,8 +159,8 @@ export function QueueView({ displayMode = "future" }: QueueViewProps) {
     ...diamondFillParentTableProps,
     // Rows aren't clickable; no hover state.
     muiTableBodyRowProps: { hover: false },
-    enableRowOrdering: true,
-    enableRowDragging: true,
+    enableRowOrdering: displayMode !== "historic",
+    enableRowDragging: displayMode !== "historic",
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
