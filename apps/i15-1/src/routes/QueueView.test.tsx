@@ -322,7 +322,7 @@ describe("QueueView", () => {
   });
 
   it("enables Clear History when historic tasks visible", () => {
-    const { container, rerender } = render(<QueueView displayMode="all" />);
+    const { rerender } = render(<QueueView displayMode="all" />);
     const button = screen.getByRole("button", {
       name: /clear history/i,
     });

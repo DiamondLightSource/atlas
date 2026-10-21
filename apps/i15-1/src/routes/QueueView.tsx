@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  Chip,
-  FormControlLabel,
-  Stack,
-  Switch,
-} from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Button, Chip, Stack } from "@mui/material";
+import { useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
