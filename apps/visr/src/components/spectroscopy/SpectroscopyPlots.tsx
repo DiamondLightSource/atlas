@@ -10,7 +10,7 @@ import {
 import { useSpectroscopyData } from "./useSpectroscopyData";
 import CamPva from "../CamPva";
 
-const CAMERA_SRC =
+const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-04:PVA:OUTPUT";
 
 const CHANNELS = [
@@ -79,10 +79,10 @@ function SpectroscopyPlots({
   // -------------------------------------------------------------------------
   // Cells
   // -------------------------------------------------------------------------
-  const cameraCell: Cell = {
+  const overviewCell: Cell = {
     key: "overview",
     title: "Overview",
-    content: <CamPva src={CAMERA_SRC} alt="DCAM-01" />,
+    content: <CamPva src={OVERVIEW_SRC} alt="DCAM-01" />,
   };
 
   const channelCells: Cell[] = CHANNELS.map(({ key, label }) => ({
@@ -110,7 +110,7 @@ function SpectroscopyPlots({
   // Drawer closed: 3 channels + composite in a 2x2
   const cells = expanded
     ? [...channelCells, compositeCell]
-    : [cameraCell, ...channelCells, compositeCell];
+    : [overviewCell, ...channelCells, compositeCell];
 
   // -------------------------------------------------------------------------
   // Layout
