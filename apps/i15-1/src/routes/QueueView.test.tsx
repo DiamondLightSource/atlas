@@ -232,7 +232,7 @@ describe("QueueView", () => {
   });
 
   it("renders queue if Show historic tasks is off", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.queryByText("session1")).not.toBeInTheDocument();
@@ -272,7 +272,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session1")).toBeInTheDocument();
@@ -280,7 +280,7 @@ describe("QueueView", () => {
   });
 
   it("renders all tasks if Show historic tasks is on", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     const showHistory = screen.getByLabelText(/Show historic tasks/);
     fireEvent.click(showHistory);
@@ -292,12 +292,12 @@ describe("QueueView", () => {
   });
 
   it("shows QueueStatusPanel", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     expect(screen.getByText("QueueStatusPanel")).toBeInTheDocument();
   });
 
   it("toggles historic tasks switch", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     const showHistory = screen.getByLabelText(/Show historic tasks/);
     expect(showHistory).not.toBeChecked();
@@ -307,7 +307,7 @@ describe("QueueView", () => {
   });
 
   it("enables Clear History when show historic tasks is enabled", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     const showHistory = screen.getByLabelText(/Show historic tasks/);
     const button = screen.getByRole("button", {
@@ -322,7 +322,7 @@ describe("QueueView", () => {
   });
 
   it("calls clearHistory when clicked", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     const clearSpy = vi.spyOn(queueService, "clearHistory");
     const showHistory = screen.getByLabelText(/Show historic tasks/);
@@ -338,7 +338,7 @@ describe("QueueView", () => {
   });
 
   it("renders PlanStatusPanel for Experiment tasks", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByText("PlanStatusPanel")).toBeInTheDocument();
     expect(screen.queryByText("JsonView")).not.toBeInTheDocument();
@@ -366,7 +366,7 @@ describe("QueueView", () => {
       ],
     } as UseQueryResult<TaskWithPosition[], Error>);
 
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.queryByText("PlanStatusPanel")).not.toBeInTheDocument();
     expect(screen.getByText("JsonView")).toBeInTheDocument();
@@ -381,7 +381,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    const { container } = render(<QueueView />);
+    const { container } = render(<QueueView instrument="i15-1" />);
 
     expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
   });
@@ -409,7 +409,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    const { container } = render(<QueueView />);
+    const { container } = render(<QueueView instrument="i15-1" />);
     expect(
       container.querySelector(".MuiSkeleton-root"),
     ).not.toBeInTheDocument();
@@ -428,7 +428,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByText("Error: boom")).toBeInTheDocument();
   });

@@ -6,21 +6,28 @@ import { JsonView } from "../components/JsonView";
 import { TaskStatusIcon } from "./TaskStatusIcon";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
-const TILED_BASE_URL = "https://tiled-ui.diamond.ac.uk/ui/browse/";
+const TILED_BASE_URL = "https://tiled.diamond.ac.uk/ui/browse";
 
 interface TiledLinksRowProps {
+  instrument: string;
+  instrument_session: string;
   tiled_ids: (string | null)[];
   run_numbers: (string | number)[];
 }
 
-function TiledLinks({ tiled_ids, run_numbers }: TiledLinksRowProps) {
+function TiledLinks({
+  instrument,
+  instrument_session,
+  tiled_ids,
+  run_numbers,
+}: TiledLinksRowProps) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
       {tiled_ids.map((tiled_id, index) =>
         tiled_id != null ? (
           <Tooltip title="Open collection in tiled" key={index}>
             <Link
-              href={`${TILED_BASE_URL}${tiled_id}`}
+              href={`${TILED_BASE_URL}/${instrument}/${instrument_session.split("-")[0]}/${instrument_session}/${tiled_id}`}
               target="_blank"
               rel="noopener noreferrer"
               underline="hover"
@@ -45,8 +52,10 @@ function TiledLinks({ tiled_ids, run_numbers }: TiledLinksRowProps) {
 }
 
 function PlanStatusRow({
+  instrument,
   blueapi_call,
 }: {
+  instrument: string;
   blueapi_call: BlueapiCallResponse;
 }) {
   const [open, setOpen] = useState(false);
@@ -73,6 +82,8 @@ function PlanStatusRow({
         <Typography>{blueapi_call.task_request.name}</Typography>
 
         <TiledLinks
+          instrument={instrument}
+          instrument_session={blueapi_call.task_request.instrument_session}
           tiled_ids={blueapi_call.tiled_ids}
           run_numbers={blueapi_call.scan_ids}
         />
@@ -85,11 +96,18 @@ function PlanStatusRow({
   );
 }
 
-export function PlanStatusPanel({ data }: { data: BlueapiCallResponse[] }) {
+export function PlanStatusPanel({
+  instrument,
+  data,
+}: {
+  instrument: string;
+  data: BlueapiCallResponse[];
+}) {
   return (
     <Box>
       {data.map((call, i) => (
         <PlanStatusRow
+          instrument={instrument}
           key={`${call.task_request.name}-${i}`}
           blueapi_call={call}
         />
