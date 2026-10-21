@@ -30,7 +30,11 @@ import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
 
-export function QueueView() {
+interface QueueViewProps {
+  instrument: string;
+}
+
+export function QueueView({ instrument }: QueueViewProps) {
   useQueueEvents();
 
   const queuedTasks = useGetQueuedTasks();
@@ -214,7 +218,7 @@ export function QueueView() {
       return (
         <Box sx={{ p: 2 }}>
           {row.original.task.kind == "Experiment" ? (
-            <PlanStatusPanel data={blueapi_calls} />
+            <PlanStatusPanel instrument={instrument} data={blueapi_calls} />
           ) : (
             <JsonView data={blueapi_calls[0].task_request} />
           )}
