@@ -7,6 +7,7 @@ import type {
   BlueapiCallResponse,
   TaskWithPosition,
 } from "../../generated/queue";
+import { useMaterialReactTable } from "material-react-table";
 
 type MockRow = {
   id: string;
@@ -17,6 +18,12 @@ type MockRow = {
 
 type MockTableOptions = {
   data: MockRow[];
+  columns: {
+    accessorKey?: string;
+    header?: string;
+  }[];
+  enableRowDragging?: boolean;
+  enableRowOrdering?: boolean;
   getRowId?: (originalRow: MockRow) => string;
   state?: {
     showSkeletons?: boolean;
@@ -54,11 +61,13 @@ vi.mock("material-react-table", () => ({
       {table.options.renderTopToolbarCustomActions?.()}
     </div>
   ),
-  useMaterialReactTable: (opts: MockTableOptions) => ({
+  useMaterialReactTable: vi.fn((opts: MockTableOptions) => ({
     options: opts,
     getState: () => ({}),
-  }),
+  })),
 }));
+
+const mockedUseMaterialReactTable = vi.mocked(useMaterialReactTable);
 
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => <div>QueueStatusPanel</div>,
@@ -435,5 +444,42 @@ describe("QueueView", () => {
     render(<QueueView />);
 
     expect(screen.getByText("Error: boom")).toBeInTheDocument();
+  });
+});
+
+describe("QueueView column visibility", () => {
+  beforeEach(() => {
+    mockedUseMaterialReactTable.mockClear();
+  });
+
+  it("shows position and cancel in all mode but hides them in historic mode", () => {
+    const { rerender } = render(<QueueView displayMode="all" />);
+
+    const getLatestOptions = () =>
+      mockedUseMaterialReactTable.mock.calls.at(-1)?.[0];
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).toContain("position");
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).toContain("cancel");
+
+    expect(getLatestOptions()?.enableRowDragging).toBe(true);
+    expect(getLatestOptions()?.enableRowOrdering).toBe(true);
+
+    rerender(<QueueView displayMode="historic" />);
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).not.toContain("position");
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).not.toContain("cancel");
+
+    expect(getLatestOptions()?.enableRowDragging).toBe(false);
+    expect(getLatestOptions()?.enableRowOrdering).toBe(false);
   });
 });
