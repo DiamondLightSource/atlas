@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  Chip,
-  FormControlLabel,
-  Stack,
-  Switch,
-} from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Button, Chip, Stack } from "@mui/material";
+import { useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -30,27 +23,36 @@ import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
 
-export function QueueView() {
+interface QueueViewProps {
+  displayMode?: "future" | "historic" | "all";
+}
+
+export function QueueView({ displayMode = "future" }: QueueViewProps) {
   useQueueEvents();
 
   const queuedTasks = useGetQueuedTasks();
   const allTasks = useGetAllTasks();
   const historicTasks = useGetHistoricTasks();
   const moveTaskMutation = useMoveTask();
-  const [showHistoric, setShowHistoric] = useState(false);
 
   // The latest historic task is prepended to the queue, so wait for both to
   // avoid briefly showing it on its own.
-  const isLoading = showHistoric
-    ? allTasks.isPending
-    : queuedTasks.isPending || historicTasks.isPending;
-  const error = showHistoric
-    ? allTasks.error
-    : (queuedTasks.error ?? historicTasks.error);
+  const isLoading =
+    displayMode === "all"
+      ? allTasks.isPending
+      : displayMode === "future"
+        ? queuedTasks.isPending
+        : historicTasks.isPending;
+  const error =
+    displayMode === "all"
+      ? allTasks.error
+      : displayMode === "future"
+        ? queuedTasks.error
+        : historicTasks.error;
 
   const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
-    if (showHistoric) return allTasks.data ?? [];
-
+    if (displayMode === "all") return allTasks.data ?? [];
+    if (displayMode === "historic") return historicTasks.data ?? [];
     if (isLoading) return [];
 
     const queued = queuedTasks.data ?? [];
@@ -66,7 +68,7 @@ export function QueueView() {
     isLoading,
     queuedTasks.data,
     allTasks.data,
-    showHistoric,
+    displayMode,
   ]);
 
   const tableData = useMemo<QueueTableData[]>(() => {
@@ -75,7 +77,15 @@ export function QueueView() {
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
-      { accessorKey: "position", header: "Position", size: 100 },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "position",
+              header: "Position",
+              size: 100,
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
       { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
@@ -96,32 +106,37 @@ export function QueueView() {
             label={cell.getValue<string>()}
             variant="outlined"
             color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
-          ></Chip>
+          />
         ),
       },
-      {
-        accessorKey: "cancel",
-        header: "",
-        size: 150,
-        enableColumnActions: false,
-        Cell: ({ row }) => {
-          const task = row.original;
-          const isDisabled = task.status != "Queued";
-          return (
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              disabled={isDisabled}
-              onClick={() => cancelTasks([task.id])}
-            >
-              Cancel
-            </Button>
-          );
-        },
-      },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "cancel",
+              header: "",
+              size: 150,
+              enableColumnActions: false,
+              Cell: ({ row }) => {
+                const task = row.original;
+                const isDisabled = task.status !== "Queued";
+
+                return (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    disabled={isDisabled}
+                    onClick={() => cancelTasks([task.id])}
+                  >
+                    Cancel
+                  </Button>
+                );
+              },
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
     ],
-    [],
+    [displayMode],
   );
 
   const table = useMaterialReactTable({
@@ -137,13 +152,14 @@ export function QueueView() {
     ...diamondFillParentTableProps,
     // Rows aren't clickable; no hover state.
     muiTableBodyRowProps: { hover: false },
-    enableRowOrdering: true,
-    enableRowDragging: true,
+    enableRowOrdering: displayMode !== "historic",
+    enableRowDragging: displayMode !== "historic",
     enableSorting: false,
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     enableExpanding: true,
     muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
+    getRowId: (originalRow) => originalRow.id,
     muiRowDragHandleProps: ({ row, table }) => {
       const isDraggable = row.original.status === "Queued";
       return {
@@ -183,19 +199,10 @@ export function QueueView() {
         width="100%"
       >
         <div>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showHistoric}
-                onChange={(e) => setShowHistoric(e.target.checked)}
-              ></Switch>
-            }
-            label="Show historic tasks"
-          ></FormControlLabel>
           <Button
             variant="outlined"
             color="error"
-            disabled={!showHistoric}
+            disabled={displayMode === "future"}
             onClick={() => clearHistory()}
           >
             Clear History

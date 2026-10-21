@@ -73,16 +73,16 @@ const navigation: SectionGroup[] = [
         path: "queue",
         pages: [
           {
-            name: "All queue tasks",
-            element: <QueueView />,
+            name: "Future tasks",
+            element: <QueueView displayMode="future" />,
           },
           {
-            name: "Next tasks",
-            element: <QueueView />,
+            name: "All tasks",
+            element: <QueueView displayMode="all" />,
           },
           {
-            name: "Previous tasks",
-            element: <QueueView />,
+            name: "Historic tasks",
+            element: <QueueView displayMode="historic" />,
           },
         ],
       },

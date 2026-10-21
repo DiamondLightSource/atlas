@@ -7,6 +7,7 @@ import type {
   BlueapiCallResponse,
   TaskWithPosition,
 } from "../../generated/queue";
+import { useMaterialReactTable } from "material-react-table";
 
 type MockRow = {
   id: string;
@@ -17,7 +18,17 @@ type MockRow = {
 
 type MockTableOptions = {
   data: MockRow[];
-  state?: { showSkeletons?: boolean };
+  columns: {
+    accessorKey?: string;
+    header?: string;
+  }[];
+  enableRowDragging?: boolean;
+  enableRowOrdering?: boolean;
+  getRowId?: (originalRow: MockRow) => string;
+  state?: {
+    showSkeletons?: boolean;
+    showAlertBanner?: boolean;
+  };
   muiToolbarAlertBannerProps?: { children?: React.ReactNode };
   renderTopToolbarCustomActions?: () => React.ReactNode;
   renderDetailPanel?: (props: {
@@ -50,11 +61,13 @@ vi.mock("material-react-table", () => ({
       {table.options.renderTopToolbarCustomActions?.()}
     </div>
   ),
-  useMaterialReactTable: (opts: MockTableOptions) => ({
+  useMaterialReactTable: vi.fn((opts: MockTableOptions) => ({
     options: opts,
     getState: () => ({}),
-  }),
+  })),
 }));
+
+const mockedUseMaterialReactTable = vi.mocked(useMaterialReactTable);
 
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => <div>QueueStatusPanel</div>,
@@ -279,16 +292,28 @@ describe("QueueView", () => {
     expect(screen.getByText("session2")).toBeInTheDocument();
   });
 
-  it("renders all tasks if Show historic tasks is on", () => {
-    render(<QueueView />);
+  it("renders queued tasks in future mode", () => {
+    render(<QueueView displayMode="future" />);
 
-    const showHistory = screen.getByLabelText(/Show historic tasks/);
-    fireEvent.click(showHistory);
+    expect(screen.getByTestId("mock-table")).toBeInTheDocument();
+    expect(screen.getByText("session2")).toBeInTheDocument();
+    expect(screen.queryByText("session1")).not.toBeInTheDocument();
+  });
 
-    expect(showHistory).toBeChecked();
+  it("renders all tasks in all mode", () => {
+    render(<QueueView displayMode="all" />);
+
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session1")).toBeInTheDocument();
     expect(screen.getByText("session2")).toBeInTheDocument();
+  });
+
+  it("renders historic tasks in historic mode", () => {
+    render(<QueueView displayMode="historic" />);
+
+    expect(screen.getByTestId("mock-table")).toBeInTheDocument();
+    expect(screen.getByText("session1")).toBeInTheDocument();
+    expect(screen.queryByText("session2")).not.toBeInTheDocument();
   });
 
   it("shows QueueStatusPanel", () => {
@@ -296,38 +321,25 @@ describe("QueueView", () => {
     expect(screen.getByText("QueueStatusPanel")).toBeInTheDocument();
   });
 
-  it("toggles historic tasks switch", () => {
-    render(<QueueView />);
-
-    const showHistory = screen.getByLabelText(/Show historic tasks/);
-    expect(showHistory).not.toBeChecked();
-    fireEvent.click(showHistory);
-
-    expect(showHistory).toBeChecked();
-  });
-
-  it("enables Clear History when show historic tasks is enabled", () => {
-    render(<QueueView />);
-
-    const showHistory = screen.getByLabelText(/Show historic tasks/);
+  it("enables Clear History when historic tasks visible", () => {
+    const { rerender } = render(<QueueView displayMode="all" />);
     const button = screen.getByRole("button", {
       name: /clear history/i,
     });
 
+    expect(button).toBeEnabled();
+
+    rerender(<QueueView displayMode="future" />);
     expect(button).toBeDisabled();
 
-    fireEvent.click(showHistory);
-
+    rerender(<QueueView displayMode="historic" />);
     expect(button).toBeEnabled();
   });
 
   it("calls clearHistory when clicked", () => {
-    render(<QueueView />);
+    render(<QueueView displayMode="all" />);
 
     const clearSpy = vi.spyOn(queueService, "clearHistory");
-    const showHistory = screen.getByLabelText(/Show historic tasks/);
-    fireEvent.click(showHistory);
-
     const button = screen.getByRole("button", {
       name: /clear history/i,
     });
@@ -372,16 +384,17 @@ describe("QueueView", () => {
     expect(screen.getByText("JsonView")).toBeInTheDocument();
   });
 
-  it("shows skeletons while either queue query is pending", () => {
+  it("shows skeletons while historic tasks are pending", () => {
     vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue({
       data: undefined,
       isPending: true,
+      error: null,
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
       TaskWithPosition[],
       Error
     >);
 
-    const { container } = render(<QueueView />);
+    const { container } = render(<QueueView displayMode="historic" />);
 
     expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
   });
@@ -409,12 +422,12 @@ describe("QueueView", () => {
       Error
     >);
 
-    const { container } = render(<QueueView />);
+    const { container, rerender } = render(<QueueView displayMode="future" />);
     expect(
       container.querySelector(".MuiSkeleton-root"),
     ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText(/Show historic tasks/));
+    rerender(<QueueView displayMode="all" />);
     expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
   });
 
@@ -431,5 +444,42 @@ describe("QueueView", () => {
     render(<QueueView />);
 
     expect(screen.getByText("Error: boom")).toBeInTheDocument();
+  });
+});
+
+describe("QueueView column visibility", () => {
+  beforeEach(() => {
+    mockedUseMaterialReactTable.mockClear();
+  });
+
+  it("shows position and cancel in all mode but hides them in historic mode", () => {
+    const { rerender } = render(<QueueView displayMode="all" />);
+
+    const getLatestOptions = () =>
+      mockedUseMaterialReactTable.mock.calls.at(-1)?.[0];
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).toContain("position");
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).toContain("cancel");
+
+    expect(getLatestOptions()?.enableRowDragging).toBe(true);
+    expect(getLatestOptions()?.enableRowOrdering).toBe(true);
+
+    rerender(<QueueView displayMode="historic" />);
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).not.toContain("position");
+
+    expect(
+      getLatestOptions()?.columns.map((column) => column.accessorKey),
+    ).not.toContain("cancel");
+
+    expect(getLatestOptions()?.enableRowDragging).toBe(false);
+    expect(getLatestOptions()?.enableRowOrdering).toBe(false);
   });
 });
