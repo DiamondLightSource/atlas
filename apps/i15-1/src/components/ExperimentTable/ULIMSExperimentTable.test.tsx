@@ -409,6 +409,43 @@ describe("ExperimentList", () => {
     expect(hasParentRow).not.toHaveAttribute("title");
   });
 
+  it("does not highlight skeleton rows as invalid while loading", () => {
+    mockedUseQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const { container } = renderComponent();
+
+    const skeletonRow = container
+      .querySelector(".MuiSkeleton-root")
+      ?.closest("tr");
+
+    expect(skeletonRow).toBeInTheDocument();
+    expect(skeletonRow).not.toHaveStyle({
+      backgroundColor: testTheme.palette.warning.light,
+    });
+    expect(skeletonRow).not.toHaveAttribute("title");
+  });
+
+  it("disables selection and 'Add all to queue' while loading with no rows", () => {
+    mockedUseQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    renderComponent();
+
+    for (const checkbox of screen.getAllByRole("checkbox")) {
+      expect(checkbox).toBeDisabled();
+    }
+    expect(
+      screen.getByRole("button", { name: /Add all to queue/ }),
+    ).toBeDisabled();
+  });
+
   it("re-queries with new proposal/session when the instrument session changes", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
