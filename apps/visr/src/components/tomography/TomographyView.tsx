@@ -5,6 +5,7 @@ import { TomographyForm } from "./TomographyForm";
 import { Plane } from "./plane";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
+import { useSharedState } from "../../hooks/useSharedState";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -21,12 +22,13 @@ interface Volume {
 
 function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
-  const [volumeVisible, setVolumeVisible] = useState(true);
   // const [revolve, setRevolve] = useState(false);
-  const [slice, setSlice] = useState<number>(0);
-  const [plane, setPlane] = useState<Plane>(Plane.Z);
-  const [threshold, setThreshold] = useState<number>(38); // 38/255 ≈ 0.15, the renderer's old default
   const [drawerOpen, setDrawerOpen] = useState(true);
+
+  // Shared across all open tabs (and restored on reload)
+  const [slice, setSlice] = useSharedState("tomography:slice", 0);
+  const [plane, setPlane] = useSharedState<Plane>("tomography:plane", Plane.Z);
+  const [threshold, setThreshold] = useSharedState("tomography:threshold", 38); // 38/255 ≈ 0.15, the renderer's old default
 
   // -------------------------------------------------------------------------
   // Load test volume
@@ -51,58 +53,31 @@ function TomographyView() {
   }, []);
 
   // -------------------------------------------------------------------------
-  // Persist values across multiple open tabs
-  // -------------------------------------------------------------------------
-  useEffect(() => {
-    localStorage.setItem("plane", plane.toString());
-    localStorage.setItem("volumeVisible", volumeVisible.toString());
-    localStorage.setItem("slice", slice.toString());
-  }, [plane, volumeVisible, slice]);
-
-  useEffect(() => {
-    const onReceiveMessage = (e: StorageEvent) => {
-      const { key, newValue } = e;
-      switch (key) {
-        case "plane": {
-          setPlane(Number(newValue));
-          break;
-        }
-        case "volumeVisible": {
-          setVolumeVisible(Boolean(newValue));
-          break;
-        }
-        case "slice": {
-          setSlice(Number(newValue));
-          break;
-        }
-      }
-    };
-    window.addEventListener("storage", onReceiveMessage);
-    return () => {
-      window.removeEventListener("storage", onReceiveMessage);
-    };
-  }, []);
-
-  // -------------------------------------------------------------------------
   // Handlers
   // -------------------------------------------------------------------------
-  const handleSlider = (event: Event, newValue: number | number[]) => {
-    const slice = typeof newValue == "number" ? newValue : newValue[0];
-    setSlice(slice);
+  const handleSlider = (_event: Event, newValue: number | number[]) => {
+    setSlice(typeof newValue === "number" ? newValue : newValue[0]);
   };
 
   const handlePlane = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const radioValue = Number((event.target as HTMLInputElement).value);
-    setPlane(radioValue);
+    setPlane(Number(event.target.value) as Plane);
   };
 
-  const handleThreshold = (event: Event, newValue: number | number[]) => {
-    setThreshold(typeof newValue == "number" ? newValue : newValue[0]);
+  const handleThreshold = (_event: Event, newValue: number | number[]) => {
+    setThreshold(typeof newValue === "number" ? newValue : newValue[0]);
   };
 
   // revolve to be implemented
 
   if (!volume) return <Box />;
+
+  // Another tab may switch to an axis with fewer slices, so clamp locally
+  const maxSlice: Record<Plane, number> = {
+    [Plane.Z]: volume.volumeShape[0] - 1,
+    [Plane.Y]: volume.volumeShape[1] - 1,
+    [Plane.X]: volume.volumeShape[2] - 1,
+  };
+  const clampedSlice = Math.min(slice, maxSlice[plane]);
 
   // -------------------------------------------------------------------------
   // Render
@@ -118,9 +93,9 @@ function TomographyView() {
     >
       <TomographyPlots
         volumeData={volume.volumeData}
-        volumeVisible={volumeVisible}
+        volumeVisible={true}
         plane={plane}
-        slice={slice}
+        slice={clampedSlice}
         threshold={threshold}
         volumeShape={volume.volumeShape}
         drawerOpen={drawerOpen}
@@ -129,13 +104,14 @@ function TomographyView() {
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={[
-          <TomographyForm />,
+          <TomographyForm key="form" />,
           <TomographyControls
+            key="controls"
             onSlide={handleSlider}
             onSetDirection={handlePlane}
             onThreshold={handleThreshold}
             plane={plane}
-            slice={slice}
+            slice={clampedSlice}
             threshold={threshold}
             volumeShape={volume.volumeShape}
           />,
