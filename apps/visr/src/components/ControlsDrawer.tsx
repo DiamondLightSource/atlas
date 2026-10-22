@@ -7,9 +7,16 @@ interface ControlsDrawerProps {
   open: boolean;
   onToggle: () => void;
   controls: ReactNode | ReactNode[];
+  /** Shown in the header, so it stays visible when the drawer is closed */
+  status?: ReactNode;
 }
 
-function ControlsDrawer({ open, onToggle, controls }: ControlsDrawerProps) {
+function ControlsDrawer({
+  open,
+  onToggle,
+  controls,
+  status,
+}: ControlsDrawerProps) {
   const items = Children.toArray(controls);
 
   return (
@@ -27,12 +34,23 @@ function ControlsDrawer({ open, onToggle, controls }: ControlsDrawerProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          gap: 2,
           px: 2,
           height: 80,
           flexShrink: 0,
         }}
       >
         <Typography variant="overline">Controls</Typography>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          {status}
+        </Box>
         <IconButton
           onClick={onToggle}
           aria-label={open ? "Collapse" : "Expand"}
