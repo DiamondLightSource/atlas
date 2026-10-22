@@ -11,6 +11,8 @@ import { useInstrumentSession } from "@atlas/app-shell";
 import { DataSource } from "./dataSource";
 import { plotKindFor, type Positions, type Shape } from "./plotKinds";
 import { useSharedState } from "../../hooks/useSharedState";
+import { useScanStatus } from "../../hooks/useScanStatus";
+import ScanStatusLine, { type LastPointsStatus } from "../ScanStatusLine";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -28,6 +30,8 @@ const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const scanStatus = useScanStatus();
+  const [lastPoints, setLastPoints] = useState<LastPointsStatus | null>(null);
 
   // Shared across all open tabs (and restored on reload)
   const [dataSource, setDataSource] = useSharedState<DataSource>(
@@ -89,10 +93,12 @@ function SpectroscopyView() {
         plotKind={plotKindFor(positions, shape)}
         expanded={!drawerOpen}
         plotAspectRatio={PLOT_ASPECT_RATIO}
+        onLastPointsChange={setLastPoints}
       />
       <ControlsDrawer
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
+        status={<ScanStatusLine status={scanStatus} lastPoints={lastPoints} />}
         controls={[
           <SpectroscopyForm key="form" />,
           <SpectroscopyControls

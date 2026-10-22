@@ -1,10 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  Fade,
-  Typography,
-  useColorScheme,
-} from "@mui/material";
+import { Box, Typography, useColorScheme } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
 import {
@@ -25,11 +19,7 @@ import {
 } from "./useSpectroscopyData";
 import { beamWarning } from "./plotKinds";
 import { DataSource } from "./dataSource";
-import {
-  SCAN_STATUS_BUSY,
-  SCAN_STATUS_TEXT,
-  type ScanStatus,
-} from "./scanStatus";
+import type { LastPointsStatus } from "../ScanStatusLine";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -75,73 +65,25 @@ function selectChannels(
 }
 
 // ---------------------------------------------------------------------------
-// Scan status: one quiet line under the plots, at the right
+// A remark about the plots themselves, in one quiet line under them
 // ---------------------------------------------------------------------------
 
-const STATUS_COLOUR: Record<ScanStatus, string> = {
-  scanning: "text.secondary",
-  loadingLastPoints: "text.secondary",
-  complete: "text.secondary",
-  lastPointsMissing: "warning.main",
-  failed: "error.main",
-};
-
-/** "Scan complete" fades out after this long; problems stay */
-const COMPLETE_SHOWN_MS = 3000;
-const FADE_MS = 1000;
-
-/** One status's text; remounted when the status changes, so a fade starts afresh */
-function ScanStatusText({ status }: { status: ScanStatus }) {
-  const [shown, setShown] = useState(true);
-  useEffect(() => {
-    if (status !== "complete") return;
-    const timer = setTimeout(() => setShown(false), COMPLETE_SHOWN_MS);
-    return () => clearTimeout(timer);
-  }, [status]);
-  return (
-    <Fade in={shown} timeout={FADE_MS} appear={false}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-        {SCAN_STATUS_BUSY.has(status) && (
-          <CircularProgress size={10} thickness={5} color="inherit" />
-        )}
-        <Typography variant="caption" color={STATUS_COLOUR[status]}>
-          {SCAN_STATUS_TEXT[status]}
-        </Typography>
-      </Box>
-    </Fade>
-  );
-}
-
-function ScanStatusLine({
-  status,
-  note,
-}: {
-  status: ScanStatus | null;
-  /** A remark about the plots themselves, on the left */
-  note?: string | null;
-}) {
+function PlotNote({ note }: { note: string | null }) {
   return (
     <Box
-      role="status"
       sx={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "flex-end",
         minHeight: 20,
         px: 1,
         flexShrink: 0,
       }}
     >
       {note && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ mr: "auto", pr: 2 }}
-        >
+        <Typography variant="caption" color="text.secondary">
           {note}
         </Typography>
       )}
-      {status && <ScanStatusText key={status} status={status} />}
     </Box>
   );
 }
@@ -196,6 +138,8 @@ interface SpectroscopyPlotsProps {
   plotKind: PlotKind;
   expanded: boolean;
   plotAspectRatio: number | "auto" | "equal";
+  /** Told whether the last points are in, for the scan status */
+  onLastPointsChange?: (lastPoints: LastPointsStatus | null) => void;
 }
 
 function SpectroscopyPlots({
@@ -203,12 +147,16 @@ function SpectroscopyPlots({
   plotKind,
   expanded,
   plotAspectRatio,
+  onLastPointsChange,
 }: SpectroscopyPlotsProps) {
   const { width, containerRef, mounted } = useContainerWidth();
   const stripes = useStripesBehind(
     containerRef as React.RefObject<HTMLElement | null>,
   );
-  const { data, status } = useSpectroscopyData(plotKind, stripes);
+  const { data, lastPoints } = useSpectroscopyData(plotKind, stripes);
+  useEffect(() => {
+    onLastPointsChange?.(lastPoints);
+  }, [lastPoints, onLastPointsChange]);
   const channels = useMemo(
     () => selectChannels(data, dataSource),
     [data, dataSource],
@@ -364,7 +312,7 @@ function SpectroscopyPlots({
           </ReactGridLayout>
         )}
       </Box>
-      <ScanStatusLine status={status} note={beamWarning(plotKind, data.beam)} />
+      <PlotNote note={beamWarning(plotKind, data.beam)} />
     </Box>
   );
 }
