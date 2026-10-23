@@ -1,0 +1,25 @@
+{
+  "name": "@atlas/p48",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@atlas/app-shell": "workspace:*",
+    "@diamondlightsource/sci-react-ui": "0.7.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.11",
+    "lucide-react": "^1.60.0",
+    "react-router-dom": "^7.18.1"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "vite": "^7.3.1",
+    "vitest": "^5.0.5"
+  }
+}
