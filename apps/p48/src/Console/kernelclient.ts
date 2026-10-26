@@ -8,16 +8,16 @@ import type { Kernel } from "@jupyterlab/services";
 export interface KernelClientOptions {
   baseUrl?: string;
   wsUrl?: string;
-  token?: string;
+  // token?: string;
 }
 
 export function makeServerSettings(opts: KernelClientOptions = {}) {
   return ServerConnection.makeSettings({
     baseUrl: opts.baseUrl ?? "http://localhost:8888",
     wsUrl: opts.wsUrl ?? "ws://localhost:8888",
-    token: opts.token ?? "",
+    // token: opts.token ?? "",
 
-    appendToken: !!opts.token,
+    // appendToken: !!opts.token,
   });
 }
 
@@ -29,7 +29,7 @@ export function makeKernelManager(
 
 export async function startKernel(
   kernelManager: KernelManager,
-  name: "python3",
+  name: string,
 ): Promise<Kernel.IKernelConnection> {
   await kernelManager.ready;
   return kernelManager.startNew({ name });

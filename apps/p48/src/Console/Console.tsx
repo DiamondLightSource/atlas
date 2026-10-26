@@ -9,7 +9,10 @@ import { Log, type LogEntry } from "./Log";
 import { executeCode, makeKernelManager, startKernel } from "./kernelclient";
 import { Kernel } from "@jupyterlab/services";
 
-const kernelManager = makeKernelManager();
+const kernelManager = makeKernelManager({
+  baseUrl: `${window.location.origin}/api/scripting/`,
+  wsUrl: `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/scripting/`,
+});
 
 export const Console = () => {
   // kernel status
@@ -27,7 +30,7 @@ export const Console = () => {
   const [kernel, setKernel] = useState<Kernel.IKernelConnection | null>(null);
   const getKernel = useCallback((): Promise<Kernel.IKernelConnection> => {
     if (!kernelRef.current) {
-      kernelRef.current = startKernel(kernelManager, "python3")
+      kernelRef.current = startKernel(kernelManager, "pykernel-dls")
         .then((kernel) => {
           setKernel(kernel);
           setStatus("ready");
