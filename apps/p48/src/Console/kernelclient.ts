@@ -2,22 +2,26 @@
 // making the connection to JKG/JEG and requesting the creation of kernels,
 // making them directly available to React components e.g. Console
 
-import { ServerConnection, KernelManager } from "@jupyterlab/services";
+import {
+  ServerConnection,
+  KernelManager,
+  KernelMessage,
+} from "@jupyterlab/services";
 import type { Kernel } from "@jupyterlab/services";
 
 export interface KernelClientOptions {
   baseUrl?: string;
   wsUrl?: string;
-  // token?: string;
+  token?: string;
 }
 
 export function makeServerSettings(opts: KernelClientOptions = {}) {
   return ServerConnection.makeSettings({
     baseUrl: opts.baseUrl ?? "http://localhost:8888",
     wsUrl: opts.wsUrl ?? "ws://localhost:8888",
-    // token: opts.token ?? "",
+    token: opts.token ?? "",
 
-    // appendToken: !!opts.token,
+    appendToken: !!opts.token,
   });
 }
 
@@ -48,29 +52,22 @@ export function executeCode(
   const future = kernel.requestExecute({ code });
 
   future.onIOPub = (msg) => {
-    switch (msg.header.msg_type) {
-      case "stream": {
-        const content = msg.content as any;
-        onOutput({ kind: "stream", text: content.text });
-        break;
+    if (KernelMessage.isStreamMsg(msg)) {
+      onOutput({ kind: "stream", text: msg.content.text });
+    } else if (
+      KernelMessage.isExecuteResultMsg(msg) ||
+      KernelMessage.isDisplayDataMsg(msg)
+    ) {
+      const text = msg.content.data["text/plain"];
+
+      if (typeof text === "string") {
+        onOutput({ kind: "result", text });
       }
-      case "execute_result":
-      case "display_data": {
-        const data = (msg.content as any).data ?? {};
-        if (data["text/plain"]) {
-          onOutput({ kind: "result", text: data["text/plain"] });
-        }
-        break;
-      }
-      case "error": {
-        const content = msg.content as any;
-        onOutput({
-          kind: "error",
-          text: `${content.ename}: ${content.evalue}`,
-        });
-      }
-      default:
-        break; // status, execute_impl, etc - ignore for minimal REPL
+    } else if (KernelMessage.isErrorMsg(msg)) {
+      onOutput({
+        kind: "error",
+        text: `${msg.content.ename}: ${msg.content.evalue}`,
+      });
     }
   };
 

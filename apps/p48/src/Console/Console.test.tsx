@@ -73,7 +73,7 @@ describe("Console", () => {
     await waitFor(() => {
       expect(mocks.startKernel).toHaveBeenCalledWith(
         expect.anything(),
-        "python3",
+        "pykernel-dls",
       );
     });
   }

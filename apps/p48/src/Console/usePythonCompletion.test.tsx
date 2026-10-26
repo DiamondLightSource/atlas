@@ -1,4 +1,4 @@
-import { act, computeHeadingLevel, renderHook } from "@atlas/vitest-conf";
+import { act, renderHook } from "@atlas/vitest-conf";
 import type { Kernel } from "@jupyterlab/services";
 import { usePythonCompletion } from "./usePythonCompletion";
 

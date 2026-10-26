@@ -16,7 +16,7 @@ const kernelManager = makeKernelManager({
 
 export const Console = () => {
   // kernel status
-  const [status, setStatus] = useState<"connecting" | "ready" | "error">(
+  const [, setStatus] = useState<"connecting" | "ready" | "error">(
     "connecting",
   );
   // prompt state, needs consolidating with the above
