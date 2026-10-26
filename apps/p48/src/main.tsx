@@ -4,9 +4,9 @@ import { RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
-import { router } from "./router.tsx";
+import { router } from "./router";
 
-import { AppProviders } from "./AppProviders.tsx";
+import { AppProviders } from "./AppProviders";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
