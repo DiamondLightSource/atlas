@@ -29,7 +29,9 @@ type MockTableOptions = {
   state?: {
     showSkeletons?: boolean;
     showAlertBanner?: boolean;
+    showProgressBars?: boolean;
   };
+
   muiToolbarAlertBannerProps?: { children?: React.ReactNode };
   renderTopToolbarCustomActions?: () => React.ReactNode;
   renderDetailPanel?: (props: {
@@ -57,6 +59,9 @@ vi.mock("material-react-table", () => ({
 
       {table.options.state?.showSkeletons ? (
         <div className="MuiSkeleton-root" />
+      ) : null}
+      {table.options.state?.showProgressBars ? (
+        <div role="progressbar" />
       ) : null}
       {table.options.muiToolbarAlertBannerProps?.children}
       {table.options.renderTopToolbarCustomActions?.()}
@@ -260,7 +265,7 @@ describe("QueueView", () => {
   });
 
   it("renders queue if Show historic tasks is off", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.queryByText("session1")).not.toBeInTheDocument();
@@ -268,7 +273,7 @@ describe("QueueView", () => {
   });
 
   it("renders queued tasks in future mode", () => {
-    render(<QueueView displayMode="future" />);
+    render(<QueueView displayMode="future" instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session2")).toBeInTheDocument();
@@ -276,7 +281,7 @@ describe("QueueView", () => {
   });
 
   it("renders all tasks in all mode", () => {
-    render(<QueueView displayMode="all" />);
+    render(<QueueView displayMode="all" instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session1")).toBeInTheDocument();
@@ -284,7 +289,7 @@ describe("QueueView", () => {
   });
 
   it("renders historic tasks in historic mode", () => {
-    render(<QueueView displayMode="historic" />);
+    render(<QueueView displayMode="historic" instrument="i15-1" />);
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session1")).toBeInTheDocument();
@@ -292,27 +297,29 @@ describe("QueueView", () => {
   });
 
   it("shows QueueStatusPanel", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     expect(screen.getByText("QueueStatusPanel")).toBeInTheDocument();
   });
 
   it("enables Clear History when historic tasks visible", () => {
-    const { rerender } = render(<QueueView displayMode="all" />);
+    const { rerender } = render(
+      <QueueView displayMode="all" instrument="i15-1" />,
+    );
     const button = screen.getByRole("button", {
       name: /clear history/i,
     });
 
     expect(button).toBeEnabled();
 
-    rerender(<QueueView displayMode="future" />);
+    rerender(<QueueView displayMode="future" instrument="i15-1" />);
     expect(button).toBeDisabled();
 
-    rerender(<QueueView displayMode="historic" />);
+    rerender(<QueueView displayMode="historic" instrument="i15-1" />);
     expect(button).toBeEnabled();
   });
 
   it("calls clearHistory when clicked", () => {
-    render(<QueueView displayMode="all" />);
+    render(<QueueView displayMode="all" instrument="i15-1" />);
 
     const clearSpy = vi.spyOn(queueService, "clearHistory");
     const button = screen.getByRole("button", {
@@ -325,7 +332,7 @@ describe("QueueView", () => {
   });
 
   it("renders PlanStatusPanel for Experiment tasks", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByText("PlanStatusPanel")).toBeInTheDocument();
     expect(screen.queryByText("JsonView")).not.toBeInTheDocument();
@@ -353,7 +360,7 @@ describe("QueueView", () => {
       ],
     } as UseQueryResult<TaskWithPosition[], Error>);
 
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.queryByText("PlanStatusPanel")).not.toBeInTheDocument();
     expect(screen.getByText("JsonView")).toBeInTheDocument();
@@ -369,9 +376,29 @@ describe("QueueView", () => {
       Error
     >);
 
-    const { container } = render(<QueueView displayMode="historic" />);
+    const { container } = render(
+      <QueueView displayMode="historic" instrument="i15-1" />,
+    );
 
     expect(container.querySelector(".MuiSkeleton-root")).toBeInTheDocument();
+  });
+
+  it("shows a progress bar, not skeletons, when refetching with data", () => {
+    vi.spyOn(queueService, "useGetTasks").mockReturnValue({
+      data: [],
+      isPending: false,
+      isFetching: true,
+    } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
+      TaskWithPosition[],
+      Error
+    >);
+
+    const { container } = render(<QueueView instrument="i15-1" />);
+
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(
+      container.querySelector(".MuiSkeleton-root"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows an error banner when a query fails", () => {
@@ -384,7 +411,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByText("Error: boom")).toBeInTheDocument();
   });
@@ -396,7 +423,9 @@ describe("QueueView column visibility", () => {
   });
 
   it("shows position and cancel in all mode but hides them in historic mode", () => {
-    const { rerender } = render(<QueueView displayMode="all" />);
+    const { rerender } = render(
+      <QueueView displayMode="all" instrument="i15-1" />,
+    );
 
     const getLatestOptions = () =>
       mockedUseMaterialReactTable.mock.calls.at(-1)?.[0];
@@ -412,7 +441,7 @@ describe("QueueView column visibility", () => {
     expect(getLatestOptions()?.enableRowDragging).toBe(true);
     expect(getLatestOptions()?.enableRowOrdering).toBe(true);
 
-    rerender(<QueueView displayMode="historic" />);
+    rerender(<QueueView displayMode="historic" instrument="i15-1" />);
 
     expect(
       getLatestOptions()?.columns.map((column) => column.accessorKey),

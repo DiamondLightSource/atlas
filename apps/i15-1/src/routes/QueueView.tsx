@@ -8,9 +8,6 @@ import {
 import {
   cancelTasks,
   clearHistory,
-  useGetAllTasks,
-  useGetHistoricTasks,
-  useGetQueuedTasks,
   useGetTasks,
   useMoveTask,
   useQueueEvents,
@@ -18,24 +15,28 @@ import {
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import { calculateNewPosition, getTableData } from "../queue/queueUtils";
-import type { Status, TaskWithPosition } from "../../generated/queue";
+import type { Status } from "../../generated/queue";
 import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
-import type { UseQueryResult } from "@tanstack/react-query";
 
 interface QueueViewProps {
   displayMode?: "future" | "historic" | "all";
+  instrument: string;
 }
 
-export function QueueView({ displayMode = "future" }: QueueViewProps) {
+export function QueueView({
+  displayMode = "future",
+  instrument,
+}: QueueViewProps) {
   useQueueEvents();
 
   const tasks = useGetTasks(displayMode);
   const moveTaskMutation = useMoveTask();
 
   const isLoading = tasks.isPending;
+  const isFetching = tasks.isFetching;
   const error = tasks.error;
 
   const tableData = useMemo<QueueTableData[]>(() => {
@@ -111,6 +112,7 @@ export function QueueView({ displayMode = "future" }: QueueViewProps) {
     data: tableData,
     state: {
       showSkeletons: isLoading,
+      showProgressBars: isFetching && !isLoading,
       showAlertBanner: !!error,
     },
     muiToolbarAlertBannerProps: error
@@ -188,7 +190,7 @@ export function QueueView({ displayMode = "future" }: QueueViewProps) {
       return (
         <Box sx={{ p: 2 }}>
           {row.original.task.kind == "Experiment" ? (
-            <PlanStatusPanel data={blueapi_calls} />
+            <PlanStatusPanel instrument={instrument} data={blueapi_calls} />
           ) : (
             <JsonView data={blueapi_calls[0].task_request} />
           )}
