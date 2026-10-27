@@ -333,6 +333,7 @@ export function prependLatestFailedTask(
   return queue;
 }
 
+// We should do this differently, see https://github.com/DiamondLightSource/atlas/issues/251
 export function useGetQueuedTasksWithLastFailed() {
   const queuedTasks = useGetQueuedTasks();
   const latestHistoricTask = useGetLatestHistoricTask();
