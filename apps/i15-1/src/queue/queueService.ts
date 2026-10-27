@@ -322,31 +322,46 @@ export function useGetLatestHistoricTask() {
   };
 }
 
+export function prependLatestFailedTask(
+  queue: TaskWithPosition[],
+  latest: TaskWithPosition | undefined,
+): TaskWithPosition[] {
+  if (latest?.status === "Error") {
+    return [latest, ...queue];
+  }
+
+  return queue;
+}
+
 export function useGetQueuedTasksWithLastFailed() {
   const queuedTasks = useGetQueuedTasks();
   const latestHistoricTask = useGetLatestHistoricTask();
 
-  const data = useMemo(() => {
-    const queue = queuedTasks.data ?? [];
-    const latest = latestHistoricTask.data;
-
-    if (latest?.status === "Error") {
-      return [latest, ...queue];
-    }
-
-    return queue;
-  }, [queuedTasks.data, latestHistoricTask.data]);
+  const data = useMemo(
+    () =>
+      prependLatestFailedTask(queuedTasks.data ?? [], latestHistoricTask.data),
+    [queuedTasks.data, latestHistoricTask.data],
+  );
 
   return {
+    ...queuedTasks,
     data,
     error: queuedTasks.error ?? latestHistoricTask.error,
-    isPending:
-      queuedTasks.data === undefined || latestHistoricTask.data === undefined,
+    isPending: queuedTasks.isPending || latestHistoricTask.isPending,
     isFetching: queuedTasks.isFetching || latestHistoricTask.isFetching,
   };
 }
 
-export function useGetTasks(mode: "future" | "historic" | "all") {
+export type TaskQueryResult = {
+  data: TaskWithPosition[] | undefined;
+  error: Error | null;
+  isPending: boolean;
+  isFetching: boolean;
+};
+
+export function useGetTasks(
+  mode: "future" | "historic" | "all",
+): TaskQueryResult {
   const futureTasks = useGetQueuedTasksWithLastFailed();
   const historicTasks = useGetHistoricTasks();
   const allTasks = useGetAllTasks();
