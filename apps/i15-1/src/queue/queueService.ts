@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import axios, { type AxiosInstance } from "axios";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type {
   QueueState,
   TaskCancelRequest,
@@ -18,7 +18,7 @@ import { client } from "../../generated/queue/client.gen";
 // with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 const QUEUE_SOCKET: string = USE_LOCAL
-  ? "http://127.0.0.1:8001"
+  ? "http://127.0.0.1:8005"
   : "/api/daq-queue";
 
 client.setConfig({ baseUrl: QUEUE_SOCKET });
@@ -311,4 +311,54 @@ export function useSumbitQueueTasks() {
       console.error(error.message);
     },
   });
+}
+
+export function useGetLatestHistoricTask() {
+  const historicTasks = useGetHistoricTasks();
+
+  return {
+    ...historicTasks,
+    data: historicTasks.data?.at(-1),
+  };
+}
+
+export function useGetQueuedTasksWithLastFailed() {
+  const queuedTasks = useGetQueuedTasks();
+  const latestHistoricTask = useGetLatestHistoricTask();
+
+  const data = useMemo(() => {
+    const queue = queuedTasks.data ?? [];
+    const latest = latestHistoricTask.data;
+
+    if (latest?.status === "Error") {
+      return [latest, ...queue];
+    }
+
+    return queue;
+  }, [queuedTasks.data, latestHistoricTask.data]);
+
+  return {
+    data,
+    error: queuedTasks.error ?? latestHistoricTask.error,
+    isPending:
+      queuedTasks.data === undefined || latestHistoricTask.data === undefined,
+    isFetching: queuedTasks.isFetching || latestHistoricTask.isFetching,
+  };
+}
+
+export function useGetTasks(mode: "future" | "historic" | "all") {
+  const futureTasks = useGetQueuedTasksWithLastFailed();
+  const historicTasks = useGetHistoricTasks();
+  const allTasks = useGetAllTasks();
+
+  switch (mode) {
+    case "future":
+      return futureTasks;
+
+    case "historic":
+      return historicTasks;
+
+    case "all":
+      return allTasks;
+  }
 }

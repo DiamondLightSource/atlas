@@ -11,6 +11,7 @@ import {
   useGetAllTasks,
   useGetHistoricTasks,
   useGetQueuedTasks,
+  useGetTasks,
   useMoveTask,
   useQueueEvents,
 } from "../queue/queueService";
@@ -22,6 +23,7 @@ import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
+import type { UseQueryResult } from "@tanstack/react-query";
 
 interface QueueViewProps {
   displayMode?: "future" | "historic" | "all";
@@ -30,50 +32,15 @@ interface QueueViewProps {
 export function QueueView({ displayMode = "future" }: QueueViewProps) {
   useQueueEvents();
 
-  const queuedTasks = useGetQueuedTasks();
-  const allTasks = useGetAllTasks();
-  const historicTasks = useGetHistoricTasks();
+  const tasks = useGetTasks(displayMode);
   const moveTaskMutation = useMoveTask();
 
-  // The latest historic task is prepended to the queue, so wait for both to
-  // avoid briefly showing it on its own.
-  const isLoading =
-    displayMode === "all"
-      ? allTasks.isPending
-      : displayMode === "future"
-        ? queuedTasks.isPending
-        : historicTasks.isPending;
-  const error =
-    displayMode === "all"
-      ? allTasks.error
-      : displayMode === "future"
-        ? queuedTasks.error
-        : historicTasks.error;
-
-  const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
-    if (displayMode === "all") return allTasks.data ?? [];
-    if (displayMode === "historic") return historicTasks.data ?? [];
-    if (isLoading) return [];
-
-    const queued = queuedTasks.data ?? [];
-    const latestHistoricTask = historicTasks.data?.at(-1);
-
-    if (latestHistoricTask == null || latestHistoricTask.status !== "Error") {
-      return queued;
-    }
-
-    return [latestHistoricTask, ...queued];
-  }, [
-    historicTasks.data,
-    isLoading,
-    queuedTasks.data,
-    allTasks.data,
-    displayMode,
-  ]);
+  const isLoading = tasks.isPending;
+  const error = tasks.error;
 
   const tableData = useMemo<QueueTableData[]>(() => {
-    return getTableData(tasksToDisplay ?? []);
-  }, [tasksToDisplay]);
+    return getTableData(tasks.data ?? []);
+  }, [tasks.data]);
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
