@@ -56,7 +56,12 @@ const queryClient = new QueryClient();
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <AppProviders api={api} queryClient={queryClient} theme={DiamondDSTheme}>
+      <AppProviders
+        authProvider={authProvider}
+        api={api}
+        queryClient={queryClient}
+        theme={DiamondDSTheme}
+      >
         <RouterProvider router={router} />
       </AppProviders>
     </StrictMode>,

@@ -5,6 +5,9 @@ import { render, screen } from "@atlas/vitest-conf";
 import { AppProviders } from "./AppProviders";
 import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
 
+vi.mock("./components/InstrumentSessionSelection/InstrumentSession", () => ({
+  useInstrumentSessions: vi.fn(() => []),
+}));
 describe("AppProviders", () => {
   it("renders the given children", () => {
     const queryClient = new QueryClient();
@@ -14,6 +17,7 @@ describe("AppProviders", () => {
 
     render(
       <AppProviders
+        authProvider={authProvider}
         queryClient={queryClient}
         api={blueapi}
         theme={DiamondDSTheme}
