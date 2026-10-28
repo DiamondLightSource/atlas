@@ -14,19 +14,12 @@ ui-base:
         external:
           uri: http://p48-blueapi.diamond.ac.uk
 
-    - id: workflows
-      path: /api/workflows
-      rewriteTarget: /graphql
-      target:
-        external:
-          uri: https://workflows.diamond.ac.uk
-
     - id: tiled
       path: /api/data/
       rewriteTarget: /api/v1/
       target:
         service:
-          name: b01-1-tiled
+          name: p48-tiled
           port: 8000
 
     - id: supergraph
