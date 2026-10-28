@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { authProvider } from "./auth";
 import { render, screen } from "@atlas/vitest-conf";
 import { AppProviders } from "./AppProviders";
+import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
 
 describe("AppProviders", () => {
   it("renders the given children", () => {
@@ -12,7 +13,11 @@ describe("AppProviders", () => {
     const App = () => <div data-testid="my-app" />;
 
     render(
-      <AppProviders queryClient={queryClient} api={blueapi}>
+      <AppProviders
+        queryClient={queryClient}
+        api={blueapi}
+        theme={DiamondDSTheme}
+      >
         <App />
       </AppProviders>,
     );
