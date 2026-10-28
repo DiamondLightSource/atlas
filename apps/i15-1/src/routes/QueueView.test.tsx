@@ -399,7 +399,7 @@ describe("QueueView", () => {
       Error
     >);
 
-    const { container } = render(<QueueView />);
+    const { container } = render(<QueueView instrument="i15-1" />);
 
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
     expect(
