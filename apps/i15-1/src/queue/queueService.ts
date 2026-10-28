@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import axios, { type AxiosInstance } from "axios";
+import { type AxiosInstance } from "axios";
 import { useEffect, useRef } from "react";
 import type {
   QueueState,
@@ -12,16 +12,18 @@ import type {
 } from "../../generated/queue";
 import { addTasksToQueueQueuePost } from "../../generated/queue";
 import { client } from "../../generated/queue/client.gen";
+import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
+import { authProvider } from "../auth";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
 // with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
-const QUEUE_SOCKET: string = USE_LOCAL
+const QUEUE_URL: string = USE_LOCAL
   ? "http://127.0.0.1:8001"
   : "/api/daq-queue";
 
-client.setConfig({ baseUrl: QUEUE_SOCKET });
+client.setConfig({ baseUrl: QUEUE_URL });
 
 const handlers = {
   state_update: "state",
@@ -33,8 +35,10 @@ const handlers = {
 };
 
 export function createQueueApiClient(baseURL: string): AxiosInstance {
-  return axios.create({ baseURL });
+  return createAxiosWithLoginRedirect(authProvider.login, { baseURL });
 }
+
+const queueClient = createQueueApiClient(QUEUE_URL);
 
 export function useQueueEvents() {
   const queryClient = useQueryClient();
@@ -43,7 +47,7 @@ export function useQueueEvents() {
   useEffect(() => {
     if (!connected) return;
 
-    const source = new EventSource(QUEUE_SOCKET + "/events");
+    const source = new EventSource(QUEUE_URL + "/events");
 
     Object.entries(handlers).forEach(([eventName, queryKey]) => {
       source.addEventListener(eventName, (event) => {
@@ -66,7 +70,7 @@ export function useQueueEvents() {
 }
 
 const getQueueHealth = async (): Promise<QueueState> => {
-  const response = await axios.get<QueueState>(QUEUE_SOCKET + "/healthz");
+  const response = await queueClient.get<QueueState>("/healthz");
   return response.data;
 };
 
@@ -103,7 +107,9 @@ export function useConnected() {
 }
 
 const getQueueState = async (): Promise<QueueState> => {
-  const response = await axios.get<QueueState>(QUEUE_SOCKET + "/queue/state");
+  const response = await queueClient.get<QueueState>(
+    QUEUE_URL + "/queue/state",
+  );
   return response.data;
 };
 
@@ -119,9 +125,11 @@ export function useGetQueueState() {
 }
 
 export const patchQueueState = async (paused: boolean): Promise<QueueState> => {
-  const response = await axios.patch<QueueState>(
-    QUEUE_SOCKET + "/queue/state",
-    { paused: paused },
+  const response = await queueClient.patch<QueueState>(
+    QUEUE_URL + "/queue/state",
+    {
+      paused: paused,
+    },
   );
   return response.data;
 };
@@ -159,7 +167,9 @@ export function useToggleQueueState() {
 }
 
 const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/queue");
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/queue",
+  );
   return response.data;
 };
 
@@ -175,7 +185,9 @@ export function useGetQueuedTasks() {
 }
 
 const getAllTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/tasks");
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/tasks",
+  );
   return response.data;
 };
 
@@ -191,8 +203,8 @@ export function useGetAllTasks() {
 }
 
 const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(
-    QUEUE_SOCKET + "/history",
+  const response = await queueClient.get<TaskWithPosition[]>(
+    QUEUE_URL + "/history",
   );
   return response.data;
 };
@@ -211,8 +223,8 @@ export function useGetHistoricTasks() {
 export const cancelTasks = async (
   taskIds: string[],
 ): Promise<TaskWithPosition[]> => {
-  const response = await axios.delete<TaskWithPosition[]>(
-    QUEUE_SOCKET + "/queue/tasks",
+  const response = await queueClient.delete<TaskWithPosition[]>(
+    QUEUE_URL + "/queue/tasks",
     {
       data: {
         task_ids: taskIds,
@@ -240,8 +252,8 @@ export const moveTask = async ({
   taskId: string;
   newPosition: number;
 }): Promise<number> => {
-  const response = await axios.post<number>(
-    QUEUE_SOCKET + "/queue/move",
+  const response = await queueClient.post<number>(
+    QUEUE_URL + "/queue/move",
     null,
     {
       params: {
@@ -265,7 +277,7 @@ export function useMoveTask() {
 }
 
 export const clearHistory = async (): Promise<number> => {
-  const response = await axios.delete<number>(QUEUE_SOCKET + "/history");
+  const response = await queueClient.delete<number>(QUEUE_URL + "/history");
 
   return response.data;
 };
