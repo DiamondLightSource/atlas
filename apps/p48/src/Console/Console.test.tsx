@@ -1,5 +1,6 @@
-import { render, screen, userEvent, waitFor } from "@atlas/vitest-conf";
+import { screen, userEvent, waitFor } from "@atlas/vitest-conf";
 import { Console } from "./Console";
+import { renderWithProviders } from "./TestUtils";
 
 const mocks = vi.hoisted(() => ({
   command: "print('hello')",
@@ -88,7 +89,7 @@ describe("Console", () => {
     await user.click(submitButton);
   }
   it("executes a complete command and logs its result", async () => {
-    render(<Console />);
+    renderWithProviders(<Console />);
 
     await waitForKernelConnection();
 
@@ -123,7 +124,7 @@ describe("Console", () => {
       content: { status: "incomplete" },
     });
 
-    render(<Console />);
+    renderWithProviders(<Console />);
 
     await waitForKernelConnection();
 
@@ -143,7 +144,7 @@ describe("Console", () => {
   // careful with the whitespace in this test...
   // it's Python whaddyouwant?
   it("constructs multiline commands", async () => {
-    render(<Console />);
+    renderWithProviders(<Console />);
     await waitForKernelConnection();
 
     mocks.kernel.requestIsComplete.mockResolvedValue({
@@ -177,10 +178,10 @@ describe("Console", () => {
     ...
     {stdout}
     so you'd want to mark the second and third commands
-    (the third being empty) as partial, so that they render
+    (the third being empty) as partial, so that they renderWithProviders
     with a different prompt icon
     */
-    render(<Console />);
+    renderWithProviders(<Console />);
     await waitForKernelConnection();
 
     mocks.kernel.requestIsComplete.mockResolvedValue({
@@ -202,7 +203,7 @@ describe("Console", () => {
   });
 
   it("handles execution errors accordingly", async () => {
-    render(<Console />);
+    renderWithProviders(<Console />);
 
     const errorMessage = "NameError: name 'hi' is not defined";
     mocks.executeCode.mockImplementation(async (_kernel, _command, onChunk) => {
