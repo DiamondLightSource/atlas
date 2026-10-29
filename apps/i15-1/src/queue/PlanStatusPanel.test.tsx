@@ -35,7 +35,7 @@ const data = [
     tiled_ids: [],
     scan_ids: [],
   },
-] as BlueapiCallResponse[];
+] as unknown as BlueapiCallResponse[];
 
 describe("PlanStatusPanel", () => {
   it("renders all plans", () => {
@@ -143,7 +143,7 @@ describe("TiledLinks", () => {
         tiled_ids: [null, "789"],
         scan_ids: ["20000", "20001"],
       },
-    ] as BlueapiCallResponse[];
+    ] as unknown as BlueapiCallResponse[];
 
     render(<PlanStatusPanel instrument="i15-1" data={dataWithNullId} />);
 
