@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { useEffect, useMemo, useRef } from "react";
 import { type AxiosInstance } from "axios";
-import { useEffect, useRef } from "react";
 import type {
   QueueState,
   TaskCancelRequest,
@@ -323,4 +322,70 @@ export function useSumbitQueueTasks() {
       console.error(error.message);
     },
   });
+}
+
+export function useGetLatestHistoricTask() {
+  const historicTasks = useGetHistoricTasks();
+
+  return {
+    ...historicTasks,
+    data: historicTasks.data?.at(-1),
+  };
+}
+
+export function prependLatestFailedTask(
+  queue: TaskWithPosition[],
+  latest: TaskWithPosition | undefined,
+): TaskWithPosition[] {
+  if (latest?.status === "Error") {
+    return [latest, ...queue];
+  }
+
+  return queue;
+}
+
+// We should do this differently, see https://github.com/DiamondLightSource/atlas/issues/251
+export function useGetQueuedTasksWithLastFailed() {
+  const queuedTasks = useGetQueuedTasks();
+  const latestHistoricTask = useGetLatestHistoricTask();
+
+  const data = useMemo(
+    () =>
+      prependLatestFailedTask(queuedTasks.data ?? [], latestHistoricTask.data),
+    [queuedTasks.data, latestHistoricTask.data],
+  );
+
+  return {
+    ...queuedTasks,
+    data,
+    error: queuedTasks.error ?? latestHistoricTask.error,
+    isPending: queuedTasks.isPending || latestHistoricTask.isPending,
+    isFetching: queuedTasks.isFetching || latestHistoricTask.isFetching,
+  };
+}
+
+export type TaskQueryResult = {
+  data: TaskWithPosition[] | undefined;
+  error: Error | null;
+  isPending: boolean;
+  isFetching: boolean;
+};
+
+export function useGetTasks(
+  mode: "future" | "historic" | "all",
+): TaskQueryResult {
+  const futureTasks = useGetQueuedTasksWithLastFailed();
+  const historicTasks = useGetHistoricTasks();
+  const allTasks = useGetAllTasks();
+
+  switch (mode) {
+    case "future":
+      return futureTasks;
+
+    case "historic":
+      return historicTasks;
+
+    case "all":
+      return allTasks;
+  }
 }

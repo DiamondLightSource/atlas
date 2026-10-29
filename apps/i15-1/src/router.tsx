@@ -78,16 +78,18 @@ const navigation: SectionGroup[] = [
         isProtected: true,
         pages: [
           {
-            name: "All queue tasks",
-            element: <QueueView instrument={INSTRUMENT} />,
+            name: "Future tasks",
+            element: <QueueView displayMode="future" instrument={INSTRUMENT} />,
           },
           {
-            name: "Next tasks",
-            element: <QueueView instrument={INSTRUMENT} />,
+            name: "All tasks",
+            element: <QueueView displayMode="all" instrument={INSTRUMENT} />,
           },
           {
-            name: "Previous tasks",
-            element: <QueueView instrument={INSTRUMENT} />,
+            name: "Historic tasks",
+            element: (
+              <QueueView displayMode="historic" instrument={INSTRUMENT} />
+            ),
           },
         ],
       },
