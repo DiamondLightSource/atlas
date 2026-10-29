@@ -8,6 +8,7 @@ import {
 import { Layout } from "./Layout";
 import React from "react";
 import { TabbedPanel } from "./TabbedRoute";
+import { AuthGuard } from "./AuthGuard";
 
 describe("createRouter", () => {
   const props: RouterProps = {
@@ -26,6 +27,7 @@ describe("createRouter", () => {
           },
           {
             name: "route2",
+            isProtected: true,
             path: "r2",
             icon: <div />,
             pages: [
@@ -79,14 +81,31 @@ describe("createRouter", () => {
     });
   });
 
-  it("creates child routes with TabbedPanel element", () => {
+  /**
+   * Helper to find the original section from the RouteObject
+   * and see whether it's protected */
+  const isProtected = (route: RouteObject) => {
+    const path = route.path!;
+    console.log("Finding section with path", path);
+    const section = props.navigation
+      .flatMap((group) => group.sections)
+      .find((section) => section.path === path);
+
+    return section?.isProtected;
+  };
+
+  it("creates child routes with TabbedPanel element, wrapped in AuthGuard if protected", () => {
     const children: RouteObject[] = router.routes[0].children!.filter(
       (child) => !child.index,
     );
 
     children.forEach((child) => {
       const element = getReactElement(child.element);
-      expect(element.type).toBe(TabbedPanel);
+      if (isProtected(child)) {
+        expect(element.type).toBe(AuthGuard);
+      } else {
+        expect(element.type).toBe(TabbedPanel);
+      }
 
       // TODO: test props: basePath, tabs
     });
