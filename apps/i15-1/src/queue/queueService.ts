@@ -18,7 +18,7 @@ import { client } from "../../generated/queue/client.gen";
 // with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 const QUEUE_SOCKET: string = USE_LOCAL
-  ? "http://127.0.0.1:8005"
+  ? "http://127.0.0.1:8001"
   : "/api/daq-queue";
 
 client.setConfig({ baseUrl: QUEUE_SOCKET });
