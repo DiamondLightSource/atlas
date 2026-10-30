@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export interface SystemControlsProps {
   open: boolean;
@@ -9,16 +9,13 @@ export function SystemControls({ open, children }: SystemControlsProps) {
   return (
     <Box
       sx={{
-        p: 2,
-        mt: "auto",
+        py: 2,
         display: "flex",
         justifyContent: "center",
         flexDirection: "column",
         alignItems: "center",
-        gap: 1,
       }}
     >
-      <Divider sx={{ width: "100%", mb: 1 }} />
       {open && (
         <Typography
           fontSize={14}
