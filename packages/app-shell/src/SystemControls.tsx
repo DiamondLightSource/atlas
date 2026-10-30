@@ -5,29 +5,22 @@ export interface SystemControlsProps {
   children?: React.ReactNode;
 }
 export function SystemControls({ open, children }: SystemControlsProps) {
-  // This component is designed to be the footer prop in the SideNav component.
   return (
-    <Box
-      sx={{
-        py: 2,
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <Box paddingY={2}>
       {open && (
-        <Typography
-          fontSize={14}
-          color="grey"
-          sx={{
-            alignSelf: "flex-start",
-          }}
-        >
+        <Typography variant="overline" color="textSecondary" noWrap={true}>
           SYSTEM CONTROLS
         </Typography>
       )}
-      {children}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }
