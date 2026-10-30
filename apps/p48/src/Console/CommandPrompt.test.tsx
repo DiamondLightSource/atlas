@@ -62,7 +62,7 @@ describe("CommandPrompt", () => {
       expect(interruptButton).toBeDisabled();
     });
 
-    it("shows disabled submit and enabled interrupt when evaluating", () => {
+    it("shows disabled prompt and submit and enabled interrupt when evaluating", () => {
       render(
         <CommandPrompt
           placeholder="Enter command..."
@@ -72,6 +72,10 @@ describe("CommandPrompt", () => {
           status="evaluating"
         />,
       );
+
+      const prompt = screen.getByRole("textbox", { name: /python command/i });
+      expect(prompt).toBeDisabled();
+
       const submitButton = screen.getByRole("button", { name: /Run command/i });
       expect(submitButton).toBeDisabled();
 
@@ -79,6 +83,28 @@ describe("CommandPrompt", () => {
         name: /Interrupt/i,
       });
       expect(interruptButton).toBeEnabled();
+    });
+
+    it("disables prompt and both buttons in 'unavailable' state", () => {
+      render(
+        <CommandPrompt
+          placeholder=""
+          onSubmit={() => {}}
+          interrupt={() => {}}
+          kernel={null}
+          status="unavailable"
+        />,
+      );
+
+      const prompt = screen.getByRole("textbox", { name: /python command/i });
+      const submitButton = screen.getByRole("button", { name: /Run command/i });
+      const interruptButton = screen.getByRole("button", {
+        name: /Interrupt/i,
+      });
+
+      expect(prompt).toBeDisabled();
+      expect(submitButton).toBeDisabled();
+      expect(interruptButton).toBeDisabled();
     });
   });
   describe("command submission/interruption", () => {
