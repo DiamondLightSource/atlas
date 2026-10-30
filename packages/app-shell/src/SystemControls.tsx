@@ -1,36 +1,26 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export interface SystemControlsProps {
   open: boolean;
   children?: React.ReactNode;
 }
 export function SystemControls({ open, children }: SystemControlsProps) {
-  // This component is designed to be the footer prop in the SideNav component.
   return (
-    <Box
-      sx={{
-        p: 2,
-        mt: "auto",
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 1,
-      }}
-    >
-      <Divider sx={{ width: "100%", mb: 1 }} />
+    <Box paddingY={2}>
       {open && (
-        <Typography
-          fontSize={14}
-          color="grey"
-          sx={{
-            alignSelf: "flex-start",
-          }}
-        >
+        <Typography variant="overline" color="textSecondary" noWrap={true}>
           SYSTEM CONTROLS
         </Typography>
       )}
-      {children}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }
