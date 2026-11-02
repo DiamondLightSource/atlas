@@ -59,6 +59,10 @@ vi.mock("material-react-table", () => ({
   }),
 }));
 
+vi.mock("../queue/QueueEstimatedRuntime", () => ({
+  QueueEstimatedRuntime: () => <div>QueueEstimatedRuntime</div>,
+}));
+
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => <div>QueueStatusPanel</div>,
 }));
@@ -112,9 +116,12 @@ describe("QueueView", () => {
               blueapi_id: "1",
               tiled_ids: [],
               scan_ids: [],
+              runtime: null,
             },
           ],
           kind: "Experiment",
+          runtime: null,
+          estimated_runtime: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -150,9 +157,12 @@ describe("QueueView", () => {
               blueapi_id: "0",
               tiled_ids: [],
               scan_ids: [],
+              runtime: null,
             },
           ],
           kind: "Plan",
+          runtime: null,
+          estimated_runtime: null,
         },
         {
           id: "1",
@@ -219,6 +229,8 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
+          runtime: null,
+          estimated_runtime: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<
@@ -268,6 +280,8 @@ describe("QueueView", () => {
           },
           blueapi_calls: [],
           kind: "Experiment",
+          runtime: null,
+          estimated_runtime: null,
         },
       ],
     } as Partial<UseQueryResult<TaskWithPosition[], Error>> as UseQueryResult<

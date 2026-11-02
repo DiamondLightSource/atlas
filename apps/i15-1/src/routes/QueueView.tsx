@@ -29,6 +29,7 @@ import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
+import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
 
 interface QueueViewProps {
   instrument: string;
@@ -209,6 +210,7 @@ export function QueueView({ instrument }: QueueViewProps) {
             Clear History
           </Button>
         </div>
+        <QueueEstimatedRuntime />
         <QueueStatusPanel />
       </Stack>
     ),
