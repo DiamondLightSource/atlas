@@ -15,11 +15,12 @@ export type AppConfig = {
    * Authorisation Whitelist
    */
   authorisation_whitelist?: Array<string> | null;
-  /**
-   * Log Level
-   */
-  log_level?: number;
   runtime_estimation?: RuntimeEstimationConfig | null;
+  logging?: LoggingConfig;
+  /**
+   * Instrument
+   */
+  instrument?: string | null;
 };
 
 /**
@@ -190,6 +191,28 @@ export type ExperimentDefinition = {
 };
 
 /**
+ * GraylogConfig
+ */
+export type GraylogConfig = {
+  /**
+   * Level
+   */
+  level?: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL' | number;
+  /**
+   * Enabled
+   */
+  enabled?: boolean;
+  /**
+   * Port
+   */
+  port?: number;
+  /**
+   * Url
+   */
+  url?: string;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -200,6 +223,24 @@ export type HttpValidationError = {
 };
 
 /**
+ * LoggingConfig
+ */
+export type LoggingConfig = {
+  stream?: LoggingHandlerConfig;
+  graylog?: GraylogConfig;
+};
+
+/**
+ * LoggingHandlerConfig
+ */
+export type LoggingHandlerConfig = {
+  /**
+   * Level
+   */
+  level?: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL' | number;
+};
+
+/**
  * OIDCConfig
  */
 export type OidcConfig = {
@@ -207,8 +248,16 @@ export type OidcConfig = {
    * Well Known Url
    *
    * URL to fetch OIDC config from the provider
+   *
+   * @deprecated
    */
-  well_known_url: string;
+  well_known_url?: string | null;
+  /**
+   * Issuer
+   *
+   * URL of OIDC provider
+   */
+  issuer?: string | null;
   /**
    * Client Id
    *
