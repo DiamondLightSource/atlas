@@ -5,13 +5,10 @@ import { useEffect, useRef } from "react";
 import type {
   QueueState,
   TaskCancelRequest,
-  AddTasksToQueueQueuePostData,
   Experiment,
   TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
-import { addTasksToQueueQueuePost } from "../../generated/queue";
-import { client } from "../../generated/queue/client.gen";
 import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
 import { authProvider } from "../auth";
 
@@ -22,8 +19,6 @@ const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 const QUEUE_URL: string = USE_LOCAL
   ? "http://127.0.0.1:8001"
   : "/api/daq-queue";
-
-client.setConfig({ baseUrl: QUEUE_URL });
 
 const handlers = {
   state_update: "state",
@@ -274,23 +269,10 @@ export const submitQueueTasks = async ({
   experiments: (Experiment | TaskRequest)[];
   taskPosition?: number;
 }) => {
-  const data: AddTasksToQueueQueuePostData = {
-    url: `/queue`,
-    body: experiments,
-    query: {
+  await queueClient.post("/queue", experiments, {
+    params: {
       position: taskPosition,
     },
-  };
-
-  await addTasksToQueueQueuePost(data).then(async (response) => {
-    if (response.response?.ok) {
-      return response;
-    } else {
-      console.error(JSON.stringify(response.error?.detail));
-      throw new Error(
-        `${response.response?.status}, ${response.response?.statusText}`,
-      );
-    }
   });
 };
 
