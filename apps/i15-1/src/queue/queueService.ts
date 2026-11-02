@@ -4,13 +4,10 @@ import { type AxiosInstance } from "axios";
 import type {
   QueueState,
   TaskCancelRequest,
-  AddTasksToQueueQueuePostData,
   Experiment,
   TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
-import { addTasksToQueueQueuePost } from "../../generated/queue";
-import { client } from "../../generated/queue/client.gen";
 import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
 import { authProvider } from "../auth";
 
@@ -21,8 +18,6 @@ const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
 const QUEUE_URL: string = USE_LOCAL
   ? "http://127.0.0.1:8001"
   : "/api/daq-queue";
-
-client.setConfig({ baseUrl: QUEUE_URL });
 
 const handlers = {
   state_update: "state",
@@ -106,9 +101,7 @@ export function useConnected() {
 }
 
 const getQueueState = async (): Promise<QueueState> => {
-  const response = await queueClient.get<QueueState>(
-    QUEUE_URL + "/queue/state",
-  );
+  const response = await queueClient.get<QueueState>("/queue/state");
   return response.data;
 };
 
@@ -124,12 +117,9 @@ export function useGetQueueState() {
 }
 
 export const patchQueueState = async (paused: boolean): Promise<QueueState> => {
-  const response = await queueClient.patch<QueueState>(
-    QUEUE_URL + "/queue/state",
-    {
-      paused: paused,
-    },
-  );
+  const response = await queueClient.patch<QueueState>("/queue/state", {
+    paused: paused,
+  });
   return response.data;
 };
 
@@ -166,9 +156,7 @@ export function useToggleQueueState() {
 }
 
 const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await queueClient.get<TaskWithPosition[]>(
-    QUEUE_URL + "/queue",
-  );
+  const response = await queueClient.get<TaskWithPosition[]>("/queue");
   return response.data;
 };
 
@@ -184,9 +172,7 @@ export function useGetQueuedTasks() {
 }
 
 const getAllTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await queueClient.get<TaskWithPosition[]>(
-    QUEUE_URL + "/tasks",
-  );
+  const response = await queueClient.get<TaskWithPosition[]>("/tasks");
   return response.data;
 };
 
@@ -202,9 +188,7 @@ export function useGetAllTasks() {
 }
 
 const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await queueClient.get<TaskWithPosition[]>(
-    QUEUE_URL + "/history",
-  );
+  const response = await queueClient.get<TaskWithPosition[]>("/history");
   return response.data;
 };
 
@@ -223,7 +207,7 @@ export const cancelTasks = async (
   taskIds: string[],
 ): Promise<TaskWithPosition[]> => {
   const response = await queueClient.delete<TaskWithPosition[]>(
-    QUEUE_URL + "/queue/tasks",
+    "/queue/tasks",
     {
       data: {
         task_ids: taskIds,
@@ -251,16 +235,12 @@ export const moveTask = async ({
   taskId: string;
   newPosition: number;
 }): Promise<number> => {
-  const response = await queueClient.post<number>(
-    QUEUE_URL + "/queue/move",
-    null,
-    {
-      params: {
-        task_id: taskId,
-        new_position: newPosition,
-      },
+  const response = await queueClient.post<number>("/queue/move", null, {
+    params: {
+      task_id: taskId,
+      new_position: newPosition,
     },
-  );
+  });
 
   return response.data;
 };
@@ -276,7 +256,7 @@ export function useMoveTask() {
 }
 
 export const clearHistory = async (): Promise<number> => {
-  const response = await queueClient.delete<number>(QUEUE_URL + "/history");
+  const response = await queueClient.delete<number>("/history");
 
   return response.data;
 };
@@ -288,23 +268,10 @@ export const submitQueueTasks = async ({
   experiments: (Experiment | TaskRequest)[];
   taskPosition?: number;
 }) => {
-  const data: AddTasksToQueueQueuePostData = {
-    url: `/queue`,
-    body: experiments,
-    query: {
+  await queueClient.post("/queue", experiments, {
+    params: {
       position: taskPosition,
     },
-  };
-
-  await addTasksToQueueQueuePost(data).then(async (response) => {
-    if (response.response?.ok) {
-      return response;
-    } else {
-      console.error(JSON.stringify(response.error?.detail));
-      throw new Error(
-        `${response.response?.status}, ${response.response?.statusText}`,
-      );
-    }
   });
 };
 
