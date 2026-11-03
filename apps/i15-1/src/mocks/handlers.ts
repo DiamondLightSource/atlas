@@ -992,7 +992,7 @@ export const handlers = [
   }),
 
   http.get("/api/daq-queue/queue/state", () => {
-    return HttpResponse.json({ paused: true, estimated_runtime: 175 });
+    return HttpResponse.json({ paused: true, estimated_runtime: 500 });
   }),
 
   http.get("/api/daq-queue/queue", () => {

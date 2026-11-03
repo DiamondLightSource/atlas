@@ -111,7 +111,7 @@ export function useGetQueueState() {
     queryKey: ["state"],
     queryFn: getQueueState,
     staleTime: Infinity,
-    refetchInterval: false,
+    refetchInterval: 1000,
     refetchOnWindowFocus: "always",
     refetchOnMount: "always",
   });
