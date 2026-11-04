@@ -168,18 +168,18 @@ export function QueueView({
         justifyContent="space-between"
         width="100%"
       >
-        <div>
-          <Button
-            variant="outlined"
-            color="error"
-            disabled={displayMode === "future"}
-            onClick={() => clearHistory()}
-          >
-            Clear History
-          </Button>
-        </div>
-        <QueueEstimatedRuntime />
-        <QueueStatusPanel />
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={displayMode === "future"}
+          onClick={() => clearHistory()}
+        >
+          Clear History
+        </Button>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <QueueEstimatedRuntime />
+          <QueueStatusPanel />
+        </Stack>
       </Stack>
     ),
 
