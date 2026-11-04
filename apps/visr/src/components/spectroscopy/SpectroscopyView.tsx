@@ -10,6 +10,7 @@ import SpectroscopyControls from "./SpectroscopyControls";
 import { useInstrumentSession } from "@atlas/app-shell";
 import { DataSource } from "./dataSource";
 import { plotKindFor, type Positions, type Shape } from "./plotKinds";
+import { useSharedState } from "../../hooks/useSharedState";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -27,9 +28,20 @@ const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [dataSource, setDataSource] = useState(DataSource.Camera);
-  const [positions, setPositions] = useState<Positions>("setpoints");
-  const [shape, setShape] = useState<Shape>("rectangles");
+
+  // Shared across all open tabs (and restored on reload)
+  const [dataSource, setDataSource] = useSharedState<DataSource>(
+    "spectroscopy:dataSource",
+    DataSource.Camera,
+  );
+  const [positions, setPositions] = useSharedState<Positions>(
+    "spectroscopy:positions",
+    "setpoints",
+  );
+  const [shape, setShape] = useSharedState<Shape>(
+    "spectroscopy:shape",
+    "rectangles",
+  );
 
   // -------------------------------------------------------------------------
   // Set off workflow when scan ends
@@ -82,8 +94,9 @@ function SpectroscopyView() {
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
         controls={[
-          <SpectroscopyForm />,
+          <SpectroscopyForm key="form" />,
           <SpectroscopyControls
+            key="controls"
             dataSource={dataSource}
             onSetDataSource={handleSetDataSource}
             positions={positions}
