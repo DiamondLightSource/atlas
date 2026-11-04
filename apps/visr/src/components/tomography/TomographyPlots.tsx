@@ -3,7 +3,7 @@ import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
 import { useLayoutEffect, useState } from "react";
 import SliceViewer from "./SliceViewer";
 import VolumeRenderer from "./VolumeRenderer";
-import { Plane } from "./PlaneEnum";
+import { Plane } from "./plane";
 
 // ---------------------------------------------------------------------------
 // Types
