@@ -6,6 +6,7 @@ import {
 import { ScanQrCode } from "lucide-react";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
+const INSTRUMENT = "b21";
 const navigation: SectionGroup[] = [
   {
     sections: [
@@ -26,7 +27,6 @@ const navigation: SectionGroup[] = [
 ];
 
 export const router = createRouter({
-  title: "i15-1",
+  title: INSTRUMENT,
   navigation,
-  footer: ({ open }) => <SystemControls open={open}></SystemControls>,
 });
