@@ -110,7 +110,7 @@ export function useGetQueueState() {
     queryKey: ["state"],
     queryFn: getQueueState,
     staleTime: Infinity,
-    refetchInterval: false,
+    refetchInterval: 1000,
     refetchOnWindowFocus: "always",
     refetchOnMount: "always",
   });
@@ -139,19 +139,19 @@ export function usePauseQueue() {
 }
 
 export function useToggleQueueState() {
-  const { data } = useGetQueueState();
+  const { data: queueState } = useGetQueueState();
   const mutation = usePatchQueueState();
 
   const toggle = async () => {
-    if (data == null) return;
-    return mutation.mutateAsync(!data.paused);
+    if (queueState == null) return;
+    return mutation.mutateAsync(!queueState.paused);
   };
 
   return {
-    paused: data?.paused ?? false,
+    queueState,
     isLoading: mutation.isPending,
     toggle,
-    isDisabled: mutation.isPending || data == null,
+    isDisabled: mutation.isPending || queueState == null,
   };
 }
 

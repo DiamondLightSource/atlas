@@ -20,6 +20,7 @@ import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
+import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
 
 interface QueueViewProps {
   displayMode?: "future" | "historic" | "all";
@@ -167,17 +168,18 @@ export function QueueView({
         justifyContent="space-between"
         width="100%"
       >
-        <div>
-          <Button
-            variant="outlined"
-            color="error"
-            disabled={displayMode === "future"}
-            onClick={() => clearHistory()}
-          >
-            Clear History
-          </Button>
-        </div>
-        <QueueStatusPanel />
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={displayMode === "future"}
+          onClick={() => clearHistory()}
+        >
+          Clear History
+        </Button>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <QueueEstimatedRuntime />
+          <QueueStatusPanel />
+        </Stack>
       </Stack>
     ),
 

@@ -75,6 +75,10 @@ vi.mock("material-react-table", () => ({
 
 const mockedUseMaterialReactTable = vi.mocked(useMaterialReactTable);
 
+vi.mock("../queue/QueueEstimatedRuntime", () => ({
+  QueueEstimatedRuntime: () => <div>QueueEstimatedRuntime</div>,
+}));
+
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => <div>QueueStatusPanel</div>,
 }));
@@ -137,9 +141,12 @@ describe("QueueView", () => {
                     blueapi_id: "1",
                     tiled_ids: [],
                     scan_ids: [],
+                    runtime: null,
                   },
                 ],
                 kind: "Experiment",
+                runtime: null,
+                estimated_runtime: null,
               },
             ],
           } as TaskQueryResult;
@@ -178,9 +185,12 @@ describe("QueueView", () => {
                     blueapi_id: "0",
                     tiled_ids: [],
                     scan_ids: [],
+                    runtime: 10.054543,
                   },
                 ],
                 kind: "Plan",
+                runtime: 10.054543,
+                estimated_runtime: null,
               },
               {
                 id: "1",
@@ -215,9 +225,12 @@ describe("QueueView", () => {
                       instrument_session: "session2",
                     },
                     blueapi_id: "1",
+                    runtime: null,
                   },
                 ],
                 kind: "Experiment",
+                runtime: null,
+                estimated_runtime: null,
               },
             ],
           } as TaskQueryResult;
@@ -250,6 +263,8 @@ describe("QueueView", () => {
                 },
                 blueapi_calls: [],
                 kind: "Experiment",
+                runtime: null,
+                estimated_runtime: null,
               },
             ],
           } as TaskQueryResult;
