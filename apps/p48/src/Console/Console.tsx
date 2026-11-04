@@ -8,19 +8,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Log, type LogEntry } from "./Log";
 import { executeCode, makeKernelManager, startKernel } from "./kernelclient";
 import { Kernel } from "@jupyterlab/services";
+import { useAuth } from "@atlas/auth";
 
 const kernelManager = makeKernelManager({
   baseUrl: `${window.location.origin}/api/scripting/`,
   wsUrl: `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/scripting/`,
 });
 
+type KernelStatus = "connecting" | "ready" | "error";
 export const Console = () => {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <UnauthenticatedPlaceholder />;
+  return <AuthenticatedConsole />;
+};
+
+const AuthenticatedConsole = () => {
   // kernel status
-  const [, setStatus] = useState<"connecting" | "ready" | "error">(
-    "connecting",
-  );
-  // prompt state, needs consolidating with the above
-  const [state, setState] = useState<CommandPromptState>("ready");
+  const [kernelStatus, setKerneStatus] = useState<KernelStatus>("connecting");
+  // prompt state
+  const [promptState, setPromptState] =
+    useState<CommandPromptState>("evaluating");
   // log entries...
   const [logLines, setLogLines] = useState<LogEntry[]>([]);
   // cached incomplete command
@@ -33,11 +40,11 @@ export const Console = () => {
       kernelRef.current = startKernel(kernelManager, "pykernel-dls")
         .then((kernel) => {
           setKernel(kernel);
-          setStatus("ready");
+          setKerneStatus("ready");
           return kernel;
         })
         .catch((err) => {
-          setStatus("error");
+          setKerneStatus("error");
           kernelRef.current = null;
           throw err;
         });
@@ -55,6 +62,38 @@ export const Console = () => {
       kernelRef.current = null;
     };
   }, [getKernel]);
+
+  useEffect(() => {
+    switch (kernelStatus) {
+      case "error":
+        setLogLines((prev) => [
+          ...prev,
+          { kind: "error", message: "Error connecting to kernel" },
+        ]);
+        setPromptState("unavailable");
+        break;
+      case "connecting":
+        setLogLines((prev) => [
+          ...prev,
+          {
+            kind: "result",
+            message: "Connecting to kernel...",
+          },
+        ]);
+        setPromptState("unavailable");
+        break;
+      case "ready":
+        setLogLines((prev) => [
+          ...prev,
+          {
+            kind: "result",
+            message: "Connected.",
+          },
+        ]);
+        setPromptState("ready");
+        break;
+    }
+  }, [kernelStatus]);
 
   const appendEntry = useCallback(
     (message: string, category: "command" | "result" | "error") => {
@@ -108,14 +147,14 @@ export const Console = () => {
 
       if (partial) {
         incompleteCommandRef.current = command;
-        setState("continuation");
+        setPromptState("continuation");
         return;
       }
 
       // The command is complete; stop accumulating
       incompleteCommandRef.current = null;
 
-      setState("evaluating");
+      setPromptState("evaluating");
       try {
         await executeCode(kernel, command, (chunk) => {
           const cat = chunk.kind === "error" ? "error" : "result";
@@ -127,12 +166,35 @@ export const Console = () => {
           "error",
         );
       } finally {
-        setState("ready");
+        setPromptState("ready");
       }
     },
     [appendEntry, getKernel],
   );
 
+  const props: Props = {
+    lines: logLines,
+    placeholder: "Enter command...",
+    onSubmit: handleCommand,
+    interrupt: interruptKernel,
+    kernel,
+    promptState,
+    kernelStatus,
+  };
+  return <ComponentLayout {...props} />;
+};
+
+type Props = {
+  lines: LogEntry[];
+  placeholder: string;
+  onSubmit: CommandHandler;
+  interrupt: () => void;
+  kernel: Kernel.IKernelConnection | null;
+  promptState?: CommandPromptState;
+  kernelStatus: KernelStatus;
+};
+
+function ComponentLayout(props: Props) {
   return (
     <Paper
       square
@@ -142,14 +204,29 @@ export const Console = () => {
         height: "100%",
       }}
     >
-      <Log lines={logLines} />
+      <Log lines={props.lines} />
       <CommandPrompt
-        placeholder="Enter command..."
-        onSubmit={handleCommand}
-        status={state}
-        interrupt={interruptKernel}
-        kernel={kernel}
+        placeholder={props.placeholder}
+        onSubmit={props.onSubmit}
+        status={props.promptState}
+        interrupt={props.interrupt}
+        kernel={props.kernel}
       />
     </Paper>
   );
-};
+}
+
+/** This is really just a fallback... the console should not be rendered in a public page */
+function UnauthenticatedPlaceholder() {
+  return (
+    <ComponentLayout
+      placeholder="You must log in first"
+      kernel={null}
+      kernelStatus="error"
+      promptState="unavailable"
+      onSubmit={() => {}}
+      interrupt={() => {}}
+      lines={[]}
+    />
+  );
+}

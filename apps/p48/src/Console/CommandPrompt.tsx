@@ -6,7 +6,8 @@ import { usePythonCompletion } from "./usePythonCompletion";
 import { AutoCompleteMenu } from "./AutoCompleteMenu";
 import { useCommandHistory } from "./useCommandHistory";
 
-export type CommandPromptState = "ready" | "evaluating" | "continuation";
+export type CommandPromptState =
+  "unavailable" | "ready" | "evaluating" | "continuation";
 
 export type CommandHandler = (command: string) => void | Promise<void>;
 
@@ -57,6 +58,7 @@ export const CommandPrompt = ({
   const [shouldRetainFocus, setShouldRetainFocus] = useState(false);
   const isEvaluating = status === "evaluating";
   const isContinuation = status === "continuation";
+  const isUnavailable = status === "unavailable";
 
   const submit = async () => {
     if (isEvaluating) {
@@ -197,7 +199,7 @@ export const CommandPrompt = ({
           fullWidth
           placeholder={placeholder}
           value={command}
-          disabled={isEvaluating}
+          disabled={isEvaluating || isUnavailable}
           onChange={(event) => {
             setCommand(event.target.value);
             setSelectedMatchIndex(0);
@@ -226,7 +228,7 @@ export const CommandPrompt = ({
             aria-label="Run command"
             ref={submitRef}
             onClick={submit}
-            disabled={isEvaluating}
+            disabled={isEvaluating || isUnavailable}
             sx={{
               borderRadius: 1,
             }}
@@ -237,7 +239,7 @@ export const CommandPrompt = ({
             size="small"
             aria-label="Interrupt"
             onClick={interrupt}
-            disabled={!isEvaluating}
+            disabled={!isEvaluating || isUnavailable}
             sx={{
               borderRadius: 1,
             }}
