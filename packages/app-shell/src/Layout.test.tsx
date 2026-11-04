@@ -6,6 +6,8 @@ import {
 import type { RouterProps } from "./Router";
 import { Layout } from "./Layout";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { AuthContextProvider } from "@atlas/auth";
+import { testAuthProvider } from "./TestUtils";
 
 // mock instrument session view which is out of scope of this test
 export function InstrumentSessionView() {
@@ -16,49 +18,78 @@ vi.mock("./context/instrumentSession/InstrumentSessionView", () => ({
 }));
 
 describe("Layout", () => {
-  it("shows title, nav section titles, and main content", () => {
-    const props: RouterProps = {
-      title: "Test app",
-      navigation: [
-        {
-          sections: [
-            {
-              name: "Dashboard",
-              icon: <div />,
-              pages: [],
-            },
-          ],
-        },
-      ],
-    };
-
-    const router = createMemoryRouter([
+  const props: RouterProps = {
+    title: "Test app",
+    navigation: [
       {
-        path: "/",
-        element: <Layout {...props} />,
-        children: [
+        sections: [
           {
-            index: true,
-            element: <div>Outlet content</div>,
+            name: "Dashboard",
+            icon: <div data-testid="dashboard-icon" />,
+            pages: [],
+          },
+          {
+            name: "Experiment",
+            isProtected: true,
+            icon: <div data-testid="experiment-icon" />,
+            pages: [],
           },
         ],
       },
-    ]);
+    ],
+  };
+
+  const router = createMemoryRouter([
+    {
+      path: "/",
+      element: <Layout {...props} />,
+      children: [
+        {
+          index: true,
+          element: <div>Outlet content</div>,
+        },
+      ],
+    },
+  ]);
+
+  const renderLayout = () => {
     render(
       <ThemeProvider theme={DiamondDSTheme} defaultMode="light">
-        <RouterProvider router={router} />
+        <AuthContextProvider provider={testAuthProvider}>
+          <RouterProvider router={router} />
+        </AuthContextProvider>
       </ThemeProvider>,
     );
+  };
+
+  it("shows title, nav section titles, and main content", async () => {
+    // we are authenticated
+    vi.mocked(testAuthProvider.getUser).mockResolvedValue({ id: "1234" });
+
+    renderLayout();
 
     // title
-    expect(screen.getByText(props.title)).toBeInTheDocument();
+    expect(await screen.findByText(props.title)).toBeInTheDocument();
 
     // each route name
-    props.navigation[0].sections.forEach((route) => {
-      expect(screen.getByText(route.name)).toBeInTheDocument();
+    props.navigation[0].sections.forEach(async (route) => {
+      expect(await screen.findByText(route.name)).toBeInTheDocument();
     });
 
     // default content
-    expect(screen.getByText("Outlet content")).toBeInTheDocument();
+    expect(await screen.findByText("Outlet content")).toBeInTheDocument();
+  });
+
+  it("hides protected sections when unauthenticated", async () => {
+    // unauthenticated
+    vi.mocked(testAuthProvider.getUser).mockResolvedValue(null);
+
+    renderLayout();
+
+    // public section link rendered
+    expect(await screen.findByTestId("dashboard-icon")).toBeInTheDocument();
+
+    // but not protected one
+    expect(screen.queryByTestId("experiment-icon")).not.toBeInTheDocument();
   });
 });

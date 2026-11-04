@@ -8,6 +8,7 @@ import { TabbedPanel, type TabDescription } from "./TabbedRoute";
 
 import type { ReactNode } from "react";
 import type React from "react";
+import { AuthGuard } from "./AuthGuard";
 
 /** App title and navigational intent */
 export interface RouterProps {
@@ -37,6 +38,7 @@ export interface SectionGroup {
 export interface LabelledRoute {
   name: string;
   path?: string;
+  isProtected?: boolean;
 }
 
 /**
@@ -71,8 +73,13 @@ function childRoute(section: Section): RouteObject {
     };
   });
   const sectionPath = routePath(section);
-  const element = (
+  const rawElement = (
     <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />
+  );
+  const element = section.isProtected ? (
+    <AuthGuard element={rawElement} />
+  ) : (
+    rawElement
   );
   const childPageRoutes: RouteObject[] = section.pages.map((page) => {
     return {
