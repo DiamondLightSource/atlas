@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { DataSource } from "./dataSource";
 import {
+  DATA_SOURCES,
   POSITIONS,
   READBACK_ONLY_HELP,
   SHAPES,
@@ -52,16 +53,15 @@ export default function Controls({
           Data Source
         </Typography>
         <RadioGroup row value={dataSource} onChange={onSetDataSource}>
-          <FormControlLabel
-            value={DataSource.Camera}
-            control={<Radio />}
-            label="Camera"
-          />
-          <FormControlLabel
-            value={DataSource.Diodes}
-            control={<Radio />}
-            label="Diodes"
-          />
+          {DATA_SOURCES.map(({ value, label, help }) => (
+            <Tooltip key={value} title={help} describeChild>
+              <FormControlLabel
+                value={value}
+                control={<Radio />}
+                label={label}
+              />
+            </Tooltip>
+          ))}
         </RadioGroup>
       </Box>
 

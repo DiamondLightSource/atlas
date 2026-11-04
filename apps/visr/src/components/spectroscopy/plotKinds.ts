@@ -1,3 +1,4 @@
+import { DataSource } from "./dataSource";
 import type { Beam, PlotKind } from "./useSpectroscopyData";
 
 /** Where the points are drawn: the scan's setpoint grid, or where the motors read back */
@@ -6,16 +7,33 @@ export type Positions = "setpoints" | "readbacks";
 /** How each point is drawn at its readback position */
 export type Shape = Exclude<PlotKind, "cells">;
 
+export const DATA_SOURCES: {
+  value: DataSource;
+  label: string;
+  help: string;
+}[] = [
+  {
+    value: DataSource.Camera,
+    label: "Camera",
+    help: "Data taken from regions of interest on the camera image",
+  },
+  {
+    value: DataSource.Diodes,
+    label: "Diodes",
+    help: "Data taken from diodes placed along the diffracted spectrum",
+  },
+];
+
 export const POSITIONS: { value: Positions; label: string; help: string }[] = [
   {
     value: "setpoints",
     label: "Setpoints",
-    help: "The grid of the scan's setpoints (from its spec), each cell the mean of the points read back in it",
+    help: "Each point at the position the scan planned to collect data at. Where several points fall in the same grid square, they are averaged",
   },
   {
     value: "readbacks",
     label: "Readbacks",
-    help: "Each point at the position the motors actually read back",
+    help: "Each point at the position the motors collected data at",
   },
 ];
 
@@ -23,17 +41,17 @@ export const SHAPES: { value: Shape; label: string; help: string }[] = [
   {
     value: "rectangles",
     label: "Rectangles",
-    help: "A step-sized rectangle on each point",
+    help: "A rectangle which is step-size by step-size. For 'Setpoints' positions this is the raw data at each point, for 'Readbacks' positions this is the interpolated data at each point",
   },
   {
     value: "gaussian",
     label: "Gaussian",
-    help: "A beam-sized Gaussian on each point: gaps the beam didn't cover show",
+    help: "A representation of the interpolated data. For 'Readbacks' positions this is the interpolated data (interpolated using a gaussian footprint) at each point",
   },
   {
     value: "ovals",
     label: "Footprints",
-    help: "Each point's beam footprint, overlaps split between neighbours",
+    help: "A representation of the interpolated data. For 'Readbacks' positions this is the interpolated data (interpolated using the footprint of the beam) at each point",
   },
 ];
 
@@ -56,6 +74,6 @@ export function beamWarning(kind: PlotKind, beam?: Beam): string | null {
   const size = (v: number) => Number(v.toPrecision(3));
   return (
     `This run doesn't record its beam size, so this is drawn with a beam of ` +
-    `one scan step (${size(beam.x)} × ${size(beam.y)}), not the real beamline footprint.`
+    `one scan step (${size(beam.x)} × ${size(beam.y)}), not the real beam footprint.`
   );
 }

@@ -6,7 +6,7 @@ describe("beamWarning", () => {
   it("warns when the beam is only the scan step, for the beam-sized drawings", () => {
     expect(beamWarning("ovals", step)).toContain("0.25 × 0.25");
     expect(beamWarning("gaussian", step)).toContain(
-      "not the real beamline footprint",
+      "not the real beam footprint",
     );
   });
 
