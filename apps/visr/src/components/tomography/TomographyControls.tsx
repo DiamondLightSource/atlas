@@ -6,7 +6,7 @@ import {
   Slider,
   Typography,
 } from "@mui/material";
-import { Plane } from "./PlaneEnum";
+import { Plane } from "./plane";
 
 interface Props {
   onSlide: (event: Event, newValue: number | number[]) => void;
