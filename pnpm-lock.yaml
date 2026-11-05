@@ -334,6 +334,58 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
 
+  apps/science-ui:
+    dependencies:
+      '@atlas/app-shell':
+        specifier: workspace:*
+        version: link:../../packages/app-shell
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@atlas/blueapi':
+        specifier: workspace:*
+        version: link:../../packages/blueapi
+      '@atlas/blueapi-query':
+        specifier: workspace:*
+        version: link:../../packages/blueapi-query
+      '@diamondlightsource/sci-react-ui':
+        specifier: 0.8.0
+        version: 0.8.0(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@jsonforms/core@3.6.0)(@jsonforms/material-renderers@3.6.0(4e424b96a58235776a27f5a48f70478f))(@jsonforms/react@3.6.0(@jsonforms/core@3.6.0)(react@18.3.1))(@mui/icons-material@7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-icons@5.6.0(react@18.3.1))(react@18.3.1)
+      '@emotion/react':
+        specifier: ^11.14.0
+        version: 11.14.0(@types/react@18.3.28)(react@18.3.1)
+      '@emotion/styled':
+        specifier: ^11.14.1
+        version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
+      '@mui/material':
+        specifier: ^7.3.11
+        version: 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      lucide-react:
+        specifier: ^1.60.0
+        version: 1.60.0(@types/react@18.3.28)(react@18.3.1)
+      react-router-dom:
+        specifier: ^7.18.1
+        version: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    devDependencies:
+      '@atlas/vitest-conf':
+        specifier: workspace:*
+        version: link:../../packages/vitest-conf
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.39.3(jiti@2.7.0))
+      eslint-plugin-react-refresh:
+        specifier: ^0.5.7
+        version: 0.5.7(eslint@9.39.3(jiti@2.7.0))
+      globals:
+        specifier: ^17.13.0
+        version: 17.13.0
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
+      vitest:
+        specifier: ^5.0.5
+        version: 5.0.5(@types/node@25.9.2)(@vitest/coverage-v8@4.0.18(vitest@4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(terser@5.48.0)(yaml@2.9.0)))(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
+
   apps/visr:
     dependencies:
       '@atlas/app-shell':
@@ -9019,14 +9071,14 @@ snapshots:
       msw: 2.12.10(@types/node@25.9.2)(typescript@7.0.2)
       vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
 
-  '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
+  '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.14.6(@types/node@25.3.3)(typescript@7.0.2)
-      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
 
   '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
     dependencies:
@@ -12124,7 +12176,7 @@ snapshots:
   vitest@4.0.18(@types/node@25.3.3)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
+      '@vitest/mocker': 4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
