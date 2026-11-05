@@ -21,7 +21,7 @@
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",
     "@atlas/pvws-config": "workspace:*",
-    "@diamondlightsource/cs-web-lib": "0.10.19",
+    "@diamondlightsource/cs-web-lib": "0.11.3",
     "@diamondlightsource/sci-react-ui": "0.7.2",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
