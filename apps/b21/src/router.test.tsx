@@ -4,7 +4,6 @@ const createRouter = vi.fn();
 
 vi.mock("@atlas/app-shell", () => ({
   createRouter,
-  SystemControls: () => null,
 }));
 
 vi.mock("@atlas/blueapi-ui", () => ({

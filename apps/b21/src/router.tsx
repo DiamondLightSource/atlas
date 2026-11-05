@@ -1,8 +1,4 @@
-import {
-  type SectionGroup,
-  SystemControls,
-  createRouter,
-} from "@atlas/app-shell";
+import { type SectionGroup, createRouter } from "@atlas/app-shell";
 import { ScanQrCode } from "lucide-react";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
