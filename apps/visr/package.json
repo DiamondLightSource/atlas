@@ -20,7 +20,7 @@
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",
     "@diamondlightsource/davidia": "^1.0.3",
-    "@diamondlightsource/sci-react-ui": "0.7.2",
+    "@diamondlightsource/sci-react-ui": "0.8.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@jsonforms/core": "3.6.0",
