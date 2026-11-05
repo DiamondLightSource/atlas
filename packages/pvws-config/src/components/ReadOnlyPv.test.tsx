@@ -3,7 +3,7 @@ import { render, screen } from "@atlas/vitest-conf";
 
 describe("DefaultPvBox", () => {
   it("box is rendered and visible", () => {
-    const pvBox = render(<DefaultPvBox label="val" value="10" />);
+    render(<DefaultPvBox label="val" value="10" />);
 
     expect(screen.getByText("val", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("10")).toBeInTheDocument();

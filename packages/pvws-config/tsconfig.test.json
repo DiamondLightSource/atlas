@@ -4,5 +4,5 @@
     "noEmit": true,
     "types": ["@atlas/vitest-conf/global-types"]
   },
-  "include": ["src/**/*.test.ts"]
+  "include": ["src/**/*.test.ts*"]
 }
