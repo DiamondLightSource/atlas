@@ -18,7 +18,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI) {
     actions: [
       {
         type: "addMany",
-        destination: "{{turboRoot}}/apps/{{name}}",
+        destination: "apps/{{name}}",
         base: "templates/science-ui",
         templateFiles: "templates/science-ui/**",
       },
