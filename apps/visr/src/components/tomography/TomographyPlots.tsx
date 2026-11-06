@@ -1,9 +1,15 @@
 import { Box, Typography } from "@mui/material";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import SliceViewer from "./SliceViewer";
 import VolumeRenderer from "./VolumeRenderer";
 import { Plane } from "./PlaneEnum";
+import CamPva from "../CamPva";
+
+const OVERVIEW_SRC =
+  "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-01:PVA:OUTPUT";
+const DETECTOR_SRC =
+  "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-05:PVA:OUTPUT";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -19,24 +25,10 @@ interface Props {
   threshold: number;
 }
 
-// ---------------------------------------------------------------------------
-// Camera view
-// ---------------------------------------------------------------------------
-
-function CamPva() {
-  const [imgSrc, setImgSrc] = useState(
-    "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-05:PVA:OUTPUT",
-  );
-
-  return (
-    <Box
-      component="img"
-      src={imgSrc}
-      sx={{ width: "100%", height: "100%", objectFit: "contain" }}
-      onError={() => setImgSrc("../../../test-data/seal.png")}
-      alt="Camera view"
-    />
-  );
+interface Cell {
+  key: string;
+  title: string;
+  content: ReactNode;
 }
 
 // ---------------------------------------------------------------------------
@@ -57,7 +49,6 @@ function TomographyPlots({
   // Grid sizing
   // -------------------------------------------------------------------------
   const h = 10;
-  const w = 1;
   const minimumRowHeight = 30;
   const minimumGridHeight = minimumRowHeight * h;
   const [containerHeight, setContainerHeight] = useState(0);
@@ -82,44 +73,72 @@ function TomographyPlots({
         : 50;
   const gridHeight = rowHeight * h;
 
-  // -------------------------------------------------------------------------
-  // Layout: 3x1
-  // -------------------------------------------------------------------------
-  const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: h, static: true },
-    { i: "1", x: 1, y: 0, w: w, h: h, static: true },
-    { i: "2", x: 2, y: 0, w: w, h: h, static: true },
-  ];
-
   if (!volumeData) return <Box />;
 
   // -------------------------------------------------------------------------
-  // Views
+  // Cells
   // -------------------------------------------------------------------------
-  const views = [
-    <CamPva />,
-    <VolumeRenderer
-      volumeData={volumeData}
-      volumeShape={volumeShape}
-      threshold={threshold / 255}
-    />,
-    <SliceViewer
-      volumeData={volumeData}
-      volumeShape={volumeShape}
-      slice={slice}
-      plane={plane}
-      threshold={threshold}
-    />,
+  const overviewCell: Cell = {
+    key: "overview",
+    title: "Overview",
+    content: <CamPva src={OVERVIEW_SRC} alt="Overview camera" />,
+  };
+
+  const plotCells: Cell[] = [
+    {
+      key: "detector",
+      title: "Detector",
+      content: <CamPva src={DETECTOR_SRC} alt="Detector camera" />,
+    },
+    {
+      key: "reconstruction",
+      title: "Reconstruction",
+      content: (
+        <VolumeRenderer
+          volumeData={volumeData}
+          volumeShape={volumeShape}
+          threshold={threshold / 255}
+        />
+      ),
+    },
+    {
+      key: "slice",
+      title: "Slice View",
+      content: (
+        <SliceViewer
+          volumeData={volumeData}
+          volumeShape={volumeShape}
+          slice={slice}
+          plane={plane}
+          threshold={threshold}
+        />
+      ),
+    },
   ];
 
-  const titles = ["Camera View", "Reconstruction", "Slice View"];
+  // Drawer open: overview + 3 plots (4x1)
+  // Drawer closed: 3 plots only (3x1)
+  const cells = drawerOpen ? [overviewCell, ...plotCells] : plotCells;
+  const cols = cells.length;
+
+  // -------------------------------------------------------------------------
+  // Layout
+  // -------------------------------------------------------------------------
+  const layout = cells.map(({ key }, i) => ({
+    i: key,
+    x: i,
+    y: 0,
+    w: 1,
+    h: h,
+    static: true,
+  }));
 
   // -------------------------------------------------------------------------
   // Plot cells
   // -------------------------------------------------------------------------
-  const plots = views.map((view, i) => (
+  const plots = cells.map(({ key, title, content }) => (
     <Box
-      key={i}
+      key={key}
       sx={{
         width: "100%",
         height: "100%",
@@ -139,7 +158,7 @@ function TomographyPlots({
         marginLeft={2}
         flexShrink={0}
       >
-        {titles[i]}
+        {title}
       </Typography>
       <Box
         sx={{
@@ -152,7 +171,7 @@ function TomographyPlots({
           "& > div": { height: "100%" },
         }}
       >
-        {view}
+        {content}
       </Box>
     </Box>
   ));
@@ -178,7 +197,7 @@ function TomographyPlots({
           width={width}
           style={{ height: gridHeight }}
           gridConfig={{
-            cols: 3,
+            cols: cols,
             rowHeight: rowHeight,
             margin: [0, 0],
           }}

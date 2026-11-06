@@ -1,8 +1,17 @@
 import { Box, Typography } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useState, type ComponentProps } from "react";
+import {
+  useLayoutEffect,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { useSpectroscopyData } from "./useSpectroscopyData";
+import CamPva from "../CamPva";
+
+const OVERVIEW_SRC =
+  "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-04:PVA:OUTPUT";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -13,6 +22,12 @@ const CHANNELS = [
 type ChannelKey = (typeof CHANNELS)[number]["key"];
 type PlotValues = ComponentProps<typeof ImagePlot>["values"];
 export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
+
+interface Cell {
+  key: string;
+  title: string;
+  content: ReactNode;
+}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -36,7 +51,7 @@ function SpectroscopyPlots({
 
   const totalRows = 10;
   const rowsPerPlot = expanded ? totalRows / 2 : totalRows;
-  const w = 1;
+  const cols = expanded ? 2 : 5;
   const minimumRowHeight = 20;
   const minimumGridHeight = minimumRowHeight * totalRows;
   const [containerHeight, setContainerHeight] = useState(0);
@@ -62,45 +77,61 @@ function SpectroscopyPlots({
   const gridHeight = rowHeight * totalRows;
 
   // -------------------------------------------------------------------------
-  // Layout: 3x1 collapsed, 2x2 expanded
+  // Cells
   // -------------------------------------------------------------------------
-  const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: rowsPerPlot, static: true },
-    { i: "1", x: 1, y: 0, w: w, h: rowsPerPlot, static: true },
-    {
-      i: "2",
-      x: expanded ? 0 : 2,
-      y: expanded ? rowsPerPlot : 0,
-      w: w,
-      h: rowsPerPlot,
-      static: true,
-    },
-  ];
+  const overviewCell: Cell = {
+    key: "overview",
+    title: "Overview",
+    content: <CamPva src={OVERVIEW_SRC} alt="DCAM-01" />,
+  };
+
+  const channelCells: Cell[] = CHANNELS.map(({ key, label }) => ({
+    key,
+    title: label,
+    content: (
+      <ImagePlot
+        aspect={plotAspectRatio}
+        plotConfig={{}}
+        customToolbarChildren={null}
+        values={channels[key]}
+        //tightAxes //requires Davidia 1.1.0
+      />
+    ),
+  }));
+
+  // Placeholder for the composite image
+  const compositeCell: Cell = {
+    key: "composite",
+    title: "Composite image",
+    content: null,
+  };
+
+  // Drawer open: camera + 3 channels + composite in one row (5x1)
+  // Drawer closed: 3 channels + composite in a 2x2
+  const cells = expanded
+    ? [...channelCells, compositeCell]
+    : [overviewCell, ...channelCells, compositeCell];
 
   // -------------------------------------------------------------------------
-  // Views
+  // Layout
   // -------------------------------------------------------------------------
-  const views = CHANNELS.map(({ key }) => (
-    <ImagePlot
-      aspect={plotAspectRatio}
-      plotConfig={{}}
-      customToolbarChildren={null}
-      values={channels[key]}
-      //tightAxes //requires Davidia 1.1.0
-    />
-  ));
-
-  const titles = CHANNELS.map(({ label }) => label);
+  const layout = cells.map(({ key }, i) => ({
+    i: key,
+    x: i % cols,
+    y: Math.floor(i / cols) * rowsPerPlot,
+    w: 1,
+    h: rowsPerPlot,
+    static: true,
+  }));
 
   // -------------------------------------------------------------------------
   // Plot cells
   // -------------------------------------------------------------------------
-  const plots = views.map((view, i) => (
+  const plots = cells.map(({ key, title, content }) => (
     <Box
-      key={i}
+      key={key}
       sx={{
         width: "100%",
-        // height: "100%",
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
@@ -117,7 +148,7 @@ function SpectroscopyPlots({
         marginLeft={2}
         flexShrink={0}
       >
-        {titles[i]}
+        {title}
       </Typography>
       <Box
         sx={{
@@ -130,7 +161,7 @@ function SpectroscopyPlots({
           "& > div": { height: "100%" },
         }}
       >
-        {view}
+        {content}
       </Box>
     </Box>
   ));
@@ -156,7 +187,7 @@ function SpectroscopyPlots({
           width={width}
           style={{ height: gridHeight }}
           gridConfig={{
-            cols: expanded ? 2 : 3,
+            cols: cols,
             rowHeight: rowHeight,
             margin: [0, 0],
           }}
