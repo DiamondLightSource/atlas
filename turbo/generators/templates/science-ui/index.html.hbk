@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/diamond.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>P48 training rig</title>
+    <title>{{ name }} Science UI</title>
   </head>
   <body>
     <script>

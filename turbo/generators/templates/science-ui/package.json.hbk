@@ -15,6 +15,7 @@
     "@atlas/auth": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi": "workspace:*",
+    "@atlas/blueapi-ui": "workspace:*",
     "@mui/material": "^7.3.11",
     "lucide-react": "^1.60.0",
     "react-router-dom": "^7.18.1",

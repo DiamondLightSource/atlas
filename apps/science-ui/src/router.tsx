@@ -1,5 +1,6 @@
 import { type SectionGroup, createRouter } from "@atlas/app-shell";
-import { LucideLayoutDashboard } from "lucide-react";
+import { PlanBrowser } from "@atlas/blueapi-ui";
+import { LucideLayoutDashboard, ScanQrCode } from "lucide-react";
 import { Dashboard } from "./Dashboard";
 
 const navigation: SectionGroup[] = [
@@ -13,6 +14,18 @@ const navigation: SectionGroup[] = [
           {
             name: "Dashboard",
             element: <Dashboard />,
+          },
+        ],
+      },
+      {
+        name: "Acquisition",
+        icon: <ScanQrCode />,
+        path: "acquisition",
+        isProtected: true,
+        pages: [
+          {
+            name: "Plans",
+            element: <PlanBrowser />,
           },
         ],
       },

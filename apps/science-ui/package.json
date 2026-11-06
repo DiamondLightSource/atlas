@@ -13,20 +13,23 @@
   "dependencies": {
     "@atlas/app-shell": "workspace:*",
     "@atlas/auth": "workspace:*",
-    "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi": "workspace:*",
-    "@mui/material": "^7.3.11",
-    "lucide-react": "^1.60.0",
-    "react-router-dom": "^7.18.1",
+    "@atlas/blueapi-query": "workspace:*",
+    "@atlas/blueapi-ui": "workspace:*",
     "@diamondlightsource/sci-react-ui": "0.8.0",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1"
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.11",
+    "@tanstack/react-query": "^5.90.21",
+    "lucide-react": "^1.60.0",
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
+    "msw": "^3.0.4",
     "vite": "^7.3.1",
     "vitest": "^5.0.5"
   }
