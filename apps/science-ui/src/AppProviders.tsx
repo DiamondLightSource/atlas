@@ -7,6 +7,9 @@ import { authProvider } from "./auth";
 import type { Api } from "@atlas/blueapi";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
+import { GetInstrumentSessions } from "./GetInstrumentSessions";
+import { RelayEnvironmentProvider } from "react-relay/hooks";
+import { relayEnvironment } from "./RelayEnvironment";
 
 type Props = {
   theme: Theme;
@@ -19,21 +22,15 @@ export function AppProviders({ theme, blueapi, queryClient, children }: Props) {
   return (
     <AuthContextProvider provider={authProvider}>
       <ThemeProvider theme={theme}>
-        <BlueapiProvider api={blueapi}>
-          <QueryClientProvider client={queryClient}>
-            <InstrumentSessionProvider
-              sessionsList={[
-                "cm44196-1",
-                "cm44196-2",
-                "cm44196-3",
-                "cm44196-4",
-                "cm44196-5",
-              ]}
-            >
-              {children}
-            </InstrumentSessionProvider>
-          </QueryClientProvider>
-        </BlueapiProvider>
+        <RelayEnvironmentProvider environment={relayEnvironment}>
+          <BlueapiProvider api={blueapi}>
+            <QueryClientProvider client={queryClient}>
+              <GetInstrumentSessions beamline="p48">
+                {children}
+              </GetInstrumentSessions>
+            </QueryClientProvider>
+          </BlueapiProvider>
+        </RelayEnvironmentProvider>
       </ThemeProvider>
     </AuthContextProvider>
   );
