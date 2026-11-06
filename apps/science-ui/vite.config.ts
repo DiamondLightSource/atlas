@@ -1,25 +1,10 @@
 import { defineConfig } from "vite";
-
-const target = "https://p48-pollux-proto-jeg.diamond.ac.uk";
+import react from "@vitejs/plugin-react-swc";
+import relay from "vite-plugin-relay";
 
 export default defineConfig({
-  server: {
-    proxy: {
-      "/api/scripting": {
-        target,
-        ws: true,
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api\/scripting/, ""),
-        configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq) =>
-            proxyReq.setHeader("origin", target),
-          );
-          proxy.on("proxyReqWs", (proxyReq) =>
-            proxyReq.setHeader("origin", target),
-          );
-        },
-      },
-    },
+  plugins: [react(), relay],
+  define: {
+    global: {},
   },
 });

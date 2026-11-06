@@ -1,2 +1,1 @@
-import getPlansResponse from "./getPlans.json";
-export const getPlans = getPlansResponse;
+export { blueapiHandlers } from "./blueapiHandlers";

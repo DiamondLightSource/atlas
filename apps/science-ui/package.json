@@ -7,8 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
+    "format": "prettier --config .prettierrc --write \"**/*.{js,ts,tsx,json}\"",
     "test": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "relay": "relay-compiler"
   },
   "dependencies": {
     "@atlas/app-shell": "workspace:*",
@@ -26,11 +28,23 @@
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^20.1.1",
+    "@vitejs/plugin-react-swc": "^3.11.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "msw": "^3.0.4",
+    "react-relay": "^20.1.1",
+    "relay-compiler": "^20.1.1",
+    "relay-runtime": "^20.1.1",
     "vite": "^7.3.1",
+    "vite-plugin-relay": "^2.1.0",
     "vitest": "^5.0.5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
