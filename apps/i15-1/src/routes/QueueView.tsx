@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  Chip,
-  FormControlLabel,
-  Stack,
-  Switch,
-} from "@mui/material";
-import { useMemo, useState } from "react";
+import { Box, Button, Chip, Stack } from "@mui/material";
+import { useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -15,68 +8,54 @@ import {
 import {
   cancelTasks,
   clearHistory,
-  useGetAllTasks,
-  useGetHistoricTasks,
-  useGetQueuedTasks,
+  useGetTasks,
   useMoveTask,
   useQueueEvents,
 } from "../queue/queueService";
 import type { QueueTableData } from "../queue/tableData";
 import { QueueStatusPanel } from "../queue/QueueStatusPanel";
 import { calculateNewPosition, getTableData } from "../queue/queueUtils";
-import type { Status, TaskWithPosition } from "../../generated/queue";
+import type { Status } from "../../generated/queue";
 import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
 import { useRowReorder } from "../components/rowReorder/useRowReorder";
+import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
 
-export function QueueView() {
+interface QueueViewProps {
+  displayMode?: "future" | "historic" | "all";
+  instrument: string;
+}
+
+export function QueueView({
+  displayMode = "future",
+  instrument,
+}: QueueViewProps) {
   useQueueEvents();
 
-  const queuedTasks = useGetQueuedTasks();
-  const allTasks = useGetAllTasks();
-  const historicTasks = useGetHistoricTasks();
+  const tasks = useGetTasks(displayMode);
   const moveTaskMutation = useMoveTask();
-  const [showHistoric, setShowHistoric] = useState(false);
 
-  // The latest historic task is prepended to the queue, so wait for both to
-  // avoid briefly showing it on its own.
-  const isLoading = showHistoric
-    ? allTasks.isPending
-    : queuedTasks.isPending || historicTasks.isPending;
-  const error = showHistoric
-    ? allTasks.error
-    : (queuedTasks.error ?? historicTasks.error);
-
-  const tasksToDisplay = useMemo<TaskWithPosition[]>(() => {
-    if (showHistoric) return allTasks.data ?? [];
-
-    if (isLoading) return [];
-
-    const queued = queuedTasks.data ?? [];
-    const latestHistoricTask = historicTasks.data?.at(-1);
-
-    if (latestHistoricTask == null || latestHistoricTask.status !== "Error") {
-      return queued;
-    }
-
-    return [latestHistoricTask, ...queued];
-  }, [
-    historicTasks.data,
-    isLoading,
-    queuedTasks.data,
-    allTasks.data,
-    showHistoric,
-  ]);
+  const isLoading = tasks.isPending;
+  const isFetching = tasks.isFetching;
+  const error = tasks.error;
 
   const tableData = useMemo<QueueTableData[]>(() => {
-    return getTableData(tasksToDisplay ?? []);
-  }, [tasksToDisplay]);
+    return getTableData(tasks.data ?? []);
+  }, [tasks.data]);
 
   const columns = useMemo<MRT_ColumnDef<QueueTableData>[]>(
     () => [
-      { accessorKey: "position", header: "Position", size: 100 },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "position",
+              header: "Position",
+              size: 100,
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
       { accessorKey: "name", header: "Name", size: 100 },
       {
         accessorKey: "instrumentSession",
@@ -97,32 +76,37 @@ export function QueueView() {
             label={cell.getValue<string>()}
             variant="outlined"
             color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
-          ></Chip>
+          />
         ),
       },
-      {
-        accessorKey: "cancel",
-        header: "",
-        size: 150,
-        enableColumnActions: false,
-        Cell: ({ row }) => {
-          const task = row.original;
-          const isDisabled = task.status != "Queued";
-          return (
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              disabled={isDisabled}
-              onClick={() => cancelTasks([task.id])}
-            >
-              Cancel
-            </Button>
-          );
-        },
-      },
+      ...(displayMode !== "historic"
+        ? [
+            {
+              accessorKey: "cancel",
+              header: "",
+              size: 150,
+              enableColumnActions: false,
+              Cell: ({ row }) => {
+                const task = row.original;
+                const isDisabled = task.status !== "Queued";
+
+                return (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    disabled={isDisabled}
+                    onClick={() => cancelTasks([task.id])}
+                  >
+                    Cancel
+                  </Button>
+                );
+              },
+            } as MRT_ColumnDef<QueueTableData>,
+          ]
+        : []),
     ],
-    [],
+    [displayMode],
   );
 
   const moveRow = (fromIndex: number, toIndex: number) => {
@@ -148,6 +132,7 @@ export function QueueView() {
     getRowId: (row) => row.id,
     state: {
       showSkeletons: isLoading,
+      showProgressBars: isFetching && !isLoading,
       showAlertBanner: !!error,
       ...reorder.state,
     },
@@ -171,28 +156,18 @@ export function QueueView() {
         justifyContent="space-between"
         width="100%"
       >
-        <div>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showHistoric}
-                onChange={(e) => setShowHistoric(e.target.checked)}
-              ></Switch>
-            }
-            label="Show historic tasks"
-          ></FormControlLabel>
-          <Button
-            variant="outlined"
-            color="error"
-            disabled={!showHistoric}
-            onClick={() => clearHistory()}
-          >
-            Clear History
-          </Button>
-        </div>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={displayMode === "future"}
+          onClick={() => clearHistory()}
+        >
+          Clear History
+        </Button>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <QueueEstimatedRuntime />
           <QueueStatusPanel />
-          {reorder.toggleButton}
+          {displayMode !== "historic" && reorder.toggleButton}
         </Stack>
       </Stack>
     ),
@@ -206,7 +181,7 @@ export function QueueView() {
       return (
         <Box sx={{ p: 2 }}>
           {row.original.task.kind == "Experiment" ? (
-            <PlanStatusPanel data={blueapi_calls} />
+            <PlanStatusPanel instrument={instrument} data={blueapi_calls} />
           ) : (
             <JsonView data={blueapi_calls[0].task_request} />
           )}

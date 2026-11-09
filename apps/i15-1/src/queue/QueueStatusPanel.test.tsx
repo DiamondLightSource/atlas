@@ -18,7 +18,10 @@ describe("QueueStatusPanel", () => {
     } as unknown as ReturnType<typeof queueService.useGetQueuedTasks>);
 
     vi.spyOn(queueService, "useToggleQueueState").mockReturnValue({
-      paused: false,
+      queueState: {
+        paused: false,
+        estimated_runtime: null,
+      },
     } as unknown as ReturnType<typeof queueService.useToggleQueueState>);
 
     render(<QueueStatusPanel />);
@@ -36,7 +39,10 @@ describe("QueueStatusPanel", () => {
     } as unknown as ReturnType<typeof queueService.useGetQueuedTasks>);
 
     vi.spyOn(queueService, "useToggleQueueState").mockReturnValue({
-      paused: false,
+      queueState: {
+        paused: false,
+        estimated_runtime: null,
+      },
     } as unknown as ReturnType<typeof queueService.useToggleQueueState>);
 
     render(<QueueStatusPanel />);
@@ -54,7 +60,10 @@ describe("QueueStatusPanel", () => {
     } as unknown as ReturnType<typeof queueService.useGetQueuedTasks>);
 
     vi.spyOn(queueService, "useToggleQueueState").mockReturnValue({
-      paused: true,
+      queueState: {
+        paused: true,
+        estimated_runtime: null,
+      },
     } as unknown as ReturnType<typeof queueService.useToggleQueueState>);
 
     render(<QueueStatusPanel />);
@@ -72,7 +81,10 @@ describe("QueueStatusPanel", () => {
     } as unknown as ReturnType<typeof queueService.useGetQueuedTasks>);
 
     vi.spyOn(queueService, "useToggleQueueState").mockReturnValue({
-      paused: true,
+      queueState: {
+        paused: true,
+        estimated_runtime: null,
+      },
     } as unknown as ReturnType<typeof queueService.useToggleQueueState>);
 
     render(<QueueStatusPanel />);
@@ -90,7 +102,10 @@ describe("QueueControlButton", () => {
     } as unknown as ReturnType<typeof queueService.useConnected>);
 
     vi.spyOn(queueService, "useToggleQueueState").mockReturnValue({
-      paused: false,
+      queueState: {
+        paused: false,
+        estimated_runtime: null,
+      },
       toggle,
       isLoading: false,
     } as unknown as ReturnType<typeof queueService.useToggleQueueState>);

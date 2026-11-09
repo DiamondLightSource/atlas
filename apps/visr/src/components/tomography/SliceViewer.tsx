@@ -1,14 +1,21 @@
 import { Box } from "@mui/material";
-import { Plane } from "./PlaneEnum";
 import { HeatmapPlot } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import createArrayFromView from "../../utils/createArrayFromView";
+
+// Not importing Plane in case we move SliceViewer somewhere else as a generic component
+enum Plane {
+  X,
+  Y,
+  Z,
+}
 
 interface Props {
   volumeData: Uint8Array;
   volumeShape: [number, number, number];
   plane: Plane;
   slice: number;
+  threshold?: number; // raw 0–255; values at or below render as the bottom of the colormap
   resizeKey?: string; //if this depends on a value, the plot will remount every time that value changes. If no need for it to remound, leave as undefined
 }
 export default function SliceViewer({
@@ -16,6 +23,7 @@ export default function SliceViewer({
   volumeShape,
   plane,
   slice,
+  threshold = 0,
   resizeKey,
 }: Props) {
   if (volumeData == undefined || volumeShape == undefined) {
@@ -46,7 +54,7 @@ export default function SliceViewer({
       aspect={"equal"}
       plotConfig={{}}
       values={sliceNdarray}
-      domain={[0, 255]}
+      domain={[threshold, 255]}
       customToolbarChildren={null}
     />
   );

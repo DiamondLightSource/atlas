@@ -8,6 +8,9 @@ import type { TaskWithPosition } from "../../generated/queue";
 vi.mock("../queue/QueueStatusPanel", () => ({
   QueueStatusPanel: () => null,
 }));
+vi.mock("../queue/QueueEstimatedRuntime", () => ({
+  QueueEstimatedRuntime: () => null,
+}));
 
 // Uses the real MaterialReactTable, unlike QueueView.test.tsx
 const task = (id: string, position: number) => ({
@@ -37,11 +40,9 @@ describe("QueueView row reordering", () => {
     vi.restoreAllMocks();
     mutate.mockReset();
     vi.spyOn(queueService, "useQueueEvents").mockImplementation(() => {});
-    vi.spyOn(queueService, "useGetQueuedTasks").mockReturnValue(
+    vi.spyOn(queueService, "useGetTasks").mockReturnValue(
       result([task("a", 0), task("b", 1), task("c", 2)]),
     );
-    vi.spyOn(queueService, "useGetAllTasks").mockReturnValue(result([]));
-    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue(result([]));
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
       mutate,
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
@@ -57,7 +58,7 @@ describe("QueueView row reordering", () => {
   };
 
   it("hides drag handles and row menus until Reorder queue is pressed, and Exit ordering hides them", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
 
     expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(0);
     expect(
@@ -81,7 +82,7 @@ describe("QueueView row reordering", () => {
   });
 
   it("moves a task down via the row menu", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     openRowMenu("Exp a");
     fireEvent.click(screen.getByRole("menuitem", { name: "Move down" }));
 
@@ -89,7 +90,7 @@ describe("QueueView row reordering", () => {
   });
 
   it("moves a task up via the row menu", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     openRowMenu("Exp c");
     fireEvent.click(screen.getByRole("menuitem", { name: "Move up" }));
 
@@ -97,7 +98,7 @@ describe("QueueView row reordering", () => {
   });
 
   it("moves a task to the top via the row menu", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     openRowMenu("Exp c");
     fireEvent.click(screen.getByRole("menuitem", { name: "Move to top" }));
 
@@ -105,7 +106,7 @@ describe("QueueView row reordering", () => {
   });
 
   it("moves a task to the bottom via the row menu", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     openRowMenu("Exp a");
     fireEvent.click(screen.getByRole("menuitem", { name: "Move to bottom" }));
 
@@ -113,10 +114,15 @@ describe("QueueView row reordering", () => {
   });
 
   it("doesn't allow dropping on a row that can't be moved", () => {
-    vi.spyOn(queueService, "useGetHistoricTasks").mockReturnValue(
-      result([{ ...task("e", 0), position: null, status: "Error" }]),
+    vi.spyOn(queueService, "useGetTasks").mockReturnValue(
+      result([
+        task("a", 0),
+        task("b", 1),
+        task("c", 2),
+        { ...task("e", 0), position: null, status: "Error" },
+      ]),
     );
-    render(<QueueView />);
+    render(<QueueView displayMode="all" instrument="i15-1" />);
     startReordering();
 
     // Only the three queued tasks can be dragged
@@ -145,9 +151,9 @@ describe("QueueView row reordering", () => {
   });
 
   it("moves the dragged task even if the queue changes mid-drag", () => {
-    const queued = vi.spyOn(queueService, "useGetQueuedTasks");
+    const queued = vi.spyOn(queueService, "useGetTasks");
     queued.mockReturnValue(result([task("a", 0), task("b", 1), task("c", 2)]));
-    const { rerender } = render(<QueueView />);
+    const { rerender } = render(<QueueView instrument="i15-1" />);
     startReordering();
 
     const dataTransfer = {
@@ -160,7 +166,7 @@ describe("QueueView row reordering", () => {
       dataTransfer,
     });
     queued.mockReturnValue(result([task("b", 1), task("c", 2)]));
-    rerender(<QueueView />);
+    rerender(<QueueView instrument="i15-1" />);
 
     fireEvent.dragEnter(
       screen.getByText("Exp c").closest("tr") as HTMLElement,
@@ -176,7 +182,7 @@ describe("QueueView row reordering", () => {
   });
 
   it("disables moving the first task up and to the top", () => {
-    render(<QueueView />);
+    render(<QueueView instrument="i15-1" />);
     openRowMenu("Exp a");
 
     for (const name of ["Move to top", "Move up"]) {
