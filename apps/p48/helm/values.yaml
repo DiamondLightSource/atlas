@@ -31,8 +31,8 @@ ui-base:
           uri: https://graph.diamond.ac.uk
 
     - id: jeg
-      path: /api/scripting/
-      rewriteTarget: /
+      path: /api/scripting/(.*)$$
+      rewriteTarget: /$$1
       passHostHeader: false
       proxyWebSockets: true
       target:
