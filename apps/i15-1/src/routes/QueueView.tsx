@@ -20,6 +20,7 @@ import { CHIP_COLOR_MAP } from "../queue/queueConstants";
 import { PlanStatusPanel } from "../queue/PlanStatusPanel";
 import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
+import { useRowReorder } from "../components/rowReorder/useRowReorder";
 import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
 
 interface QueueViewProps {
@@ -108,58 +109,45 @@ export function QueueView({
     [displayMode],
   );
 
+  const moveRow = (fromIndex: number, toIndex: number) => {
+    const task = tableData[fromIndex];
+    if (task?.position == null || task.status !== "Queued") return;
+    if (tableData[toIndex] == null) return;
+
+    moveTaskMutation.mutate({
+      taskId: task.id,
+      newPosition: calculateNewPosition(task.position, fromIndex, toIndex),
+    });
+  };
+  const reorder = useRowReorder<QueueTableData>({
+    label: "Reorder queue",
+    onReorder: moveRow,
+    // Only queued tasks can be moved
+    isMovable: (row) => row.original.status === "Queued",
+  });
+
   const table = useMaterialReactTable({
     columns: columns,
     data: tableData,
+    getRowId: (row) => row.id,
     state: {
       showSkeletons: isLoading,
       showProgressBars: isFetching && !isLoading,
       showAlertBanner: !!error,
+      ...reorder.state,
     },
     muiToolbarAlertBannerProps: error
       ? { color: "error", children: `Error: ${error.message}` }
       : undefined,
     ...diamondFillParentTableProps,
+    ...reorder.tableOptions,
     // Rows aren't clickable; no hover state.
-    muiTableBodyRowProps: { hover: false },
-    enableRowOrdering: displayMode !== "historic",
-    enableRowDragging: displayMode !== "historic",
-    enableSorting: false,
+    muiTableBodyRowProps: { hover: false, sx: reorder.rowSx },
+    muiTopToolbarProps: { sx: reorder.toolbarSx },
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     enableExpanding: true,
     muiDetailPanelProps: { sx: { py: 0, backgroundColor: "action.hover" } },
-    getRowId: (originalRow) => originalRow.id,
-    muiRowDragHandleProps: ({ row, table }) => {
-      const isDraggable = row.original.status === "Queued";
-      return {
-        draggable: isDraggable,
-        sx: !isDraggable ? { display: "none" } : undefined,
-        onDragEnd: () => {
-          const draggedRow = table.getState().draggingRow;
-          const targetRow = table.getState().hoveredRow;
-
-          if (
-            !draggedRow ||
-            draggedRow.original.position === null ||
-            !targetRow ||
-            targetRow.index === undefined
-          )
-            return;
-
-          const newPosition = calculateNewPosition(
-            draggedRow.original.position,
-            draggedRow.index,
-            targetRow.index,
-          );
-
-          moveTaskMutation.mutate({
-            taskId: draggedRow.original.id,
-            newPosition: newPosition,
-          });
-        },
-      };
-    },
     renderTopToolbarCustomActions: () => (
       <Stack
         direction="row"
@@ -179,6 +167,7 @@ export function QueueView({
         <Stack direction="row" alignItems="center" spacing={2}>
           <QueueEstimatedRuntime />
           <QueueStatusPanel />
+          {displayMode !== "historic" && reorder.toggleButton}
         </Stack>
       </Stack>
     ),
