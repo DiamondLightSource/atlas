@@ -19,6 +19,8 @@ import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 
+const INSTRUMENT: string = "i15-1";
+
 const navigation: SectionGroup[] = [
   {
     sections: [
@@ -37,6 +39,7 @@ const navigation: SectionGroup[] = [
         name: "Acquisition",
         icon: <ScanQrCode />,
         path: "acquisition",
+        isProtected: true,
         pages: [
           {
             name: "Robot",
@@ -56,6 +59,7 @@ const navigation: SectionGroup[] = [
         name: "Setup",
         icon: <SlidersHorizontal />,
         path: "setup",
+        isProtected: true,
         pages: [
           {
             name: "Pucks",
@@ -71,18 +75,21 @@ const navigation: SectionGroup[] = [
         name: "Queue",
         icon: <ListTodo />,
         path: "queue",
+        isProtected: true,
         pages: [
           {
-            name: "All queue tasks",
-            element: <QueueView />,
+            name: "Future tasks",
+            element: <QueueView displayMode="future" instrument={INSTRUMENT} />,
           },
           {
-            name: "Next tasks",
-            element: <QueueView />,
+            name: "All tasks",
+            element: <QueueView displayMode="all" instrument={INSTRUMENT} />,
           },
           {
-            name: "Previous tasks",
-            element: <QueueView />,
+            name: "Historic tasks",
+            element: (
+              <QueueView displayMode="historic" instrument={INSTRUMENT} />
+            ),
           },
         ],
       },

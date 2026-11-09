@@ -10,11 +10,13 @@ import {
   ColourSchemeButton,
   Logo,
   Navbar,
+  User,
 } from "@diamondlightsource/sci-react-ui";
 
 import { topBarHeight } from "./layoutConstants";
 
 import { InstrumentSessionView } from "./context/instrumentSession/InstrumentSessionView";
+import { useAuth } from "@atlas/auth";
 
 type Props = {
   title: string;
@@ -23,6 +25,11 @@ type Props = {
 };
 
 export function TopBar({ title, open, setOpen }: Props) {
+  const { isAuthenticated, isLoading, user, login, logout } = useAuth();
+
+  if (isLoading) return null;
+
+  const authState = isAuthenticated ? { name: user!.name } : null;
   return (
     <Navbar
       surface="surface"
@@ -68,25 +75,6 @@ export function TopBar({ title, open, setOpen }: Props) {
             variant="h6"
             noWrap
             component="div"
-            sx={{
-              ml: 1.5,
-              mr: 1.25,
-            }}
-          >
-            Data Acquisition
-          </Typography>
-
-          <Divider
-            orientation="vertical"
-            variant="middle"
-            flexItem
-            sx={{ borderColor: "currentColor", opacity: 0.3 }}
-          />
-
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
             sx={{ ml: 1.5, mr: 1.25 }}
           >
             {title}
@@ -108,7 +96,12 @@ export function TopBar({ title, open, setOpen }: Props) {
           </Box>
         </Box>
       }
-      rightSlot={<ColourSchemeButton />}
+      rightSlot={
+        <>
+          <User onLogin={login} onLogout={logout} user={authState} />
+          <ColourSchemeButton />
+        </>
+      }
     />
   );
 }

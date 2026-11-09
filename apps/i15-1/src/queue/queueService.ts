@@ -1,27 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import axios, { type AxiosInstance } from "axios";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { type AxiosInstance } from "axios";
 import type {
   QueueState,
   TaskCancelRequest,
-  AddTasksToQueueQueuePostData,
   Experiment,
   TaskRequest,
   TaskWithPosition,
 } from "../../generated/queue";
-import { addTasksToQueueQueuePost } from "../../generated/queue";
-import { client } from "../../generated/queue/client.gen";
+import { createAxiosWithLoginRedirect } from "@atlas/auth/axios";
+import { authProvider } from "../auth";
 
 // This should be tidied up in https://github.com/DiamondLightSource/atlas/issues/59
 // Ideally we would use a vite proxy for it (like BlueAPI) but this doesn't play nice
 // with the websockets needed for `events`
 const USE_LOCAL = import.meta.env.VITE_USE_LOCAL === "true";
-const QUEUE_SOCKET: string = USE_LOCAL
+const QUEUE_URL: string = USE_LOCAL
   ? "http://127.0.0.1:8001"
   : "/api/daq-queue";
-
-client.setConfig({ baseUrl: QUEUE_SOCKET });
 
 const handlers = {
   state_update: "state",
@@ -33,8 +29,10 @@ const handlers = {
 };
 
 export function createQueueApiClient(baseURL: string): AxiosInstance {
-  return axios.create({ baseURL });
+  return createAxiosWithLoginRedirect(authProvider.login, { baseURL });
 }
+
+const queueClient = createQueueApiClient(QUEUE_URL);
 
 export function useQueueEvents() {
   const queryClient = useQueryClient();
@@ -43,7 +41,7 @@ export function useQueueEvents() {
   useEffect(() => {
     if (!connected) return;
 
-    const source = new EventSource(QUEUE_SOCKET + "/events");
+    const source = new EventSource(QUEUE_URL + "/events");
 
     Object.entries(handlers).forEach(([eventName, queryKey]) => {
       source.addEventListener(eventName, (event) => {
@@ -66,7 +64,7 @@ export function useQueueEvents() {
 }
 
 const getQueueHealth = async (): Promise<QueueState> => {
-  const response = await axios.get<QueueState>(QUEUE_SOCKET + "/healthz");
+  const response = await queueClient.get<QueueState>("/healthz");
   return response.data;
 };
 
@@ -103,7 +101,7 @@ export function useConnected() {
 }
 
 const getQueueState = async (): Promise<QueueState> => {
-  const response = await axios.get<QueueState>(QUEUE_SOCKET + "/queue/state");
+  const response = await queueClient.get<QueueState>("/queue/state");
   return response.data;
 };
 
@@ -112,17 +110,16 @@ export function useGetQueueState() {
     queryKey: ["state"],
     queryFn: getQueueState,
     staleTime: Infinity,
-    refetchInterval: false,
+    refetchInterval: 1000,
     refetchOnWindowFocus: "always",
     refetchOnMount: "always",
   });
 }
 
 export const patchQueueState = async (paused: boolean): Promise<QueueState> => {
-  const response = await axios.patch<QueueState>(
-    QUEUE_SOCKET + "/queue/state",
-    { paused: paused },
-  );
+  const response = await queueClient.patch<QueueState>("/queue/state", {
+    paused: paused,
+  });
   return response.data;
 };
 
@@ -142,24 +139,24 @@ export function usePauseQueue() {
 }
 
 export function useToggleQueueState() {
-  const { data } = useGetQueueState();
+  const { data: queueState } = useGetQueueState();
   const mutation = usePatchQueueState();
 
   const toggle = async () => {
-    if (data == null) return;
-    return mutation.mutateAsync(!data.paused);
+    if (queueState == null) return;
+    return mutation.mutateAsync(!queueState.paused);
   };
 
   return {
-    paused: data?.paused ?? false,
+    queueState,
     isLoading: mutation.isPending,
     toggle,
-    isDisabled: mutation.isPending || data == null,
+    isDisabled: mutation.isPending || queueState == null,
   };
 }
 
 const getQueuedTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/queue");
+  const response = await queueClient.get<TaskWithPosition[]>("/queue");
   return response.data;
 };
 
@@ -175,7 +172,7 @@ export function useGetQueuedTasks() {
 }
 
 const getAllTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(QUEUE_SOCKET + "/tasks");
+  const response = await queueClient.get<TaskWithPosition[]>("/tasks");
   return response.data;
 };
 
@@ -191,9 +188,7 @@ export function useGetAllTasks() {
 }
 
 const getHistoricTasks = async (): Promise<TaskWithPosition[]> => {
-  const response = await axios.get<TaskWithPosition[]>(
-    QUEUE_SOCKET + "/history",
-  );
+  const response = await queueClient.get<TaskWithPosition[]>("/history");
   return response.data;
 };
 
@@ -211,8 +206,8 @@ export function useGetHistoricTasks() {
 export const cancelTasks = async (
   taskIds: string[],
 ): Promise<TaskWithPosition[]> => {
-  const response = await axios.delete<TaskWithPosition[]>(
-    QUEUE_SOCKET + "/queue/tasks",
+  const response = await queueClient.delete<TaskWithPosition[]>(
+    "/queue/tasks",
     {
       data: {
         task_ids: taskIds,
@@ -240,16 +235,12 @@ export const moveTask = async ({
   taskId: string;
   newPosition: number;
 }): Promise<number> => {
-  const response = await axios.post<number>(
-    QUEUE_SOCKET + "/queue/move",
-    null,
-    {
-      params: {
-        task_id: taskId,
-        new_position: newPosition,
-      },
+  const response = await queueClient.post<number>("/queue/move", null, {
+    params: {
+      task_id: taskId,
+      new_position: newPosition,
     },
-  );
+  });
 
   return response.data;
 };
@@ -265,7 +256,7 @@ export function useMoveTask() {
 }
 
 export const clearHistory = async (): Promise<number> => {
-  const response = await axios.delete<number>(QUEUE_SOCKET + "/history");
+  const response = await queueClient.delete<number>("/history");
 
   return response.data;
 };
@@ -277,23 +268,10 @@ export const submitQueueTasks = async ({
   experiments: (Experiment | TaskRequest)[];
   taskPosition?: number;
 }) => {
-  const data: AddTasksToQueueQueuePostData = {
-    url: `/queue`,
-    body: experiments,
-    query: {
+  await queueClient.post("/queue", experiments, {
+    params: {
       position: taskPosition,
     },
-  };
-
-  await addTasksToQueueQueuePost(data).then(async (response) => {
-    if (response.response?.ok) {
-      return response;
-    } else {
-      console.error(JSON.stringify(response.error?.detail));
-      throw new Error(
-        `${response.response?.status}, ${response.response?.statusText}`,
-      );
-    }
   });
 };
 
@@ -311,4 +289,70 @@ export function useSumbitQueueTasks() {
       console.error(error.message);
     },
   });
+}
+
+export function useGetLatestHistoricTask() {
+  const historicTasks = useGetHistoricTasks();
+
+  return {
+    ...historicTasks,
+    data: historicTasks.data?.at(-1),
+  };
+}
+
+export function prependLatestFailedTask(
+  queue: TaskWithPosition[],
+  latest: TaskWithPosition | undefined,
+): TaskWithPosition[] {
+  if (latest?.status === "Error") {
+    return [latest, ...queue];
+  }
+
+  return queue;
+}
+
+// We should do this differently, see https://github.com/DiamondLightSource/atlas/issues/251
+export function useGetQueuedTasksWithLastFailed() {
+  const queuedTasks = useGetQueuedTasks();
+  const latestHistoricTask = useGetLatestHistoricTask();
+
+  const data = useMemo(
+    () =>
+      prependLatestFailedTask(queuedTasks.data ?? [], latestHistoricTask.data),
+    [queuedTasks.data, latestHistoricTask.data],
+  );
+
+  return {
+    ...queuedTasks,
+    data,
+    error: queuedTasks.error ?? latestHistoricTask.error,
+    isPending: queuedTasks.isPending || latestHistoricTask.isPending,
+    isFetching: queuedTasks.isFetching || latestHistoricTask.isFetching,
+  };
+}
+
+export type TaskQueryResult = {
+  data: TaskWithPosition[] | undefined;
+  error: Error | null;
+  isPending: boolean;
+  isFetching: boolean;
+};
+
+export function useGetTasks(
+  mode: "future" | "historic" | "all",
+): TaskQueryResult {
+  const futureTasks = useGetQueuedTasksWithLastFailed();
+  const historicTasks = useGetHistoricTasks();
+  const allTasks = useGetAllTasks();
+
+  switch (mode) {
+    case "future":
+      return futureTasks;
+
+    case "historic":
+      return historicTasks;
+
+    case "all":
+      return allTasks;
+  }
 }

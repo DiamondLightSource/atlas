@@ -2,29 +2,39 @@ import { GlobalStyles } from "@mui/material";
 import Box from "@mui/material/Box";
 import { NavLink, Outlet } from "react-router-dom";
 import { routePath, type RouterProps } from "./Router";
-import { SidebarNav, type Navigation } from "./SidebarNav";
+import { SidebarNav, type Navigation } from "@diamondlightsource/sci-react-ui";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
+import { useAuth } from "@atlas/auth";
+import type { ReactNode } from "react";
 
-export function toNavItemGroups(routerProps: RouterProps): Navigation {
+export function toNavItemGroups(
+  routerProps: RouterProps,
+  isAuthenticated: boolean,
+): Navigation {
   return routerProps.navigation.map((group) => ({
     name: group.name,
-    navItems: group.sections.map((section) => ({
-      label: section.name,
-      icon: section.icon,
-      linkProps: {
-        to: routePath(section),
-        component: NavLink,
-      },
-    })),
+    navItems: group.sections
+      .filter((section) => isAuthenticated || !section.isProtected)
+      .map((section) => ({
+        label: section.name,
+        icon: section.icon,
+        linkProps: {
+          to: routePath(section),
+          component: NavLink,
+        },
+      })),
   }));
 }
 
 export function Layout(props: RouterProps) {
   const { open, setOpen } = usePersistentDrawerState();
+  const { isLoading, isAuthenticated } = useAuth();
+  if (isLoading) return null;
+  const navigation = toNavItemGroups(props, isAuthenticated);
 
-  const navigation = toNavItemGroups(props);
+  const footer = props.footer ? props.footer({ open }) : undefined;
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -40,7 +50,7 @@ export function Layout(props: RouterProps) {
         navigation={navigation}
         open={open}
         setOpen={setOpen}
-        footer={props.footer}
+        footerSlot={footer}
       />
       <Box
         component="main"

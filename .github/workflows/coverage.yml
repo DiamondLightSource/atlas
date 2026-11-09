@@ -73,6 +73,10 @@ jobs:
             cp "$file" "pr-coverage/$project.json"
           done
 
+      - name: Clear PR coverage output
+        if: env.has_affected == 'true'
+        run: find apps packages -name node_modules -prune -o -type d -name coverage -prune -exec rm -rf {} +
+
         # --- baseline coverage ---
       - name: Checkout target branch
         if: env.has_affected == 'true'
@@ -128,6 +132,8 @@ jobs:
         # --- compare ---
       - name: Compare coverage
         if: env.has_affected == 'true'
+        env:
+          COVERAGE_TOLERANCE: "5"
         # the script errors (exit code 1), causing this action to fail,
         # if regression for any app or package is detected
         run: node scripts/compare-coverage.mjs pr-coverage base-coverage

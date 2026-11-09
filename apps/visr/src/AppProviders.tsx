@@ -6,14 +6,17 @@ import type { ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { RelayEnvironment } from "./RelayEnvironment";
 import { BlueapiProvider } from "@atlas/blueapi-query";
+import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
 import { InstrumentSessionLoader } from "./components/InstrumentSessionSelection/InstrumentSessionLoader";
 
 export const AppProviders = ({
+  authProvider,
   api,
   queryClient,
   theme,
   children,
 }: {
+  authProvider: AuthProvider;
   api: Api;
   queryClient: QueryClient;
   theme: Theme;
@@ -21,13 +24,15 @@ export const AppProviders = ({
 }) => {
   return (
     <ThemeProvider theme={theme}>
-      <RelayEnvironmentProvider environment={RelayEnvironment}>
-        <InstrumentSessionLoader>
-          <QueryClientProvider client={queryClient}>
-            <BlueapiProvider api={api}>{children}</BlueapiProvider>
-          </QueryClientProvider>
-        </InstrumentSessionLoader>
-      </RelayEnvironmentProvider>
+      <AuthContextProvider provider={authProvider}>
+        <RelayEnvironmentProvider environment={RelayEnvironment}>
+          <InstrumentSessionLoader>
+            <QueryClientProvider client={queryClient}>
+              <BlueapiProvider api={api}>{children}</BlueapiProvider>
+            </QueryClientProvider>
+          </InstrumentSessionLoader>
+        </RelayEnvironmentProvider>
+      </AuthContextProvider>
     </ThemeProvider>
   );
 };
