@@ -453,8 +453,9 @@ describe("QueueView column visibility", () => {
       getLatestOptions()?.columns.map((column) => column.accessorKey),
     ).toContain("cancel");
 
-    expect(getLatestOptions()?.enableRowDragging).toBe(true);
-    expect(getLatestOptions()?.enableRowOrdering).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Reorder queue" }),
+    ).toBeInTheDocument();
 
     rerender(<QueueView displayMode="historic" instrument="i15-1" />);
 
@@ -466,7 +467,6 @@ describe("QueueView column visibility", () => {
       getLatestOptions()?.columns.map((column) => column.accessorKey),
     ).not.toContain("cancel");
 
-    expect(getLatestOptions()?.enableRowDragging).toBe(false);
-    expect(getLatestOptions()?.enableRowOrdering).toBe(false);
+    expect(screen.queryByRole("button", { name: "Reorder queue" })).toBeNull();
   });
 });
