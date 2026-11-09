@@ -2,11 +2,12 @@ import { GlobalStyles } from "@mui/material";
 import Box from "@mui/material/Box";
 import { NavLink, Outlet } from "react-router-dom";
 import { routePath, type RouterProps } from "./Router";
-import { SidebarNav, type Navigation } from "./SidebarNav";
+import { SidebarNav, type Navigation } from "@diamondlightsource/sci-react-ui";
 import { TopBar } from "./TopBar";
 import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
 import { useAuth } from "@atlas/auth";
+import type { ReactNode } from "react";
 
 export function toNavItemGroups(
   routerProps: RouterProps,
@@ -33,6 +34,8 @@ export function Layout(props: RouterProps) {
   if (isLoading) return null;
   const navigation = toNavItemGroups(props, isAuthenticated);
 
+  const footer = props.footer ? props.footer({ open }) : undefined;
+
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
       <GlobalStyles
@@ -47,7 +50,7 @@ export function Layout(props: RouterProps) {
         navigation={navigation}
         open={open}
         setOpen={setOpen}
-        footer={props.footer}
+        footerSlot={footer}
       />
       <Box
         component="main"
