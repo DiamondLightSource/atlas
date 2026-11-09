@@ -33,6 +33,7 @@ ui-base:
     - id: jeg
       path: /api/scripting
       rewriteTarget: /
+      passHostHeader: false
       target:
         external:
           uri: https://p48-pollux-proto-jeg.diamond.ac.uk
