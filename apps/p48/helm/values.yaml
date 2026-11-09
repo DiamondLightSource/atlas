@@ -32,7 +32,7 @@ ui-base:
 
     - id: jeg
       path: /api/scripting
-      rewriteTarget: /
+      rewriteTarget: ""
       passHostHeader: false
       target:
         external:
