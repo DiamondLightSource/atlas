@@ -14,12 +14,12 @@ import {
 } from "./queueService";
 
 export function QueueControlButton() {
-  const { paused, toggle, isLoading } = useToggleQueueState();
+  const { queueState, toggle, isLoading } = useToggleQueueState();
   const { connected } = useConnected();
 
   const icon = isLoading ? (
     <CircularProgress size={16} />
-  ) : paused ? (
+  ) : queueState?.paused ? (
     <PlayArrowIcon fontSize="small" />
   ) : (
     <PauseIcon fontSize="small" />
@@ -37,22 +37,21 @@ export function QueueControlButton() {
         },
       }}
       variant="contained"
-      color={!connected ? "error" : paused ? "warning" : "success"}
+      color={!connected ? "error" : queueState?.paused ? "warning" : "success"}
       onClick={toggle}
       disabled={!connected}
       startIcon={icon}
     >
-      {paused ? "Resume" : "Pause"}
+      {queueState?.paused ? "Resume" : "Pause"}
     </Button>
   );
 }
 
 export function QueueStatusPanel() {
-  const { paused } = useToggleQueueState();
+  const { queueState } = useToggleQueueState();
   const queuedTasks = useGetQueuedTasks();
   const empty = !queuedTasks.data || queuedTasks.data.length === 0;
   const { connected } = useConnected();
-
   return (
     <Box
       sx={{
@@ -60,7 +59,7 @@ export function QueueStatusPanel() {
         border: "1px solid",
         borderColor: !connected
           ? "error.main"
-          : paused
+          : queueState?.paused
             ? "warning.main"
             : "success.main",
         borderRadius: 1,
@@ -73,7 +72,7 @@ export function QueueStatusPanel() {
           sx={{
             color: !connected
               ? "error.main"
-              : paused
+              : queueState?.paused
                 ? "warning.main"
                 : "success.main",
             fontWeight: 500,
@@ -85,7 +84,7 @@ export function QueueStatusPanel() {
             ? "Not Connected"
             : empty
               ? "Finished"
-              : paused
+              : queueState?.paused
                 ? "Paused"
                 : "Running"}
         </Typography>
