@@ -34,6 +34,7 @@ ui-base:
       path: /api/scripting/
       rewriteTarget: /
       passHostHeader: false
+      proxyWebSockets: true
       target:
         external:
           uri: https://p48-pollux-proto-jeg.diamond.ac.uk
