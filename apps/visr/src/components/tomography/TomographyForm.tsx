@@ -4,24 +4,11 @@ import AbortButton from "../AbortButton";
 import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
-
-enum LightSource {
-  LED = "led",
-  SR = "sr",
-  DARK = "dark",
-}
+import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 export type TomographyFormData = {
   scan_type: ScanType;
   number_of_projections: number;
-  light_source: LightSource;
   exposure_time: number;
 };
 
@@ -30,7 +17,6 @@ export function TomographyForm() {
   const [formData, setFormData] = useState<TomographyFormData>({
     scan_type: ScanType.STEP,
     number_of_projections: 360,
-    light_source: LightSource.LED,
     exposure_time: 0.1,
   });
   const minProjections = 30;
@@ -88,30 +74,6 @@ export function TomographyForm() {
           onCommit={v => setField("exposure_time", v)}
           minValue={0.1}
         />
-        <FormControl fullWidth sx={{ position: "relative" }}>
-          <FormLabel
-            id="light-source-label"
-            sx={{
-              position: "absolute",
-              top: -24,
-              left: 0,
-              fontSize: "0.875rem",
-            }}
-          >
-            Light Source
-          </FormLabel>
-          <ToggleButtonGroup
-            exclusive
-            fullWidth
-            aria-labelledby="light-source-label"
-            value={formData.light_source}
-            onChange={(_, v) => v && setField("light_source", v)}
-          >
-            <ToggleButton value={LightSource.LED}>LED</ToggleButton>
-            <ToggleButton value={LightSource.SR}>Synchrotron</ToggleButton>
-            <ToggleButton value={LightSource.DARK}>Off</ToggleButton>
-          </ToggleButtonGroup>
-        </FormControl>
       </Box>
 
       {/* Scan controls */}
@@ -140,23 +102,6 @@ export function TomographyForm() {
           buttonText="Run"
         />
         <AbortButton />
-      </Box>
-
-      {/* Darks/flats */}
-      <Box
-        sx={{
-          ...sectionSx,
-        }}
-      >
-        <RunPlanButton
-          name="darks_flats"
-          params={{
-            light_source: formData.light_source,
-            exposure_time: formData.exposure_time,
-          }}
-          instrumentSession={instrumentSession}
-          buttonText="Acquire Darks/Flats"
-        />
       </Box>
     </Box>
   );
