@@ -64,6 +64,7 @@
           "rewriteTarget": { "type": "string" },
           "sse": { "type": "boolean" },
           "passHostHeader": { "type": "boolean" },
+          "proxyWebSockets": { "type": "boolean" },
           "target": {
             "type": "object",
             "oneOf": [
