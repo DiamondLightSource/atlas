@@ -1,14 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import {
-  useLayoutEffect,
-  useState,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
+import { useLayoutEffect, useState, type ComponentProps } from "react";
 import { useSpectroscopyData } from "./useSpectroscopyData";
 import CamPva from "../CamPva";
+import type { Cell } from "../cell";
 
 const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-04:PVA:OUTPUT";
@@ -22,12 +18,6 @@ const CHANNELS = [
 type ChannelKey = (typeof CHANNELS)[number]["key"];
 type PlotValues = ComponentProps<typeof ImagePlot>["values"];
 export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
-
-interface Cell {
-  key: string;
-  title: string;
-  content: ReactNode;
-}
 
 // ---------------------------------------------------------------------------
 // Component

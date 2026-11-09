@@ -1,10 +1,11 @@
 import { Box, Typography } from "@mui/material";
 import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useState, type ReactNode } from "react";
+import { useLayoutEffect, useState } from "react";
 import SliceViewer from "./SliceViewer";
 import VolumeRenderer from "./VolumeRenderer";
 import { Plane } from "./PlaneEnum";
 import CamPva from "../CamPva";
+import type { Cell } from "../cell";
 
 const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-01:PVA:OUTPUT";
@@ -23,12 +24,6 @@ interface Props {
   slice: number;
   plane: Plane;
   threshold: number;
-}
-
-interface Cell {
-  key: string;
-  title: string;
-  content: ReactNode;
 }
 
 // ---------------------------------------------------------------------------
