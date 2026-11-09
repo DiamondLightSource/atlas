@@ -12,6 +12,9 @@ export interface DataChannels {
   diodesRed: NDT;
   diodesGreen: NDT;
   diodesBlue: NDT;
+  /** Composite images; not computed yet, so all empty cells for now */
+  cameraComposite: NDT;
+  diodesComposite: NDT;
   xValues: NDT;
   yValues: NDT;
   /** The beam size /render drew with, and where it came from (Gaussian and footprints) */
@@ -326,6 +329,8 @@ export function toChannels(
       diodesRed: image(ch.DiodesRed, "red"),
       diodesGreen: image(ch.DiodesGreen, "green"),
       diodesBlue: image(ch.DiodesBlue, "blue"),
+      cameraComposite: image(null, "gray"),
+      diodesComposite: image(null, "gray"),
       xValues: binEdgesToAxis(pixelEdges(v.x0, v.x1, v.width)),
       yValues: binEdgesToAxis(pixelEdges(v.y0, v.y1, v.height)),
       beam: answer.beam,
@@ -341,6 +346,8 @@ export function toChannels(
       diodesRed: empty,
       diodesGreen: empty,
       diodesBlue: empty,
+      cameraComposite: empty,
+      diodesComposite: empty,
       xValues: initialAxes,
       yValues: initialAxes,
     };
@@ -361,6 +368,8 @@ export function toChannels(
     diodesRed: image(binned.DiodesRed, "red"),
     diodesGreen: image(binned.DiodesGreen, "green"),
     diodesBlue: image(binned.DiodesBlue, "blue"),
+    cameraComposite: image(null, "gray"),
+    diodesComposite: image(null, "gray"),
     xValues: binEdgesToAxis(splitEdges(binned.x_limits, parts)),
     yValues: binEdgesToAxis(splitEdges(binned.y_limits, parts)),
   };

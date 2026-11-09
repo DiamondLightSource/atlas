@@ -30,6 +30,11 @@ import {
   SCAN_STATUS_TEXT,
   type ScanStatus,
 } from "./scanStatus";
+import CamPva from "../CamPva";
+import type { Cell } from "../cell";
+
+const OVERVIEW_SRC =
+  "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-04:PVA:OUTPUT";
 
 const CHANNELS = [
   { key: "red", label: "Red channel" },
@@ -39,7 +44,8 @@ const CHANNELS = [
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
 type PlotValues = ComponentProps<typeof ImagePlot>["values"];
-export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
+type ImageKey = ChannelKey | "composite";
+export type SpectroscopyData = Partial<Record<ImageKey, PlotValues>>;
 
 // ---------------------------------------------------------------------------
 // Data source -> channel mapping
@@ -47,17 +53,22 @@ export type SpectroscopyData = Partial<Record<ChannelKey, PlotValues>>;
 
 const SOURCE_CHANNELS: Record<
   DataSource,
-  Record<ChannelKey, `${"camera" | "diodes"}${"Red" | "Green" | "Blue"}`>
+  Record<
+    ImageKey,
+    `${"camera" | "diodes"}${"Red" | "Green" | "Blue" | "Composite"}`
+  >
 > = {
   [DataSource.Camera]: {
     red: "cameraRed",
     green: "cameraGreen",
     blue: "cameraBlue",
+    composite: "cameraComposite",
   },
   [DataSource.Diodes]: {
     red: "diodesRed",
     green: "diodesGreen",
     blue: "diodesBlue",
+    composite: "diodesComposite",
   },
 };
 
@@ -71,6 +82,7 @@ function selectChannels(
     red: data[mapping.red],
     green: data[mapping.green],
     blue: data[mapping.blue],
+    composite: data[mapping.composite],
   };
 }
 
@@ -220,7 +232,7 @@ function SpectroscopyPlots({
 
   const totalRows = 10;
   const rowsPerPlot = expanded ? totalRows / 2 : totalRows;
-  const w = 1;
+  const cols = expanded ? 2 : 5;
   const minimumRowHeight = 20;
   const minimumGridHeight = minimumRowHeight * totalRows;
   const [containerHeight, setContainerHeight] = useState(0);
@@ -246,28 +258,16 @@ function SpectroscopyPlots({
   const gridHeight = rowHeight * totalRows;
 
   // -------------------------------------------------------------------------
-  // Layout: 3x1 collapsed, 2x2 expanded
+  // Cells
   // -------------------------------------------------------------------------
-  const layout = [
-    { i: "0", x: 0, y: 0, w: w, h: rowsPerPlot, static: true },
-    { i: "1", x: 1, y: 0, w: w, h: rowsPerPlot, static: true },
-    {
-      i: "2",
-      x: expanded ? 0 : 2,
-      y: expanded ? rowsPerPlot : 0,
-      w: w,
-      h: rowsPerPlot,
-      static: true,
-    },
-  ];
+  const overviewCell: Cell = {
+    key: "overview",
+    title: "Overview",
+    content: <CamPva src={OVERVIEW_SRC} alt="DCAM-01" />,
+  };
 
-  // -------------------------------------------------------------------------
-  // Views
-  // -------------------------------------------------------------------------
-  const views = CHANNELS.map(({ key }) => {
-    const values = channels[key];
-    if (!values) return null;
-    return (
+  const plot = (values: PlotValues | undefined) =>
+    values ? (
       <ImagePlot
         aspect={plotAspectRatio}
         plotConfig={{ xValues: data.xValues, yValues: data.yValues }}
@@ -275,17 +275,45 @@ function SpectroscopyPlots({
         values={values}
         //tightAxes //requires Davidia 1.1.0
       />
-    );
-  });
+    ) : null;
 
-  const titles = CHANNELS.map(({ label }) => label);
+  const channelCells: Cell[] = CHANNELS.map(({ key, label }) => ({
+    key,
+    title: label,
+    content: plot(channels[key]),
+  }));
+
+  // Not computed yet: empty cells on the same axes as the channels
+  const compositeCell: Cell = {
+    key: "composite",
+    title: "Composite image",
+    content: plot(channels.composite),
+  };
+
+  // Drawer open: camera + 3 channels + composite in one row (5x1)
+  // Drawer closed: 3 channels + composite in a 2x2
+  const cells = expanded
+    ? [...channelCells, compositeCell]
+    : [overviewCell, ...channelCells, compositeCell];
+
+  // -------------------------------------------------------------------------
+  // Layout
+  // -------------------------------------------------------------------------
+  const layout = cells.map(({ key }, i) => ({
+    i: key,
+    x: i % cols,
+    y: Math.floor(i / cols) * rowsPerPlot,
+    w: 1,
+    h: rowsPerPlot,
+    static: true,
+  }));
 
   // -------------------------------------------------------------------------
   // Plot cells
   // -------------------------------------------------------------------------
-  const plots = views.map((view, i) => (
+  const plots = cells.map(({ key, title, content }) => (
     <Box
-      key={i}
+      key={key}
       sx={{
         width: "100%",
         minHeight: 0,
@@ -304,7 +332,7 @@ function SpectroscopyPlots({
         marginLeft={2}
         flexShrink={0}
       >
-        {titles[i]}
+        {title}
       </Typography>
       <Box
         sx={{
@@ -317,7 +345,7 @@ function SpectroscopyPlots({
           "& > div": { height: "100%" },
         }}
       >
-        {view}
+        {content}
       </Box>
     </Box>
   ));
@@ -353,7 +381,7 @@ function SpectroscopyPlots({
             width={width}
             style={{ height: gridHeight }}
             gridConfig={{
-              cols: expanded ? 2 : 3,
+              cols: cols,
               rowHeight: rowHeight,
               margin: [0, 0],
             }}
