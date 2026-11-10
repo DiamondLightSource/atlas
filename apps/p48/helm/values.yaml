@@ -33,7 +33,6 @@ ui-base:
     - id: jeg
       path: /api/scripting/
       rewriteTarget: /
-      passHostHeader: false
       proxyWebSockets: true
       target:
         external:
