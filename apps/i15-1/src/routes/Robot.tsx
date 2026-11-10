@@ -3,63 +3,14 @@ import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import { ReadOnlyPv } from "@atlas/pvws-config";
-import { StatusCard } from "../components/StatusCard";
 import { AbortPlanButton } from "../components/AbortPlanButton";
 import { WebcamStreamFromPv } from "../components/Webcam";
-import { BlueapiWorkerState } from "../components/BlueapiWorkerState";
+import { StatusSummary } from "../components/StatusSummary";
 
 type RobotSampleFormData = {
   puck: number;
   position: number;
 };
-
-function StatusSidebar() {
-  const theme = useTheme();
-  return (
-    <Box sx={{ ml: 5 }}>
-      <Stack direction={"row"} spacing={2}>
-        <StatusCard
-          title="Ring status"
-          bgColor={theme.palette.success.light}
-          cardColor={theme.palette.primary.main}
-        >
-          <ReadOnlyPv
-            label="Ring Current"
-            pv="ca://SR-DI-DCCT-01:SIGNAL"
-            parseNumeric
-            units="mA"
-          />
-          <ReadOnlyPv
-            label="Ring Energy"
-            pv="ca://CS-CS-MSTAT-01:BEAMENERGY"
-            parseNumeric
-            units="GeV"
-          />
-        </StatusCard>
-        <StatusCard
-          title="EH3 Safety"
-          bgColor={theme.palette.success.light}
-          cardColor={theme.palette.primary.main}
-        >
-          <ReadOnlyPv label="Hutch Enabled" pv="ca://BL15I-PS-IOC-02:M14:LOP" />
-        </StatusCard>
-        <StatusCard
-          title="Currently loaded"
-          bgColor={theme.palette.info.light}
-          cardColor={theme.palette.primary.main}
-        >
-          <ReadOnlyPv label="Puck" pv="ca://BL15J-EA-LOC-01:PUCK:INDEX" />
-          <ReadOnlyPv
-            label="Sample Pin"
-            pv="ca://BL15J-EA-LOC-01:SAMPLE:INDEX"
-          />
-        </StatusCard>
-        <BlueapiWorkerState />
-      </Stack>
-    </Box>
-  );
-}
 
 function RobotControl() {
   const { instrumentSession } = useInstrumentSession();
@@ -134,26 +85,24 @@ function Robot() {
       // component={"section"}
       sx={{
         display: "flex",
+        flexDirection: "column",
         justifyContent: "left",
-        mr: 5,
-        ml: 5,
+        gap: 2,
       }}
     >
-      <Stack direction={"column"} spacing={3} alignItems={"left"}>
-        <StatusSidebar />
-        <Stack direction={"row"} spacing={3} alignItems={"left"}>
-          <WebcamStreamFromPv
-            label="JWEB1"
-            sourcePv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
-            size="250"
-          />
-          <WebcamStreamFromPv
-            label="JCAM2"
-            sourcePv="ca://BL15J-DI-CAM-02:MJPG:MJPG_URL_RBV"
-            size="250"
-          />
-          <RobotControl />
-        </Stack>
+      <StatusSummary />
+      <Stack direction={"row"} spacing={3} alignItems={"left"}>
+        <WebcamStreamFromPv
+          label="JWEB1"
+          sourcePv="ca://BL15J-DI-WEB-01:MJPG:MJPG_URL_RBV"
+          size="250"
+        />
+        <WebcamStreamFromPv
+          label="JCAM2"
+          sourcePv="ca://BL15J-DI-CAM-02:MJPG:MJPG_URL_RBV"
+          size="250"
+        />
+        <RobotControl />
       </Stack>
     </Box>
   );

@@ -1,64 +1,41 @@
+import type { WorkerState } from "@atlas/blueapi";
 import { useGetWorkerState } from "@atlas/blueapi-query";
-import {
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-  useTheme,
-  type Theme,
-} from "@mui/material";
+import { DataCard } from "@diamondlightsource/sci-react-ui";
 
-function getStateColorMap(theme: Theme) {
-  return {
-    IDLE: theme.palette.info.main,
-    RUNNING: theme.palette.success.main,
-    PAUSING: theme.palette.warning.main,
-    PAUSED: theme.palette.warning.main,
-    HALTING: theme.palette.warning.main,
-    STOPPING: theme.palette.error.main,
-    ABORTING: theme.palette.error.main,
-    SUSPENDING: theme.palette.error.main,
-    PANICKED: theme.palette.error.main,
-    UNKNOWN: theme.palette.background.paper,
-  };
+function getColour(state: WorkerState) {
+  switch (state) {
+    case "IDLE":
+      return "success";
+    case "RUNNING":
+      return "info";
+    case "PAUSING":
+    case "PAUSED":
+    case "HALTING":
+      return "warning";
+    case "STOPPING":
+    case "ABORTING":
+    case "SUSPENDING":
+    case "PANICKED":
+      return "danger";
+    case "UNKNOWN":
+    default:
+      return "neutral";
+  }
+}
+
+function normaliseCase(state: WorkerState) {
+  return state.charAt(0).toUpperCase() + state.substring(1).toLowerCase();
 }
 
 export function BlueapiWorkerState() {
-  const theme = useTheme();
   const workerState = useGetWorkerState();
-  const stateMap = getStateColorMap(theme);
+  const state = workerState.data ?? "UNKNOWN";
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        minWidth: 250,
-        maxHeight: 200,
-        bgcolor: theme.palette.background.paper,
-        borderColor: theme.palette.text.primary,
-      }}
-    >
-      <CardContent>
-        <Stack direction={"column"} spacing={"1"}>
-          <Typography
-            variant="body1"
-            sx={{
-              fontSize: 16,
-              fontStyle: "italic",
-              fontWeight: "bold",
-            }}
-          >
-            Blueapi worker state:{" "}
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ fontSize: 18, fontWeight: "bold" }}
-            color={stateMap[workerState.data ? workerState.data : "UNKNOWN"]}
-          >
-            {workerState.data}
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
+    <DataCard
+      title="Blueapi worker"
+      value={{ value: normaliseCase(state) }}
+      colour={getColour(state)}
+    />
   );
 }

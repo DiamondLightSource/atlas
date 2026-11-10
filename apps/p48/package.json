@@ -13,7 +13,7 @@
   "dependencies": {
     "@atlas/app-shell": "workspace:*",
     "@atlas/auth": "workspace:*",
-    "@diamondlightsource/sci-react-ui": "0.7.2",
+    "@diamondlightsource/sci-react-ui": "0.8.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@jupyterlab/services": "^7.5.11",
