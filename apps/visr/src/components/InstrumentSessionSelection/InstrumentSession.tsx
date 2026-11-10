@@ -2,6 +2,8 @@ import { useLazyLoadQuery } from "react-relay/hooks";
 import { graphql } from "relay-runtime";
 import type { InstrumentSessionQuery as InstrumentSessionQueryType } from "./__generated__/InstrumentSessionQuery.graphql";
 
+import { useAuth } from "@atlas/auth";
+
 const instrumentSessionQuery = graphql`
   query InstrumentSessionQuery($instrumentKey: String!) {
     instrumentByKey(key: $instrumentKey) {
@@ -17,9 +19,12 @@ const instrumentSessionQuery = graphql`
 `;
 
 export function useInstrumentSessions() {
+  const isAuthenticated = useAuth();
+
   const data = useLazyLoadQuery<InstrumentSessionQueryType>(
     instrumentSessionQuery,
     { instrumentKey: "B01-1" },
+    { fetchPolicy: isAuthenticated ? "store-or-network" : "store-only" },
   );
 
   return (
