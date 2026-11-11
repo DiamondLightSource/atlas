@@ -704,9 +704,15 @@ importers:
         specifier: ^20.1.1
         version: 20.1.1
     devDependencies:
+      '@atlas/vitest-conf':
+        specifier: workspace:*
+        version: link:../vitest-conf
       '@types/relay-runtime':
         specifier: ^20.1.1
         version: 20.1.1
+      vitest:
+        specifier: ^5.1.0
+        version: 5.1.0(@types/node@25.9.2)(@vitest/coverage-v8@4.0.18(vitest@4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(terser@5.48.0)(yaml@2.9.0)))(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
 
   packages/vitest-conf:
     dependencies:
@@ -2973,6 +2979,17 @@ packages:
       vite:
         optional: true
 
+  '@vitest/mocker@5.1.0':
+    resolution: {integrity: sha512-5umB9/jlWcqVS6fsrFmv5Gdnpu6wAUio/lEOwAmvB7v+lFo/IW2B9FhAD0p19GCULTgMzLCdUmuCDCnAzWgppQ==}
+    peerDependencies:
+      msw: ^2.4.9 || ^3.0.0
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      msw:
+        optional: true
+      vite:
+        optional: true
+
   '@vitest/pretty-format@4.0.18':
     resolution: {integrity: sha512-P24GK3GulZWC5tz87ux0m8OADrQIUVDPIjjj65vBXYG17ZeU3qD7r+MNZ1RNv4l8CGU2vtTRqixrOi9fYk/yKw==}
 
@@ -2987,6 +3004,9 @@ packages:
 
   '@vitest/spy@5.0.5':
     resolution: {integrity: sha512-lwJRExuH417257Q5wv9QYugN9IMJkoxcrKrYxGPQkBzl7wlNpTUxD/5yNX4ESKVUIShKPgkGchYPFMWOOk0wzw==}
+
+  '@vitest/spy@5.1.0':
+    resolution: {integrity: sha512-2DPO5OMHWKrBngC+fCmTQqemNF0gidRhp3lxbBmRhW+M1XJrfgPpqNqWVevXtn2f2ufD5ZaR1B6B641aAlcX5A==}
 
   '@vitest/utils@4.0.18':
     resolution: {integrity: sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA==}
@@ -6045,6 +6065,47 @@ packages:
       jsdom:
         optional: true
 
+  vitest@5.1.0:
+    resolution: {integrity: sha512-MzmNFnrwa8v8lF1bLxw3UJ4EREwVOVb75VqJZmUDRjJ6EluK/x9th7qTbaeDk41WxE1GxWqmTXcdsfobfH5sOA==}
+    engines: {node: ^22.12.0 || ^24.0.0 || >=26.0.0}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@opentelemetry/api': ^1.9.0
+      '@types/node': ^22.0.0 || >=24.0.0
+      '@vitest/browser-playwright': 5.1.0
+      '@vitest/browser-preview': 5.1.0
+      '@vitest/browser-webdriverio': ^5.0.0-beta.5 || >=5.0.0
+      '@vitest/coverage-istanbul': 5.1.0
+      '@vitest/coverage-v8': 5.1.0
+      '@vitest/ui': 5.1.0
+      happy-dom: '*'
+      jsdom: '*'
+      vite: ^6.4.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+      '@types/node':
+        optional: true
+      '@vitest/browser-playwright':
+        optional: true
+      '@vitest/browser-preview':
+        optional: true
+      '@vitest/browser-webdriverio':
+        optional: true
+      '@vitest/coverage-istanbul':
+        optional: true
+      '@vitest/coverage-v8':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
@@ -8819,14 +8880,14 @@ snapshots:
       msw: 2.12.10(@types/node@25.9.2)(typescript@7.0.2)
       vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
 
-  '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
+  '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.14.6(@types/node@25.3.3)(typescript@7.0.2)
-      vite: 7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
 
   '@vitest/mocker@4.0.18(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
     dependencies:
@@ -8856,6 +8917,16 @@ snapshots:
       msw: 2.14.6(@types/node@25.9.2)(typescript@7.0.2)
       vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
 
+  '@vitest/mocker@5.1.0(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))':
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      '@vitest/spy': 5.1.0
+      estree-walker: 3.0.3
+      magic-string: 1.4.3
+    optionalDependencies:
+      msw: 2.14.6(@types/node@25.9.2)(typescript@7.0.2)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
+
   '@vitest/pretty-format@4.0.18':
     dependencies:
       tinyrainbow: 3.1.0
@@ -8874,6 +8945,8 @@ snapshots:
   '@vitest/spy@4.0.18': {}
 
   '@vitest/spy@5.0.5': {}
+
+  '@vitest/spy@5.1.0': {}
 
   '@vitest/utils@4.0.18':
     dependencies:
@@ -11899,7 +11972,7 @@ snapshots:
   vitest@4.0.18(@types/node@25.3.3)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.3.3)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
+      '@vitest/mocker': 4.0.18(msw@2.14.6(@types/node@25.3.3)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
@@ -12052,6 +12125,29 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.0.5(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
+      chai: 6.3.0
+      es-module-lexer: 2.3.2
+      expect-type: 1.4.0
+      magic-string: 1.4.3
+      obug: 3.0.0
+      picomatch: 4.0.7
+      std-env: 4.3.0
+      tinybench: 6.2.2
+      tinyexec: 1.3.1
+      tinyglobby: 0.2.17
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)
+      why-is-node-running: 3.2.1
+    optionalDependencies:
+      '@types/node': 25.9.2
+      '@vitest/coverage-v8': 4.0.18(vitest@4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(terser@5.48.0)(yaml@2.9.0))
+      jsdom: 26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - msw
+
+  vitest@5.1.0(@types/node@25.9.2)(@vitest/coverage-v8@4.0.18(vitest@4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@5.9.3))(terser@5.48.0)(yaml@2.9.0)))(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)):
+    dependencies:
+      '@types/chai': 5.2.3
+      '@vitest/mocker': 5.1.0(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
