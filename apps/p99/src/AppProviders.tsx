@@ -8,7 +8,7 @@ import {
 } from "@diamondlightsource/sci-react-ui";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./context/supergraph/RelayEnvironment";
+import { relayEnvironment } from "./relay";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 
 interface Props extends PropsWithChildren {
@@ -27,7 +27,7 @@ export const AppProviders = ({
     <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
       <AuthContextProvider provider={authProvider}>
         <InstrumentSessionProvider>
-          <RelayEnvironmentProvider environment={RelayEnvironment}>
+          <RelayEnvironmentProvider environment={relayEnvironment}>
             <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={blueapi}>{children}</BlueapiProvider>
             </QueryClientProvider>

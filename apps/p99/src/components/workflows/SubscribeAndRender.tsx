@@ -31,12 +31,11 @@ const SubscribeAndRender = ({
   const [workflowData, setWorkflowData] =
     useState<subscribeAndRenderSubscription$data | null>(null);
 
-  const subscriptionData: GraphQLSubscriptionConfig<SubscribeAndRenderSubscriptionType> =
-    useMemo(
+  const subscriptionData = useMemo(
       () => ({
         subscription: subscribeAndRenderSubscription,
         variables: { visit, name: workflowName },
-        onNext: (response) => {
+        onNext: (response: any) => {
           setWorkflowData(response ?? null);
         },
         onError: (error: unknown) => {
