@@ -11,12 +11,12 @@ const HTTP_DEFAULT_ENDPOINT = "/api/supergraph";
 
 function createFetchFunction(authProvider?: AuthProvider): FetchFunction {
   
-  const fetchFn = authProvider
+  const fetchImpl = authProvider
     ? createFetchLoginRedirect(authProvider.login)
     : fetch;
 
   return async (request, variables) => {
-    const resp = await fetchFn(HTTP_DEFAULT_ENDPOINT, {
+    const resp = await fetchImpl(HTTP_DEFAULT_ENDPOINT, {
       method: "POST",
       credentials: "include",
       headers: {

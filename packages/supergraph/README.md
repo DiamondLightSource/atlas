@@ -62,11 +62,14 @@ pnpm relay
 
 ## Using the Relay environment
 
-The shared Relay environment is exported by `@atlas/supergraph`:
+`@atlas/supergraph` exports a `createRelayEnvironment` factory function. Each application should create its own Relay environment, optionally passing an [`AuthProvider`](../auth/README.md) to enable authentication and automatic login redirects on 401 responses.:
 
-```ts
+```tsx
 import { RelayEnvironmentProvider } from "react-relay";
-import { relayEnvironment } from "@atlas/supergraph";
+import { createRelayEnvironment } from "@atlas/supergraph";
+import { authProvider } from "./auth";
+
+const relayEnvironment = createRelayEnvironment(authProvider);
 
 export function App() {
   return (
@@ -76,6 +79,7 @@ export function App() {
   );
 }
 ```
+The authentication provider is optional. If omitted, requests use the standard `fetch` implementation without automatic login redirects.
 
 The environment is configured to communicate with the supergraph at `/api/supergraph`.
 
@@ -109,11 +113,10 @@ The query can be placed wherever it is used by the application. Relay Compiler w
 
 ### 2. Compile the query
 
-Run Relay Compiler from your app's directory:
+Run Relay Compiler:
 
 ```bash
-cd apps/myApp
-pnpm relay
+pnpm -F @atlas/myApp relay
 ```
 
 The compiler:
