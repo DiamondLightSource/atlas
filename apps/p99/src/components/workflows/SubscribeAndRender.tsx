@@ -8,11 +8,9 @@ import RenderSubmittedMessage from "./RenderSubmittedMessage";
 import { useMemo, useState } from "react";
 import type {
   subscribeAndRenderSubscription$data,
-  subscribeAndRenderSubscription as SubscribeAndRenderSubscriptionType,
-} from "../../graphql/__generated__/subscribeAndRenderSubscription.graphql";
+  } from "../../graphql/__generated__/subscribeAndRenderSubscription.graphql";
 import { subscribeAndRenderSubscription } from "../../graphql/subscribeAndRenderSubscription";
 import { useSubscription } from "react-relay";
-import type { GraphQLSubscriptionConfig } from "relay-runtime";
 
 const SubscribeAndRender = ({
   result,
@@ -35,8 +33,8 @@ const SubscribeAndRender = ({
       () => ({
         subscription: subscribeAndRenderSubscription,
         variables: { visit, name: workflowName },
-        onNext: (response: any) => {
-          setWorkflowData(response ?? null);
+        onNext: (response: unknown) => {
+          setWorkflowData(response as subscribeAndRenderSubscription$data);
         },
         onError: (error: unknown) => {
           console.error("Subscription error:", error);
