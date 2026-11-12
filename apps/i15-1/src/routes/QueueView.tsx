@@ -63,9 +63,25 @@ export function QueueView({
         size: 150,
       },
       { accessorKey: "samplePosition", header: "Sample Position", size: 150 },
-      { accessorKey: "density", header: "Density", size: 150 },
-      { accessorKey: "beamSize", header: "Beam size (μm)", size: 150 },
-      { accessorKey: "timePerPDF", header: "Time per PDF (sec)", size: 150 },
+      { accessorKey: "density", header: "Density", maxSize: 150 },
+      {
+        accessorKey: "beamSize",
+        header: "Beam size (μm)",
+        Header: () => (
+          <div style={{ whiteSpace: "normal" }}>Beam size (μm)</div>
+        ),
+        size: 120,
+        maxSize: 150,
+      },
+      {
+        accessorKey: "timePerPDF",
+        header: "Time per PDF (sec)",
+        Header: () => (
+          <div style={{ whiteSpace: "normal" }}>Time per PDF (s)</div>
+        ),
+        size: 120,
+        maxSize: 150,
+      },
       {
         accessorKey: "listOfTemperatures",
         header: "Temperatures (°C)",
