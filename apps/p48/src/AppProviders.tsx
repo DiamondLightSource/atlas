@@ -3,7 +3,10 @@ import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
 import { AuthContextProvider } from "@atlas/auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authProvider } from "./auth";
+
+const queryClient = new QueryClient();
 
 type Props = {
   theme: Theme;
@@ -23,7 +26,9 @@ export function AppProviders({ theme, children }: Props) {
             "cm44196-5",
           ]}
         >
-          {children}
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
         </InstrumentSessionProvider>
       </ThemeProvider>
     </AuthContextProvider>
