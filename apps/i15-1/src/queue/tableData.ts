@@ -12,5 +12,5 @@ export type QueueTableData = {
   beamSize: number | null;
   timePerPDF: number | null;
   status: Status;
-  listOfTemperatures: number[] | null;
+  listOfTemperatures: number[] | undefined;
 };

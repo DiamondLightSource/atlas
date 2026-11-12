@@ -14,7 +14,7 @@ export type ExperimentTableData = {
   beamEnergy: number;
   beamSize: number;
   timePerPDF: number;
-  listOfTemperatures: number[] | null;
+  listOfTemperatures: number[] | undefined;
 };
 
 export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
