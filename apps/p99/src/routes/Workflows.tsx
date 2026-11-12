@@ -5,7 +5,7 @@ import TemplateView from "../components/workflows/TemplateView";
 const Workflows = () => (
   <Container maxWidth={false} sx={{ minHeight: "100vh", mt: 3, mb: 3 }}>
     <Suspense>
-      <TemplateView templateName="ptypy-p99-from-config" />
+      <TemplateView templateName="ptypy-p99-nexus" />
     </Suspense>
   </Container>
 );
