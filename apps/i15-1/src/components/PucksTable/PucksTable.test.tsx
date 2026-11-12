@@ -6,7 +6,7 @@ import * as apollo from "@apollo/client/react";
 
 type MockRow = {
   id: string;
-  barcode: string;
+  name: string;
   session: string;
   parentPosition: number | null;
   status: "Mounted" | "Unmounted";
@@ -52,7 +52,7 @@ vi.mock("material-react-table", () => ({
       <div data-testid="mock-table">
         {table.options.data.map((row: MockRow) => (
           <div key={row.id}>
-            <span>{row.barcode}</span>
+            <span>{row.name}</span>
             <span>{row.session}</span>
             <span>{row.status}</span>
             {row.parentPosition != null && (
@@ -250,8 +250,8 @@ describe("PucksTable", () => {
     renderComponent();
 
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
-    expect(screen.getByText("i15-1_1234")).toBeInTheDocument();
-    expect(screen.getByText("i15-1_56789")).toBeInTheDocument();
+    expect(screen.getByText("i15-1 Puck 1234")).toBeInTheDocument();
+    expect(screen.getByText("i15-1 Puck 56789")).toBeInTheDocument();
     expect(screen.queryByText("i15-1_robot_table")).not.toBeInTheDocument();
     expect(screen.queryByText("i15-1_cupboard_1")).not.toBeInTheDocument();
   });
