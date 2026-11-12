@@ -318,6 +318,9 @@ importers:
       '@atlas/blueapi-query':
         specifier: workspace:*
         version: link:../../packages/blueapi-query
+      '@atlas/supergraph':
+        specifier: workspace:*
+        version: link:../../packages/supergraph
       '@diamondlightsource/sci-react-ui':
         specifier: 0.8.0
         version: 0.8.0(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@jsonforms/core@3.6.0)(@jsonforms/material-renderers@3.6.0(1c22238584d4b5d1e94a37fa2afd1ed3))(@jsonforms/react@3.6.0(@jsonforms/core@3.6.0)(react@18.3.1))(@mui/icons-material@7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-icons@5.6.0(react@18.3.1))(react@18.3.1)
@@ -433,6 +436,9 @@ importers:
       '@atlas/blueapi-ui':
         specifier: workspace:*
         version: link:../../packages/blueapi-ui
+      '@atlas/supergraph':
+        specifier: workspace:*
+        version: link:../../packages/supergraph
       '@diamondlightsource/davidia':
         specifier: ^1.0.3
         version: 1.0.4(@h5web/lib@13.0.0(@react-three/fiber@8.18.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.164.1))(@types/react@18.3.28)(immer@11.2.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.164.1)(typescript@7.0.2))(@react-three/drei@9.122.0(@react-three/fiber@8.18.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.164.1))(@types/react@18.3.28)(@types/three@0.164.1)(immer@11.2.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.164.1)(use-sync-external-store@1.7.0(react@18.3.1)))(@react-three/fiber@8.18.0(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.164.1))(@types/react@18.3.28)(ndarray@1.0.19)(react-dom@18.3.1(react@18.3.1))(react-toastify@11.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(three@0.164.1)
@@ -694,6 +700,25 @@ importers:
       '@atlas/vitest-conf':
         specifier: workspace:*
         version: link:../vitest-conf
+      vitest:
+        specifier: '*'
+        version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
+
+  packages/supergraph:
+    dependencies:
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../auth
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
+    devDependencies:
+      '@atlas/vitest-conf':
+        specifier: workspace:*
+        version: link:../vitest-conf
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
       vitest:
         specifier: '*'
         version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
@@ -2641,6 +2666,9 @@ packages:
 
   '@types/relay-runtime@19.0.3':
     resolution: {integrity: sha512-pvpWWQq5e9KeESF8klQaP2igLLhr2bRd3XxVCxNpGElsPQiP6Mejr59RT9/OGY3O3i8jAGGQsshVe0QCQDbxNg==}
+
+  '@types/relay-runtime@20.1.1':
+    resolution: {integrity: sha512-loM2iJteknnJcsxrynmBVb7pIDkSkJUuCMnAa/oDFcrvaxkDvq8iy0J2UshMdDy14iJJocDblXeAu7c6Q1+Ucw==}
 
   '@types/relay-test-utils@19.0.0':
     resolution: {integrity: sha512-yC/wVgDetV+88HrHLKlesIfju3RGsp32vLs0IiwBPKD0npQSTrFddcP3FNPe5Kkk4/Y/kgY3oR/DA8g8Bmmppw==}
@@ -8432,6 +8460,8 @@ snapshots:
 
   '@types/relay-runtime@19.0.3': {}
 
+  '@types/relay-runtime@20.1.1': {}
+
   '@types/relay-test-utils@19.0.0':
     dependencies:
       '@types/react': 18.3.28
@@ -11032,7 +11062,7 @@ snapshots:
 
   react-relay@20.1.1(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       fbjs: 3.0.5
       invariant: 2.2.4
       nullthrows: 1.1.1
@@ -11187,7 +11217,7 @@ snapshots:
 
   relay-runtime@20.1.1:
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       fbjs: 3.0.5
       invariant: 2.2.4
     transitivePeerDependencies:
