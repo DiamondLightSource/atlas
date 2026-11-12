@@ -26,14 +26,12 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
     header: "Beam Energy (keV)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Beam Energy (keV)</div>,
     accessorKey: "beamEnergy",
-    size: 120,
     maxSize: 150,
   },
   {
     header: "Beam Size (μm)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Beam Size (μm)</div>,
     accessorKey: "beamSize",
-    size: 120,
     maxSize: 150,
   },
   {
