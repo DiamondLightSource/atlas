@@ -14,7 +14,7 @@ export type ExperimentTableData = {
   beamEnergy: number;
   beamSize: number;
   timePerPDF: number;
-  listOfTemperatures: number[] | undefined;
+  listOfTemperatures: number[] | null;
 };
 
 export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
@@ -26,13 +26,13 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
     header: "Beam Energy (keV)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Beam Energy (keV)</div>,
     accessorKey: "beamEnergy",
-    maxSize: 120
+    maxSize: 120,
   },
   {
     header: "Beam Size (μm)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Beam Size (μm)</div>,
     accessorKey: "beamSize",
-    maxSize: 120
+    maxSize: 120,
   },
   {
     header: "Time per PDF (s)",
