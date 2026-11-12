@@ -19,6 +19,7 @@
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",
+    "@atlas/supergraph": "workspace:*",
     "@diamondlightsource/davidia": "^1.0.3",
     "@diamondlightsource/sci-react-ui": "0.8.0",
     "@emotion/react": "^11.14.0",

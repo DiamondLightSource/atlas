@@ -4,7 +4,7 @@ import type { Theme } from "@mui/material";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnvironment";
+import { relayEnvironment } from "./relay";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
 import { InstrumentSessionLoader } from "./components/InstrumentSessionSelection/InstrumentSessionLoader";
@@ -25,7 +25,7 @@ export const AppProviders = ({
   return (
     <ThemeProvider theme={theme}>
       <AuthContextProvider provider={authProvider}>
-        <RelayEnvironmentProvider environment={RelayEnvironment}>
+        <RelayEnvironmentProvider environment={relayEnvironment}>
           <InstrumentSessionLoader>
             <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={api}>{children}</BlueapiProvider>
