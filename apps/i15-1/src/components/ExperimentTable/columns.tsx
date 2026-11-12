@@ -22,11 +22,21 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
   { header: "Sample Name", accessorKey: "sampleName" },
   { header: "Composition", accessorKey: "composition" },
   { header: "Density", accessorKey: "density", maxSize: 120 },
-  { header: "Beam Energy (keV)", accessorKey: "beamEnergy" },
-  { header: "Beam Size (μm)", accessorKey: "beamSize", maxSize: 150 },
+  {
+    header: "Beam Energy (keV)",
+    Header: () => <div style={{ whiteSpace: "normal" }}>Beam Energy (keV)</div>,
+    accessorKey: "beamEnergy",
+    maxSize: 120
+  },
+  {
+    header: "Beam Size (μm)",
+    Header: () => <div style={{ whiteSpace: "normal" }}>Beam Size (μm)</div>,
+    accessorKey: "beamSize",
+    maxSize: 120
+  },
   {
     header: "Time per PDF (s)",
-    //Header: () => <div style={{ whiteSpace: "normal" }}>Time per PDF (s)</div>,
+    Header: () => <div style={{ whiteSpace: "normal" }}>Time per PDF (s)</div>,
     accessorKey: "timePerPDF",
     maxSize: 120,
   },
