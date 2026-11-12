@@ -8,12 +8,15 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ReaderFragment } from 'relay-runtime';
+import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
 export type renderSubmittedMessageFragment$data = {
-  readonly status: {
-    readonly __typename: string;
-  } | null | undefined;
+  readonly status:
+    | {
+        readonly __typename: string;
+      }
+    | null
+    | undefined;
   readonly " $fragmentType": "renderSubmittedMessageFragment";
 };
 export type renderSubmittedMessageFragment$key = {
@@ -22,32 +25,32 @@ export type renderSubmittedMessageFragment$key = {
 };
 
 const node: ReaderFragment = {
-  "argumentDefinitions": [],
-  "kind": "Fragment",
-  "metadata": null,
-  "name": "renderSubmittedMessageFragment",
-  "selections": [
+  argumentDefinitions: [],
+  kind: "Fragment",
+  metadata: null,
+  name: "renderSubmittedMessageFragment",
+  selections: [
     {
-      "alias": null,
-      "args": null,
-      "concreteType": null,
-      "kind": "LinkedField",
-      "name": "status",
-      "plural": false,
-      "selections": [
+      alias: null,
+      args: null,
+      concreteType: null,
+      kind: "LinkedField",
+      name: "status",
+      plural: false,
+      selections: [
         {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "__typename",
-          "storageKey": null
-        }
+          alias: null,
+          args: null,
+          kind: "ScalarField",
+          name: "__typename",
+          storageKey: null,
+        },
       ],
-      "storageKey": null
-    }
+      storageKey: null,
+    },
   ],
-  "type": "Workflow",
-  "abstractKey": null
+  type: "Workflow",
+  abstractKey: null,
 };
 
 (node as any).hash = "03e612be6ddc650f978d56b8e18a9818";
