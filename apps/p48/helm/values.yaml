@@ -31,8 +31,10 @@ ui-base:
           uri: https://graph.diamond.ac.uk
 
     - id: jeg
-      path: /api/scripting
-      rewriteTarget: /api/
+      path: /api/scripting/
+      rewriteTarget: /
+      passHostHeader: false
+      proxyWebSockets: true
       target:
         external:
           uri: https://p48-pollux-proto-jeg.diamond.ac.uk

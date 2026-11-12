@@ -47,6 +47,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
   path: /
   uri: http://{{ include "ui-base.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:80
   passHostHeader: true
+  proxyWebSockets: false
 
 {{- range (.Values.upstreams | default list) }}
 - id: {{ .id }}
@@ -56,6 +57,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
   rewriteTarget: {{ .rewriteTarget }}
   {{- end }}
   passHostHeader: {{ .passHostHeader | default false }}
+  proxyWebSockets: {{ .proxyWebSockets | default false }}
 {{- end }}
 
 {{- end }}
