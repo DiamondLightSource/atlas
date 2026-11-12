@@ -136,6 +136,7 @@ export function ExperimentList() {
     data: flatExperiments,
     ...diamondFillParentTableProps,
     enableColumnResizing: true,
+    layoutMode: "grid", // Because enabling column resizing automatically makes this default to "grid-no-grow"
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
