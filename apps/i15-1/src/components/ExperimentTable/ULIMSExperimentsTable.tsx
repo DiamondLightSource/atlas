@@ -29,6 +29,7 @@ export type ExperimentDefinitionData = {
   beam_energy: number;
   time_per_pdf: number;
   focused_beam_size: number;
+  list_of_temperatures: number[];
 };
 
 export type SampleData = {
@@ -49,6 +50,7 @@ const convertNodeToTableData = (
   beamEnergy: node.experimentDefinition.data.beam_energy,
   timePerPDF: node.experimentDefinition.data.time_per_pdf,
   beamSize: node.experimentDefinition.data.focused_beam_size,
+  listOfTemperatures: node.experimentDefinition.data.list_of_temperatures,
 });
 
 const GET_EXPERIMENTS: TypedDocumentNode<

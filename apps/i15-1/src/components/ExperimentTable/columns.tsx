@@ -14,14 +14,20 @@ export type ExperimentTableData = {
   beamEnergy: number;
   beamSize: number;
   timePerPDF: number;
+  listOfTemperatures: number[] | undefined;
 };
 
 export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
   { header: "Experiment Name", accessorKey: "experimentName" },
   { header: "Sample Name", accessorKey: "sampleName" },
   { header: "Composition", accessorKey: "composition" },
-  { header: "Density", accessorKey: "density" },
+  { header: "Density", accessorKey: "density", maxSize: 120 },
   { header: "Beam Energy (keV)", accessorKey: "beamEnergy" },
   { header: "Beam Size (μm)", accessorKey: "beamSize" },
-  { header: "Time per PDF (sec)", accessorKey: "timePerPDF" },
+  { header: "Time per PDF (sec)", accessorKey: "timePerPDF", maxSize: 120 },
+  {
+    header: "Temperatures (C)",
+    accessorKey: "listOfTemperatures",
+    Cell: ({ cell }) => (cell.getValue<string[]>() ?? []).join(", "),
+  },
 ];
