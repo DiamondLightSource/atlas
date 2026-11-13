@@ -1,4 +1,3 @@
-/* eslint-disable */
 /* tslint:disable */
 
 /**
@@ -7,15 +6,10 @@
  * - Please do NOT modify this file.
  */
 
-const PACKAGE_VERSION = "3.0.3";
-const INTEGRITY_CHECKSUM = "5cd5cf8b54c3a90f82960cedcd637772";
+const PACKAGE_VERSION = "2.10.4";
+const INTEGRITY_CHECKSUM = "f5825c521429caf22a4dd13b66e243af";
 const IS_MOCKED_RESPONSE = Symbol("isMockedResponse");
-
 const activeClientIds = new Set();
-/**
- * @type {Map<string, Set<Promise<Response>>>}
- */
-const pendingRequests = new Map();
 
 addEventListener("install", function () {
   self.skipWaiting();
@@ -25,101 +19,85 @@ addEventListener("activate", function (event) {
   event.waitUntil(self.clients.claim());
 });
 
-addEventListener("message", function (event) {
+addEventListener("message", async function (event) {
   const clientId = Reflect.get(event.source || {}, "id");
 
   if (!clientId || !self.clients) {
     return;
   }
 
-  event.waitUntil(
-    (async () => {
-      if (event.data === "CLIENT_CLOSE") {
-        const allClients = await self.clients.matchAll({
-          type: "window",
-        });
+  const client = await self.clients.get(clientId);
 
-        activeClientIds.delete(clientId);
+  if (!client) {
+    return;
+  }
 
-        // Await any pending requests from the closing client.
-        // This makes sure that those requests are handled and not passthrough.
-        const pending = pendingRequests.get(clientId);
-        if (pending != null && pending.size > 0) {
-          await Promise.allSettled(pending);
-        }
-        pendingRequests.delete(clientId);
+  const allClients = await self.clients.matchAll({
+    type: "window",
+  });
 
-        const remainingClients = allClients.filter(client => {
-          return client.id !== clientId;
-        });
+  switch (event.data) {
+    case "KEEPALIVE_REQUEST": {
+      sendToClient(client, {
+        type: "KEEPALIVE_RESPONSE",
+      });
+      break;
+    }
 
-        // Unregister itself when there are no more clients
-        if (remainingClients.length === 0) {
-          await self.registration.unregister();
-        }
+    case "INTEGRITY_CHECK_REQUEST": {
+      sendToClient(client, {
+        type: "INTEGRITY_CHECK_RESPONSE",
+        payload: {
+          packageVersion: PACKAGE_VERSION,
+          checksum: INTEGRITY_CHECKSUM,
+        },
+      });
+      break;
+    }
 
-        const client = await self.clients.get(clientId);
+    case "MOCK_ACTIVATE": {
+      activeClientIds.add(clientId);
 
-        if (client != null) {
-          await sendToClient(client, {
-            type: "CLIENT_CLOSED",
-          });
-        }
+      sendToClient(client, {
+        type: "MOCKING_ENABLED",
+        payload: {
+          client: {
+            id: client.id,
+            frameType: client.frameType,
+          },
+        },
+      });
+      break;
+    }
 
-        return;
+    case "MOCK_DEACTIVATE": {
+      activeClientIds.delete(clientId);
+      break;
+    }
+
+    case "CLIENT_CLOSED": {
+      activeClientIds.delete(clientId);
+
+      const remainingClients = allClients.filter((client) => {
+        return client.id !== clientId;
+      });
+
+      // Unregister itself when there are no more clients
+      if (remainingClients.length === 0) {
+        self.registration.unregister();
       }
 
-      /**
-       * @note Check for the client AFTER handling "CLIENT_CLOSE".
-       * This prevents early return on "!client" in case the page has reloaded
-       * and disassociated itself from the worker. This ensures self-unregistration
-       * still fires for those pages.
-       */
-      const client = await self.clients.get(clientId);
-
-      if (!client) {
-        return;
-      }
-
-      switch (event.data) {
-        case "KEEPALIVE_REQUEST": {
-          await sendToClient(client, {
-            type: "KEEPALIVE_RESPONSE",
-          });
-          break;
-        }
-
-        case "INTEGRITY_CHECK_REQUEST": {
-          await sendToClient(client, {
-            type: "INTEGRITY_CHECK_RESPONSE",
-            payload: {
-              packageVersion: PACKAGE_VERSION,
-              checksum: INTEGRITY_CHECKSUM,
-            },
-          });
-          break;
-        }
-
-        case "MOCK_ACTIVATE": {
-          activeClientIds.add(clientId);
-
-          await sendToClient(client, {
-            type: "MOCKING_ENABLED",
-            payload: {
-              client: {
-                id: client.id,
-                frameType: client.frameType,
-              },
-            },
-          });
-          break;
-        }
-      }
-    })(),
-  );
+      break;
+    }
+  }
 });
 
 addEventListener("fetch", function (event) {
+  // Bypass navigation requests.
+  if (event.request.mode === "navigate") {
+    return;
+  }
+
   // Opening the DevTools triggers the "only-if-cached" request
   // that cannot be handled by the worker. Bypass such requests.
   if (
@@ -131,7 +109,7 @@ addEventListener("fetch", function (event) {
 
   // Bypass all requests when there are no active clients.
   // Prevents the self-unregistered worked from handling requests
-  // after it's been terminated (still remains active until the next reload).
+  // after it's been deleted (still remains active until the next reload).
   if (activeClientIds.size === 0) {
     return;
   }
@@ -147,44 +125,7 @@ addEventListener("fetch", function (event) {
 async function handleRequest(event, requestId) {
   const client = await resolveMainClient(event);
   const requestCloneForEvents = event.request.clone();
-
-  const responsePromise = getResponse(event, client, requestId);
-
-  if (client != null) {
-    let pending = pendingRequests.get(client.id);
-
-    if (pending == null) {
-      pendingRequests.set(client.id, (pending = new Set()));
-    }
-
-    pending.add(responsePromise);
-    responsePromise
-      .finally(() => pending.delete(responsePromise))
-      .catch(() => {});
-  }
-
-  let response;
-
-  try {
-    response = await responsePromise;
-  } catch (error) {
-    // The request has settled without a response (e.g. a passthrough
-    // request failed with a network error). Notify the client so it
-    // can release the resources associated with this request.
-    if (client && activeClientIds.has(client.id)) {
-      sendToClient(client, {
-        type: "REQUEST_ERROR",
-        payload: {
-          request: {
-            id: requestId,
-          },
-          error: serializeError(error),
-        },
-      });
-    }
-
-    throw error;
-  }
+  const response = await getResponse(event, client, requestId);
 
   // Send back the response clone for the "response:*" life-cycle events.
   // Ensure MSW is active and ready to handle the message, otherwise
@@ -192,18 +133,8 @@ async function handleRequest(event, requestId) {
   if (client && activeClientIds.has(client.id)) {
     const serializedRequest = await serializeRequest(requestCloneForEvents);
 
-    // Omit the body of server-sent event stream responses.
-    // Cloning such responses would prevent client-side stream cancelations
-    // from reaching the original stream (a teed stream only cancels its
-    // source once both of its branches cancel) and would buffer the
-    // entire stream into the unconsumed clone indefinitely.
-    const isEventStreamResponse = response.headers
-      .get("content-type")
-      ?.toLowerCase()
-      .startsWith("text/event-stream");
-
     // Clone the response so both the client and the library could consume it.
-    const responseClone = isEventStreamResponse ? null : response.clone();
+    const responseClone = response.clone();
 
     sendToClient(
       client,
@@ -216,17 +147,15 @@ async function handleRequest(event, requestId) {
             ...serializedRequest,
           },
           response: {
-            type: response.type,
-            status: response.status,
-            statusText: response.statusText,
-            headers: Object.fromEntries(response.headers.entries()),
-            body: responseClone ? responseClone.body : null,
+            type: responseClone.type,
+            status: responseClone.status,
+            statusText: responseClone.statusText,
+            headers: Object.fromEntries(responseClone.headers.entries()),
+            body: responseClone.body,
           },
         },
       },
-      responseClone && responseClone.body
-        ? [serializedRequest.body, responseClone.body]
-        : [],
+      responseClone.body ? [serializedRequest.body, responseClone.body] : [],
     );
   }
 
@@ -257,11 +186,11 @@ async function resolveMainClient(event) {
   });
 
   return allClients
-    .filter(client => {
+    .filter((client) => {
       // Get only those clients that are currently visible.
       return client.visibilityState === "visible";
     })
-    .find(client => {
+    .find((client) => {
       // Find the client ID that's recorded in the
       // set of clients that have registered the worker.
       return activeClientIds.has(client.id);
@@ -279,34 +208,19 @@ async function getResponse(event, client, requestId) {
   // (i.e. its body has been read and sent to the client).
   const requestClone = event.request.clone();
 
-  /**
-   * @param {{ request?: { headers?: Array<[string, string]> } }} [data]
-   */
-  function passthrough(data) {
-    const headers = new Headers();
-    const requestHeaders = data?.request?.headers;
-
-    if (Array.isArray(requestHeaders)) {
-      // Apply the request headers provided by the client.
-      // Those reflect any modifications made in the request handlers.
-      // Use ".append()" to support multiple headers with the same name.
-      for (const [name, value] of requestHeaders) {
-        headers.append(name, value);
-      }
-    } else {
-      for (const [name, value] of requestClone.headers) {
-        headers.append(name, value);
-      }
-    }
+  function passthrough() {
+    // Cast the request headers to a new Headers instance
+    // so the headers can be manipulated with.
+    const headers = new Headers(requestClone.headers);
 
     // Remove the "accept" header value that marked this request as passthrough.
     // This prevents request alteration and also keeps it compliant with the
     // user-defined CORS policies.
     const acceptHeader = headers.get("accept");
     if (acceptHeader) {
-      const values = acceptHeader.split(",").map(value => value.trim());
+      const values = acceptHeader.split(",").map((value) => value.trim());
       const filteredValues = values.filter(
-        value => value !== "msw/passthrough",
+        (value) => value !== "msw/passthrough",
       );
 
       if (filteredValues.length > 0) {
@@ -348,33 +262,15 @@ async function getResponse(event, client, requestId) {
 
   switch (clientMessage.type) {
     case "MOCK_RESPONSE": {
-      return respondWithMock(clientMessage.data, event);
+      return respondWithMock(clientMessage.data);
     }
 
     case "PASSTHROUGH": {
-      return passthrough(clientMessage.data);
+      return passthrough();
     }
   }
 
   return passthrough();
-}
-
-/**
- * @param {unknown} error
- * @returns {{ name: string, message: string }}
- */
-function serializeError(error) {
-  if (error instanceof Error) {
-    return {
-      name: error.name,
-      message: error.message,
-    };
-  }
-
-  return {
-    name: "Error",
-    message: String(error),
-  };
 }
 
 /**
@@ -387,7 +283,7 @@ function sendToClient(client, message, transferrables = []) {
   return new Promise((resolve, reject) => {
     const channel = new MessageChannel();
 
-    channel.port1.onmessage = event => {
+    channel.port1.onmessage = (event) => {
       if (event.data && event.data.error) {
         return reject(event.data.error);
       }
@@ -404,10 +300,9 @@ function sendToClient(client, message, transferrables = []) {
 
 /**
  * @param {Response} response
- * @param {FetchEvent} event
- * @returns {Promise<Response>}
+ * @returns {Response}
  */
-async function respondWithMock(response, event) {
+function respondWithMock(response) {
   // Setting response status code to 0 is a no-op.
   // However, when responding with a "Response.error()", the produced Response
   // instance will have status code set to 0. Since it's not possible to create
@@ -416,19 +311,7 @@ async function respondWithMock(response, event) {
     return Response.error();
   }
 
-  let body = response.body;
-
-  // Buffer the streamed mocked response body for navigation requests.
-  // The stream is transferred from the client that is being navigated
-  // away from. Once the navigation commits, that client gets destroyed
-  // and the stream will never complete, resulting in an empty document.
-  // Buffering here keeps "event.respondWith()" pending (the navigation
-  // cannot commit) until the entire body arrives from the client.
-  if (event.request.mode === "navigate" && body instanceof ReadableStream) {
-    body = await new Response(body).arrayBuffer();
-  }
-
-  const mockedResponse = new Response(body, response);
+  const mockedResponse = new Response(response.body, response);
 
   Reflect.defineProperty(mockedResponse, IS_MOCKED_RESPONSE, {
     value: true,
