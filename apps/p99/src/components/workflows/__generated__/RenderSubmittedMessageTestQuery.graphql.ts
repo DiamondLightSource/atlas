@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9c473f603b589c9fd2fab1aa81f93533>>
+ * @generated SignedSource<<448bc7a0163c7afc3170fe2e0d10758d>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -127,12 +127,12 @@ const node: ConcreteRequest = (function () {
       ],
     },
     params: {
-      cacheID: "5ca78f304d1729649dbb93c2a951718a",
+      cacheID: "9b53b9a04efddc5116c6e7e7cbbb0a49",
       id: null,
       metadata: {},
       name: "RenderSubmittedMessageTestQuery",
       operationKind: "query",
-      text: "query RenderSubmittedMessageTestQuery(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n}\n",
+      text: "query RenderSubmittedMessageTestQuery(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n  id\n}\n",
     },
   };
 })();

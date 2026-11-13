@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<38bf7fc232db12c20f23bdfba063f4a4>>
+ * @generated SignedSource<<0cf6d3cdfc626be601743508e4756422>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,6 +11,7 @@
 import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
 export type renderSubmittedMessageFragment$data = {
+  readonly id: string;
   readonly status:
     | {
         readonly __typename: string;
@@ -48,11 +49,18 @@ const node: ReaderFragment = {
       ],
       storageKey: null,
     },
+    {
+      alias: null,
+      args: null,
+      kind: "ScalarField",
+      name: "id",
+      storageKey: null,
+    },
   ],
   type: "Workflow",
   abstractKey: null,
 };
 
-(node as any).hash = "03e612be6ddc650f978d56b8e18a9818";
+(node as any).hash = "fe393773e47da80475d877ac163f481d";
 
 export default node;
