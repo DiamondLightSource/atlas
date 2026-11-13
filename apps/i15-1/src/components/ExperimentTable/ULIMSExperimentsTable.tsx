@@ -55,6 +55,7 @@ const convertNodeToTableData = (
   timePerPDF: node.experimentDefinition.data.time_per_pdf,
   beamSize: node.experimentDefinition.data.focused_beam_size,
   qMax: node.experimentDefinition.data.q_max,
+  frames: node.experimentDefinition.data.frames,
   listOfTemperatures: node.experimentDefinition.data.list_of_temperatures,
   rampRate: node.experimentDefinition.data.ramp_rate,
   settleTime: node.experimentDefinition.data.settle_time,
@@ -149,6 +150,7 @@ export function ExperimentList() {
     initialState: {
       columnVisibility: {
         capillary: false,
+        frames: false,
         rampRate: false,
         settleTime: false,
       },

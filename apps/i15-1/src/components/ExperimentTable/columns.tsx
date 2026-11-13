@@ -17,6 +17,7 @@ export type ExperimentTableData = {
   beamSize: number;
   timePerPDF: number;
   qMax: number;
+  frames: number;
   listOfTemperatures: number[] | null;
   rampRate: number | null;
   settleTime: number | null;
@@ -63,6 +64,7 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
     size: 100,
     maxSize: 150,
   },
+  { header: "Frames", accessorKey: "frames", size: 120, maxSize: 150 },
   {
     header: "Temperatures (°C)",
     accessorKey: "listOfTemperatures",
