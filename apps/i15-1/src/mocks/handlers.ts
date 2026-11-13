@@ -94,6 +94,53 @@ const fakeExperiments = {
             },
           },
         },
+        {
+          node: {
+            name: "Test blower experiment",
+            sample: {
+              container: {
+                id: "019fae86-1551-74f2-b876-f2b5dd4dbb43",
+                positionInParent: {
+                  position: 1,
+                },
+                parent: {
+                  id: "019fae86-9deb-7c71-ac6b-2a846f4f2bee",
+                  name: ROBOT_TABLE_NAME,
+                },
+              },
+              positionInContainer: {
+                position: 3,
+              },
+              name: "Test_8_3",
+              id: "19ad91f0-a155-4c5c-b5ba-175bb6f7c057",
+              instrumentSessions: [
+                {
+                  instrumentSessionReference: "CM44163-3",
+                },
+              ],
+              data: {
+                density: 56,
+                capillary: "bs1.5",
+                composition: "Stuff",
+                packing_fraction: 0.5,
+              },
+            },
+            experimentDefinition: {
+              name: "run_full_collection",
+              id: "b645e887-85b4-40d6-a8f0-500a436bc395",
+              data: {
+                q_max: 67,
+                frames: 100,
+                beam_energy: 40,
+                time_per_pdf: 2,
+                focused_beam_size: 5,
+                list_of_temperatures: [100, 120],
+                ramp_rate: 5,
+                settle_time: 10,
+              },
+            },
+          },
+        },
       ],
     },
   },
@@ -712,6 +759,9 @@ const fakeQueue = [
           beam_energy: 40,
           time_per_pdf: 2,
           focused_beam_size: 10,
+          list_of_temperatures: [25, 50, 100],
+          ramp_rate: 5,
+          settle_time: 10,
         },
       },
     },
@@ -786,6 +836,9 @@ const fakeQueue = [
                   beam_energy: 40,
                   time_per_pdf: 2,
                   focused_beam_size: 10,
+                  list_of_temperatures: [25, 50, 100],
+                  ramp_rate: 5,
+                  settle_time: 10,
                 },
               },
             },

@@ -29,6 +29,9 @@ export type ExperimentDefinitionData = {
   beam_energy: number;
   time_per_pdf: number;
   focused_beam_size: number;
+  list_of_temperatures: number[];
+  ramp_rate: number;
+  settle_time: number;
 };
 
 export type SampleData = {
@@ -46,9 +49,16 @@ const convertNodeToTableData = (
   sampleName: node.sample.name,
   density: node.sample.data.density,
   composition: node.sample.data.composition,
+  capillary: node.sample.data.capillary,
+  packingFraction: node.sample.data.packing_fraction,
   beamEnergy: node.experimentDefinition.data.beam_energy,
   timePerPDF: node.experimentDefinition.data.time_per_pdf,
   beamSize: node.experimentDefinition.data.focused_beam_size,
+  qMax: node.experimentDefinition.data.q_max,
+  frames: node.experimentDefinition.data.frames,
+  listOfTemperatures: node.experimentDefinition.data.list_of_temperatures,
+  rampRate: node.experimentDefinition.data.ramp_rate,
+  settleTime: node.experimentDefinition.data.settle_time,
 });
 
 const GET_EXPERIMENTS: TypedDocumentNode<
@@ -135,6 +145,17 @@ export function ExperimentList() {
     columns,
     data: flatExperiments,
     ...diamondFillParentTableProps,
+    enableColumnResizing: true,
+    layoutMode: "grid", // Because enabling column resizing automatically makes this default to "grid-no-grow"
+    initialState: {
+      columnVisibility: {
+        capillary: false,
+        frames: false,
+        rampRate: false,
+        settleTime: false,
+      },
+    },
+    enableColumnOrdering: true,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box

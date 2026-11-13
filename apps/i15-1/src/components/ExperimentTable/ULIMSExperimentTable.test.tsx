@@ -74,6 +74,7 @@ const mockExperiments = {
               beam_energy: 20,
               time_per_pdf: 10,
               focused_beam_size: 5,
+              // list_of_temperatures: [110]  // in C for blower
             },
           },
         },
@@ -121,6 +122,9 @@ const mockExperiments = {
               beam_energy: 20,
               time_per_pdf: 10,
               focused_beam_size: 5,
+              list_of_temperatures: [100, 120],
+              ramp_rate: 5,
+              settle_time: 10,
             },
           },
         },
