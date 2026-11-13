@@ -1,9 +1,9 @@
 ui-base:
-  name: p48
-  host: p48.diamond.ac.uk
+  name: {{ name }}
+  host: {{ name }}.diamond.ac.uk
 
   image:
-    repository: ghcr.io/diamondlightsource/atlas/p48
+    repository: ghcr.io/diamondlightsource/atlas/{{ name }}
     tag: # Updated by CI job with latest release version
 
   upstreams:
@@ -12,15 +12,14 @@ ui-base:
       rewriteTarget: /
       target:
         external:
-          uri: http://p48-blueapi.diamond.ac.uk
+          uri: {{ blueapiUrl }}
 
     - id: tiled
       path: /api/data/
       rewriteTarget: /api/v1/
       target:
-        service:
-          name: p48-tiled
-          port: 8000
+        external:
+          uri: https://tiled.diamond.ac.uk
 
     - id: supergraph
       path: /api/supergraph
@@ -29,10 +28,3 @@ ui-base:
       target:
         external:
           uri: https://graph.diamond.ac.uk
-
-    - id: jeg
-      path: /api/scripting
-      rewriteTarget: /api/
-      target:
-        external:
-          uri: https://p48-pollux-proto-jeg.diamond.ac.uk
