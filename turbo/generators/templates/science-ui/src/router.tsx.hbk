@@ -82,6 +82,6 @@ const navigation: SectionGroup[] = [
 ];
 
 export const router = createRouter({
-  title: "P48",
+  title: "{{ name }}",
   navigation,
 });

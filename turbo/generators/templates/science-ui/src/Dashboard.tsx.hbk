@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 
-/** 
+/**
  * Placeholder landling page. A suggestion would be:
  * - name of beamline and very brief description;
  * - general status of the beamline e.g. 'Scanning',
@@ -9,9 +9,12 @@ import { Box, Typography } from "@mui/material";
 export function Dashboard() {
   return (
     <Box sx={{ ml: 8 }}>
-      <Typography variant="h4Display">Welcome to the Science UI for p48</Typography>
+      <Typography variant="h4Display">
+        Welcome to the Science UI for {{ name }}
+      </Typography>
       <Typography variant="body1">
-        This page should show the beamline at a glance, without requiring logging in.
+        This page should show the beamline at a glance, without requiring
+        logging in.
       </Typography>
     </Box>
   );
