@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<bd1b8135caeb17d19bce04484c0b8df1>>
+ * @generated SignedSource<<0aa0fd58af321e41de7ea616583db2fc>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -124,12 +124,12 @@ const node: ConcreteRequest = (function () {
       ],
     },
     params: {
-      cacheID: "1ca97628bb694c4d5fe00452a2a1d3f8",
+      cacheID: "46861de098dee5318b7418eadfee0c1f",
       id: null,
       metadata: {},
       name: "subscribeAndRenderSubscription",
       operationKind: "subscription",
-      text: "subscription subscribeAndRenderSubscription(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n}\n",
+      text: "subscription subscribeAndRenderSubscription(\n  $visit: VisitInput!\n  $name: String!\n) {\n  workflow(visit: $visit, name: $name) {\n    ...renderSubmittedMessageFragment\n    id\n  }\n}\n\nfragment renderSubmittedMessageFragment on Workflow {\n  status {\n    __typename\n  }\n  id\n}\n",
     },
   };
 })();
