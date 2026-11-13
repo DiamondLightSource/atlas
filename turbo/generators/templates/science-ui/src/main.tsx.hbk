@@ -11,7 +11,7 @@ import { createApi } from "@atlas/blueapi";
 import { authProvider } from "./auth";
 import { QueryClient } from "@tanstack/react-query";
 
-const blueapi = createApi("/api/blueapi", authProvider.login);
+export const blueapi = createApi("/api/blueapi", authProvider.login);
 const queryClient = new QueryClient();
 
 async function enableMocking() {
@@ -25,6 +25,7 @@ enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <AppProviders
+        beamline="{{ name }}"
         theme={DiamondDSTheme}
         blueapi={blueapi}
         queryClient={queryClient}
