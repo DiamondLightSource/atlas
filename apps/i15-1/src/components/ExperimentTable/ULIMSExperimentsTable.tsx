@@ -155,6 +155,7 @@ export function ExperimentList() {
         settleTime: false,
       },
     },
+    enableColumnOrdering: true,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
