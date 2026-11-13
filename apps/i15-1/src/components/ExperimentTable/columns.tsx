@@ -11,10 +11,17 @@ export type ExperimentTableData = {
   sampleName: string;
   composition: string;
   density: number;
+  capillary: string;
+  packingFraction: number;
   beamEnergy: number;
   beamSize: number;
   timePerPDF: number;
+  qMax: number;
   listOfTemperatures: number[] | null;
+  rampRate: number | null;
+  settleTime: number | null;
+  // comment: string | null; // There's 2, one in data and one in exp definition
+  // figure out later
 };
 
 export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
@@ -22,6 +29,14 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
   { header: "Sample Name", accessorKey: "sampleName" },
   { header: "Composition", accessorKey: "composition" },
   { header: "Density", accessorKey: "density", maxSize: 150 },
+  { header: "Capillary", accessorKey: "capillary", size: 120, maxSize: 150 },
+  {
+    header: "Packing Fraction",
+    Header: () => <div style={{ whiteSpace: "normal" }}>Packing Fraction</div>,
+    accessorKey: "packingFraction",
+    size: 120,
+    maxSize: 150,
+  },
   {
     header: "Beam Energy (keV)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Beam Energy (keV)</div>,
@@ -42,8 +57,31 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
     maxSize: 150,
   },
   {
+    header: "Q max (Å⁻¹)",
+    Header: () => <div style={{ whiteSpace: "normal" }}>Q max (Å⁻¹)</div>,
+    accessorKey: "qMax", // if missing it's 25
+    size: 100,
+    maxSize: 150,
+  },
+  {
     header: "Temperatures (°C)",
     accessorKey: "listOfTemperatures",
     Cell: ({ cell }) => (cell.getValue<string[]>() ?? []).join(", "),
+  },
+  {
+    header: "Ramp Rate (°C/min)",
+    Header: () => (
+      <div style={{ whiteSpace: "normal" }}>Ramp Rate (°C/min)</div>
+    ),
+    accessorKey: "rampRate",
+    size: 120,
+    maxSize: 150,
+  },
+  {
+    header: "Settle Time (s)",
+    Header: () => <div style={{ whiteSpace: "normal" }}>Settle Time (s)</div>,
+    accessorKey: "settleTime",
+    size: 120,
+    maxSize: 150,
   },
 ];
