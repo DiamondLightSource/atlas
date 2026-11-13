@@ -21,8 +21,6 @@ export type ExperimentTableData = {
   listOfTemperatures: number[] | null;
   rampRate: number | null;
   settleTime: number | null;
-  // comment: string | null; // There's 2, one in data and one in exp definition
-  // figure out later
 };
 
 export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
@@ -60,7 +58,7 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
   {
     header: "Q max (Å⁻¹)",
     Header: () => <div style={{ whiteSpace: "normal" }}>Q max (Å⁻¹)</div>,
-    accessorKey: "qMax", // if missing it's 25
+    accessorKey: "qMax",
     size: 100,
     maxSize: 150,
   },
