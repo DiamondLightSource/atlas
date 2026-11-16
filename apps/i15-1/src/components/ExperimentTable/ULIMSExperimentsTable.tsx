@@ -7,7 +7,7 @@ import {
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTasks } from "../../queue/queueService";
@@ -76,8 +76,15 @@ export function ExperimentList() {
   }
 
   const visit = visitTextToVisit(instrumentSession ?? "cm0-0");
+  const hasVisit = !!visit;
 
-  const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
+  const [paginationError, setPaginationError] = useState<Error>();
+  const {
+    data,
+    loading,
+    error: queryError,
+    fetchMore,
+  } = useQuery(GET_EXPERIMENTS, {
     skip: !visit,
     variables: {
       proposal: visit?.proposalNumber ?? 0,
@@ -85,9 +92,61 @@ export function ExperimentList() {
       first: 50,
     },
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
     context: { pathname: location.pathname },
   });
 
+  useEffect(() => {
+    setPaginationError(undefined);
+  }, [visit?.proposalNumber, visit?.number]);
+
+  const hasNextPage = data?.experiments?.pageInfo?.hasNextPage;
+  const endCursor = data?.experiments?.pageInfo?.endCursor;
+
+  useEffect(() => {
+    if (
+      !hasVisit ||
+      loading ||
+      queryError ||
+      paginationError ||
+      !hasNextPage ||
+      !endCursor
+    ) {
+      return;
+    }
+
+    void fetchMore({
+      variables: { after: endCursor },
+      updateQuery: (previous, { fetchMoreResult }) => {
+        if (!previous.experiments || !fetchMoreResult.experiments) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          experiments: {
+            ...fetchMoreResult.experiments,
+            edges: [
+              ...previous.experiments.edges,
+              ...fetchMoreResult.experiments.edges,
+            ],
+          },
+        };
+      },
+    }).catch((error: Error) => setPaginationError(error));
+  }, [
+    hasVisit,
+    visit?.proposalNumber,
+    visit?.number,
+    loading,
+    queryError,
+    paginationError,
+    hasNextPage,
+    endCursor,
+    fetchMore,
+  ]);
+
+  const error = queryError ?? paginationError;
   const experiments = data?.experiments?.edges || [];
 
   const typedExperiments = experiments as {
@@ -251,9 +310,9 @@ export function ExperimentList() {
     },
     muiToolbarAlertBannerProps: error
       ? {
-          color: "error",
-          children: `Error: ${error.message}`,
-        }
+        color: "error",
+        children: `Error: ${error.message}`,
+      }
       : undefined,
   });
 
