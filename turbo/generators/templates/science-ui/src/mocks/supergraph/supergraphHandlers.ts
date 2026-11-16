@@ -5,7 +5,7 @@ import { activeVisits } from "./instrumentSession";
 const supergraph = graphql.link("/api/supergraph");
 
 export const supergraphHandlers = [
-  supergraph.query("GetInstrumentSessionsQuery", () =>
+  supergraph.query("InstrumentSessionQuery", () =>
     HttpResponse.json(activeVisits),
   ),
 ];
