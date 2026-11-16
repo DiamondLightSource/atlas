@@ -8,6 +8,7 @@ import {
 import {
   cancelTasks,
   clearHistory,
+  useCancelTasks,
   useGetTasks,
   useMoveTask,
   useQueueEvents,
@@ -36,6 +37,7 @@ export function QueueView({
 
   const tasks = useGetTasks(displayMode);
   const moveTaskMutation = useMoveTask();
+  const cancelTaskMutation = useCancelTasks();
 
   const isLoading = tasks.isPending;
   const isFetching = tasks.isFetching;
@@ -95,8 +97,8 @@ export function QueueView({
                     variant="contained"
                     color="error"
                     size="small"
-                    disabled={isDisabled}
-                    onClick={() => cancelTasks([task.id])}
+                    onClick={() => cancelTaskMutation.mutate([task.id])}
+                    disabled={isDisabled || cancelTaskMutation.isPending}
                   >
                     Cancel
                   </Button>
@@ -106,7 +108,7 @@ export function QueueView({
           ]
         : []),
     ],
-    [displayMode],
+    [displayMode, cancelTaskMutation.isPending],
   );
 
   const moveRow = (fromIndex: number, toIndex: number) => {
