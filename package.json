@@ -21,7 +21,6 @@
     "@vitest/coverage-v8": "^4.0.13",
     "eslint": "^9.36.0",
     "glob": "^14.0.6",
-    "plop-action-copy": "^1.1.0",
     "prettier": "^3.8.1",
     "sort-package-json": "^3.4.0",
     "turbo": "^2.5.6",
