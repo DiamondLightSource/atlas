@@ -194,6 +194,9 @@ export function ExperimentList() {
     columns,
     data: flatExperiments,
     ...diamondFillParentTableProps,
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: 25 },
+    },
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
