@@ -44,6 +44,11 @@ export default function generator(plop: PlopTypes.NodePlopAPI) {
         name: "blueapiUrl",
         message: "Blueapi deployment URL",
       },
+      {
+        type: "input",
+        name: "instrumentKey",
+        message: "Instrument key as it exists in UAS",
+      },
     ],
     actions: [
       {
