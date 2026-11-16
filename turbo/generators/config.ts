@@ -7,7 +7,7 @@ import { globSync } from "glob";
 /* custom action to copy any non handlebar file over */
 const copyRaw = (data: any) => {
   const src = path.resolve(__dirname, "templates/science-ui");
-  const dest = path.resolve(process.cwd(), "apps", data.name);
+  const dest = path.resolve(process.cwd(), "apps", data.name.toLowerCase());
 
   const files = globSync("**/*", {
     cwd: src,

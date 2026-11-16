@@ -6,6 +6,5 @@
     "esModuleInterop": true,
     "types": ["vite/client", "@atlas/vitest-conf/global-types"]
   },
-  "include": ["src", "global.d.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts*", "**/*.spec.ts"]
+  "include": ["src"]
 }
