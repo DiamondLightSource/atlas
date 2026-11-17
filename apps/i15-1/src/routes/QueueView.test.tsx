@@ -22,6 +22,7 @@ type MockTableOptions = {
   columns: {
     accessorKey?: string;
     header?: string;
+    Cell?: (props: { row: { original: MockRow } }) => React.ReactNode;
   }[];
   enableRowDragging?: boolean;
   enableRowOrdering?: boolean;
@@ -53,6 +54,9 @@ vi.mock("material-react-table", () => ({
             {table.options.renderDetailPanel?.({
               row: { original: row },
             })}
+            {table.options.columns
+              .find((column) => column.accessorKey === "cancel")
+              ?.Cell?.({ row: { original: row } })}
           </div>
         ))}
       </div>
@@ -275,6 +279,11 @@ describe("QueueView", () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
 
+    vi.spyOn(queueService, "useCancelTasks").mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof queueService.useCancelTasks>);
+
     vi.spyOn(queueService, "clearHistory").mockImplementation(vi.fn());
     vi.spyOn(queueService, "cancelTasks").mockImplementation(vi.fn());
   });
@@ -309,6 +318,35 @@ describe("QueueView", () => {
     expect(screen.getByTestId("mock-table")).toBeInTheDocument();
     expect(screen.getByText("session1")).toBeInTheDocument();
     expect(screen.queryByText("session2")).not.toBeInTheDocument();
+  });
+
+  it("cancels a queued task when its Cancel button is clicked", () => {
+    const mutate = vi.fn();
+    vi.spyOn(queueService, "useCancelTasks").mockReturnValue({
+      mutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof queueService.useCancelTasks>);
+
+    render(<QueueView instrument="i15-1" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(mutate).toHaveBeenCalledWith(["1"]);
+  });
+
+  it("disables task cancellation while a cancel request is pending", () => {
+    const mutate = vi.fn();
+    vi.spyOn(queueService, "useCancelTasks").mockReturnValue({
+      mutate,
+      isPending: true,
+    } as unknown as ReturnType<typeof queueService.useCancelTasks>);
+
+    render(<QueueView instrument="i15-1" />);
+
+    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    expect(cancelButton).toBeDisabled();
+    fireEvent.click(cancelButton);
+    expect(mutate).not.toHaveBeenCalled();
   });
 
   it("shows QueueStatusPanel", () => {
