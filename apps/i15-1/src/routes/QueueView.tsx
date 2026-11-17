@@ -6,7 +6,6 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import {
-  cancelTasks,
   clearHistory,
   useCancelTasks,
   useGetTasks,
