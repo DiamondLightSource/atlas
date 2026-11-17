@@ -36,5 +36,6 @@ ui-base:
       passHostHeader: false
       proxyWebSockets: true
       target:
-        external:
-          uri: https://p48-pollux-proto-jeg.diamond.ac.uk
+        service:
+          name: enterprise-gateway
+          port: 8888
