@@ -6,11 +6,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient } from "@tanstack/react-query";
 import { createApi } from "@atlas/blueapi";
-import {
-  createRouter,
-  type SectionGroup,
-  SystemControls,
-} from "@atlas/app-shell";
+import { createRouter, type SectionGroup } from "@atlas/app-shell";
 import { PlanBrowser } from "@atlas/blueapi-ui";
 import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
 import { AppProviders } from "./AppProviders.tsx";
@@ -18,8 +14,6 @@ import TomographyView from "./components/tomography/TomographyView.tsx";
 import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
 import Workflows from "./components/workflows/Workflows.tsx";
 import { authProvider } from "./auth.ts";
-
-import { InstrumentSessionButton } from "./components/InstrumentSessionSelection/InstrumentSessionButton.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -54,11 +48,6 @@ const navigation: SectionGroup[] = [
 const router = createRouter({
   title: "ViSR",
   navigation,
-  footer: ({ open }) => (
-    <SystemControls open={open}>
-      <InstrumentSessionButton />
-    </SystemControls>
-  ),
 });
 
 const api = createApi("/api/blueapi", authProvider.login);
