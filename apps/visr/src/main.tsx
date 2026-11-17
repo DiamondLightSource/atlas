@@ -19,7 +19,7 @@ import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
 import Workflows from "./components/workflows/Workflows.tsx";
 import { authProvider } from "./auth.ts";
 
-import { InstrumentSessionButton } from "./components/InstrumentSessionSelection/InstrumentSession.tsx";
+import { InstrumentSessionButton } from "./components/InstrumentSessionSelection/InstrumentSessionButton.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
