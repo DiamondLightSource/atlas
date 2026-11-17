@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Dashboard } from "./Dashboard";
 import { Typography } from "@mui/material";
+import { Mapping } from "./mapping/Mapping";
 
 const navigation: SectionGroup[] = [
   {
@@ -45,6 +46,10 @@ const navigation: SectionGroup[] = [
         path: "acquisition",
         isProtected: true,
         pages: [
+          {
+            name: "Mapping",
+            element: <Mapping />,
+          },
           {
             name: "Plans",
             element: (
