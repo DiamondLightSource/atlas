@@ -41,7 +41,7 @@ const fakeExperiments = {
               name: "run_full_collection",
               id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
               data: {
-                q_max: 67,
+                q_max: 30,
                 frames: 90,
                 beam_energy: 40,
                 time_per_pdf: 2,
@@ -85,7 +85,7 @@ const fakeExperiments = {
               name: "run_full_collection",
               id: "b645e887-85b4-40d6-a8f0-500a436bc395",
               data: {
-                q_max: 67,
+                q_max: 40,
                 frames: 100,
                 beam_energy: 40,
                 time_per_pdf: 2,
@@ -237,7 +237,7 @@ const fakeHistory = [
         name: "run_full_collection",
         id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
         data: {
-          q_max: 67,
+          q_max: 35,
           frames: 90,
           beam_energy: 40,
           time_per_pdf: 2,
@@ -296,7 +296,7 @@ const fakeHistory = [
                 name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
-                  q_max: 67,
+                  q_max: 35,
                   frames: 90,
                   beam_energy: 40,
                   time_per_pdf: 2,
@@ -357,7 +357,7 @@ const fakeHistory = [
         name: "run_full_collection",
         id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
         data: {
-          q_max: 67,
+          q_max: 35,
           frames: 90,
           beam_energy: 40,
           time_per_pdf: 2,
@@ -414,7 +414,7 @@ const fakeHistory = [
                 name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
-                  q_max: 67,
+                  q_max: 35,
                   frames: 90,
                   beam_energy: 40,
                   time_per_pdf: 2,
@@ -460,7 +460,7 @@ const fakeHistory = [
                 name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
-                  q_max: 67,
+                  q_max: 35,
                   frames: 90,
                   beam_energy: 40,
                   time_per_pdf: 2,
@@ -537,7 +537,7 @@ const fakeQueue = [
         name: "run_full_collection",
         id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
         data: {
-          q_max: 67,
+          q_max: 25,
           frames: 90,
           beam_energy: 40,
           time_per_pdf: 2,
@@ -611,7 +611,7 @@ const fakeQueue = [
                 name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
-                  q_max: 67,
+                  q_max: 25,
                   frames: 90,
                   beam_energy: 40,
                   time_per_pdf: 2,
@@ -707,7 +707,7 @@ const fakeQueue = [
         name: "run_full_collection",
         id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
         data: {
-          q_max: 67,
+          q_max: 30,
           frames: 90,
           beam_energy: 40,
           time_per_pdf: 2,
@@ -781,7 +781,7 @@ const fakeQueue = [
                 name: "run_full_collection",
                 id: "62b75b2f-8401-4230-b7ef-a4e577af598a",
                 data: {
-                  q_max: 67,
+                  q_max: 25,
                   frames: 90,
                   beam_energy: 40,
                   time_per_pdf: 2,
