@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useInstrumentSessions } from "./InstrumentSession";
+// import { useInstrumentSessions } from "./InstrumentSession";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
 
 export const InstrumentSessionLoader = ({
