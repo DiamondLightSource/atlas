@@ -156,6 +156,7 @@ export function ExperimentList() {
       },
     },
     enableColumnOrdering: true,
+    enableColumnDragging: false,
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
