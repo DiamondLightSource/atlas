@@ -27,7 +27,7 @@ export const columns: MRT_ColumnDef<ExperimentTableData>[] = [
   { header: "Experiment Name", accessorKey: "experimentName" },
   { header: "Sample Name", accessorKey: "sampleName" },
   { header: "Composition", accessorKey: "composition" },
-  { header: "Density", accessorKey: "density", maxSize: 150 },
+  { header: "Density", accessorKey: "density", size: 120, maxSize: 150 },
   { header: "Capillary", accessorKey: "capillary", size: 120, maxSize: 150 },
   {
     header: "Packing Fraction",
