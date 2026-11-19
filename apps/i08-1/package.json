@@ -1,0 +1,51 @@
+{
+  "name": "@atlas/i08-1",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint .",
+    "format": "prettier --config .prettierrc --write \"**/*.{js,ts,tsx,json}\"",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "relay": "relay-compiler"
+  },
+  "dependencies": {
+    "@atlas/app-shell": "workspace:*",
+    "@atlas/auth": "workspace:*",
+    "@atlas/blueapi": "workspace:*",
+    "@atlas/blueapi-query": "workspace:*",
+    "@atlas/blueapi-ui": "workspace:*",
+    "@atlas/supergraph": "workspace:*",
+    "@diamondlightsource/sci-react-ui": "0.8.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.11",
+    "@tanstack/react-query": "^5.90.21",
+    "lucide-react": "^1.60.0",
+    "react-router-dom": "^7.18.1"
+  },
+  "devDependencies": {
+    "@atlas/vitest-conf": "workspace:*",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^20.1.1",
+    "@vitejs/plugin-react-swc": "^3.11.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "msw": "^3.0.4",
+    "react-relay": "^20.1.1",
+    "relay-compiler": "^20.1.1",
+    "relay-runtime": "^20.1.1",
+    "vite": "^7.3.1",
+    "vite-plugin-relay": "^2.1.0",
+    "vitest": "^5.0.5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
