@@ -57,7 +57,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
   rewriteTarget: {{ .rewriteTarget }}
   {{- end }}
   passHostHeader: {{ .passHostHeader | default false }}
-  proxyWebSockets: {{ .proxyWebSockets | default false }}
+  proxyWebSockets: {{ .ws | default false }}
 {{- end }}
 
 {{- end }}
