@@ -1,7 +1,32 @@
 import { Box, Grid } from "@mui/material";
 import { Map } from "./Map";
+import { ROIs } from "./roi/ROIs";
+import {
+  RectangularSelection,
+  type SelectionBase,
+  type SelectionHandler,
+} from "@diamondlightsource/davidia";
+import { useState } from "react";
+import { Parameters } from "./Parameters";
 
 export function Mapping() {
+  const [selections, setSelections] = useState<SelectionBase[]>([]);
+  const selectionHandler: SelectionHandler = (
+    updatedSelection,
+    dragging,
+    clear,
+  ) => {
+    if (!updatedSelection) return "";
+    if (RectangularSelection.isShape(updatedSelection)) {
+      setSelections(prev =>
+        prev.map(sel =>
+          sel.id === updatedSelection.id ? updatedSelection : sel,
+        ),
+      );
+    }
+    return updatedSelection.id;
+  };
+
   return (
     <Box
       sx={{
@@ -18,7 +43,7 @@ export function Mapping() {
         }}
       >
         <Grid size={2}>Datasets</Grid>
-        <Grid size={6}>
+        <Grid size={7}>
           <Box
             sx={{
               display: "flex",
@@ -39,7 +64,10 @@ export function Mapping() {
                 },
               }}
             >
-              <Map />
+              <Map
+                selections={selections}
+                selectionHandler={selectionHandler}
+              />
             </Box>
             <Box
               sx={{
@@ -53,11 +81,13 @@ export function Mapping() {
                 },
               }}
             >
-              <Map />
+              <Map selections={[]} selectionHandler={() => null} />
             </Box>
           </Box>
         </Grid>
-        <Grid size={4}>Scan parameters</Grid>
+        <Grid size={3}>
+          <Parameters selections={selections} setSelections={setSelections} />
+        </Grid>
       </Grid>
     </Box>
   );

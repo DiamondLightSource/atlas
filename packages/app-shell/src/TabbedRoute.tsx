@@ -63,7 +63,7 @@ export function TabbedPanel({ tabs, basePath }: TabbedPanelProps) {
           minHeight: 0,
           minWidth: 0,
           overflow: "auto",
-          p: 3,
+          // p: 3,
           display: "flex",
           flexDirection: "column",
         }}
