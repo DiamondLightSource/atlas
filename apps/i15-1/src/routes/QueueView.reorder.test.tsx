@@ -1,4 +1,11 @@
-import { render, screen, fireEvent, within } from "@atlas/vitest-conf";
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  userEvent,
+  waitFor,
+} from "@atlas/vitest-conf";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { QueueView } from "./QueueView";
@@ -34,6 +41,7 @@ const result = (data: unknown) =>
   > as UseQueryResult<TaskWithPosition[], Error>;
 
 describe("QueueView row reordering", () => {
+  const user = userEvent.setup();
   const mutate = vi.fn();
 
   beforeEach(() => {
@@ -48,72 +56,86 @@ describe("QueueView row reordering", () => {
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
   });
 
-  const startReordering = () =>
-    fireEvent.click(screen.getByRole("button", { name: "Reorder queue" }));
+  const startReordering = async () =>
+    await user.click(screen.getByRole("button", { name: "Reorder queue" }));
 
-  const openRowMenu = (rowName: string) => {
-    startReordering();
+  const openRowMenu = async (rowName: string) => {
+    await startReordering();
     const row = screen.getByText(rowName).closest("tr") as HTMLElement;
-    fireEvent.click(within(row).getByRole("button", { name: /row actions/i }));
+    await user.click(within(row).getByRole("button", { name: /row actions/i }));
   };
 
-  it("hides drag handles and row menus until Reorder queue is pressed, and Exit ordering hides them", () => {
+  it("hides drag handles and row menus until Reorder queue is pressed, and Exit ordering hides them", async () => {
     render(<QueueView instrument="i15-1" />);
 
+    // initial state
     expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(0);
     expect(
       screen.queryAllByRole("button", { name: /row actions/i }),
     ).toHaveLength(0);
 
-    startReordering();
+    // enter reorder mode
+    await startReordering();
 
-    expect(screen.queryByRole("button", { name: "Reorder queue" })).toBeNull();
-    expect(screen.getAllByRole("button", { name: /move/i })).toHaveLength(3);
+    await waitFor(() => {
+      expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(
+        3,
+      );
+      expect(
+        screen.queryAllByRole("button", { name: /row actions/i }),
+      ).toHaveLength(3);
+    });
+
     expect(
-      screen.getAllByRole("button", { name: /row actions/i }),
-    ).toHaveLength(3);
+      screen.queryByRole("button", { name: "Reorder queue" }),
+    ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Exit ordering" }));
+    // exit reorder mode
+    await user.click(screen.getByRole("button", { name: "Exit ordering" }));
 
-    expect(
-      screen.getByRole("button", { name: "Reorder queue" }),
-    ).toBeInTheDocument();
-    expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(0);
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Reorder queue" }),
+      ).toBeInTheDocument();
+      expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(
+        0,
+      );
+    });
   });
 
-  it("moves a task down via the row menu", () => {
+  it("moves a task down via the row menu", async () => {
     render(<QueueView instrument="i15-1" />);
-    openRowMenu("Exp a");
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move down" }));
+    await openRowMenu("Exp a");
+    await user.click(screen.getByRole("menuitem", { name: "Move down" }));
 
     expect(mutate).toHaveBeenCalledWith({ taskId: "a", newPosition: 1 });
   });
 
-  it("moves a task up via the row menu", () => {
+  it("moves a task up via the row menu", async () => {
     render(<QueueView instrument="i15-1" />);
-    openRowMenu("Exp c");
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move up" }));
+    await openRowMenu("Exp c");
+    await user.click(screen.getByRole("menuitem", { name: "Move up" }));
 
     expect(mutate).toHaveBeenCalledWith({ taskId: "c", newPosition: 1 });
   });
 
-  it("moves a task to the top via the row menu", () => {
+  it("moves a task to the top via the row menu", async () => {
     render(<QueueView instrument="i15-1" />);
-    openRowMenu("Exp c");
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move to top" }));
+    await openRowMenu("Exp c");
+    await user.click(screen.getByRole("menuitem", { name: "Move to top" }));
 
     expect(mutate).toHaveBeenCalledWith({ taskId: "c", newPosition: 0 });
   });
 
-  it("moves a task to the bottom via the row menu", () => {
+  it("moves a task to the bottom via the row menu", async () => {
     render(<QueueView instrument="i15-1" />);
-    openRowMenu("Exp a");
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move to bottom" }));
+    await openRowMenu("Exp a");
+    await user.click(screen.getByRole("menuitem", { name: "Move to bottom" }));
 
     expect(mutate).toHaveBeenCalledWith({ taskId: "a", newPosition: 2 });
   });
 
-  it("doesn't allow dropping on a row that can't be moved", () => {
+  it("doesn't allow dropping on a row that can't be moved", async () => {
     vi.spyOn(queueService, "useGetTasks").mockReturnValue(
       result([
         task("a", 0),
@@ -123,7 +145,7 @@ describe("QueueView row reordering", () => {
       ]),
     );
     render(<QueueView displayMode="all" instrument="i15-1" />);
-    startReordering();
+    await startReordering();
 
     // Only the three queued tasks can be dragged
     const handles = screen.getAllByRole("button", { name: /^move$/i });
@@ -150,11 +172,11 @@ describe("QueueView row reordering", () => {
     expect(mutate).not.toHaveBeenCalled();
   });
 
-  it("moves the dragged task even if the queue changes mid-drag", () => {
+  it("moves the dragged task even if the queue changes mid-drag", async () => {
     const queued = vi.spyOn(queueService, "useGetTasks");
     queued.mockReturnValue(result([task("a", 0), task("b", 1), task("c", 2)]));
     const { rerender } = render(<QueueView instrument="i15-1" />);
-    startReordering();
+    await startReordering();
 
     const dataTransfer = {
       effectAllowed: "",
@@ -181,9 +203,9 @@ describe("QueueView row reordering", () => {
     expect(mutate).toHaveBeenCalledWith({ taskId: "b", newPosition: 2 });
   });
 
-  it("disables moving the first task up and to the top", () => {
+  it("disables moving the first task up and to the top", async () => {
     render(<QueueView instrument="i15-1" />);
-    openRowMenu("Exp a");
+    await openRowMenu("Exp a");
 
     for (const name of ["Move to top", "Move up"]) {
       expect(screen.getByRole("menuitem", { name })).toHaveAttribute(
