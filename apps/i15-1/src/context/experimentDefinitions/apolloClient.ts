@@ -4,7 +4,7 @@ import { authProvider } from "../../auth";
 
 export const client = new ApolloClient({
   link: new HttpLink({
-    uri: "/api/graphql",
+    uri: "/api/supergraph",
     credentials: "include",
     fetch: createFetchLoginRedirect(authProvider.login),
   }),

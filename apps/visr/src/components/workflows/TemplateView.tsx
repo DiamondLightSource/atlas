@@ -14,7 +14,7 @@ import { visitTextToVisit } from "../../utils/common";
 import { Box } from "@mui/material";
 import SubmittedMessagesList from "./SubmittedMessagesList";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 
 const templateViewQuery = graphql`
   query TemplateViewQuery($templateName: String!) {

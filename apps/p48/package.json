@@ -13,16 +13,21 @@
   "dependencies": {
     "@atlas/app-shell": "workspace:*",
     "@atlas/auth": "workspace:*",
+    "@atlas/instrument-session": "workspace:*",
     "@diamondlightsource/sci-react-ui": "0.8.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@jupyterlab/services": "^7.5.11",
     "@mui/material": "^7.3.11",
     "lucide-react": "^1.60.0",
-    "react-router-dom": "^7.18.1"
+    "react-relay": "^20.1.1",
+    "react-router-dom": "^7.18.1",
+    "relay-runtime": "^20.1.1"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^20.1.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",

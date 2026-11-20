@@ -7,7 +7,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { relayEnvironment } from "./relay";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
-import { InstrumentSessionLoader } from "./components/InstrumentSessionSelection/InstrumentSessionLoader";
+import { InstrumentSessionProvider } from "@atlas/instrument-session";
 
 export const AppProviders = ({
   authProvider,
@@ -26,11 +26,11 @@ export const AppProviders = ({
     <ThemeProvider theme={theme}>
       <AuthContextProvider provider={authProvider}>
         <RelayEnvironmentProvider environment={relayEnvironment}>
-          <InstrumentSessionLoader>
+          <InstrumentSessionProvider instrument="B01-1">
             <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={api}>{children}</BlueapiProvider>
             </QueryClientProvider>
-          </InstrumentSessionLoader>
+          </InstrumentSessionProvider>
         </RelayEnvironmentProvider>
       </AuthContextProvider>
     </ThemeProvider>

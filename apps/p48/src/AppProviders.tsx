@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
-import { InstrumentSessionProvider } from "@atlas/app-shell";
+import { InstrumentSessionProvider } from "@atlas/instrument-session";
 import { AuthContextProvider } from "@atlas/auth";
 import { authProvider } from "./auth";
 
@@ -15,7 +15,8 @@ export function AppProviders({ theme, children }: Props) {
     <AuthContextProvider provider={authProvider}>
       <ThemeProvider theme={theme}>
         <InstrumentSessionProvider
-          sessionsList={[
+          instrument="P48"
+          sessions={[
             "cm44196-1",
             "cm44196-2",
             "cm44196-3",
