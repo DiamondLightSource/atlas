@@ -228,6 +228,12 @@ export function useCancelTasks() {
   });
 }
 
+export const clearAllTasks = async (): Promise<TaskWithPosition[]> => {
+  const response = await queueClient.delete<TaskWithPosition[]>("/queue");
+
+  return response.data;
+};
+
 export const moveTask = async ({
   taskId,
   newPosition,

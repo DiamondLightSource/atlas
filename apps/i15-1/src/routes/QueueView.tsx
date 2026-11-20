@@ -7,6 +7,7 @@ import {
 } from "material-react-table";
 import {
   cancelTasks,
+  clearAllTasks,
   clearHistory,
   useGetTasks,
   useMoveTask,
@@ -180,7 +181,8 @@ export function QueueView({
         justifyContent="space-between"
         width="100%"
       >
-        <Button
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Button
           variant="outlined"
           color="error"
           disabled={displayMode === "future"}
@@ -188,6 +190,15 @@ export function QueueView({
         >
           Clear History
         </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={displayMode === "future"}
+          onClick={() => clearAllTasks()}
+        >
+          Clear All
+        </Button>
+        </Stack>
         <Stack direction="row" alignItems="center" spacing={2}>
           <QueueEstimatedRuntime />
           <QueueStatusPanel />
