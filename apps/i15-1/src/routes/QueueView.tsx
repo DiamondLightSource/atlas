@@ -183,21 +183,21 @@ export function QueueView({
       >
         <Stack direction="row" alignItems="center" spacing={2}>
           <Button
-          variant="outlined"
-          color="error"
-          disabled={displayMode === "future"}
-          onClick={() => clearHistory()}
-        >
-          Clear History
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          disabled={displayMode === "future"}
-          onClick={() => clearAllTasks()}
-        >
-          Clear All
-        </Button>
+            variant="outlined"
+            color="error"
+            disabled={displayMode === "future"}
+            onClick={() => clearHistory()}
+          >
+            Clear History
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            disabled={displayMode === "future"}
+            onClick={() => clearAllTasks()}
+          >
+            Clear All
+          </Button>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={2}>
           <QueueEstimatedRuntime />
