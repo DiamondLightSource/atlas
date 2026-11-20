@@ -4,6 +4,7 @@ import type { PayloadError } from "relay-runtime";
 export interface SubmissionSuccessMessage {
   type: "success";
   message: string;
+  link: string;
 }
 
 export interface SubmissionNetworkErrorMessage {
