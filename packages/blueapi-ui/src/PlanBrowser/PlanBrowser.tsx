@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Plan } from "@atlas/blueapi";
+import type { Plan, TaskRequest } from "@atlas/blueapi";
 import {
   Box,
   Button,
@@ -20,9 +20,10 @@ type Props = {
   plans: Plan[];
   selected: Plan | null;
   select: (plan: Plan) => void;
+  onQueuePlan?: (taskRequest: TaskRequest) => Promise<void>;
 };
 
-function CompactLayout({ plans, selected, select }: Props) {
+function CompactLayout({ plans, selected, select, onQueuePlan }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   return (
     <Box>
@@ -53,19 +54,28 @@ function CompactLayout({ plans, selected, select }: Props) {
               View plans
             </Button>
           </Box>
-          <PlanParametersWrapper selected={selected} />
+          <PlanParametersWrapper
+            selected={selected}
+            onQueuePlan={onQueuePlan}
+          />
         </Stack>
       </Paper>
     </Box>
   );
 }
 
-function PlanParametersWrapper({ selected }: { selected: Plan | null }) {
+function PlanParametersWrapper({
+  selected,
+  onQueuePlan,
+}: {
+  selected: Plan | null;
+  onQueuePlan?: (taskRequest: TaskRequest) => Promise<void>;
+}) {
   return (
     <Box sx={{ display: "flex", flex: 1, height: "100%" }}>
       {selected ? (
         <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-          <PlanParameters plan={selected} />
+          <PlanParameters plan={selected} onQueuePlan={onQueuePlan} />
         </Box>
       ) : (
         <Box sx={{ m: "auto", textAlign: "center" }}>
@@ -81,7 +91,7 @@ function PlanParametersWrapper({ selected }: { selected: Plan | null }) {
   );
 }
 
-function FullLayout({ plans, selected, select }: Props) {
+function FullLayout({ plans, selected, select, onQueuePlan }: Props) {
   return (
     <Box sx={{ display: "flex", height: "100%", gap: 1 }}>
       <Paper
@@ -112,13 +122,17 @@ function FullLayout({ plans, selected, select }: Props) {
           display: "flex",
         }}
       >
-        <PlanParametersWrapper selected={selected} />
+        <PlanParametersWrapper selected={selected} onQueuePlan={onQueuePlan} />
       </Paper>
     </Box>
   );
 }
 
-export function PlanBrowser() {
+export function PlanBrowser({
+  onQueuePlan,
+}: {
+  onQueuePlan?: (taskRequest: TaskRequest) => Promise<void>;
+}) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const { data } = usePlans();
@@ -139,6 +153,7 @@ export function PlanBrowser() {
         plans={plans}
         selected={selectedPlan}
         select={setSelectedPlan}
+        onQueuePlan={onQueuePlan}
       />
     );
   }
@@ -147,6 +162,7 @@ export function PlanBrowser() {
       plans={plans}
       selected={selectedPlan}
       select={setSelectedPlan}
+      onQueuePlan={onQueuePlan}
     />
   );
 }
