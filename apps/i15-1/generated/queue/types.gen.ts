@@ -248,16 +248,8 @@ export type OidcConfig = {
    * Well Known Url
    *
    * URL to fetch OIDC config from the provider
-   *
-   * @deprecated
    */
-  well_known_url?: string | null;
-  /**
-   * Issuer
-   *
-   * URL of OIDC provider
-   */
-  issuer?: string | null;
+  well_known_url: string;
   /**
    * Client Id
    *
@@ -358,7 +350,7 @@ export type Sample = {
 /**
  * Status
  */
-export type Status = 'Queued' | 'In progress' | 'Complete' | 'Error' | 'Cancelled';
+export type Status = 'Queued' | 'In progress' | 'Complete' | 'Error' | 'Cancelled' | 'On hold';
 
 /**
  * StompConfig
@@ -383,9 +375,9 @@ export type StompConfig = {
 };
 
 /**
- * TaskCancelRequest
+ * TaskActionRequest
  */
-export type TaskCancelRequest = {
+export type TaskActionRequest = {
   /**
    * Task Ids
    */
@@ -500,6 +492,10 @@ export type TaskWithPosition = {
    * Runtime
    */
   runtime: number | null;
+  /**
+   * Hold Reason
+   */
+  hold_reason: string | null;
 };
 
 /**
@@ -633,6 +629,20 @@ export type GetConfigConfigGetResponses = {
 
 export type GetConfigConfigGetResponse = GetConfigConfigGetResponses[keyof GetConfigConfigGetResponses];
 
+export type SyncQueueSyncPostData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/sync';
+};
+
+export type SyncQueueSyncPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type CancelAllTasksQueueDeleteData = {
   body?: never;
   path?: never;
@@ -755,7 +765,7 @@ export type MoveTaskQueueMovePostResponses = {
 export type MoveTaskQueueMovePostResponse = MoveTaskQueueMovePostResponses[keyof MoveTaskQueueMovePostResponses];
 
 export type CancelTasksQueueTasksDeleteData = {
-  body: TaskCancelRequest;
+  body: TaskActionRequest;
   path?: never;
   query?: never;
   url: '/queue/tasks';
@@ -780,6 +790,52 @@ export type CancelTasksQueueTasksDeleteResponses = {
 };
 
 export type CancelTasksQueueTasksDeleteResponse = CancelTasksQueueTasksDeleteResponses[keyof CancelTasksQueueTasksDeleteResponses];
+
+export type PutTasksOnHoldQueueTasksPutOnHoldPostData = {
+  body: TaskActionRequest;
+  path?: never;
+  query?: never;
+  url: '/queue/tasks/put_on_hold';
+};
+
+export type PutTasksOnHoldQueueTasksPutOnHoldPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PutTasksOnHoldQueueTasksPutOnHoldPostError = PutTasksOnHoldQueueTasksPutOnHoldPostErrors[keyof PutTasksOnHoldQueueTasksPutOnHoldPostErrors];
+
+export type PutTasksOnHoldQueueTasksPutOnHoldPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type TakeTasksOffHoldQueueTasksTakeOffHoldPostData = {
+  body: TaskActionRequest;
+  path?: never;
+  query?: never;
+  url: '/queue/tasks/take_off_hold';
+};
+
+export type TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type TakeTasksOffHoldQueueTasksTakeOffHoldPostError = TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors[keyof TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors];
+
+export type TakeTasksOffHoldQueueTasksTakeOffHoldPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
 
 export type GetTaskByPositionQueuePositionGetData = {
   body?: never;
