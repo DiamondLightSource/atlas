@@ -42,6 +42,8 @@ export function getTableData(
           beamSize: exp.experiment_definition.data.focused_beam_size as number,
           timePerPDF: exp.experiment_definition.data.time_per_pdf as number,
           status: task.status,
+          listOfTemperatures: exp.experiment_definition.data
+            .list_of_temperatures as number[],
         };
       } else {
         const plan = task.experiment as TaskRequest;
@@ -58,6 +60,7 @@ export function getTableData(
           beamSize: null,
           timePerPDF: null,
           status: task.status,
+          listOfTemperatures: null,
         };
       }
     }) ?? []
