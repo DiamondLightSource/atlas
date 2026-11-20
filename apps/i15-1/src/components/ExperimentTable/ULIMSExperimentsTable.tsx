@@ -29,6 +29,7 @@ export type ExperimentDefinitionData = {
   beam_energy: number;
   time_per_pdf: number;
   focused_beam_size: number;
+  list_of_temperatures: number[];
 };
 
 export type SampleData = {
@@ -49,6 +50,7 @@ const convertNodeToTableData = (
   beamEnergy: node.experimentDefinition.data.beam_energy,
   timePerPDF: node.experimentDefinition.data.time_per_pdf,
   beamSize: node.experimentDefinition.data.focused_beam_size,
+  listOfTemperatures: node.experimentDefinition.data.list_of_temperatures,
 });
 
 const GET_EXPERIMENTS: TypedDocumentNode<
@@ -197,6 +199,8 @@ export function ExperimentList() {
     initialState: {
       pagination: { pageIndex: 0, pageSize: 25 },
     },
+    enableColumnResizing: true,
+    layoutMode: "grid", // Because enabling column resizing automatically makes this default to "grid-no-grow"
     enableRowOrdering: false,
     enableRowDragging: false,
     enableRowSelection: (row) => isExperimentQueueable(row.original), // Disables selection of invalid rows from check box
@@ -313,9 +317,9 @@ export function ExperimentList() {
     },
     muiToolbarAlertBannerProps: error
       ? {
-        color: "error",
-        children: `Error: ${error.message}`,
-      }
+          color: "error",
+          children: `Error: ${error.message}`,
+        }
       : undefined,
   });
 
