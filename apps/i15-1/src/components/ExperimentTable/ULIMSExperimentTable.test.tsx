@@ -5,7 +5,7 @@ import * as apollo from "@apollo/client/react";
 import { MemoryRouter } from "react-router-dom";
 import * as queueService from "../../queue/queueService";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import * as appShell from "@atlas/app-shell";
+import * as instrumentSession from "@atlas/instrument-session";
 
 vi.mock("@apollo/client/react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@apollo/client/react")>();
@@ -24,18 +24,14 @@ vi.mock("../../queue/queueService", async (importOriginal) => {
   };
 });
 
-vi.mock("@atlas/app-shell", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@atlas/app-shell")>();
-  return {
-    ...actual,
-    useInstrumentSession: vi.fn(),
-  };
-});
+vi.mock("@atlas/instrument-session", () => ({
+  useInstrumentSession: vi.fn(),
+}));
 
 const mockedUseSubmitTask = queueService.useSumbitQueueTasks as unknown as Mock;
 const mockedUseQuery = apollo.useQuery as unknown as Mock;
 const mockedUseInstrumentSession =
-  appShell.useInstrumentSession as unknown as Mock;
+  instrumentSession.useInstrumentSession as unknown as Mock;
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -48,7 +44,7 @@ beforeEach(() => {
   mockedUseInstrumentSession.mockReturnValue({
     instrumentSession: "cm44163-3",
     setInstrumentSession: vi.fn(),
-    sessionsList: ["cm44163-3"],
+    instrumentSessionList: ["cm44163-3"],
   });
 });
 
@@ -471,7 +467,7 @@ describe("ExperimentList", () => {
     mockedUseInstrumentSession.mockReturnValue({
       instrumentSession: "cm55555-1",
       setInstrumentSession: vi.fn(),
-      sessionsList: ["cm55555-1"],
+      instrumentSessionList: ["cm55555-1"],
     });
 
     rerender(

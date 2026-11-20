@@ -20,7 +20,8 @@ import type {
 import type { ExperimentDefinition, Sample } from "../../../generated/queue";
 import { ROBOT_TABLE_NAME } from "../PucksTable/PucksTable";
 import { diamondFillParentTableProps } from "../diamondTableProps";
-import { useInstrumentSession, visitTextToVisit } from "@atlas/app-shell";
+import { visitTextToVisit } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import { FeedbackSnackbar, type SeverityLevel } from "@atlas/blueapi-ui";
 
 export type ExperimentDefinitionData = {

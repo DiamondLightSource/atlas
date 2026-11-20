@@ -6,7 +6,7 @@ import { authProvider } from "./auth";
 import type { Api } from "@atlas/blueapi";
 import { BlueapiProvider } from "@atlas/blueapi-query";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import { VisitsProvider } from "./VisitsProvider";
+import { InstrumentSessionProvider } from "@atlas/instrument-session";
 import { RelayEnvironmentProvider } from "react-relay/hooks";
 import { relayEnvironment } from "./relay";
 
@@ -31,7 +31,9 @@ export function AppProviders({
         <RelayEnvironmentProvider environment={relayEnvironment}>
           <BlueapiProvider api={blueapi}>
             <QueryClientProvider client={queryClient}>
-              <VisitsProvider beamline={beamline}>{children}</VisitsProvider>
+              <InstrumentSessionProvider instrument={beamline}>
+                {children}
+              </InstrumentSessionProvider>
             </QueryClientProvider>
           </BlueapiProvider>
         </RelayEnvironmentProvider>

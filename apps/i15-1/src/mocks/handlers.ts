@@ -928,7 +928,7 @@ export const handlers = [
     return HttpResponse.json(workerStatus.status);
   }),
 
-  http.post("/api/graphql", async ({ request }) => {
+  http.post("/api/supergraph", async ({ request }) => {
     const body = (await request.json()) as {
       operationName?: string;
       query?: string;
@@ -1023,7 +1023,8 @@ export const handlers = [
       }
     }
 
-    if (body.operationName === "InstrumentSession") {
+    // Relay sends the query text without an operationName
+    if (body.query?.startsWith("query InstrumentSessionQuery(")) {
       return HttpResponse.json(fakeInstrumentSession);
     }
 

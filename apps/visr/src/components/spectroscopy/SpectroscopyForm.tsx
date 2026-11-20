@@ -1,4 +1,4 @@
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
 import { ScanType } from "../scanType";
