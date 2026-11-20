@@ -8,7 +8,7 @@ import {
   type SeverityLevel,
   FeedbackSnackbar,
 } from "@atlas/blueapi-ui";
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 
 export interface StopAllButtonProps {
   compact?: boolean;

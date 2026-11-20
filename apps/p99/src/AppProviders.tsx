@@ -6,7 +6,7 @@ import {
   DiamondDSTheme,
   ThemeProvider,
 } from "@diamondlightsource/sci-react-ui";
-import { InstrumentSessionProvider } from "@atlas/app-shell";
+import { InstrumentSessionProvider } from "@atlas/instrument-session";
 import { RelayEnvironmentProvider } from "react-relay";
 import { relayEnvironment } from "./relay";
 import { BlueapiProvider } from "@atlas/blueapi-query";
@@ -26,13 +26,13 @@ export const AppProviders = ({
   return (
     <ThemeProvider theme={DiamondDSTheme} defaultMode="system">
       <AuthContextProvider provider={authProvider}>
-        <InstrumentSessionProvider>
-          <RelayEnvironmentProvider environment={relayEnvironment}>
+        <RelayEnvironmentProvider environment={relayEnvironment}>
+          <InstrumentSessionProvider instrument="P99">
             <QueryClientProvider client={queryClient}>
               <BlueapiProvider api={blueapi}>{children}</BlueapiProvider>
             </QueryClientProvider>
-          </RelayEnvironmentProvider>
-        </InstrumentSessionProvider>
+          </InstrumentSessionProvider>
+        </RelayEnvironmentProvider>
       </AuthContextProvider>
     </ThemeProvider>
   );

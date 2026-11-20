@@ -11,9 +11,9 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@atlas/app-shell": "workspace:*",
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
+    "@atlas/instrument-session": "workspace:*",
     "@jsonforms/core": "3.6.0",
     "@jsonforms/material-renderers": "3.6.0",
     "@jsonforms/react": "3.6.0",

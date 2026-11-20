@@ -69,9 +69,15 @@ importers:
       '@atlas/blueapi-ui':
         specifier: workspace:*
         version: link:../../packages/blueapi-ui
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@atlas/pvws-config':
         specifier: workspace:*
         version: link:../../packages/pvws-config
+      '@atlas/supergraph':
+        specifier: workspace:*
+        version: link:../../packages/supergraph
       '@diamondlightsource/cs-web-lib':
         specifier: 0.10.19
         version: 0.10.19(7772fef4e224e6bfbd3edbfddef8cd81)
@@ -87,9 +93,15 @@ importers:
       lucide-react:
         specifier: ^1.68.0
         version: 1.68.0(@types/react@18.3.28)(react@18.3.1)
+      react-relay:
+        specifier: ^20.1.1
+        version: 20.1.1(react@18.3.1)
       react-router-dom:
         specifier: ^7.18.5
         version: 7.18.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
     devDependencies:
       '@atlas/vitest-conf':
         specifier: workspace:*
@@ -97,6 +109,12 @@ importers:
       '@types/react-redux':
         specifier: 7.1.34
         version: 7.1.34
+      '@types/react-relay':
+        specifier: ^18.2.1
+        version: 18.2.1
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
       '@vitejs/plugin-react-swc':
         specifier: ^3.11.0
         version: 3.11.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
@@ -145,6 +163,9 @@ importers:
       '@atlas/blueapi-ui':
         specifier: workspace:*
         version: link:../../packages/blueapi-ui
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@atlas/supergraph':
         specifier: workspace:*
         version: link:../../packages/supergraph
@@ -233,9 +254,15 @@ importers:
       '@atlas/blueapi-ui':
         specifier: workspace:*
         version: link:../../packages/blueapi-ui
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@atlas/pvws-config':
         specifier: workspace:*
         version: link:../../packages/pvws-config
+      '@atlas/supergraph':
+        specifier: workspace:*
+        version: link:../../packages/supergraph
       '@diamondlightsource/cs-web-lib':
         specifier: 0.11.3
         version: 0.11.3(7772fef4e224e6bfbd3edbfddef8cd81)
@@ -275,6 +302,12 @@ importers:
       react-icons:
         specifier: ^5.3.0
         version: 5.6.0(react@18.3.1)
+      react-relay:
+        specifier: ^20.1.1
+        version: 20.1.1(react@18.3.1)
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
     devDependencies:
       '@atlas/vitest-conf':
         specifier: workspace:*
@@ -297,6 +330,12 @@ importers:
       '@types/react-redux':
         specifier: 7.1.34
         version: 7.1.34
+      '@types/react-relay':
+        specifier: ^18.2.1
+        version: 18.2.1
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
       '@vitejs/plugin-react-swc':
         specifier: ^3.11.0
         version: 3.11.0(vite@7.3.1(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
@@ -342,6 +381,9 @@ importers:
       '@atlas/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@diamondlightsource/sci-react-ui':
         specifier: 0.8.0
         version: 0.8.0(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@jsonforms/core@3.6.0)(@jsonforms/material-renderers@3.6.0(1c22238584d4b5d1e94a37fa2afd1ed3))(@jsonforms/react@3.6.0(@jsonforms/core@3.6.0)(react@18.3.1))(@mui/icons-material@7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-icons@5.6.0(react@18.3.1))(react@18.3.1)
@@ -360,13 +402,25 @@ importers:
       lucide-react:
         specifier: ^1.60.0
         version: 1.60.0(@types/react@18.3.28)(react@18.3.1)
+      react-relay:
+        specifier: ^20.1.1
+        version: 20.1.1(react@18.3.1)
       react-router-dom:
         specifier: ^7.18.1
         version: 7.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
     devDependencies:
       '@atlas/vitest-conf':
         specifier: workspace:*
         version: link:../../packages/vitest-conf
+      '@types/react-relay':
+        specifier: ^18.2.1
+        version: 18.2.1
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
       eslint-plugin-react-hooks:
         specifier: ^5.2.0
         version: 5.2.0(eslint@9.39.3(jiti@2.7.0))
@@ -397,6 +451,9 @@ importers:
       '@atlas/blueapi-query':
         specifier: workspace:*
         version: link:../../packages/blueapi-query
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@atlas/supergraph':
         specifier: workspace:*
         version: link:../../packages/supergraph
@@ -515,6 +572,9 @@ importers:
       '@atlas/blueapi-ui':
         specifier: workspace:*
         version: link:../../packages/blueapi-ui
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../../packages/instrument-session
       '@atlas/supergraph':
         specifier: workspace:*
         version: link:../../packages/supergraph
@@ -651,6 +711,9 @@ importers:
       '@atlas/auth':
         specifier: workspace:*
         version: link:../auth
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../instrument-session
       '@mui/icons-material':
         specifier: ^7.0.0
         version: 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)
@@ -723,15 +786,15 @@ importers:
 
   packages/blueapi-ui:
     dependencies:
-      '@atlas/app-shell':
-        specifier: workspace:*
-        version: link:../app-shell
       '@atlas/blueapi':
         specifier: workspace:*
         version: link:../blueapi
       '@atlas/blueapi-query':
         specifier: workspace:*
         version: link:../blueapi-query
+      '@atlas/instrument-session':
+        specifier: workspace:*
+        version: link:../instrument-session
       '@jsonforms/core':
         specifier: 3.6.0
         version: 3.6.0
@@ -760,6 +823,40 @@ importers:
       '@mui/material':
         specifier: ^7.0.0
         version: 7.3.11(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      vitest:
+        specifier: '*'
+        version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
+
+  packages/instrument-session:
+    dependencies:
+      '@atlas/auth':
+        specifier: workspace:*
+        version: link:../auth
+    devDependencies:
+      '@atlas/vitest-conf':
+        specifier: workspace:*
+        version: link:../vitest-conf
+      '@types/react-relay':
+        specifier: ^18.2.1
+        version: 18.2.1
+      '@types/relay-runtime':
+        specifier: ^20.1.1
+        version: 20.1.1
+      '@types/relay-test-utils':
+        specifier: ^19.0.0
+        version: 19.0.0
+      react-relay:
+        specifier: ^20.1.1
+        version: 20.1.1(react@18.3.1)
+      relay-compiler:
+        specifier: ^20.1.1
+        version: 20.1.1
+      relay-runtime:
+        specifier: ^20.1.1
+        version: 20.1.1
+      relay-test-utils:
+        specifier: ^21.0.1
+        version: 21.0.1
       vitest:
         specifier: '*'
         version: 4.0.18(@types/node@25.9.2)(jiti@2.7.0)(jsdom@26.1.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(msw@2.14.6(@types/node@25.9.2)(typescript@7.0.2))(terser@5.48.0)(yaml@2.9.0)
