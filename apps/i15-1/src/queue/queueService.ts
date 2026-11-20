@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { type AxiosInstance } from "axios";
 import type {
   QueueState,
-  TaskCancelRequest,
+  TaskActionRequest,
   Experiment,
   TaskRequest,
   TaskWithPosition,
@@ -211,7 +211,7 @@ export const cancelTasks = async (
     {
       data: {
         task_ids: taskIds,
-      } as TaskCancelRequest,
+      } as TaskActionRequest,
     },
   );
 
@@ -222,6 +222,43 @@ export function useCancelTasks() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: cancelTasks,
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["queue", "tasks"] });
+    },
+  });
+}
+
+export const holdTasks = async (
+  taskIds: string[],
+): Promise<TaskWithPosition[]> => {
+  const response = await queueClient.post<TaskWithPosition[]>(
+    "/queue/tasks/put_on_hold",
+    { task_ids: taskIds } as TaskActionRequest,
+  );
+  return response.data;
+};
+
+export function useHoldTasks() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: holdTasks,
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["queue", "tasks"] });
+    },
+  });
+}
+
+export const releaseTasks = async (taskIds: string[]): Promise<null> => {
+  const response = await queueClient.post<null>("/queue/tasks/take_off_hold", {
+    task_ids: taskIds,
+  } as TaskActionRequest);
+  return response.data;
+};
+
+export function useReleaseTasks() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: releaseTasks,
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ["queue", "tasks"] });
     },

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelAllTasksQueueDeleteData, CancelAllTasksQueueDeleteResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
+import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelAllTasksQueueDeleteData, CancelAllTasksQueueDeleteResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, PutTasksOnHoldQueueTasksPutOnHoldPostData, PutTasksOnHoldQueueTasksPutOnHoldPostErrors, PutTasksOnHoldQueueTasksPutOnHoldPostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, SyncQueueSyncPostData, SyncQueueSyncPostResponses, TakeTasksOffHoldQueueTasksTakeOffHoldPostData, TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors, TakeTasksOffHoldQueueTasksTakeOffHoldPostResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
   /**
@@ -51,6 +51,11 @@ export const updateQueueStateQueueStatePatch = <ThrowOnError extends boolean = f
 export const getConfigConfigGet = <ThrowOnError extends boolean = false>(options?: Options<GetConfigConfigGetData, ThrowOnError>): RequestResult<GetConfigConfigGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetConfigConfigGetResponses, unknown, ThrowOnError>({ url: '/config', ...options });
 
 /**
+ * Sync Queue
+ */
+export const syncQueueSyncPost = <ThrowOnError extends boolean = false>(options?: Options<SyncQueueSyncPostData, ThrowOnError>): RequestResult<SyncQueueSyncPostResponses, unknown, ThrowOnError> => (options?.client ?? client).post<SyncQueueSyncPostResponses, unknown, ThrowOnError>({ url: '/sync', ...options });
+
+/**
  * Cancel All Tasks
  */
 export const cancelAllTasksQueueDelete = <ThrowOnError extends boolean = false>(options?: Options<CancelAllTasksQueueDeleteData, ThrowOnError>): RequestResult<CancelAllTasksQueueDeleteResponses, unknown, ThrowOnError> => (options?.client ?? client).delete<CancelAllTasksQueueDeleteResponses, unknown, ThrowOnError>({ url: '/queue', ...options });
@@ -82,6 +87,30 @@ export const moveTaskQueueMovePost = <ThrowOnError extends boolean = false>(opti
  */
 export const cancelTasksQueueTasksDelete = <ThrowOnError extends boolean = false>(options: Options<CancelTasksQueueTasksDeleteData, ThrowOnError>): RequestResult<CancelTasksQueueTasksDeleteResponses, CancelTasksQueueTasksDeleteErrors, ThrowOnError> => (options.client ?? client).delete<CancelTasksQueueTasksDeleteResponses, CancelTasksQueueTasksDeleteErrors, ThrowOnError>({
   url: '/queue/tasks',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * Put Tasks On Hold
+ */
+export const putTasksOnHoldQueueTasksPutOnHoldPost = <ThrowOnError extends boolean = false>(options: Options<PutTasksOnHoldQueueTasksPutOnHoldPostData, ThrowOnError>): RequestResult<PutTasksOnHoldQueueTasksPutOnHoldPostResponses, PutTasksOnHoldQueueTasksPutOnHoldPostErrors, ThrowOnError> => (options.client ?? client).post<PutTasksOnHoldQueueTasksPutOnHoldPostResponses, PutTasksOnHoldQueueTasksPutOnHoldPostErrors, ThrowOnError>({
+  url: '/queue/tasks/put_on_hold',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * Take Tasks Off Hold
+ */
+export const takeTasksOffHoldQueueTasksTakeOffHoldPost = <ThrowOnError extends boolean = false>(options: Options<TakeTasksOffHoldQueueTasksTakeOffHoldPostData, ThrowOnError>): RequestResult<TakeTasksOffHoldQueueTasksTakeOffHoldPostResponses, TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors, ThrowOnError> => (options.client ?? client).post<TakeTasksOffHoldQueueTasksTakeOffHoldPostResponses, TakeTasksOffHoldQueueTasksTakeOffHoldPostErrors, ThrowOnError>({
+  url: '/queue/tasks/take_off_hold',
   ...options,
   headers: {
     'Content-Type': 'application/json',
