@@ -1,30 +1,45 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  within,
-  userEvent,
-  waitFor,
-} from "@atlas/vitest-conf";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, act } from "@atlas/vitest-conf";
 import type { UseQueryResult } from "@tanstack/react-query";
+import type { MRT_Row } from "material-react-table";
 import { QueueView } from "./QueueView";
 import * as queueService from "../queue/queueService";
+import type { QueueTableData } from "../queue/tableData";
 import type { TaskWithPosition } from "../../generated/queue";
+import { useRowReorder } from "../components/rowReorder/useRowReorder";
 
-vi.mock("../queue/QueueStatusPanel", () => ({
-  QueueStatusPanel: () => null,
+// QueueView's own part of reordering: which rows may move, and turning the
+// table indices useRowReorder reports into a moveTask call. The drag and menu
+// behaviour is useRowReorder's, tested in useRowReorder.test.tsx and
+// rowMoveMenuItems.test.tsx, so it and the table are mocked here.
+
+vi.mock("material-react-table", () => ({
+  MaterialReactTable: ({
+    table,
+  }: {
+    table: { options: { renderTopToolbarCustomActions?: () => unknown } };
+  }) => <div>{table.options.renderTopToolbarCustomActions?.() as never}</div>,
+  useMaterialReactTable: (options: unknown) => ({ options }),
 }));
+vi.mock("../components/rowReorder/useRowReorder", () => ({
+  useRowReorder: vi.fn(() => ({
+    isReordering: false,
+    state: {},
+    rowSx: {},
+    toolbarSx: undefined,
+    tableOptions: {},
+    toggleButton: <button>Reorder toggle</button>,
+  })),
+}));
+vi.mock("../queue/QueueStatusPanel", () => ({ QueueStatusPanel: () => null }));
 vi.mock("../queue/QueueEstimatedRuntime", () => ({
   QueueEstimatedRuntime: () => null,
 }));
 
-// Uses the real MaterialReactTable, unlike QueueView.test.tsx
-const task = (id: string, position: number) => ({
+const task = (id: string, position: number | null, status = "Queued") => ({
   user: null,
   id,
   position,
-  status: "Queued",
+  status,
   experiment: {
     name: `Exp ${id}`,
     instrument_session: `session${id}`,
@@ -40,15 +55,27 @@ const result = (data: unknown) =>
     UseQueryResult<TaskWithPosition[], Error>
   > as UseQueryResult<TaskWithPosition[], Error>;
 
+// The options QueueView passed to useRowReorder on its latest render
+const reorderOptions = () => {
+  const options = vi.mocked(useRowReorder).mock.calls.at(-1)?.[0];
+  if (!options) throw new Error("useRowReorder was not called");
+  // The mock's calls lose QueueView's row type
+  return options as Parameters<typeof useRowReorder<QueueTableData>>[0];
+};
+const reorder = (fromIndex: number, toIndex: number) =>
+  act(() => reorderOptions().onReorder(fromIndex, toIndex));
+const rowWithStatus = (status: string) =>
+  ({ original: { status } }) as MRT_Row<QueueTableData>;
+
 describe("QueueView row reordering", () => {
-  const user = userEvent.setup();
   const mutate = vi.fn();
+  const getTasks = vi.spyOn(queueService, "useGetTasks");
 
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.mocked(useRowReorder).mockClear();
     mutate.mockReset();
     vi.spyOn(queueService, "useQueueEvents").mockImplementation(() => {});
-    vi.spyOn(queueService, "useGetTasks").mockReturnValue(
+    getTasks.mockReturnValue(
       result([task("a", 0), task("b", 1), task("c", 2)]),
     );
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
@@ -56,162 +83,81 @@ describe("QueueView row reordering", () => {
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
   });
 
-  const startReordering = async () =>
-    await user.click(screen.getByRole("button", { name: "Reorder queue" }));
+  it("shows the reorder toggle except for historic tasks", () => {
+    const { rerender } = render(<QueueView instrument="i15-1" />);
+    expect(reorderOptions().label).toBe("Reorder queue");
+    expect(screen.getByText("Reorder toggle")).toBeInTheDocument();
 
-  const openRowMenu = async (rowName: string) => {
-    await startReordering();
-    const row = screen.getByText(rowName).closest("tr") as HTMLElement;
-    await user.click(within(row).getByRole("button", { name: /row actions/i }));
-  };
+    rerender(<QueueView displayMode="historic" instrument="i15-1" />);
+    expect(screen.queryByText("Reorder toggle")).not.toBeInTheDocument();
+  });
 
-  it("hides drag handles and row menus until Reorder queue is pressed, and Exit ordering hides them", async () => {
+  it("only lets queued tasks move", () => {
     render(<QueueView instrument="i15-1" />);
+    const { isMovable } = reorderOptions();
 
-    // initial state
-    expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(0);
-    expect(
-      screen.queryAllByRole("button", { name: /row actions/i }),
-    ).toHaveLength(0);
+    expect(isMovable?.(rowWithStatus("Queued"))).toBe(true);
+    for (const status of ["Error", "Complete", "Running", "Cancelled"]) {
+      expect(isMovable?.(rowWithStatus(status))).toBe(false);
+    }
+  });
 
-    // enter reorder mode
-    await startReordering();
+  it.each([
+    { from: 0, to: 1, taskId: "a", newPosition: 1 },
+    { from: 2, to: 1, taskId: "c", newPosition: 1 },
+    { from: 2, to: 0, taskId: "c", newPosition: 0 },
+    { from: 0, to: 2, taskId: "a", newPosition: 2 },
+  ])(
+    "moves the task at row $from to row $to",
+    ({ from, to, taskId, newPosition }) => {
+      render(<QueueView instrument="i15-1" />);
+      reorder(from, to);
+      expect(mutate).toHaveBeenCalledExactlyOnceWith({ taskId, newPosition });
+    },
+  );
 
-    await waitFor(() => {
-      expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(
-        3,
-      );
-      expect(
-        screen.queryAllByRole("button", { name: /row actions/i }),
-      ).toHaveLength(3);
+  it("converts row indices to queue positions when other tasks are shown", () => {
+    // A finished task above the queue shifts the rows down by one
+    getTasks.mockReturnValue(
+      result([task("done", null, "Complete"), task("a", 0), task("b", 1)]),
+    );
+    render(<QueueView displayMode="all" instrument="i15-1" />);
+
+    reorder(2, 1);
+    expect(mutate).toHaveBeenCalledExactlyOnceWith({
+      taskId: "b",
+      newPosition: 0,
     });
-
-    expect(
-      screen.queryByRole("button", { name: "Reorder queue" }),
-    ).not.toBeInTheDocument();
-
-    // exit reorder mode
-    await user.click(screen.getByRole("button", { name: "Exit ordering" }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Reorder queue" }),
-      ).toBeInTheDocument();
-      expect(screen.queryAllByRole("button", { name: /move/i })).toHaveLength(
-        0,
-      );
-    });
   });
 
-  it("moves a task down via the row menu", async () => {
-    render(<QueueView instrument="i15-1" />);
-    await openRowMenu("Exp a");
-    await user.click(screen.getByRole("menuitem", { name: "Move down" }));
-
-    expect(mutate).toHaveBeenCalledWith({ taskId: "a", newPosition: 1 });
-  });
-
-  it("moves a task up via the row menu", async () => {
-    render(<QueueView instrument="i15-1" />);
-    await openRowMenu("Exp c");
-    await user.click(screen.getByRole("menuitem", { name: "Move up" }));
-
-    expect(mutate).toHaveBeenCalledWith({ taskId: "c", newPosition: 1 });
-  });
-
-  it("moves a task to the top via the row menu", async () => {
-    render(<QueueView instrument="i15-1" />);
-    await openRowMenu("Exp c");
-    await user.click(screen.getByRole("menuitem", { name: "Move to top" }));
-
-    expect(mutate).toHaveBeenCalledWith({ taskId: "c", newPosition: 0 });
-  });
-
-  it("moves a task to the bottom via the row menu", async () => {
-    render(<QueueView instrument="i15-1" />);
-    await openRowMenu("Exp a");
-    await user.click(screen.getByRole("menuitem", { name: "Move to bottom" }));
-
-    expect(mutate).toHaveBeenCalledWith({ taskId: "a", newPosition: 2 });
-  });
-
-  it("doesn't allow dropping on a row that can't be moved", async () => {
-    vi.spyOn(queueService, "useGetTasks").mockReturnValue(
+  it("ignores moves from a task that isn't queued or has no position, or to a row that doesn't exist", () => {
+    getTasks.mockReturnValue(
       result([
         task("a", 0),
         task("b", 1),
-        task("c", 2),
-        { ...task("e", 0), position: null, status: "Error" },
+        // Has a position, so only its status stops it moving
+        task("r", 2, "Running"),
+        task("e", null, "Error"),
       ]),
     );
     render(<QueueView displayMode="all" instrument="i15-1" />);
-    await startReordering();
 
-    // Only the three queued tasks can be dragged
-    const handles = screen.getAllByRole("button", { name: /^move$/i });
-    expect(handles).toHaveLength(3);
-
-    const errorCell = within(
-      screen.getByText("Exp e").closest("tr") as HTMLElement,
-    ).getAllByRole("cell")[2];
-    expect(errorCell).toHaveAttribute("data-immovable");
-
-    const dataTransfer = {
-      effectAllowed: "",
-      dropEffect: "move",
-      setDragImage: () => {},
-    };
-    fireEvent.dragStart(handles[0], { dataTransfer });
-    fireEvent.dragEnter(errorCell.closest("tr") as HTMLElement, {
-      dataTransfer,
-    });
-    fireEvent.dragOver(errorCell, { dataTransfer });
-    expect(dataTransfer.dropEffect).toBe("none");
-
-    fireEvent.dragEnd(handles[0], { dataTransfer });
+    reorder(2, 0);
+    reorder(3, 0);
+    reorder(0, 5);
     expect(mutate).not.toHaveBeenCalled();
   });
 
-  it("moves the dragged task even if the queue changes mid-drag", async () => {
-    const queued = vi.spyOn(queueService, "useGetTasks");
-    queued.mockReturnValue(result([task("a", 0), task("b", 1), task("c", 2)]));
+  it("uses the current tasks if the queue changes before the move", () => {
     const { rerender } = render(<QueueView instrument="i15-1" />);
-    await startReordering();
-
-    const dataTransfer = {
-      effectAllowed: "",
-      dropEffect: "move",
-      setDragImage: () => {},
-    };
-    // Pick up b (index 1), then a finishes and b becomes index 0
-    fireEvent.dragStart(screen.getAllByRole("button", { name: /^move$/i })[1], {
-      dataTransfer,
-    });
-    queued.mockReturnValue(result([task("b", 1), task("c", 2)]));
+    // a finishes, so b and c move up a row
+    getTasks.mockReturnValue(result([task("b", 1), task("c", 2)]));
     rerender(<QueueView instrument="i15-1" />);
 
-    fireEvent.dragEnter(
-      screen.getByText("Exp c").closest("tr") as HTMLElement,
-      {
-        dataTransfer,
-      },
-    );
-    fireEvent.dragEnd(screen.getAllByRole("button", { name: /^move$/i })[0], {
-      dataTransfer,
+    reorder(0, 1);
+    expect(mutate).toHaveBeenCalledExactlyOnceWith({
+      taskId: "b",
+      newPosition: 2,
     });
-
-    expect(mutate).toHaveBeenCalledWith({ taskId: "b", newPosition: 2 });
-  });
-
-  it("disables moving the first task up and to the top", async () => {
-    render(<QueueView instrument="i15-1" />);
-    await openRowMenu("Exp a");
-
-    for (const name of ["Move to top", "Move up"]) {
-      expect(screen.getByRole("menuitem", { name })).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      );
-    }
   });
 });
