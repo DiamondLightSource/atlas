@@ -54,6 +54,10 @@ describe("QueueView row reordering", () => {
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
       mutate,
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
+    vi.spyOn(queueService, "useCancelTasks").mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof queueService.useCancelTasks>);
   });
 
   const startReordering = async () =>

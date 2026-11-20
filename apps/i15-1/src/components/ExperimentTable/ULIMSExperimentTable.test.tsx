@@ -44,6 +44,7 @@ afterEach(() => {
 beforeEach(() => {
   mockedUseSubmitTask.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
+    isPending: false,
   });
   mockedUseInstrumentSession.mockReturnValue({
     instrumentSession: "cm44163-3",
@@ -212,6 +213,28 @@ describe("ExperimentList", () => {
     ).toBeInTheDocument();
   });
 
+  it("disables queue submission while an add request is pending", () => {
+    const mutateAsync = vi.fn();
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync,
+      isPending: true,
+    });
+
+    renderComponent();
+
+    const addButton = screen.getByRole("button", {
+      name: /add all to queue/i,
+    });
+    expect(addButton).toBeDisabled();
+    fireEvent.click(addButton);
+    expect(mutateAsync).not.toHaveBeenCalled();
+  });
+
   it("changes button text when a row is selected", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
@@ -241,9 +264,7 @@ describe("ExperimentList", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    mockedUseSubmitTask.mockReturnValue({
-      mutateAsync,
-    });
+    mockedUseSubmitTask.mockReturnValue({ mutateAsync, isPending: false });
 
     renderComponent();
 
@@ -295,9 +316,7 @@ describe("ExperimentList", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    mockedUseSubmitTask.mockReturnValue({
-      mutateAsync,
-    });
+    mockedUseSubmitTask.mockReturnValue({ mutateAsync, isPending: false });
 
     renderComponent();
 
@@ -344,7 +363,15 @@ describe("ExperimentList", () => {
   });
 
   it("shows alert with error message when submission to queue fails", async () => {
-    mockedUseSubmitTask.mockResolvedValue(null);
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync: vi.fn().mockRejectedValue(new Error("request failed")),
+      isPending: false,
+    });
 
     renderComponent();
 
