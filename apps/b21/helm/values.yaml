@@ -23,7 +23,7 @@ ui-base:
           uri: https://b21-daq-queue.diamond.ac.uk
 
     - id: supergraph
-      path: /api/graphql
+      path: /api/supergraph
       rewriteTarget: /graphql
       target:
         external:

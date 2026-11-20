@@ -7,7 +7,7 @@ import { visitTextToVisit } from "../../utils/common";
 import ControlsDrawer from "../ControlsDrawer";
 import { SpectroscopyForm } from "./SpectroscopyForm";
 import SpectroscopyControls from "./SpectroscopyControls";
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import { DataSource } from "./dataSource";
 import { plotKindFor, type Positions, type Shape } from "./plotKinds";
 import { useSharedState } from "../../hooks/useSharedState";

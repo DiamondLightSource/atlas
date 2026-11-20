@@ -5,10 +5,6 @@ import { DiamondDSTheme } from "@diamondlightsource/sci-react-ui";
 import { createApi } from "@atlas/blueapi";
 import { authProvider } from "./auth";
 
-vi.mock("./InstrumentSession", () => ({
-  useInstrumentSessions: vi.fn(() => []),
-}));
-
 // exercising the app providers with real values
 describe("AppProviders", () => {
   it("renders app children", () => {
