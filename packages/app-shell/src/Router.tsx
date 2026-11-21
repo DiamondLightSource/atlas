@@ -4,6 +4,7 @@ import {
   Navigate,
   type RouteObject,
 } from "react-router-dom";
+import { ContentPanel } from "./ContentPanel";
 import { TabbedPanel, type TabDescription } from "./TabbedRoute";
 
 import type { ReactNode } from "react";
@@ -41,16 +42,28 @@ export interface LabelledRoute {
   isProtected?: boolean;
 }
 
+interface BaseSection extends LabelledRoute {
+  /** icon for top-level navigation */
+  icon: ReactNode;
+}
+
+/** A section rendering several pages as tabs */
+export interface TabbedSection extends BaseSection {
+  /** First one is default */
+  pages: Page[];
+  element?: never;
+}
+
+/** A section rendering a single page, with no tabs */
+export interface SingleSection extends BaseSection {
+  element: ReactNode;
+  pages?: never;
+}
+
 /**
  * This describes a top-level screen,
  * accessible via main navigation component */
-export interface Section extends LabelledRoute {
-  /** icon for top-level navigation */
-  icon: ReactNode;
-
-  /** First one is default */
-  pages: Page[];
-}
+export type Section = TabbedSection | SingleSection;
 
 export interface Page extends LabelledRoute {
   element: ReactNode;
@@ -65,7 +78,18 @@ export function routePath(route: LabelledRoute) {
   return route.path ?? sanitisePath(route.name);
 }
 
+function guarded(section: Section, element: ReactNode): ReactNode {
+  return section.isProtected ? <AuthGuard element={element} /> : element;
+}
+
 function childRoute(section: Section): RouteObject {
+  if (!section.pages) {
+    return {
+      path: routePath(section),
+      element: guarded(section, <ContentPanel>{section.element}</ContentPanel>),
+    };
+  }
+
   const tabbedPages: TabDescription[] = section.pages.map((page) => {
     return {
       label: page.name,
@@ -73,13 +97,9 @@ function childRoute(section: Section): RouteObject {
     };
   });
   const sectionPath = routePath(section);
-  const rawElement = (
-    <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />
-  );
-  const element = section.isProtected ? (
-    <AuthGuard element={rawElement} />
-  ) : (
-    rawElement
+  const element = guarded(
+    section,
+    <TabbedPanel basePath={`/${sectionPath}`} tabs={tabbedPages} />,
   );
   const childPageRoutes: RouteObject[] = section.pages.map((page) => {
     return {
@@ -116,8 +136,9 @@ function getRoutes(navigation: SectionGroup[]): Section[] {
  * consisting of app bar, side navigation panel, and main content panel (`<Outlet />`).
  *
  * Adds an index child which redirects to the first given route.
- * All given routes render a `<TabbedRoute />`, with tabs for each panel,
- * and a redirect to the first panel.
+ * Sections with pages render a `<TabbedRoute />`, with tabs for each panel,
+ * and a redirect to the first panel. Sections with an `element` render it
+ * directly, with no tabs.
  *
  */
 export function createRouter(props: RouterProps) {

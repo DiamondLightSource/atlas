@@ -9,12 +9,7 @@ const navigation: SectionGroup[] = [
         name: "Dashboard",
         icon: <LucideLayoutDashboard />,
         path: "dashboard",
-        pages: [
-          {
-            name: "Dashboard",
-            element: <Dashboard />,
-          },
-        ],
+        element: <Dashboard />,
       },
     ],
   },
