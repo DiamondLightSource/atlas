@@ -21,6 +21,9 @@ import { useElementSize } from "../../hooks/useElementSize";
 const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-01:PVA:OUTPUT";
 
+/** Pane collapsed, the three plots side by side get no narrower than this: below it, one goes across the top and two below */
+const MIN_ROW_PLOT_WIDTH = 260;
+
 const DETECTOR_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-05:PVA:OUTPUT";
 
@@ -63,11 +66,13 @@ function TomographyPlots({
   // Grid sizing
   // -------------------------------------------------------------------------
   // Pane open: overview + 3 plots in 2x2
-  // Pane collapsed: 3 plots in a row
+  // Pane collapsed: 3 plots in a row; or, too narrow for that, the first
+  // across the top and the other two side by side below
   // Narrow: all in one column, scrolling
   const plotCount = paneOpen ? 4 : 3;
   const oneColumn = width > 0 && width < ONE_COLUMN_BELOW;
-  const cols = oneColumn ? 1 : paneOpen ? 2 : 3;
+  const split = !paneOpen && !oneColumn && width < 3 * MIN_ROW_PLOT_WIDTH;
+  const cols = oneColumn ? 1 : paneOpen || split ? 2 : 3;
   const rowsPerPlot = ROWS_PER_PLOT;
   const h = Math.ceil(plotCount / cols) * rowsPerPlot;
   const minimumRowHeight = minimumRowHeightFor(oneColumn);
@@ -129,14 +134,18 @@ function TomographyPlots({
   // -------------------------------------------------------------------------
   // Layout
   // -------------------------------------------------------------------------
-  const layout = cells.map(({ key }, i) => ({
-    i: key,
-    x: i % cols,
-    y: Math.floor(i / cols) * rowsPerPlot,
-    w: 1,
-    h: rowsPerPlot,
-    static: true,
-  }));
+  const layout = cells.map(({ key }, i) => {
+    const size = { i: key, h: rowsPerPlot, static: true };
+    // split: the first takes the whole top row, the rest go below it
+    if (split && i === 0) return { ...size, x: 0, y: 0, w: cols };
+    const j = split ? i + 1 : i;
+    return {
+      ...size,
+      x: j % cols,
+      y: Math.floor(j / cols) * rowsPerPlot,
+      w: 1,
+    };
+  });
 
   // -------------------------------------------------------------------------
   // Plot cells
