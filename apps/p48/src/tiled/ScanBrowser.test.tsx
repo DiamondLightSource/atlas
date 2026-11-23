@@ -78,6 +78,10 @@ function workspace() {
   return within(screen.getByRole("region", { name: "Selected scan" }));
 }
 
+function panel() {
+  return within(screen.getByRole("complementary", { name: "Scans" }));
+}
+
 beforeAll(() => {
   Element.prototype.scrollIntoView = vi.fn();
 });
@@ -180,5 +184,107 @@ describe("ScanBrowser", () => {
 
     expect(screen.getByText("No scans found")).toBeVisible();
     expect(screen.getByText(NO_SCANS)).toBeVisible();
+  });
+
+  it("shows a scan that is missing its ID and points", () => {
+    const partial: TiledNode = {
+      ...SCAN_1,
+      metadata: { start: { time: 1_700_000_000 } },
+    };
+    mockScans(() => [partial]);
+
+    renderBrowser();
+
+    expect(panel().getByText("Scan ?")).toBeVisible();
+    expect(
+      panel().getByText(new Date(1_700_000_000_000).toLocaleString()),
+    ).toBeVisible();
+    expect(panel().getByText("-")).toBeVisible();
+  });
+
+  it("shows progress while the scans load", async () => {
+    vi.mocked(useGetLatestRun).mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+      isSuccess: false,
+    } as ReturnType<typeof useGetLatestRun>);
+    vi.mocked(useGetChildren).mockReturnValue({
+      data: undefined,
+      isPending: true,
+      error: null,
+    } as unknown as ReturnType<typeof useGetChildren>);
+
+    renderBrowser();
+
+    expect(panel().queryByText("Scan 2")).not.toBeInTheDocument();
+    expect(
+      await workspace().findByRole("progressbar", {}, { timeout: 3000 }),
+    ).toBeInTheDocument();
+  });
+
+  it("says when Tiled cannot be reached", () => {
+    vi.mocked(useGetLatestRun).mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isSuccess: false,
+    } as ReturnType<typeof useGetLatestRun>);
+    vi.mocked(useGetChildren).mockReturnValue({
+      data: undefined,
+      isPending: false,
+      error: new Error("Request failed with status code 502"),
+    } as unknown as ReturnType<typeof useGetChildren>);
+
+    renderBrowser();
+
+    expect(
+      panel().getByText(
+        "Could not fetch from Tiled: Request failed with status code 502",
+      ),
+    ).toBeVisible();
+    expect(workspace().getByText("Could not fetch from Tiled")).toBeVisible();
+  });
+
+  it("filters by plan", async () => {
+    const user = userEvent.setup();
+    vi.mocked(useGetPlanNames).mockReturnValue({
+      data: ["count", "scan"],
+    } as ReturnType<typeof useGetPlanNames>);
+    renderBrowser();
+
+    await user.click(screen.getByRole("combobox", { name: "Plan" }));
+    await user.click(screen.getByRole("option", { name: "scan" }));
+
+    expect(useGetChildren).toHaveBeenCalledWith(
+      "p48/cm44196/cm44196-1",
+      1,
+      expect.objectContaining({ plan: "scan" }),
+    );
+  });
+
+  it("clears the search and filters when nothing matches", async () => {
+    const user = userEvent.setup();
+    mockScans(({ search }) => (search ? [] : [SCAN_2, SCAN_1]));
+    renderBrowser();
+
+    await user.type(screen.getByLabelText("Search scans"), "abc");
+    await user.click(
+      await panel().findByRole("button", { name: "Clear filters" }),
+    );
+
+    expect(screen.getByLabelText("Search scans")).toHaveValue("");
+  });
+
+  it("pages through a session with many scans", () => {
+    vi.mocked(useGetChildren).mockReturnValue({
+      data: { nodes: [SCAN_2, SCAN_1], count: 120 },
+      isPending: false,
+      error: null,
+    } as unknown as ReturnType<typeof useGetChildren>);
+
+    renderBrowser();
+
+    expect(panel().getByText("1–50 of 120")).toBeVisible();
   });
 });

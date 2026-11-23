@@ -150,4 +150,48 @@ describe("RunTree", () => {
     );
     expect(line.scrollIntoView).toHaveBeenCalled();
   });
+
+  it("labels a run without a scan ID or plan, and entries of every kind", async () => {
+    mockChildren(() => ({
+      data: {
+        nodes: [
+          {
+            ...PRIMARY,
+            id: "image",
+            path: `${RUN.path}/image`,
+            structureFamily: "array",
+          },
+          {
+            ...PRIMARY,
+            id: "events",
+            path: `${RUN.path}/events`,
+            structureFamily: "awkward",
+          },
+        ],
+        count: 2,
+      },
+      isPending: false,
+      error: null,
+    }));
+    render(
+      <RunTree
+        run={{ ...RUN, metadata: {} }}
+        selection={null}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Scan ? · unknown plan")).toBeVisible();
+    expect(await screen.findByText("array")).toBeVisible();
+    expect(screen.getByText("awkward")).toBeVisible();
+  });
+
+  it("shows progress while a level loads", async () => {
+    mockChildren(() => ({ data: undefined, isPending: true, error: null }));
+    render(<Tree />);
+
+    expect(
+      await screen.findByRole("progressbar", {}, { timeout: 3000 }),
+    ).toBeInTheDocument();
+  });
 });

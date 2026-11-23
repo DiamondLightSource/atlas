@@ -1,4 +1,4 @@
-import { summariseRun } from "./runSummary";
+import { getColour, getStatus, summariseRun } from "./runSummary";
 
 describe("summariseRun", () => {
   it("reads a finished run", () => {
@@ -55,5 +55,27 @@ describe("summariseRun", () => {
         stop: { exit_status: false, time: "later" },
       }),
     ).toEqual({ finished: true });
+  });
+});
+
+describe("getStatus", () => {
+  it.each([
+    [{ finished: false }, "running"],
+    [{ finished: true, exitStatus: "success" }, "success"],
+    [{ finished: true }, "unknown"],
+  ])("gives %o the status %s", (summary, status) => {
+    expect(getStatus(summary)).toBe(status);
+  });
+});
+
+describe("getColour", () => {
+  it.each([
+    ["success", "success"],
+    ["running", "info"],
+    ["abort", "warning"],
+    ["fail", "danger"],
+    ["unknown", "neutral"],
+  ])("colours %s as %s", (status, colour) => {
+    expect(getColour(status)).toBe(colour);
   });
 });

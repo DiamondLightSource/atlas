@@ -33,6 +33,7 @@ import {
   sessionPath,
   useGetChildren,
   useGetLatestRun,
+  useGetPlanNames,
   useRefreshOnRunChange,
 } from "./tiledService";
 
@@ -229,6 +230,29 @@ describe("Tiled HTTP requests", () => {
         expect.stringMatching(/^filter/),
       );
     });
+
+    it("treats 404 as no runs, and other errors as failures", async () => {
+      await getChildren(SESSION_PATH);
+      const { validateStatus } = mocks.get.mock.calls[0][1];
+
+      expect(validateStatus(200)).toBe(true);
+      expect(validateStatus(404)).toBe(true);
+      expect(validateStatus(500)).toBe(false);
+    });
+
+    it("treats an entry without a structure family as a container", async () => {
+      mocks.get.mockResolvedValue(
+        searchResponse([{ id: "bare", attributes: {} }]),
+      );
+
+      const { nodes } = await getChildren(SESSION_PATH);
+
+      expect(nodes[0]).toMatchObject({
+        structureFamily: "container",
+        specs: [],
+        metadata: {},
+      });
+    });
   });
 
   describe("getPlanNames", () => {
@@ -373,5 +397,18 @@ describe("Tiled hooks", () => {
         queryKey: ["tiled", "children"],
       });
     });
+  });
+
+  it("gets the plan names for the filter", async () => {
+    mocks.get.mockResolvedValue({
+      status: 200,
+      data: { metadata: { "start.plan_name": [{ value: "count" }] } },
+    });
+
+    const { result } = renderHook(() => useGetPlanNames("cm44196-1"), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual(["count"]));
   });
 });

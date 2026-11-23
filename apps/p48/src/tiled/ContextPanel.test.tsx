@@ -129,4 +129,19 @@ describe("ContextPanel", () => {
     expect(screen.getByText("Could not fetch")).toBeVisible();
     expect(screen.queryByText("Nothing yet")).not.toBeInTheDocument();
   });
+
+  it("starts with an empty search, and shows a footer below the items", () => {
+    render(
+      <ContextPanel
+        title="Scans"
+        items={ITEMS}
+        onSearchChange={vi.fn()}
+        searchLabel="Search scans"
+        footer={<p>Page controls</p>}
+      />,
+    );
+
+    expect(screen.getByLabelText("Search scans")).toHaveValue("");
+    expect(screen.getByText("Page controls")).toBeVisible();
+  });
 });

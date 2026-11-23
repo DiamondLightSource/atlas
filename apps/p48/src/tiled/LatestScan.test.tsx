@@ -105,4 +105,13 @@ describe("LatestScan", () => {
 
     expect(screen.getByText("Could not fetch from Tiled")).toBeVisible();
   });
+
+  it("shows progress until the newest scan arrives", async () => {
+    mockLatestRun({ isPending: true });
+    renderLatestScan();
+
+    expect(
+      await screen.findByRole("progressbar", {}, { timeout: 3000 }),
+    ).toBeInTheDocument();
+  });
 });
