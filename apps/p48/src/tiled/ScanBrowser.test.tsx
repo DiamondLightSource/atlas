@@ -4,6 +4,7 @@ import {
   ThemeProvider,
 } from "@diamondlightsource/sci-react-ui";
 import { MemoryRouter } from "react-router-dom";
+import { NO_SCANS } from "./Message";
 import { ScanBrowser } from "./ScanBrowser";
 import type { Selection } from "./selection";
 import {
@@ -177,7 +178,7 @@ describe("ScanBrowser", () => {
     mockScans(() => []);
     renderBrowser();
 
-    expect(screen.getByText("No scans yet")).toBeVisible();
-    expect(screen.getByText("No scans in this session yet")).toBeVisible();
+    expect(screen.getByText("No scans found")).toBeVisible();
+    expect(screen.getByText(NO_SCANS)).toBeVisible();
   });
 });

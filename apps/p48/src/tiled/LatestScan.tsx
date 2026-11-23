@@ -1,19 +1,12 @@
 import { ProgressDelayed } from "@diamondlightsource/sci-react-ui";
 import { Box, Link, Typography } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Message, NO_SCANS } from "./Message";
 import { ScanSummary } from "./ScanSummary";
 import { useGetLatestRun } from "./tiledService";
 
 // The page itself: going via /scans redirects, which drops what was clicked
 const SCANS_PAGE = "/scans/scans";
-
-function Message({ children }: { children: string }) {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      {children}
-    </Typography>
-  );
-}
 
 /** The session's newest scan, kept up to date while it runs */
 export function LatestScan({ session }: { session: string }) {
@@ -36,7 +29,7 @@ export function LatestScan({ session }: { session: string }) {
       )}
       {latest.isPending && <ProgressDelayed />}
       {latest.isError && <Message>Could not fetch from Tiled</Message>}
-      {latest.data === null && <Message>No scans in this session yet</Message>}
+      {latest.data === null && <Message>{NO_SCANS}</Message>}
     </Box>
   );
 }

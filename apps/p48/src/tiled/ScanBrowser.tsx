@@ -1,8 +1,9 @@
 import { ProgressDelayed } from "@diamondlightsource/sci-react-ui";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ContextPanel, type CardItem } from "./ContextPanel";
+import { Message, NO_SCANS } from "./Message";
 import { PageControls } from "./PageControls";
 import {
   getColour,
@@ -56,14 +57,6 @@ function toCard(run: TiledNode): CardItem {
       { key: "points", label: "Points", value: summary.numPoints ?? "-" },
     ],
   };
-}
-
-function Message({ children }: { children: string }) {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      {children}
-    </Typography>
-  );
 }
 
 /** A session's scans to pick from, beside the picked one (by default the newest) */
@@ -175,7 +168,7 @@ export function ScanBrowser({ session }: { session: string }) {
             ? `Could not fetch from Tiled: ${scans.error.message}`
             : undefined
         }
-        emptyMessage="No scans yet"
+        emptyMessage="No scans found"
         footer={
           scans.data &&
           scans.data.count > PAGE_SIZE && (
@@ -210,9 +203,7 @@ export function ScanBrowser({ session }: { session: string }) {
         {!run && latest.isError && (
           <Message>Could not fetch from Tiled</Message>
         )}
-        {!run && latest.isSuccess && (
-          <Message>No scans in this session yet</Message>
-        )}
+        {!run && latest.isSuccess && <Message>{NO_SCANS}</Message>}
       </Box>
     </Box>
   );

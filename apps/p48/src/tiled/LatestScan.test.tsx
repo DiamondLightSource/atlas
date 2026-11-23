@@ -5,6 +5,7 @@ import {
 } from "@diamondlightsource/sci-react-ui";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { LatestScan } from "./LatestScan";
+import { NO_SCANS } from "./Message";
 import { useGetLatestRun, type TiledNode } from "./tiledService";
 
 vi.mock("./tiledService", async (importOriginal) => ({
@@ -95,7 +96,7 @@ describe("LatestScan", () => {
     mockLatestRun({ data: null });
     renderLatestScan();
 
-    expect(screen.getByText("No scans in this session yet")).toBeVisible();
+    expect(screen.getByText(NO_SCANS)).toBeVisible();
   });
 
   it("says when Tiled cannot be reached", () => {

@@ -72,6 +72,15 @@ export function createTiledApiClient(baseURL: string): AxiosInstance {
 
 const tiledClient = createTiledApiClient(TILED_URL);
 
+export const tiledKeys = {
+  latestRun: (session: string) => ["tiled", "latestRun", session] as const,
+  allChildren: ["tiled", "children"] as const,
+  children: (path: string, page: number, query: ScanQuery) =>
+    ["tiled", "children", path, page, query] as const,
+  allPlanNames: ["tiled", "planNames"] as const,
+  planNames: (session: string) => ["tiled", "planNames", session] as const,
+};
+
 /** Diamond's tiled keeps a session's runs at <beamline>/<proposal>/<session> */
 export function sessionPath(session: string) {
   const proposal = session.split("-")[0];
@@ -188,7 +197,7 @@ export const getPlanNames = async (session: string): Promise<string[]> => {
 
 export function useGetLatestRun(session: string) {
   return useQuery({
-    queryKey: ["tiled", "latestRun", session],
+    queryKey: tiledKeys.latestRun(session),
     queryFn: () => getLatestRun(session),
     refetchInterval: 5000,
     retry: 1,
@@ -197,7 +206,7 @@ export function useGetLatestRun(session: string) {
 
 export function useGetChildren(path: string, page = 1, query: ScanQuery = {}) {
   return useQuery({
-    queryKey: ["tiled", "children", path, page, query],
+    queryKey: tiledKeys.children(path, page, query),
     queryFn: () => getChildren(path, { page, query }),
     // Keep showing the current page while the next one loads
     placeholderData: keepPreviousData,
@@ -207,7 +216,7 @@ export function useGetChildren(path: string, page = 1, query: ScanQuery = {}) {
 
 export function useGetPlanNames(session: string) {
   return useQuery({
-    queryKey: ["tiled", "planNames", session],
+    queryKey: tiledKeys.planNames(session),
     queryFn: () => getPlanNames(session),
     retry: 1,
   });
@@ -230,8 +239,8 @@ export function useRefreshOnRunChange(session: string) {
       previousState.current !== undefined &&
       state !== previousState.current
     ) {
-      queryClient.invalidateQueries({ queryKey: ["tiled", "children"] });
-      queryClient.invalidateQueries({ queryKey: ["tiled", "planNames"] });
+      queryClient.invalidateQueries({ queryKey: tiledKeys.allChildren });
+      queryClient.invalidateQueries({ queryKey: tiledKeys.allPlanNames });
     }
     previousState.current = state;
   }, [run, queryClient]);

@@ -2,21 +2,25 @@ import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
 import { InstrumentSessionProvider } from "@atlas/app-shell";
-import { AuthContextProvider } from "@atlas/auth";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { authProvider } from "./auth";
-
-const queryClient = new QueryClient();
+import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
+import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 
 type Props = {
+  authProvider: AuthProvider;
+  queryClient: QueryClient;
   theme: Theme;
   children: ReactNode;
 };
 
-export function AppProviders({ theme, children }: Props) {
+export function AppProviders({
+  authProvider,
+  queryClient,
+  theme,
+  children,
+}: Props) {
   return (
-    <AuthContextProvider provider={authProvider}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <AuthContextProvider provider={authProvider}>
         <InstrumentSessionProvider
           sessionsList={[
             "cm44196-1",
@@ -30,7 +34,7 @@ export function AppProviders({ theme, children }: Props) {
             {children}
           </QueryClientProvider>
         </InstrumentSessionProvider>
-      </ThemeProvider>
-    </AuthContextProvider>
+      </AuthContextProvider>
+    </ThemeProvider>
   );
 }
