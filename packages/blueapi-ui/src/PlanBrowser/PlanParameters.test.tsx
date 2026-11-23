@@ -1,5 +1,5 @@
 import type { Plan } from "@atlas/blueapi";
-import { render, screen } from "@atlas/vitest-conf";
+import { render, screen, userEvent } from "@atlas/vitest-conf";
 
 import { PlanParameters } from "./PlanParameters";
 
@@ -64,5 +64,26 @@ describe("PlanParameters", () => {
     expect(screen.getByText("UI unavailable")).toBeInTheDocument();
 
     window.removeEventListener("error", errorHandler);
+    mockJsonFormsImpl.mockImplementation(() => {
+      return <div data-testid="jsonforms-sentinel" />;
+    });
+  });
+
+  it("adds the plan and current form values to the queue", async () => {
+    const user = userEvent.setup();
+    const onQueuePlan = vi.fn().mockResolvedValue(undefined);
+
+    render(<PlanParameters plan={plan} onQueuePlan={onQueuePlan} />);
+
+    await user.click(screen.getByRole("button", { name: "Add to queue" }));
+
+    expect(onQueuePlan).toHaveBeenCalledWith({
+      name: "hi_plan",
+      params: undefined,
+      instrument_session: "cm12345-1",
+    });
+    expect(
+      await screen.findByText("hi_plan added to queue"),
+    ).toBeInTheDocument();
   });
 });

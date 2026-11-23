@@ -36,7 +36,7 @@ import type {
 
 type PuckTableData = {
   id: string;
-  barcode: string;
+  name: string;
   session: string;
   parentPosition: number | null;
   status: PuckMountStatus;
@@ -99,7 +99,7 @@ export function PucksTable() {
       .filter((edge) => edge.node.type.name === PUCK_CONTAINER_TYPE)
       .map((edge) => ({
         id: String(edge.node.id),
-        barcode: edge.node.barcode ?? "",
+        name: edge.node.name,
         session:
           edge.node.instrumentSessions[0]?.instrumentSessionReference ?? "",
         parentPosition: edge.node.positionInParent?.position ?? null,
@@ -142,7 +142,7 @@ export function PucksTable() {
 
   const columns = useMemo<MRT_ColumnDef<PuckTableData>[]>(
     () => [
-      { accessorKey: "barcode", id: "puckId", header: "Puck ID" },
+      { accessorKey: "name", id: "puckId", header: "Puck ID" },
       {
         accessorKey: "parentPosition",
         id: "puckPosition",
