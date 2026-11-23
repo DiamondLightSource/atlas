@@ -1,10 +1,7 @@
 import { act, render, screen, userEvent, waitFor } from "@atlas/vitest-conf";
 import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
 import { RelayEnvironmentProvider } from "react-relay";
-import {
-  createMockEnvironment,
-  type RelayMockEnvironment,
-} from "relay-test-utils";
+import { createMockEnvironment, type MockEnvironment } from "relay-test-utils";
 import { InstrumentSessionProvider } from "./InstrumentSessionProvider";
 import { useInstrumentSession } from "./context";
 import { storeSession } from "./storage";
@@ -56,7 +53,7 @@ function Consumer() {
   );
 }
 
-function renderQueried(environment: RelayMockEnvironment, loggedIn = true) {
+function renderQueried(environment: MockEnvironment, loggedIn = true) {
   return render(
     <AuthContextProvider provider={authProvider(loggedIn)}>
       <RelayEnvironmentProvider environment={environment}>
@@ -68,10 +65,7 @@ function renderQueried(environment: RelayMockEnvironment, loggedIn = true) {
   );
 }
 
-async function resolveWith(
-  environment: RelayMockEnvironment,
-  references: string[],
-) {
+async function resolveWith(environment: MockEnvironment, references: string[]) {
   await waitFor(() =>
     expect(environment.mock.getAllOperations()).toHaveLength(1),
   );
