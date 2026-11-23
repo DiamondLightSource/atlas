@@ -1,6 +1,8 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
+import FormFieldset from "../FormFieldset";
+import { useWorkerBusy } from "../../hooks/useWorkerBusy";
 import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
@@ -14,6 +16,8 @@ export type TomographyFormData = {
 
 export function TomographyForm() {
   const { instrumentSession } = useInstrumentSession();
+  // no changes under a running plan
+  const busy = useWorkerBusy();
   const [formData, setFormData] = useState<TomographyFormData>({
     scan_type: ScanType.STEP,
     number_of_projections: 360,
@@ -45,36 +49,38 @@ export function TomographyForm() {
       }}
     >
       {/* Parameters */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "1fr 1fr",
-            md: "repeat(3, 1fr)",
-          },
-          columnGap: 3,
-          rowGap: 4,
-          alignItems: "start",
-          pt: 2,
-        }}
-      >
-        <NumberInput
-          label="Number of Projections"
-          numberMode="natural"
-          defaultValue={formData.number_of_projections}
-          onCommit={v => setField("number_of_projections", v)}
-          minValue={minProjections}
-          maxValue={maxProjections}
-        />
-        <NumberInput
-          label="Exposure Time"
-          numberMode="scientific"
-          defaultValue={formData.exposure_time}
-          onCommit={v => setField("exposure_time", v)}
-          minValue={0.1}
-        />
-      </Box>
+      <FormFieldset disabled={busy}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "1fr 1fr",
+              md: "repeat(3, 1fr)",
+            },
+            columnGap: 3,
+            rowGap: 4,
+            alignItems: "start",
+            pt: 2,
+          }}
+        >
+          <NumberInput
+            label="Number of Projections"
+            numberMode="natural"
+            defaultValue={formData.number_of_projections}
+            onCommit={v => setField("number_of_projections", v)}
+            minValue={minProjections}
+            maxValue={maxProjections}
+          />
+          <NumberInput
+            label="Exposure Time"
+            numberMode="scientific"
+            defaultValue={formData.exposure_time}
+            onCommit={v => setField("exposure_time", v)}
+            minValue={0.1}
+          />
+        </Box>
+      </FormFieldset>
 
       {/* Scan controls */}
       <Box
@@ -89,6 +95,7 @@ export function TomographyForm() {
           exclusive
           fullWidth
           aria-label="Scan type"
+          disabled={busy}
           value={formData.scan_type}
           onChange={(_, v) => v && setField("scan_type", v)}
         >
