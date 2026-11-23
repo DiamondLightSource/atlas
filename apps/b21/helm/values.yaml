@@ -12,7 +12,7 @@ ui-base:
       rewriteTarget: /
       target:
         external:
-          uri: b21-blueapi.diamond.ac.uk
+          uri: https://b21-blueapi.diamond.ac.uk
 
     - id: tiled
       path: /api/data/
