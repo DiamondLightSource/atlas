@@ -399,6 +399,8 @@ export function useSpectroscopyData(
 
   /** Cached interval id */
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** The scan whose last points have been reported; later polls of it are view switches */
+  const reportedFor = useRef<string | null>(null);
 
   // React to scan updates
   useEffect(() => {
@@ -436,8 +438,16 @@ export function useSpectroscopyData(
       return "done";
     }
 
-    /** The last poll after a scan ends: no later poll will follow a 503, so retry */
+    /**
+     * The last poll after a scan ends: no later poll will follow a 503, so
+     * retry. Only the first, at the scan's end, reports on its last points.
+     */
     async function finalPoll() {
+      const report = (next: LastPointsStatus | null) => {
+        if (reportedFor.current === uuid) return;
+        setLastPoints(next);
+        if (next !== "loading") reportedFor.current = uuid;
+      };
       for (
         let attempt = 0;
         attempt < FINAL_POLL_ATTEMPTS && !cancelled;
@@ -445,16 +455,17 @@ export function useSpectroscopyData(
       ) {
         const result = await poll();
         if (cancelled) return;
-        if (result === "done") return setLastPoints(null);
-        if (result === "error") return setLastPoints("missing");
-        setLastPoints("loading");
+        if (result === "done") return report(null);
+        if (result === "error") return report("missing");
+        report("loading");
         await new Promise(resolve => setTimeout(resolve, result.retryAfterMs));
       }
-      if (!cancelled) setLastPoints("missing");
+      if (!cancelled) report("missing");
     }
 
     if (running && uuid) {
-      // start polling
+      // start polling, at once so a view switch shows straight away
+      void poll();
       pollInterval.current = setInterval(poll, 500); // 2 Hz
     } else if (!running && uuid) {
       // The scan has ended: poll once more for its last points. (The previous
