@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { SubmissionData } from "../../utils/types";
 import { MemoryRouter } from "react-router-dom";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "../../context/supergraph/RelayEnvironment";
+import { relayEnvironment } from "../../relay";
 import SubmittedMessagesList from "./SubmittedMessagesList";
 import { userEvent } from "@atlas/vitest-conf";
 
@@ -48,7 +48,7 @@ describe("SubmittedMessagesList", () => {
 
     render(
       <MemoryRouter initialEntries={["/"]} initialIndex={0}>
-        <RelayEnvironmentProvider environment={RelayEnvironment}>
+        <RelayEnvironmentProvider environment={relayEnvironment}>
           <SubmittedMessagesList submissionData={messages} />
         </RelayEnvironmentProvider>
       </MemoryRouter>,

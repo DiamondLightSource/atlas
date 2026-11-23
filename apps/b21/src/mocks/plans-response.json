@@ -1,0 +1,2068 @@
+{
+  "plans": [
+    {
+      "name": "take_flame_data",
+      "description": null,
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "filepath": {
+            "title": "Filepath",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "exposure_time": {
+            "title": "Exposure Time",
+            "type": "integer"
+          },
+          "flame": {
+            "default": "flame_spectrometer",
+            "enum": ["flame_spectrometer"],
+            "title": "Flame",
+            "type": "dodal.devices.beamlines.b21.flame_spectrometer.FlameSpectrometer"
+          }
+        },
+        "required": ["filepath", "filename", "exposure_time"],
+        "title": "take_flame_data",
+        "type": "object"
+      }
+    },
+    {
+      "name": "count",
+      "description": "Reads from a number of devices.\n\nWraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable\nparameters and metadata.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "num": {
+            "default": 1,
+            "title": "Num",
+            "type": "integer"
+          },
+          "delay": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              }
+            ],
+            "default": 0,
+            "title": "Delay"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors"],
+        "title": "count",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_grid_rscan",
+      "description": "Scan independent trajectories, relative to current positions.\n\nThe scan is defined by providing a list of points for each scan trajectory. Snakes\nall fast axes by default (all axes but the first axis provided). Wraps\nbluesky.plans.rel_list_grid_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "default": true,
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "list_grid_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_grid_scan",
+      "description": "Scan independent trajectories.\n\nThe scan is defined by providing a list of points for each scan trajectory. Snakes\nall fast axes by default (all axes but the first axis provided). Wraps\nbluesky.plans.list_grid_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "default": true,
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "list_grid_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_rscan",
+      "description": "Scan concurrent trajector(y/ies), relative to current position.\n\nThe scan is defined by providing a list of points for each scan trajectory.\nWraps bluesky.plans.rel_list_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "list_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_scan",
+      "description": "Scan concurrent single or multi-motor trajector(y/ies).\n\nThe scan is defined by providing a list of points for each scan trajectory.\nWraps bluesky.plans.list_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "list_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "num_grid_rscan",
+      "description": "Scan independent trajectories, relative to current positions.\n\nThe scan is defined by number of points along scan trajectories. Snakes all fast\naxes by default (all axes but the first axis provided). Wraps\nbluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "default": true,
+            "title": "Snake Axes"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "num_grid_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "num_grid_scan",
+      "description": "Scan independent multi-motor trajectories.\n\nThe scan is defined by number of points along scan trajectories. Snakes all fast\naxes by default (all axes but the first axis provided). Wraps\nbluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "default": true,
+            "title": "Snake Axes"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "num_grid_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "num_rscan",
+      "description": "Scan concurrent trajector(y/ies), relative to current position(s).\n\nThe scan is defined by number of points along scan trajector(y/ies). Wraps\nbluesky.plans.rel_scan(det, *args, num, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "num": {
+            "title": "Num",
+            "type": "integer"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "num_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "num_scan",
+      "description": "Scan concurrent single or multi-motor trajector(y/ies).\n\nThe scan is defined by number of points along scan trajector(y/ies). Wraps\nbluesky.plans.scan(det, *args, num, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "num": {
+            "title": "Num",
+            "type": "integer"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params", "num"],
+        "title": "num_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "spec_scan",
+      "description": "Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.\nA `Spec` is an N-dimensional path.\n",
+      "schema": {
+        "$defs": {
+          "Concat_Reference_": {
+            "additionalProperties": false,
+            "description": "Concatenate two Specs together, running one after the other.\n\nEach Dimension of left and right must contain the same axes. Typically\nformed using `Spec.concat`.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 3, 3).concat(Linspace(\"x\", 4, 5, 5)))",
+            "properties": {
+              "left": {
+                "$ref": "#/$defs/Spec",
+                "description": "The left-hand Spec to Concat, midpoints will appear earlier"
+              },
+              "right": {
+                "$ref": "#/$defs/Spec",
+                "description": "The right-hand Spec to Concat, midpoints will appear later"
+              },
+              "gap": {
+                "default": false,
+                "description": "If True, force a gap in the output at the join",
+                "title": "Gap",
+                "type": "boolean"
+              },
+              "check_path_changes": {
+                "default": true,
+                "description": "If True path through scan will not be modified by squash",
+                "title": "Check Path Changes",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Concat",
+                "default": "Concat",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["left", "right"],
+            "title": "Concat",
+            "type": "object"
+          },
+          "ConstantDuration_Reference_": {
+            "additionalProperties": false,
+            "description": "Apply a constant duration to every point in a Spec.\n\nTypically applied with the ``@`` modifier.\n\n.. example_spec::\n\n    from scanspec.specs import Linspace\n\n    spec = 0.1 @ Linspace(\"x\", 1, 2, 3)",
+            "properties": {
+              "constant_duration": {
+                "description": "The value at each point",
+                "title": "Constant Duration",
+                "type": "number"
+              },
+              "spec": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Spec contaning the path to be followed"
+              },
+              "type": {
+                "const": "ConstantDuration",
+                "default": "ConstantDuration",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["constant_duration"],
+            "title": "ConstantDuration",
+            "type": "object"
+          },
+          "Ellipse_Reference_": {
+            "additionalProperties": false,
+            "description": "Grid of points masked to an elliptical footprint.\n\nConstructs a 2-D scan over an axis-aligned ellipse defined by\n``(x_axis, y_axis)``, centred at (``x_centre``, ``y_centre``), with\ndiameters ``x_diameter`` and ``y_diameter``. Grid spacing along each axis is\ncontrolled by ``x_step`` and ``y_step``. If ``snake`` is True, the fast\naxis will zigzag like a snake. If ``vertical`` is True, the y axis will be\nthe fast axis.\n\nStarts from one of the four extremes of the ellipse identified by the signs of\n``x_step`` and ``y_step``.\n\n.. example_spec::\n\n    from scanspec.specs import Ellipse, Fly\n\n    # An elliptical region centred at (0, 0) on axes \"x\" and \"y\",\n    # with 10x6 diameters and steps of 0.5 in both directions.\n    spec = Fly(\n        Ellipse(\n            \"x\", 0, 10, 0.5,\n            \"y\", 0, 6,\n            snake=True,\n            vertical=False,\n        )\n    )",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "x_centre": {
+                "description": "x centre of the spiral",
+                "title": "X Centre",
+                "type": "number"
+              },
+              "x_diameter": {
+                "description": "x width of the spiral",
+                "title": "X Diameter",
+                "type": "number"
+              },
+              "x_step": {
+                "description": "Spacing along x",
+                "exclusiveMinimum": 0,
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_centre": {
+                "description": "y centre of the spiral",
+                "title": "Y Centre",
+                "type": "number"
+              },
+              "y_diameter": {
+                "description": "y width of the spiral (defaults to x_diameter)",
+                "title": "Y Diameter",
+                "type": "number"
+              },
+              "y_step": {
+                "description": "Spacing along y (defaults to x_step)",
+                "exclusiveMinimum": 0,
+                "title": "Y Step",
+                "type": "number"
+              },
+              "snake": {
+                "default": false,
+                "description": "If True, path zigzag like a snake (defaults to False)",
+                "title": "Snake",
+                "type": "boolean"
+              },
+              "vertical": {
+                "default": false,
+                "description": "If True, y axis is the fast axis (defaults to False)",
+                "title": "Vertical",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Ellipse",
+                "default": "Ellipse",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "x_axis",
+              "x_centre",
+              "x_diameter",
+              "x_step",
+              "y_axis",
+              "y_centre"
+            ],
+            "title": "Ellipse",
+            "type": "object"
+          },
+          "Fly_Reference_": {
+            "additionalProperties": false,
+            "description": "Move through lower to upper bounds of the Spec rather than stopping.\n\nThis is commonly termed a \"fly scan\" rather than a \"step scan\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 3))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "Spec contaning the path to be followed"
+              },
+              "type": {
+                "const": "Fly",
+                "default": "Fly",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Fly",
+            "type": "object"
+          },
+          "Linspace_Reference_": {
+            "additionalProperties": false,
+            "description": "Linearly spaced frames with start and stop as first and last midpoints.\n\nThis class is intended to handle linearly spaced frames defined with a\nspecific number of frames.\n\n.. seealso::\n    `Range`: For linearly spaced frames defined with a step size.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"x\", 1, 2, 5))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "start": {
+                "description": "Midpoint of the first point of the line",
+                "title": "Start",
+                "type": "number"
+              },
+              "stop": {
+                "description": "Midpoint of the last point of the line",
+                "title": "Stop",
+                "type": "number"
+              },
+              "num": {
+                "default": 1,
+                "description": "Number of frames to produce (defaults to 1)",
+                "minimum": 1,
+                "title": "Num",
+                "type": "integer"
+              },
+              "type": {
+                "const": "Linspace",
+                "default": "Linspace",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "start", "stop"],
+            "title": "Linspace",
+            "type": "object"
+          },
+          "Polygon_Reference_": {
+            "additionalProperties": false,
+            "description": "Grid of points masked to a polygonal footprint.\n\nConstructs a 2-D scan over an axis-aligned polygon defined by an ordered\nlist of vertices \"(x, y)\" given in ``vertices``. The polygon may be convex\nor concave, and the interior is determined using an even-odd ray-casting\nrule. Grid spacing along each axis is controlled by ``x_step`` and ``y_step``,\nIf ``snake`` is True, the fast axis will zigzag like a snake. If ``vertical`` is\nTrue, the y axis will be the fast axis.\n\n.. example_spec::\n\n    from scanspec.specs import Polygon, Fly\n\n    # A triangular region on axes \"x\" and \"y\", stepped by 0.2 units\n    # in both directions.\n    spec = Fly(\n        Polygon(\n            x_axis=\"x\",\n            y_axis=\"y\",\n            vertices=[(0, 0), (5, 0), (2.5, 4)],\n            x_step=0.2,\n            y_step=0.2,\n            snake=True,\n            vertical=False,\n        )\n    )",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "vertices": {
+                "description": "List of (x, y) vertices defining the polygon",
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "title": "Vertices",
+                "type": "array"
+              },
+              "x_step": {
+                "description": "Spacing along x",
+                "exclusiveMinimum": 0,
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_step": {
+                "description": "Spacing along y (defaults to x_step)",
+                "exclusiveMinimum": 0,
+                "title": "Y Step",
+                "type": "number"
+              },
+              "snake": {
+                "default": false,
+                "description": "If True, path zigzag like a snake (defaults to False)",
+                "title": "Snake",
+                "type": "boolean"
+              },
+              "vertical": {
+                "default": false,
+                "description": "If True, y axis is the fast axis (defaults to False)",
+                "title": "Vertical",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Polygon",
+                "default": "Polygon",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["x_axis", "y_axis", "vertices", "x_step"],
+            "title": "Polygon",
+            "type": "object"
+          },
+          "Product_Reference_": {
+            "additionalProperties": false,
+            "description": "Outer product of two Specs, nesting inner within outer.\n\nThis means that inner will run in its entirety at each point in outer.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 3, 4, 12))\n\nAn inner integer can be used to repeat the same point many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3) * 2)\n\nAn outer integer can be used to repeat the same scan many times.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(2 * ~Linspace.bounded(\"x\", 3, 4, 1))\n\nIf you want snaked axes to have no gap between iterations you can do:\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Product\n\n    spec = Fly(Product(2, ~Linspace.bounded(\"x\", 3, 4, 1), gap=False))\n\n.. note:: There is no turnaround arrow at x=4",
+            "properties": {
+              "outer": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "description": "Will be executed once",
+                "title": "Outer"
+              },
+              "inner": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/Spec"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "description": "Will be executed len(outer) times",
+                "title": "Inner"
+              },
+              "gap": {
+                "default": true,
+                "description": "If False and the outer spec is an integer and the inner spec is snaked then the end and start of consecutive iterations of inner will have no gap",
+                "title": "Gap",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Product",
+                "default": "Product",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["outer", "inner"],
+            "title": "Product",
+            "type": "object"
+          },
+          "Range_Reference_": {
+            "additionalProperties": false,
+            "description": "Linearly spaced frames with start and stop as the bounding midpoints.\n\n``step`` defines the distance between midpoints.\n\n.. seealso::\n    `Linspace`: For linearly spaced frames defined with a number of frames.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Range\n\n    spec = Fly(Range(\"x\", 1, 2, 0.25))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "start": {
+                "description": "Midpoint of the first point of the line",
+                "title": "Start",
+                "type": "number"
+              },
+              "stop": {
+                "description": "Midpoint of the last point of the line",
+                "title": "Stop",
+                "type": "number"
+              },
+              "step": {
+                "description": "Step size (defaults to stop - start)",
+                "exclusiveMinimum": 0,
+                "title": "Step",
+                "type": "number"
+              },
+              "type": {
+                "const": "Range",
+                "default": "Range",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "start", "stop"],
+            "title": "Range",
+            "type": "object"
+          },
+          "Snake_Reference_": {
+            "additionalProperties": false,
+            "description": "Run the Spec in reverse on every other iteration when nested.\n\nTypically created with the ``~`` operator.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(Linspace(\"y\", 1, 3, 3) * ~Linspace(\"x\", 3, 5, 5))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "The Spec to run in reverse every other iteration"
+              },
+              "type": {
+                "const": "Snake",
+                "default": "Snake",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Snake",
+            "type": "object"
+          },
+          "Spec": {
+            "discriminator": {
+              "mapping": {
+                "Concat": "#/$defs/Concat_Reference_",
+                "ConstantDuration": "#/$defs/ConstantDuration_Reference_",
+                "Ellipse": "#/$defs/Ellipse_Reference_",
+                "Fly": "#/$defs/Fly_Reference_",
+                "Linspace": "#/$defs/Linspace_Reference_",
+                "Polygon": "#/$defs/Polygon_Reference_",
+                "Product": "#/$defs/Product_Reference_",
+                "Range": "#/$defs/Range_Reference_",
+                "Snake": "#/$defs/Snake_Reference_",
+                "Spiral": "#/$defs/Spiral_Reference_",
+                "Squash": "#/$defs/Squash_Reference_",
+                "Static": "#/$defs/Static_Reference_",
+                "Zip": "#/$defs/Zip_Reference_"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Product_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Zip_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Snake_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Concat_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Squash_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Linspace_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Range_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Fly_Reference_"
+              },
+              {
+                "$ref": "#/$defs/ConstantDuration_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Static_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Spiral_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Ellipse_Reference_"
+              },
+              {
+                "$ref": "#/$defs/Polygon_Reference_"
+              }
+            ]
+          },
+          "Spiral_Reference_": {
+            "additionalProperties": false,
+            "description": "Archimedean spiral of \"x_axis\" and \"y_axis\".\n\nStarts at centre point (\"x_start\", \"y_start\")\". Produces \"num\" points in a\nspiral spanning width of \"x_range\" and height of \"y_range\"\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Spiral\n\n    spec = Fly(Spiral(\"x\", 1, 10, 2.5, \"y\", 5, 50))",
+            "properties": {
+              "x_axis": {
+                "description": "An identifier for what to move for x",
+                "enum": [],
+                "title": "X Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "x_centre": {
+                "description": "x centre of the spiral",
+                "title": "X Centre",
+                "type": "number"
+              },
+              "x_diameter": {
+                "description": "x width of the spiral",
+                "title": "X Diameter",
+                "type": "number"
+              },
+              "x_step": {
+                "description": "Radial spacing along x",
+                "title": "X Step",
+                "type": "number"
+              },
+              "y_axis": {
+                "description": "An identifier for what to move for y",
+                "enum": [],
+                "title": "Y Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "y_centre": {
+                "description": "y centre of the spiral",
+                "title": "Y Centre",
+                "type": "number"
+              },
+              "y_diameter": {
+                "description": "y width of the spiral (defaults to x_diameter)",
+                "title": "Y Diameter",
+                "type": "number"
+              },
+              "type": {
+                "const": "Spiral",
+                "default": "Spiral",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "x_axis",
+              "x_centre",
+              "x_diameter",
+              "x_step",
+              "y_axis",
+              "y_centre"
+            ],
+            "title": "Spiral",
+            "type": "object"
+          },
+          "Squash_Reference_": {
+            "additionalProperties": false,
+            "description": "Squash a stack of Dimension together into a single expanded Dimension object.\n\nSee Also:\n    `why-squash-can-change-path`\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Squash\n\n    spec = Fly(Squash(Linspace(\"y\", 1, 2, 3) * Linspace(\"x\", 0, 1, 4)))",
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/Spec",
+                "description": "The Spec to squash the dimensions of"
+              },
+              "check_path_changes": {
+                "default": true,
+                "description": "If True path through scan will not be modified by squash",
+                "title": "Check Path Changes",
+                "type": "boolean"
+              },
+              "type": {
+                "const": "Squash",
+                "default": "Squash",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["spec"],
+            "title": "Squash",
+            "type": "object"
+          },
+          "Static_Reference_": {
+            "additionalProperties": false,
+            "description": "A static frame, repeated num times, with axis at value.\n\nCan be used to set axis=value at every point in a scan.\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace, Static\n\n    spec = Fly(Linspace(\"y\", 1, 2, 3).zip(Static(\"x\", 3)))",
+            "properties": {
+              "axis": {
+                "description": "An identifier for what to move",
+                "enum": [],
+                "title": "Axis",
+                "type": "bluesky.protocols.Movable"
+              },
+              "value": {
+                "description": "The value at each point",
+                "title": "Value",
+                "type": "number"
+              },
+              "num": {
+                "default": 1,
+                "description": "Number of frames to produce",
+                "minimum": 1,
+                "title": "Num",
+                "type": "integer"
+              },
+              "type": {
+                "const": "Static",
+                "default": "Static",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["axis", "value"],
+            "title": "Static",
+            "type": "object"
+          },
+          "Zip_Reference_": {
+            "additionalProperties": false,
+            "description": "Run two Specs in parallel, merging their midpoints together.\n\nTypically formed using `Spec.zip`.\n\nStacks of Dimension are merged by:\n\n- If right creates a stack of a single Dimension object of size 1, expand it to\n  the size of the fastest Dimension object created by left\n- Merge individual Dimension objects together from fastest to slowest\n\nThis means that Zipping a Spec producing stack [l2, l1] with a Spec\nproducing stack [r1] will assert len(l1)==len(r1), and produce\nstack [l2, l1.zip(r1)].\n\n.. example_spec::\n\n    from scanspec.specs import Fly, Linspace\n\n    spec = Fly(\n        Linspace(\"z\", 1, 2, 3) * Linspace(\"y\", 3, 4, 5).zip(Linspace(\"x\", 4, 5, 5))\n    )",
+            "properties": {
+              "left": {
+                "$ref": "#/$defs/Spec",
+                "description": "The left-hand Spec to Zip, will appear earlier in axes"
+              },
+              "right": {
+                "$ref": "#/$defs/Spec",
+                "description": "The right-hand Spec to Zip, will appear later in axes"
+              },
+              "type": {
+                "const": "Zip",
+                "default": "Zip",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": ["left", "right"],
+            "title": "Zip",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "enum": [
+                "flame_spectrometer",
+                "it",
+                "mirror",
+                "panda1",
+                "slits_1",
+                "slits_2",
+                "slits_3",
+                "slits_5",
+                "slits_6",
+                "slits_7",
+                "synchrotron",
+                "table",
+                "vici_valves",
+                "wbscam"
+              ],
+              "type": "bluesky.protocols.Readable"
+            },
+            "title": "Detectors",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "spec": {
+            "$ref": "#/$defs/Spec"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "spec"],
+        "title": "spec_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "step_grid_rscan",
+      "description": "Scan independent trajectories with specified step size, relative to position.\n\nGenerates list(s) of points for each trajectory, used with\nbluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by\ndefault (all axes but the first axis provided).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "default": true,
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "step_grid_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "step_grid_scan",
+      "description": "Scan independent trajectories with specified step size.\n\nGenerates list(s) of points for each trajectory, used with\nbluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by\ndefault (all axes but the first axis provided).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "snake_axes": {
+            "default": true,
+            "title": "Snake Axes",
+            "type": "boolean"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "step_grid_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "step_rscan",
+      "description": "Scan concurrent trajectories with specified step size, relative to position.\n\nGenerates list(s) of points for each trajectory, used with\nbluesky.plans.rel_list_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "step_rscan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "step_scan",
+      "description": "Scan concurrent trajectories with specified step size.\n\nGenerates list(s) of points for each trajectory, used with\nbluesky.plans.list_scan(det, *args, md=metadata).\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "detectors": {
+            "items": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "bluesky.protocols.Readable"
+                },
+                {
+                  "enum": [
+                    "flame_spectrometer",
+                    "it",
+                    "mirror",
+                    "panda1",
+                    "slits_1",
+                    "slits_2",
+                    "slits_3",
+                    "slits_5",
+                    "slits_6",
+                    "slits_7",
+                    "synchrotron",
+                    "table",
+                    "vici_valves",
+                    "wbscam"
+                  ],
+                  "type": "ophyd_async.core._protocol.AsyncReadable"
+                }
+              ]
+            },
+            "title": "Detectors",
+            "type": "array"
+          },
+          "params": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "enum": [],
+                  "type": "bluesky.protocols.Movable"
+                },
+                {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": ["detectors", "params"],
+        "title": "step_scan",
+        "type": "object"
+      }
+    },
+    {
+      "name": "move",
+      "description": "Move a device, wrapper for `bp.mv`.\n\nArgs:\n    moves (Mapping[Movable, T]): Mapping of Movables to target positions.\n    group (Group | None, optional): The message group to associate with the setting,\n        for sequencing. Defaults to None.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "moves": {
+            "additionalProperties": true,
+            "title": "Moves",
+            "type": "object"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          }
+        },
+        "required": ["moves"],
+        "title": "move",
+        "type": "object"
+      }
+    },
+    {
+      "name": "move_relative",
+      "description": "Move a device relative to its current position, wrapper for `bp.mvr`.\n\nArgs:\n    moves (Mapping[Movable, T]): Mapping of Movables to target deltas.\n    group (Group | None, optional): The message group to associate with the\n        setting, for sequencing. Defaults to None.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "moves": {
+            "additionalProperties": true,
+            "title": "Moves",
+            "type": "object"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          }
+        },
+        "required": ["moves"],
+        "title": "move_relative",
+        "type": "object"
+      }
+    },
+    {
+      "name": "rd",
+      "description": "Reads a single-value non-triggered object, wrapper for `bps.rd`.\n\nArgs:\n    readable (Readable): The device to be read\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "readable": {
+            "enum": [
+              "flame_spectrometer",
+              "it",
+              "mirror",
+              "panda1",
+              "slits_1",
+              "slits_2",
+              "slits_3",
+              "slits_5",
+              "slits_6",
+              "slits_7",
+              "synchrotron",
+              "table",
+              "vici_valves",
+              "wbscam"
+            ],
+            "title": "Readable",
+            "type": "bluesky.protocols.Readable"
+          }
+        },
+        "required": ["readable"],
+        "title": "rd",
+        "type": "object"
+      }
+    },
+    {
+      "name": "set_absolute",
+      "description": "Set a device, wrapper for `bp.abs_set`.\n\nArgs:\n    movable (Movable[T]): The device to set.\n    value (T): The new value.\n    group (Group | None, optional): The message group to associate with the setting,\n        for sequencing. Defaults to None.\n    wait (bool, optional): The group should wait until all setting is complete (e.g.\n        a motor has finished moving). Defaults to False.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "movable": {
+            "enum": [],
+            "title": "Movable",
+            "type": "bluesky.protocols.Movable",
+            "types": ["Any"]
+          },
+          "value": {
+            "title": "Value"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "wait": {
+            "default": true,
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": ["movable", "value"],
+        "title": "set_absolute",
+        "type": "object"
+      }
+    },
+    {
+      "name": "set_relative",
+      "description": "Change a device, wrapper for `bp.rel_set`.\n\nArgs:\n    movable (Movable): The device to set.\n    value (T): The new value.\n    group (Group | None, optional): The message group to associate with the setting,\n        for sequencing. Defaults to None.\n    wait (bool, optional): The group should wait until all setting is complete (e.g.\n        a motor has finished moving). Defaults to False.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "movable": {
+            "enum": [],
+            "title": "Movable",
+            "type": "bluesky.protocols.Movable",
+            "types": ["Any"]
+          },
+          "value": {
+            "title": "Value"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "wait": {
+            "default": true,
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": ["movable", "value"],
+        "title": "set_relative",
+        "type": "object"
+      }
+    },
+    {
+      "name": "sleep",
+      "description": "Suspend all action for a given time, wrapper for `bp.sleep`.\n\nArgs:\n    time (float): Time to wait in seconds.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "time": {
+            "title": "Time",
+            "type": "number"
+          }
+        },
+        "required": ["time"],
+        "title": "sleep",
+        "type": "object"
+      }
+    },
+    {
+      "name": "stop",
+      "description": "Stop a device, wrapper for `bps.stop`.\n\nArgs:\n    stoppable (Stoppable): Device to be stopped\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "stoppable": {
+            "enum": [],
+            "title": "Stoppable",
+            "type": "bluesky.protocols.Stoppable"
+          }
+        },
+        "required": ["stoppable"],
+        "title": "stop",
+        "type": "object"
+      }
+    },
+    {
+      "name": "wait",
+      "description": "Wait for a group status to complete, wrapper for `bp.wait`.\nDoes not expose move_on, as when used as a stub will not fail on Timeout.\n\nArgs:\n    group (Group | None, optional): The name of the group to wait for, defaults to\n        None, in which case waits for all groups that have not yet been awaited.\n    timeout (float | None, default=None): a timeout in seconds.\n\nReturns:\n    MsgGenerator: Plan.\n\nYields:\n    Iterator[MsgGenerator]: Bluesky messages.\n",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "timeout": {
+            "title": "Timeout",
+            "type": "number"
+          }
+        },
+        "title": "wait",
+        "type": "object"
+      }
+    }
+  ]
+}
