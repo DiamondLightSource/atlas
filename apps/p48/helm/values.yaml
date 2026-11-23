@@ -34,7 +34,8 @@ ui-base:
       path: /api/scripting/
       rewriteTarget: /
       passHostHeader: false
-      proxyWebSockets: true
+      ws: true
       target:
-        external:
-          uri: https://p48-pollux-proto-jeg.diamond.ac.uk
+        service:
+          name: enterprise-gateway
+          port: 8888
