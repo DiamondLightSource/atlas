@@ -6,7 +6,6 @@ import { Plane } from "./plane";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
 import { useSharedState } from "../../hooks/useSharedState";
-import { useScanStatus } from "../../hooks/useScanStatus";
 import ScanStatusLine from "../ScanStatusLine";
 
 // ---------------------------------------------------------------------------
@@ -26,7 +25,6 @@ function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
   // const [revolve, setRevolve] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const scanStatus = useScanStatus();
 
   // Shared across all open tabs (and restored on reload)
   const [slice, setSlice] = useSharedState("tomography:slice", 0);
@@ -106,7 +104,7 @@ function TomographyView() {
       <ControlsDrawer
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
-        status={<ScanStatusLine status={scanStatus} />}
+        status={<ScanStatusLine />}
         controls={[
           <TomographyForm key="form" />,
           <TomographyControls

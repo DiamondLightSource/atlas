@@ -1,43 +1,71 @@
 import { useEffect, useRef, useState } from "react";
-import type { TrackableTask } from "@atlas/blueapi";
+import type { Api, TrackableTask, WorkerState } from "@atlas/blueapi";
 import { useBlueapi, useGetWorkerState } from "@atlas/blueapi-query";
 import { useScanEvents } from "./scanEvents";
 
-/** Where the latest scan is, as far as the scan events and blueapi say */
-export type ScanPhase = "running" | "complete" | "failed" | "aborted";
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
+/**
+ * "ending": over, waiting on blueapi for how. "finished": over, but blueapi
+ * never said how.
+ */
+export type ScanPhase =
+  | "running"
+  | "ending"
+  | "complete"
+  | "finished"
+  | "failed"
+  | "aborted";
+
+/**
+ * The latest scan (from the scan events), or the plan the worker is running
+ * outside a scan: before, between or after scans, or with none at all.
+ */
 export interface ScanStatus {
+  /** From the scan events, or from blueapi's worker */
+  source: "scan" | "plan";
   phase: ScanPhase;
-  /** The scan's uuid, from the scan events */
-  uuid: string;
-  /** The blueapi plan that ran it, once known */
+  /** Tells one scan or plan run from the next */
+  id: string;
   planName?: string;
-  /** The plan's `scan_type` parameter ("step" or "fly"), if it has one */
+  /** The plan's `scan_type` parameter, if it has one */
   scanType?: string;
-  /** When this tab saw the scan start (ms since the epoch); unknown if the tab joined mid-scan */
+  /** When this tab saw it start; unknown if it joined partway */
   startedAt?: number;
-  /** When this tab saw the scan end */
   endedAt?: number;
-  /** Blueapi's error for a failed or aborted scan */
+  /** When this tab first saw it, for telling which came last */
+  seenAt: number;
   error?: string;
+  /** The worker's state, when not plain RUNNING */
+  workerState?: WorkerState;
 }
 
-/** Tries for blueapi to mark the task complete after the scan ends */
+/** Whether blueapi's worker state is known: not yet, yes, or not reachable */
+export type WorkerReach = "loading" | "ok" | "unreachable";
+
+type TaskInfo = Pick<ScanStatus, "planName" | "scanType">;
+type TaskResult = TaskInfo & Pick<ScanStatus, "phase" | "error">;
+
+/** Whether the worker is doing anything; unknown counts as not */
+export const isBusy = (state: WorkerState | undefined) =>
+  state !== undefined && state !== "IDLE" && state !== "UNKNOWN";
+
+// ---------------------------------------------------------------------------
+// Blueapi tasks
+// ---------------------------------------------------------------------------
+
+/** Tries for blueapi to mark a task complete once it ends */
 const TASK_SETTLE_ATTEMPTS = 10;
 const TASK_SETTLE_DELAY_MS = 500;
 
-/**
- * An error that reads as an abort. The UI aborts with the reason "UI
- * Intervention"; the worker passing through ABORTING is the other sign.
- */
+/** The UI aborts with the reason "UI Intervention" */
 const ABORT_PATTERN = /abort|UI Intervention/i;
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** The plan and scan type a task ran */
-function describeTask(
-  task: TrackableTask,
-): Pick<ScanStatus, "planName" | "scanType"> {
+function describeTask(task: TrackableTask): TaskInfo {
   const params = task.task.params as { scan_type?: unknown };
   return {
     planName: task.task.name,
@@ -46,7 +74,6 @@ function describeTask(
   };
 }
 
-/** The task's error, if it ended in one */
 function taskError(task: TrackableTask): string | undefined {
   if (task.errors.length > 0) return task.errors[0];
   if (task.outcome?.outcome === "error") {
@@ -55,105 +82,238 @@ function taskError(task: TrackableTask): string | undefined {
   return undefined;
 }
 
-/**
- * The latest scan's status, for a status line: the scan events say when it
- * starts and ends, and blueapi's task says which plan ran it, its scan type,
- * and why it failed.
- */
-export function useScanStatus(): ScanStatus | null {
+/** The worker's current task */
+async function fetchActiveTask(
+  blueapi: Api,
+): Promise<{ taskId: string; info: TaskInfo } | null> {
+  try {
+    const { task_id } = await blueapi.worker.getActiveTask();
+    if (!task_id) return null;
+    return {
+      taskId: task_id,
+      info: describeTask(await blueapi.tasks.get(task_id)),
+    };
+  } catch (err) {
+    console.warn("Couldn't identify the running task:", err);
+    return null;
+  }
+}
+
+/** How a task ended, once blueapi has finished it; null if it never does */
+async function settleTask(
+  blueapi: Api,
+  taskId: string,
+  sawAbort: boolean,
+  failedEvent = false,
+): Promise<TaskResult | null> {
+  try {
+    for (let attempt = 0; attempt < TASK_SETTLE_ATTEMPTS; attempt++) {
+      const task = await blueapi.tasks.get(taskId);
+      if (task.is_complete) {
+        const error = taskError(task);
+        const aborted =
+          sawAbort || (error !== undefined && ABORT_PATTERN.test(error));
+        return {
+          ...describeTask(task),
+          error,
+          phase: aborted
+            ? "aborted"
+            : error !== undefined || failedEvent
+              ? "failed"
+              : "complete",
+        };
+      }
+      await delay(TASK_SETTLE_DELAY_MS);
+    }
+  } catch (err) {
+    console.warn("Couldn't fetch the finished task:", err);
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Latest scan, from the scan events
+// ---------------------------------------------------------------------------
+
+function useLatestScan(workerState: WorkerState | undefined) {
   const blueapi = useBlueapi();
   const scanEvent = useScanEvents();
-  const workerState = useGetWorkerState();
   const [status, setStatus] = useState<ScanStatus | null>(null);
 
-  /** The scan the refs below belong to */
+  // the current scan, its task, and whether the worker aborted during it
   const scanUuid = useRef<string | null>(null);
-  /** Its blueapi task, once known */
   const taskId = useRef<string | null>(null);
-  /** Whether the worker was seen aborting during it */
   const sawAbort = useRef(false);
 
-  // An abort can be over before the task records why, so note it as it happens
+  // an abort can be over before the task records why
   useEffect(() => {
-    if (workerState.data === "ABORTING") sawAbort.current = true;
-  }, [workerState.data]);
+    if (workerState === "ABORTING") sawAbort.current = true;
+  }, [workerState]);
 
   useEffect(() => {
     if (!scanEvent) return;
     const { uuid } = scanEvent;
 
-    /** Merge into the status, if it is still this scan's */
     const update = (changes: Partial<ScanStatus>) =>
       setStatus(current =>
-        current?.uuid === uuid ? { ...current, ...changes } : current,
+        current?.id === uuid ? { ...current, ...changes } : current,
       );
 
-    /** Find the running task, for its plan and scan type */
-    async function identify() {
-      try {
-        const { task_id } = await blueapi.worker.getActiveTask();
-        if (!task_id || scanUuid.current !== uuid) return;
-        taskId.current = task_id;
-        update(describeTask(await blueapi.tasks.get(task_id)));
-      } catch (err) {
-        console.warn("Couldn't identify the running task:", err);
-      }
-    }
-
-    /** Once blueapi has finished the task, take its error, if any */
-    async function settle(failedEvent: boolean) {
-      const id = taskId.current;
-      if (!id) return;
-      try {
-        for (let attempt = 0; attempt < TASK_SETTLE_ATTEMPTS; attempt++) {
-          const task = await blueapi.tasks.get(id);
-          if (task.is_complete) {
-            const error = taskError(task);
-            const aborted =
-              sawAbort.current ||
-              (error !== undefined && ABORT_PATTERN.test(error));
-            update({
-              ...describeTask(task),
-              error,
-              phase: aborted
-                ? "aborted"
-                : error !== undefined || failedEvent
-                  ? "failed"
-                  : "complete",
-            });
-            return;
-          }
-          await delay(TASK_SETTLE_DELAY_MS);
-        }
-      } catch (err) {
-        console.warn("Couldn't fetch the finished task:", err);
-      }
-    }
-
     if (scanEvent.status === "running") {
-      if (scanUuid.current === uuid) return; // the same scan, already shown
+      if (scanUuid.current === uuid) return; // already shown
       scanUuid.current = uuid;
       taskId.current = null;
-      sawAbort.current = workerState.data === "ABORTING";
-      setStatus({ phase: "running", uuid, startedAt: Date.now() });
-      void identify();
+      sawAbort.current = workerState === "ABORTING";
+      const now = Date.now();
+      setStatus({
+        source: "scan",
+        phase: "running",
+        id: uuid,
+        startedAt: now,
+        seenAt: now,
+      });
+      void fetchActiveTask(blueapi).then(active => {
+        if (!active || scanUuid.current !== uuid) return;
+        taskId.current = active.taskId;
+        update(active.info);
+      });
     } else {
       const failedEvent = scanEvent.status === "failed";
       if (scanUuid.current !== uuid) {
-        // the tab joined mid-scan: no start time or task to go on
+        // joined mid-scan: no start time or task
         scanUuid.current = uuid;
         taskId.current = null;
       }
       setStatus(current => ({
-        ...(current?.uuid === uuid ? current : { uuid }),
+        ...(current?.id === uuid
+          ? current
+          : { source: "scan" as const, id: uuid, seenAt: Date.now() }),
         phase: failedEvent ? "failed" : "complete",
         endedAt: Date.now(),
       }));
-      void settle(failedEvent);
+      const id = taskId.current;
+      if (id) {
+        void settleTask(blueapi, id, sawAbort.current, failedEvent).then(
+          result => result && update(result),
+        );
+      }
     }
-    // workerState is only read for the starting value of sawAbort
+    // workerState only seeds sawAbort
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanEvent, blueapi]);
 
   return status;
+}
+
+// ---------------------------------------------------------------------------
+// Latest plan run, from the worker state
+// ---------------------------------------------------------------------------
+
+function useLatestPlan(workerState: WorkerState | undefined) {
+  const blueapi = useBlueapi();
+  const [run, setRun] = useState<ScanStatus | null>(null);
+
+  // the run in progress, its task lookup, and whether the worker aborted
+  const runId = useRef<string | null>(null);
+  const task = useRef<Promise<string | null> | null>(null);
+  const sawAbort = useRef(false);
+  /** Unknown before: the tab joined a busy worker, rather than saw it start */
+  const previous = useRef<WorkerState | undefined>(undefined);
+
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = workerState;
+    if (workerState === undefined || workerState === "UNKNOWN") return;
+
+    const update = (id: string, changes: Partial<ScanStatus>) =>
+      setRun(current =>
+        current?.id === id ? { ...current, ...changes } : current,
+      );
+
+    if (isBusy(workerState)) {
+      if (workerState === "ABORTING") sawAbort.current = true;
+      const shown = workerState === "RUNNING" ? undefined : workerState;
+      if (runId.current) {
+        update(runId.current, { workerState: shown });
+        return;
+      }
+      const now = Date.now();
+      const id = `plan-${now}`;
+      runId.current = id;
+      sawAbort.current = workerState === "ABORTING";
+      setRun({
+        source: "plan",
+        phase: "running",
+        id,
+        startedAt: before === undefined ? undefined : now,
+        seenAt: now,
+        workerState: shown,
+      });
+      // kept, so the run's end can wait for it however late it is
+      task.current = fetchActiveTask(blueapi).then(active => {
+        if (!active) return null;
+        update(id, active.info);
+        return active.taskId;
+      });
+    } else if (runId.current) {
+      const id = runId.current;
+      const lookup = task.current;
+      const aborted = sawAbort.current;
+      runId.current = null;
+      task.current = null;
+      update(id, {
+        phase: "ending",
+        endedAt: Date.now(),
+        workerState: undefined,
+      });
+      void (async () => {
+        const taskId = await lookup;
+        const result = taskId && (await settleTask(blueapi, taskId, aborted));
+        update(id, result || { phase: aborted ? "aborted" : "finished" });
+      })();
+    }
+  }, [workerState, blueapi]);
+
+  return run;
+}
+
+// ---------------------------------------------------------------------------
+// Status
+// ---------------------------------------------------------------------------
+
+/** The scan or the plan, whichever says more */
+function choose(
+  scan: ScanStatus | null,
+  plan: ScanStatus | null,
+): ScanStatus | null {
+  if (plan?.phase === "running") {
+    return scan?.phase === "running"
+      ? { ...scan, workerState: plan.workerState }
+      : plan;
+  }
+  if (!plan || !scan) return plan ?? scan;
+  const scanEnded = scan.endedAt ?? Number.POSITIVE_INFINITY;
+  // no scan during the plan
+  if (scanEnded < plan.seenAt) return plan;
+  // a plan that went wrong after its scan
+  const planWentWrong = plan.phase === "failed" || plan.phase === "aborted";
+  if (planWentWrong && (plan.endedAt ?? 0) >= scanEnded) return plan;
+  return scan;
+}
+
+/**
+ * The status line's status: while the worker is busy, the running scan, else
+ * the plan; once idle, whichever ended last. Null before anything has happened.
+ */
+export function useScanStatus(): {
+  status: ScanStatus | null;
+  worker: WorkerReach;
+} {
+  const { data: workerState, isError } = useGetWorkerState();
+  const scan = useLatestScan(workerState);
+  const plan = useLatestPlan(workerState);
+  return {
+    status: choose(scan, plan),
+    worker: isError ? "unreachable" : workerState ? "ok" : "loading",
+  };
 }
