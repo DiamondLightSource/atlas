@@ -279,7 +279,7 @@ function StatusText({ line }: { line: Line }) {
           minWidth: 0,
           color: line.colour,
           typography: "h6",
-          fontWeight: 700,
+          fontWeight: "var(--ds-font-weight-bold)",
           fontStyle: "italic",
           // the theme's h6 line height (1.2) is too tight for noWrap's
           // overflow: hidden, which clips the descenders

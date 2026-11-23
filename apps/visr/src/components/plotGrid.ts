@@ -1,3 +1,5 @@
+import type { Theme } from "@mui/material/styles";
+
 // Spacing for grids of PlotCells
 
 /** Space between the plot cells, and at their sides; none above or below, so they run the full height like the controls pane */
@@ -30,15 +32,17 @@ export function minimumRowHeightFor(oneColumn: boolean): number {
   return (oneColumn ? 240 : 120) / ROWS_PER_PLOT;
 }
 
-/** How long the controls pane takes to open or close */
-export const LAYOUT_TRANSITION_MS = 150;
-
-/** A transition that is skipped for anyone who has asked for less motion */
+/**
+ * The theme's quickest transition (150ms), as the controls pane opens and
+ * closes; skipped for anyone who has asked for less motion
+ */
 export function layoutTransition(properties: string[]) {
   return {
-    transition: properties
-      .map(property => `${property} ${LAYOUT_TRANSITION_MS}ms ease-out`)
-      .join(", "),
+    transition: (theme: Theme) =>
+      theme.transitions.create(properties, {
+        duration: theme.transitions.duration.shortest,
+        easing: theme.transitions.easing.easeOut,
+      }),
     "@media (prefers-reduced-motion: reduce)": { transition: "none" },
   } as const;
 }

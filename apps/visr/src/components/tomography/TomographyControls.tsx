@@ -39,7 +39,10 @@ export default function Controls({
         p: 3,
       }}
     >
-      <Typography variant="subtitle1" fontWeight={600}>
+      <Typography
+        variant="subtitle1"
+        fontWeight="var(--ds-font-weight-semibold)"
+      >
         General
       </Typography>
 
@@ -59,7 +62,10 @@ export default function Controls({
         />
       </Box>
 
-      <Typography variant="subtitle1" fontWeight={600}>
+      <Typography
+        variant="subtitle1"
+        fontWeight="var(--ds-font-weight-semibold)"
+      >
         Cross-section
       </Typography>
 

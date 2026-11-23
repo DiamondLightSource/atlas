@@ -71,7 +71,7 @@ function ControlsPane({ open, onToggle, tabs, status }: ControlsPaneProps) {
           <Typography
             variant="h6"
             component="h2"
-            fontWeight={600}
+            fontWeight="var(--ds-font-weight-semibold)"
             noWrap
             sx={{ mr: "auto" }}
           >
