@@ -1,0 +1,59 @@
+# CODEOWNERS for the Atlas monorepo
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Rules:
+#   - The LAST matching pattern wins, so we keep the catch-all default at the top
+#     and more specific paths below it.
+#   - A matching line replaces (does not add to) the owners from earlier lines.
+#   - Owners can be teams (@diamondlightsource/<team-slug>) or users (@username),
+#     space separated. Teams must have write access to this repo.
+#   - A path with no owners listed after it has no code owner.
+#
+# -----------------------------------------------------------------------------
+# Default owners: Atlas Core team
+# -----------------------------------------------------------------------------
+*                                   @diamondlightsource/atlas-core
+
+# -----------------------------------------------------------------------------
+# Repo infrastructure
+# -----------------------------------------------------------------------------
+/.github/                           @diamondlightsource/atlas-core
+/docker/                            @diamondlightsource/atlas-core
+/helm/                              @diamondlightsource/atlas-core
+/scripts/                           @diamondlightsource/atlas-core
+/package.json                       @diamondlightsource/atlas-core
+# Deliberately unowned: meaningful review happens on the package.json that caused the change.
+/pnpm-lock.yaml
+/pnpm-workspace.yaml                @diamondlightsource/atlas-core
+/turbo.json                         @diamondlightsource/atlas-core
+/tsconfig.json                      @diamondlightsource/atlas-core
+
+# -----------------------------------------------------------------------------
+# Apps
+# -----------------------------------------------------------------------------
+/apps/b21/                          @diamondlightsource/developers-scm-x
+/apps/i08-1/                        @diamondlightsource/developers-imaging @NatLeung96
+/apps/i15-1/                        @diamondlightsource/developers-scm-x
+/apps/p48/                          @diamondlightsource/ui-ux @diamondlightsource/atlas-core
+/apps/p99/                          @diamondlightsource/developers-mmg
+/apps/visr/                         @diamondlightsource/visr @diamondlightsource/ui-ux
+
+# -----------------------------------------------------------------------------
+# Packages
+# -----------------------------------------------------------------------------
+/packages/app-shell/                @diamondlightsource/ui-ux
+/packages/auth/                     @diamondlightsource/atlas-core
+/packages/blueapi/                  @diamondlightsource/atlas-core
+/packages/blueapi-query/            @diamondlightsource/atlas-core
+/packages/blueapi-ui/               @diamondlightsource/ui-ux
+/packages/instrument-session/       @diamondlightsource/atlas-core
+/packages/pvws-config/              @diamondlightsource/atlas-core
+/packages/supergraph/               @diamondlightsource/atlas-core
+/packages/vitest-conf/              @diamondlightsource/atlas-core
+
+# -----------------------------------------------------------------------------
+# Ownership of this file stays with the core team. Keep this rule last so
+# nothing above can override it.
+# -----------------------------------------------------------------------------
+/.github/CODEOWNERS                 @diamondlightsource/atlas-core
