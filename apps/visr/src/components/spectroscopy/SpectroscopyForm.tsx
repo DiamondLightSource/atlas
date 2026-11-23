@@ -37,14 +37,14 @@ export function SpectroscopyForm() {
     value: (typeof formData)[K],
   ) => setFormData(prev => ({ ...prev, [key]: value }));
 
-  const sectionSx = { pt: 3, borderTop: 1, borderColor: "divider" };
+  const sectionSx = { pt: 2, borderTop: 1, borderColor: "divider" };
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 3,
+        gap: 2,
         p: 3,
         "& .MuiButton-root": {
           width: "100%",
@@ -60,12 +60,12 @@ export function SpectroscopyForm() {
           sx={{
             display: "grid",
             gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-            gap: 3,
+            gap: 2,
             alignItems: "start",
           }}
         >
           {/* x and y share one cell */}
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
             <NumberInput
               label="Grid Origin x"
               numberMode="scientific"
@@ -114,7 +114,7 @@ export function SpectroscopyForm() {
           ...sectionSx,
           display: "grid",
           gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-          gap: 2,
+          gap: 1.5,
         }}
       >
         <ToggleButtonGroup

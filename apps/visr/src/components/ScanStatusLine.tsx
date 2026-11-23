@@ -1,10 +1,5 @@
-import {
-  Box,
-  CircularProgress,
-  Fade,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Fade, Tooltip, Typography } from "@mui/material";
+import { keyframes } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import type { WorkerState } from "@atlas/blueapi";
 import {
@@ -20,8 +15,9 @@ export type LastPointsStatus = "loading" | "missing";
 // Timing
 // ---------------------------------------------------------------------------
 
-/** "Complete" goes idle after this; problems stay until the next scan */
-const IDLE_AFTER_MS = 5000;
+/** How long "complete" and "finished" stay before going idle; problems stay until the next scan */
+const COMPLETE_IDLE_AFTER_MS = 15000;
+const FINISHED_IDLE_AFTER_MS = 5000;
 const FADE_MS = 1000;
 
 /** 0:07, 1:42, 1:02:03 */
@@ -71,14 +67,14 @@ function usePauses(id: string | undefined, paused: boolean): Pauses {
 }
 
 /** Whether the line under `key` has had its time and gone idle */
-function useGoneIdle(key: string, goesIdle: boolean): boolean {
+function useGoneIdle(key: string, idleAfter: number | undefined): boolean {
   const [idleKey, setIdleKey] = useState<string | null>(null);
   useEffect(() => {
-    if (!goesIdle) return;
-    const timer = setTimeout(() => setIdleKey(key), IDLE_AFTER_MS);
+    if (idleAfter === undefined) return;
+    const timer = setTimeout(() => setIdleKey(key), idleAfter);
     return () => clearTimeout(timer);
-  }, [key, goesIdle]);
-  return goesIdle && idleKey === key;
+  }, [key, idleAfter]);
+  return idleAfter !== undefined && idleKey === key;
 }
 
 // ---------------------------------------------------------------------------
@@ -90,10 +86,10 @@ type Line = {
   /** Duration after the text */
   time?: string;
   colour: string;
-  /** Changes on its own: shown with a spinner */
+  /** Changes on its own: shown with a pulsing dot */
   busy?: boolean;
-  /** Goes idle after a while */
-  goesIdle?: boolean;
+  /** Goes idle after this many ms */
+  idleAfter?: number;
   /** Fades in */
   fadeIn?: boolean;
   /** Full text on hover, for text cut short */
@@ -174,13 +170,13 @@ function describe(
             ? formatDuration(endedAt - startedAt)
             : undefined,
         colour: "success.main",
-        goesIdle: true,
+        idleAfter: COMPLETE_IDLE_AFTER_MS,
       };
     case "finished":
       return {
         text: `${name} finished`,
         colour: "text.secondary",
-        goesIdle: true,
+        idleAfter: FINISHED_IDLE_AFTER_MS,
       };
     case "aborted":
       return { text: `${name} aborted`, colour: "warning.main" };
@@ -223,9 +219,54 @@ function chooseLine(
 
 const fixedSx = { flexShrink: 0 };
 
+const DOT_SIZE = 14;
+
+const pulse = keyframes`
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+`;
+
+/** A dot in the line's colour; pulsing while something is going on */
+function StatusDot({ busy = false }: { busy?: boolean }) {
+  return (
+    <Box
+      sx={{
+        ...fixedSx,
+        width: DOT_SIZE,
+        height: DOT_SIZE,
+        borderRadius: "50%",
+        bgcolor: "currentColor",
+        ...(busy && {
+          animation: `${pulse} 1.6s ease-in-out infinite`,
+          "@media (prefers-reduced-motion: reduce)": { animation: "none" },
+        }),
+      }}
+    />
+  );
+}
+
+/** The dot alone, pulsing while something is going on: for the collapsed pane */
+function StatusSymbol({ line }: { line: Line }) {
+  const full = line.time ? `${line.text} · ${line.time}` : line.text;
+  return (
+    <Fade in appear={line.fadeIn ?? false} timeout={FADE_MS}>
+      <Box sx={{ display: "flex", color: line.colour }}>
+        <Tooltip
+          title={line.detail ? `${full}: ${line.detail}` : full}
+          placement="left"
+        >
+          <Box sx={{ display: "flex", p: 1 }} aria-label={full}>
+            <StatusDot busy={line.busy} />
+          </Box>
+        </Tooltip>
+      </Box>
+    </Fade>
+  );
+}
+
 /**
- * One line; remounted when it changes, so a fade starts afresh. The spinner
- * goes after the text: the line is right-aligned, so it stays put.
+ * One line; remounted when it changes, so a fade starts afresh. The pulsing
+ * dot goes after the text: the line is right-aligned, so it stays put.
  */
 function StatusText({ line }: { line: Line }) {
   return (
@@ -237,22 +278,23 @@ function StatusText({ line }: { line: Line }) {
           gap: 1,
           minWidth: 0,
           color: line.colour,
-          typography: "body1",
-          fontWeight: 500,
+          typography: "h6",
+          fontWeight: 700,
+          fontStyle: "italic",
+          // the theme's h6 line height (1.2) is too tight for noWrap's
+          // overflow: hidden, which clips the descenders
+          lineHeight: 1.5,
         }}
       >
         <Tooltip title={line.detail ?? ""} disableHoverListener={!line.detail}>
-          <Typography variant="inherit" noWrap>
+          {/* italics lean past the text's box; the padding keeps the last
+              letter clear of noWrap's clipping */}
+          <Typography variant="inherit" noWrap sx={{ pr: "0.15em" }}>
             {line.text}
           </Typography>
         </Tooltip>
         {line.busy ? (
-          <CircularProgress
-            size={16}
-            thickness={5}
-            color="inherit"
-            sx={fixedSx}
-          />
+          <StatusDot busy />
         ) : (
           line.time && <Box sx={fixedSx}>·</Box>
         )}
@@ -269,10 +311,18 @@ function StatusText({ line }: { line: Line }) {
 interface ScanStatusLineProps {
   /** The plots' last points, for a view that polls for them after the scan */
   lastPoints?: LastPointsStatus | null;
+  /** Just a coloured dot, with the text on hover */
+  compact?: boolean;
 }
 
-/** The latest scan or plan in one line, "Idle", or "Worker unreachable" */
-export function ScanStatusLine({ lastPoints = null }: ScanStatusLineProps) {
+/**
+ * The latest scan or plan in one line, "Idle", or "Worker unreachable"; or,
+ * compact, as a coloured symbol
+ */
+export function ScanStatusLine({
+  lastPoints = null,
+  compact = false,
+}: ScanStatusLineProps) {
   const { status, worker } = useScanStatus();
   const running = status?.phase === "running";
   const paused = running && status.workerState === "PAUSED";
@@ -284,17 +334,15 @@ export function ScanStatusLine({ lastPoints = null }: ScanStatusLineProps) {
       : undefined;
 
   const chosen = chooseLine(status, worker, lastPoints, elapsed);
-  const goneIdle = useGoneIdle(
-    chosen?.key ?? "",
-    chosen?.line.goesIdle ?? false,
-  );
+  const goneIdle = useGoneIdle(chosen?.key ?? "", chosen?.line.idleAfter);
   if (!chosen) return null;
+  const Shown = compact ? StatusSymbol : StatusText;
   return (
     <Box
       role="status"
       sx={{ display: "flex", alignItems: "center", minWidth: 0 }}
     >
-      <StatusText
+      <Shown
         key={goneIdle ? "gone-idle" : chosen.key}
         line={goneIdle ? { ...IDLE_LINE, fadeIn: true } : chosen.line}
       />

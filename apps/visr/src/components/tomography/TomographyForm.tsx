@@ -31,14 +31,14 @@ export function TomographyForm() {
     value: (typeof formData)[K],
   ) => setFormData(prev => ({ ...prev, [key]: value }));
 
-  const sectionSx = { pt: 3, borderTop: 1, borderColor: "divider" };
+  const sectionSx = { pt: 2, borderTop: 1, borderColor: "divider" };
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 3,
+        gap: 2,
         p: 3,
         "& .MuiButton-root": {
           width: "100%",
@@ -58,7 +58,7 @@ export function TomographyForm() {
               sm: "1fr 1fr",
               md: "repeat(3, 1fr)",
             },
-            columnGap: 3,
+            columnGap: 2,
             rowGap: 4,
             alignItems: "start",
             pt: 2,
@@ -88,7 +88,7 @@ export function TomographyForm() {
           ...sectionSx,
           display: "grid",
           gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-          gap: 2,
+          gap: 1.5,
         }}
       >
         <ToggleButtonGroup

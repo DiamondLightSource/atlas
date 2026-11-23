@@ -1,10 +1,10 @@
 import { Box, Typography, useColorScheme } from "@mui/material";
 import { ImagePlot } from "@diamondlightsource/davidia";
-import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
+import { ReactGridLayout } from "react-grid-layout";
 import {
   useEffect,
-  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ComponentProps,
 } from "react";
@@ -22,14 +22,26 @@ import { DataSource } from "./dataSource";
 import type { LastPointsStatus } from "../ScanStatusLine";
 import CamPva from "../CamPva";
 import type { Cell } from "../cell";
+import { PlotCell } from "../PlotCell";
+import {
+  ONE_COLUMN_BELOW,
+  PLOT_GRID_SPACING,
+  ROWS_PER_PLOT,
+  gridHeightFor,
+  minimumRowHeightFor,
+  rowHeightFor,
+  settlingSx,
+} from "../plotGrid";
+import { useSettling } from "../../hooks/useSettling";
+import { useElementSize } from "../../hooks/useElementSize";
 
 const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-04:PVA:OUTPUT";
 
 const CHANNELS = [
-  { key: "red", label: "Red channel" },
-  { key: "green", label: "Green channel" },
-  { key: "blue", label: "Blue channel" },
+  { key: "red", label: "Red" },
+  { key: "green", label: "Green" },
+  { key: "blue", label: "Blue" },
 ] as const;
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
@@ -80,23 +92,24 @@ function selectChannels(
 // A remark about the plots themselves, in one quiet line under them
 // ---------------------------------------------------------------------------
 
+/** Over the plots' bottom-left corner, so it takes no room from them */
 function PlotNote({ note }: { note: string | null }) {
+  if (!note) return null;
   return (
-    <Box
+    <Typography
+      variant="caption"
+      color="text.secondary"
       sx={{
-        display: "flex",
-        alignItems: "center",
-        minHeight: 20,
+        position: "absolute",
+        left: 24,
+        bottom: 8,
         px: 1,
-        flexShrink: 0,
+        borderRadius: 1,
+        bgcolor: "background.default",
       }}
     >
-      {note && (
-        <Typography variant="caption" color="text.secondary">
-          {note}
-        </Typography>
-      )}
-    </Box>
+      {note}
+    </Typography>
   );
 }
 
@@ -104,13 +117,29 @@ function PlotNote({ note }: { note: string | null }) {
 // Empty-cell stripes in the colours of the page behind the plots
 // ---------------------------------------------------------------------------
 
-/** The first opaque background colour at or above `element`, if any */
+/**
+ * The background colour seen at `element`: the backgrounds at and above it,
+ * see-through ones blended over the first opaque one. Null if none is opaque.
+ */
 function backgroundBehind(element: HTMLElement | null): Rgb | null {
+  const layers: number[][] = [];
   for (let el = element; el; el = el.parentElement) {
     const parts = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
-    if (parts && parts.length >= 3 && (parts.length < 4 || +parts[3] > 0)) {
-      return [+parts[0], +parts[1], +parts[2]];
+    if (!parts || parts.length < 3) continue;
+    const [r, g, b, a = 1] = parts.map(Number);
+    if (a <= 0) continue;
+    if (a >= 1) {
+      // blend the see-through layers over this one, innermost last
+      return layers.reduceRight<Rgb>(
+        (under, [lr, lg, lb, la]) => [
+          under[0] * (1 - la) + lr * la,
+          under[1] * (1 - la) + lg * la,
+          under[2] * (1 - la) + lb * la,
+        ],
+        [r, g, b],
+      );
     }
+    layers.push([r, g, b, a]);
   }
   return null;
 }
@@ -121,6 +150,8 @@ function backgroundBehind(element: HTMLElement | null): Rgb | null {
  */
 function useStripesBehind(
   element: React.RefObject<HTMLElement | null>,
+  /** Whether `element` is rendered yet */
+  ready: boolean,
 ): StripeColours {
   const { mode, systemMode } = useColorScheme();
   const scheme = mode === "system" ? systemMode : mode;
@@ -131,7 +162,7 @@ function useStripesBehind(
       if (found) setBackground(found.join(","));
     });
     return () => cancelAnimationFrame(frame);
-  }, [element, scheme]);
+  }, [element, scheme, ready]);
   return useMemo(
     () =>
       background
@@ -148,7 +179,7 @@ function useStripesBehind(
 interface SpectroscopyPlotsProps {
   dataSource: DataSource;
   plotKind: PlotKind;
-  expanded: boolean;
+  paneOpen: boolean;
   plotAspectRatio: number | "auto" | "equal";
   /** Told whether the last points are in, for the scan status */
   onLastPointsChange?: (lastPoints: LastPointsStatus | null) => void;
@@ -157,14 +188,20 @@ interface SpectroscopyPlotsProps {
 function SpectroscopyPlots({
   dataSource,
   plotKind,
-  expanded,
+  paneOpen,
   plotAspectRatio,
   onLastPointsChange,
 }: SpectroscopyPlotsProps) {
-  const { width, containerRef, mounted } = useContainerWidth();
-  const stripes = useStripesBehind(
-    containerRef as React.RefObject<HTMLElement | null>,
-  );
+  // measured before the first paint, so the cards never show at a guessed size
+  const { ref: containerRef, size } = useElementSize();
+  const mounted = size !== null;
+  const width = size?.width ?? 0;
+  const containerHeight = size?.height ?? 0;
+  // hidden while the plots resize after the pane opens or closes, or the window is resized
+  const settling = useSettling(paneOpen, containerRef);
+  // the stripes match the cells' shading, so are read from inside one
+  const cellContent = useRef<HTMLDivElement>(null);
+  const stripes = useStripesBehind(cellContent, mounted);
   const { data, lastPoints } = useSpectroscopyData(plotKind, stripes);
   useEffect(() => {
     onLastPointsChange?.(lastPoints);
@@ -178,32 +215,22 @@ function SpectroscopyPlots({
   // Grid sizing
   // -------------------------------------------------------------------------
 
-  const totalRows = 10;
-  const rowsPerPlot = expanded ? totalRows / 2 : totalRows;
-  const cols = expanded ? 2 : 5;
-  const minimumRowHeight = 20;
+  // Pane open: overview across the top, 3 channels + composite in 2x2 below
+  // Pane collapsed: 3 channels + composite in 2x2
+  // Narrow: all in one column, scrolling
+  const oneColumn = width > 0 && width < ONE_COLUMN_BELOW;
+  const cols = oneColumn ? 1 : 2;
+  const plotRows = oneColumn ? (paneOpen ? 5 : 4) : paneOpen ? 3 : 2;
+  const rowsPerPlot = ROWS_PER_PLOT;
+  const totalRows = plotRows * rowsPerPlot;
+  const minimumRowHeight = minimumRowHeightFor(oneColumn);
   const minimumGridHeight = minimumRowHeight * totalRows;
-  const [containerHeight, setContainerHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver(([entry]) => {
-      setContainerHeight(entry.contentRect.height);
-    });
-    resizeObserver.observe(container);
-
-    return () => resizeObserver.disconnect();
-  }, [containerRef]);
 
   const rowHeight =
     containerHeight > 0
-      ? Math.max(containerHeight / totalRows, minimumRowHeight)
-      : expanded
-        ? minimumRowHeight
-        : 50;
-  const gridHeight = rowHeight * totalRows;
+      ? Math.max(rowHeightFor(containerHeight, totalRows), minimumRowHeight)
+      : minimumRowHeight;
+  const gridHeight = gridHeightFor(rowHeight, totalRows);
 
   // -------------------------------------------------------------------------
   // Cells
@@ -221,7 +248,7 @@ function SpectroscopyPlots({
         plotConfig={{ xValues: data.xValues, yValues: data.yValues }}
         customToolbarChildren={null}
         values={values}
-        //tightAxes //requires Davidia 1.1.0
+        tightAxes
       />
     ) : null;
 
@@ -234,68 +261,40 @@ function SpectroscopyPlots({
   // Not computed yet: empty cells on the same axes as the channels
   const compositeCell: Cell = {
     key: "composite",
-    title: "Composite image",
+    title: "Composite",
     content: plot(channels.composite),
   };
 
-  // Drawer open: camera + 3 channels + composite in one row (5x1)
-  // Drawer closed: 3 channels + composite in a 2x2
-  const cells = expanded
-    ? [...channelCells, compositeCell]
-    : [overviewCell, ...channelCells, compositeCell];
+  const cells = paneOpen
+    ? [overviewCell, ...channelCells, compositeCell]
+    : [...channelCells, compositeCell];
 
   // -------------------------------------------------------------------------
   // Layout
   // -------------------------------------------------------------------------
-  const layout = cells.map(({ key }, i) => ({
-    i: key,
-    x: i % cols,
-    y: Math.floor(i / cols) * rowsPerPlot,
-    w: 1,
-    h: rowsPerPlot,
-    static: true,
-  }));
+  const layout = cells.map(({ key }, i) => {
+    const size = { i: key, h: rowsPerPlot, static: true };
+    // the overview, when shown, takes the whole top row
+    if (key === "overview") return { ...size, x: 0, y: 0, w: cols };
+    const j = paneOpen ? i - 1 : i;
+    const row = Math.floor(j / cols) + (paneOpen ? 1 : 0);
+    return { ...size, x: j % cols, y: row * rowsPerPlot, w: 1 };
+  });
 
   // -------------------------------------------------------------------------
   // Plot cells
   // -------------------------------------------------------------------------
   const plots = cells.map(({ key, title, content }) => (
-    <Box
-      key={key}
-      sx={{
-        width: "100%",
-        minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        borderRight: 1,
-        borderColor: "divider",
-      }}
-    >
-      <Typography
-        variant="overline"
-        color="primary"
-        borderBottom={1}
-        borderColor={"divider"}
-        marginLeft={2}
-        flexShrink={0}
-      >
-        {title}
-      </Typography>
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          overflow: "hidden",
-          // davidia wraps every plot in a hardcoded
-          // <div style="display:grid;position:relative"> with no height,
-          // which breaks the size chain. This gives it one.
-          "& > div": { height: "100%" },
-        }}
+    <div key={key}>
+      <PlotCell
+        title={title}
+        contentRef={key === "red" ? cellContent : undefined}
+        balanceAxes={key !== "overview"}
+        largeTitle={!paneOpen}
       >
         {content}
-      </Box>
-    </Box>
+      </PlotCell>
+    </div>
   ));
 
   // -------------------------------------------------------------------------
@@ -310,6 +309,7 @@ function SpectroscopyPlots({
         width: "100%",
         minWidth: 0,
         minHeight: 0,
+        position: "relative",
       }}
     >
       <Box
@@ -321,6 +321,12 @@ function SpectroscopyPlots({
           height: gridHeight,
           minHeight: minimumGridHeight,
           overflow: "visible",
+          // react-grid-layout places its cells with position: absolute, and
+          // only its stylesheet (not imported) makes the grid their
+          // container. Without this they're placed against something
+          // further up the page, outside the scrolling plot column
+          position: "relative",
+          ...settlingSx(settling),
         }}
       >
         {mounted && (
@@ -331,7 +337,7 @@ function SpectroscopyPlots({
             gridConfig={{
               cols: cols,
               rowHeight: rowHeight,
-              margin: [0, 0],
+              ...PLOT_GRID_SPACING,
             }}
             autoSize
             onLayoutChange={() => {}}

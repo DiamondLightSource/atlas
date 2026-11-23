@@ -2,8 +2,8 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import TomographyControls from "./TomographyControls";
 import { TomographyForm } from "./TomographyForm";
-import { Plane } from "./plane";
-import ControlsDrawer from "../ControlsDrawer";
+import { Plane, maxSliceFor } from "./plane";
+import ControlsPane, { PANE_WIDTH } from "../ControlsPane";
 import TomographyPlots from "./TomographyPlots";
 import { useSharedState } from "../../hooks/useSharedState";
 import ScanStatusLine from "../ScanStatusLine";
@@ -24,7 +24,7 @@ interface Volume {
 function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
   // const [revolve, setRevolve] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [paneOpen, setPaneOpen] = useState(true);
 
   // Shared across all open tabs (and restored on reload)
   const [slice, setSlice] = useSharedState("tomography:slice", 0);
@@ -70,53 +70,71 @@ function TomographyView() {
 
   // revolve to be implemented
 
-  if (!volume) return <Box />;
-
-  // Another tab may switch to an axis with fewer slices, so clamp locally
-  const maxSlice: Record<Plane, number> = {
-    [Plane.Z]: volume.volumeShape[0] - 1,
-    [Plane.Y]: volume.volumeShape[1] - 1,
-    [Plane.X]: volume.volumeShape[2] - 1,
-  };
-  const clampedSlice = Math.min(slice, maxSlice[plane]);
+  // Another tab may switch to an axis with fewer slices, so clamp locally.
+  // The layout shows before the volume loads, as spectroscopy's does
+  const clampedSlice = volume
+    ? Math.min(slice, maxSliceFor(volume.volumeShape, plane))
+    : slice;
 
   // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
+  // The plots take the width the controls pane leaves
   return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
-        minWidth: 260 * 3,
+        flexGrow: 1,
+        // as tall as the page area and no taller, so only the plots scroll
+        minHeight: 0,
+        minWidth: paneOpen ? PANE_WIDTH + 400 : 400,
         height: "100%",
       }}
     >
-      <TomographyPlots
-        volumeData={volume.volumeData}
-        volumeVisible={true}
-        plane={plane}
-        slice={clampedSlice}
-        threshold={threshold}
-        volumeShape={volume.volumeShape}
-        drawerOpen={drawerOpen}
-      />
-      <ControlsDrawer
-        open={drawerOpen}
-        onToggle={() => setDrawerOpen(prev => !prev)}
-        status={<ScanStatusLine />}
-        controls={[
-          <TomographyForm key="form" />,
-          <TomographyControls
-            key="controls"
-            onSlide={handleSlider}
-            onSetDirection={handlePlane}
-            onThreshold={handleThreshold}
-            plane={plane}
-            slice={clampedSlice}
-            threshold={threshold}
-            volumeShape={volume.volumeShape}
-          />,
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: 0,
+          // stacked plots scroll, with the scrollbar hidden; never sideways
+          overflowY: "auto",
+          overflowX: "hidden",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
+        }}
+      >
+        <TomographyPlots
+          volumeData={volume?.volumeData}
+          volumeVisible={true}
+          plane={plane}
+          slice={clampedSlice}
+          threshold={threshold}
+          volumeShape={volume?.volumeShape}
+          paneOpen={paneOpen}
+        />
+      </Box>
+      <ControlsPane
+        open={paneOpen}
+        onToggle={() => setPaneOpen(prev => !prev)}
+        status={<ScanStatusLine compact={!paneOpen} />}
+        tabs={[
+          { label: "Scan", content: <TomographyForm /> },
+          {
+            label: "Display",
+            content: (
+              <TomographyControls
+                onSlide={handleSlider}
+                onSetDirection={handlePlane}
+                onThreshold={handleThreshold}
+                plane={plane}
+                slice={clampedSlice}
+                threshold={threshold}
+                volumeShape={volume?.volumeShape}
+              />
+            ),
+          },
         ]}
       />
     </Box>

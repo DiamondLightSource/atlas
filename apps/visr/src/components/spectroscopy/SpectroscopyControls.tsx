@@ -40,16 +40,12 @@ export default function Controls({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 3,
+        gap: 2,
         p: 3,
       }}
     >
-      <Typography variant="overline" color="primary">
-        Plots
-      </Typography>
-
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2" color="primary">
+        <Typography variant="body2" color="text.secondary">
           Data Source
         </Typography>
         <RadioGroup row value={dataSource} onChange={onSetDataSource}>
@@ -66,7 +62,7 @@ export default function Controls({
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2" color="primary">
+        <Typography variant="body2" color="text.secondary">
           Positions
         </Typography>
         <RadioGroup
@@ -87,7 +83,7 @@ export default function Controls({
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2" color="primary">
+        <Typography variant="body2" color="text.secondary">
           Plot Type
         </Typography>
         <RadioGroup
