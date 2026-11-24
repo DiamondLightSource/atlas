@@ -1,5 +1,5 @@
 import { Box, Button, Chip, Stack } from "@mui/material";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -23,6 +23,7 @@ import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
 import { useRowReorder } from "../components/rowReorder/useRowReorder";
 import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
+import { FeedbackSnackbar } from "../../../../packages/blueapi-ui/src/utils/FeedbackSnackbar";
 
 interface QueueViewProps {
   displayMode?: "future" | "historic" | "all";
@@ -149,6 +150,13 @@ export function QueueView({
     isMovable: (row) => row.original.status === "Queued",
   });
 
+  const [notifyClearHistory, setNotifyClearHistory] = useState<boolean>(false);
+  const handleClearHistory = () => {
+    clearHistory();
+    setNotifyClearHistory(true);
+  }
+  const [notifyClearAll, setNotifyClearAll] = useState<boolean>(false);
+
   const table = useMaterialReactTable({
     columns: columns,
     data: tableData,
@@ -186,10 +194,16 @@ export function QueueView({
             variant="outlined"
             color="error"
             disabled={displayMode === "future"}
-            onClick={() => clearHistory()}
+            onClick={() => handleClearHistory()}
           >
             Clear History
           </Button>
+          <FeedbackSnackbar
+            open={notifyClearHistory}
+            setOpen={setNotifyClearHistory}
+            message="History deleted"
+            severity="success"
+          />
           <Button
             variant="outlined"
             color="error"
@@ -198,6 +212,12 @@ export function QueueView({
           >
             Clear All
           </Button>
+          {/* <FeedbackSnackbar
+            open={notifyClearAll}
+            setOpen={setNotifyClearAll}
+            message="Queue deleted"
+            severity="success"
+          /> */}
         </Stack>
         <Stack direction="row" alignItems="center" spacing={2}>
           <QueueEstimatedRuntime />
