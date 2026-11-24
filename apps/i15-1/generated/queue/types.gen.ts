@@ -248,16 +248,8 @@ export type OidcConfig = {
    * Well Known Url
    *
    * URL to fetch OIDC config from the provider
-   *
-   * @deprecated
    */
-  well_known_url?: string | null;
-  /**
-   * Issuer
-   *
-   * URL of OIDC provider
-   */
-  issuer?: string | null;
+  well_known_url: string;
   /**
    * Client Id
    *
@@ -632,6 +624,20 @@ export type GetConfigConfigGetResponses = {
 };
 
 export type GetConfigConfigGetResponse = GetConfigConfigGetResponses[keyof GetConfigConfigGetResponses];
+
+export type SyncQueueSyncPostData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/sync';
+};
+
+export type SyncQueueSyncPostResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
 
 export type CancelAllTasksQueueDeleteData = {
   body?: never;
