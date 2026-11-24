@@ -48,7 +48,7 @@ const renderSubmittedMessage = (
       return (
         <Accordion key={`error-msg-${String(i)}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography sx={{ color: "red" }}>
+            <Typography color="error">
               Submission error type {r.error.name}
             </Typography>
           </AccordionSummary>
@@ -62,9 +62,7 @@ const renderSubmittedMessage = (
       return (
         <Accordion key={`errors-${String(i)}`}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography sx={{ color: "red" }}>
-              Submission error type GraphQL
-            </Typography>
+            <Typography color="error">Submission error type GraphQL</Typography>
           </AccordionSummary>
           <AccordionDetails>
             {r.errors.map((e, j) => {

@@ -1,12 +1,21 @@
-import { Box, IconButton, Tab, Tabs, Tooltip, Typography } from "@mui/material";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { useState, type ReactNode } from "react";
+import {
+  Box,
+  Drawer,
+  IconButton,
+  Tab,
+  Tabs,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
+  type Theme,
+} from "@mui/material";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
+import { useRef, useState, type ReactNode } from "react";
+import { PageSidePanel, TabBarActions } from "@atlas/app-shell";
 import { layoutTransition } from "./plotGrid";
 
-export const PANE_WIDTH = 600;
-const COLLAPSED_WIDTH = 56;
-export const HEADER_HEIGHT = 56;
+const PANE_WIDTH = 600;
+const DRAWER_ID = "controls-drawer";
 
 export interface PaneTab {
   label: string;
@@ -17,153 +26,127 @@ interface ControlsPaneProps {
   open: boolean;
   onToggle: () => void;
   tabs: PaneTab[];
-  /** In the footer; stays mounted when collapsed, so give it a compact form */
-  status?: ReactNode;
 }
 
 /**
- * The controls, in tabs, in a pane at the right. Collapses to a strip with the
- * expand button and the status. The tabs stay mounted, so a form keeps its
+ * The controls, in tabs, in a persistent drawer at the right of the page,
+ * below the section's tab bar, making room for itself. Its button is at the
+ * end of the tab bar, above it. The drawer stays mounted, so a form keeps its
  * values while hidden.
  */
-function ControlsPane({ open, onToggle, tabs, status }: ControlsPaneProps) {
+function ControlsPane({ open, onToggle, tabs }: ControlsPaneProps) {
   const [tab, setTab] = useState(0);
+  const theme = useTheme();
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  // the name stays the same; aria-expanded says whether it is open
+  const tooltip = open ? "Hide controls" : "Show controls";
+
+  // the drawer comes after the whole page in the tab order, so opening it
+  // with its button takes focus straight to it, once it has slid in
+  const focusOnOpen = useRef(false);
+  const focusTab = () => {
+    if (!focusOnOpen.current) return;
+    focusOnOpen.current = false;
+    document.getElementById(`controls-tab-${tab}`)?.focus();
+  };
+  const toggle = () => {
+    focusOnOpen.current = !open;
+    onToggle();
+  };
 
   return (
-    <Box
-      component="aside"
-      aria-label="Controls"
-      sx={{
-        width: open ? PANE_WIDTH : COLLAPSED_WIDTH,
-        flexShrink: 0,
-        // opens and closes quickly, rather than snapping; its contents are
-        // revealed or cut off by the edge as it goes
-        ...layoutTransition(["width"]),
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: 0,
-        borderLeft: 1,
-        borderColor: "divider",
-        // set apart from the workspace: a tinted body, and a stronger header
-        bgcolor: "action.hover",
-      }}
-    >
-      {/* Header: the title, and the button; just the button when collapsed */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          // the button stays at the right, in the same place whether open,
-          // closed or in between: 8px in, which centres it when collapsed
-          justifyContent: "flex-end",
-          gap: 1,
-          height: HEADER_HEIGHT,
-          pl: open ? 2 : 0,
-          pr: 1,
-          flexShrink: 0,
-          bgcolor: "action.selected",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        {open && (
-          <Typography
-            variant="h6"
-            component="h2"
-            fontWeight="var(--ds-font-weight-semibold)"
-            noWrap
-            sx={{ mr: "auto" }}
-          >
-            Controls
-          </Typography>
-        )}
-        <Tooltip title={open ? "Collapse controls" : "Expand controls"}>
+    <>
+      <TabBarActions>
+        <Tooltip title={tooltip}>
           <IconButton
-            onClick={onToggle}
-            aria-label={open ? "Collapse controls" : "Expand controls"}
+            onClick={toggle}
+            aria-label="Controls"
             aria-expanded={open}
+            aria-controls={DRAWER_ID}
           >
-            {open ? (
-              <KeyboardDoubleArrowRightIcon />
-            ) : (
-              <KeyboardDoubleArrowLeftIcon />
-            )}
+            {open ? <PanelRightClose /> : <PanelRightOpen />}
           </IconButton>
         </Tooltip>
-      </Box>
+      </TabBarActions>
 
-      {/* Tabs */}
-      <Box
-        sx={{
-          display: open ? "flex" : "none",
-          flexDirection: "column",
-          flex: 1,
-          minHeight: 0,
-          // its full width throughout, so the forms don't reflow as the pane
-          // opens (the border takes 1px)
-          width: PANE_WIDTH - 1,
-          flexShrink: 0,
-        }}
-      >
-        <Tabs
-          value={tab}
-          onChange={(_, value: number) => setTab(value)}
-          variant="fullWidth"
+      <PageSidePanel>
+        <Box
           sx={{
-            flexShrink: 0,
-            borderBottom: 1,
-            borderColor: "divider",
-            "& .MuiTab-root": { textTransform: "none", fontSize: "1.125rem" },
+            position: "relative",
+            overflow: "hidden",
+            width: open ? PANE_WIDTH : 0,
+            // the drawer slides in as the space opens, at the same pace
+            ...layoutTransition(["width"]),
           }}
         >
-          {tabs.map(({ label }, i) => (
-            <Tab
-              key={label}
-              label={label}
-              id={`controls-tab-${i}`}
-              aria-controls={`controls-tabpanel-${i}`}
-            />
-          ))}
-        </Tabs>
-        <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-          {tabs.map(({ label, content }, i) => (
-            <Box
-              key={label}
-              role="tabpanel"
-              hidden={i !== tab}
-              id={`controls-tabpanel-${i}`}
-              aria-labelledby={`controls-tab-${i}`}
+          <Drawer
+            variant="persistent"
+            anchor="right"
+            open={open}
+            transitionDuration={
+              reducedMotion ? 0 : theme.transitions.duration.shortest
+            }
+            slotProps={{
+              transition: { onEntered: focusTab },
+              paper: {
+                id: DRAWER_ID,
+                component: "aside",
+                "aria-label": "Controls",
+                sx: {
+                  // in the space made for it, not fixed over the whole window
+                  position: "absolute",
+                  width: PANE_WIDTH,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                  // what an elevation-1 Paper paints; a persistent drawer's
+                  // paper is held at elevation 0
+                  bgcolor: (theme: Theme) => theme.palette.surface.elevated(1),
+                  borderLeft: 1,
+                  borderColor: "divider",
+                },
+              },
+            }}
+          >
+            <Tabs
+              aria-label="Controls"
+              value={tab}
+              onChange={(_, value: number) => setTab(value)}
+              sx={{
+                flexShrink: 0,
+                // sized to their labels, not stretched or held to a minimum
+                "& .MuiTab-root": { minWidth: 0, px: 2 },
+                bgcolor: (theme: Theme) => theme.palette.surface.elevated(2),
+                borderBottom: 1,
+                borderColor: "divider",
+              }}
             >
-              {content}
+              {tabs.map(({ label }, i) => (
+                <Tab
+                  key={label}
+                  label={label}
+                  id={`controls-tab-${i}`}
+                  aria-controls={`controls-tabpanel-${i}`}
+                />
+              ))}
+            </Tabs>
+            <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+              {tabs.map(({ label, content }, i) => (
+                <Box
+                  key={label}
+                  role="tabpanel"
+                  hidden={i !== tab}
+                  id={`controls-tabpanel-${i}`}
+                  aria-labelledby={`controls-tab-${i}`}
+                >
+                  {content}
+                </Box>
+              ))}
             </Box>
-          ))}
+          </Drawer>
         </Box>
-      </Box>
-
-      {/* Footer: the status; just a symbol when collapsed. Always rendered
-          here, so it stays mounted through a collapse */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: open ? "flex-end" : "center",
-          alignItems: "center",
-          minWidth: 0,
-          // the same height open or collapsed, matching the header
-          height: HEADER_HEIGHT,
-          px: open ? 2 : 0,
-          // at the bottom even when collapsed, with the tabs hidden
-          mt: "auto",
-          flexShrink: 0,
-          // shaded like the header, so it reads as the pane's footer
-          bgcolor: "action.selected",
-          borderTop: 1,
-          borderColor: "divider",
-        }}
-      >
-        {status}
-      </Box>
-    </Box>
+      </PageSidePanel>
+    </>
   );
 }
 

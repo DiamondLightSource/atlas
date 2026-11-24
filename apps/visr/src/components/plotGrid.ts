@@ -46,14 +46,3 @@ export function layoutTransition(properties: string[]) {
     "@media (prefers-reduced-motion: reduce)": { transition: "none" },
   } as const;
 }
-
-/**
- * Hides the plot cards at once while they settle after a layout change, then
- * fades them back in, rather than showing them jump or move into place
- */
-export function settlingSx(settling: boolean) {
-  return {
-    opacity: settling ? 0 : 1,
-    transition: settling ? "none" : "opacity 100ms ease-out",
-  } as const;
-}

@@ -3,10 +3,9 @@ import { useEffect, useState } from "react";
 import TomographyControls from "./TomographyControls";
 import { TomographyForm } from "./TomographyForm";
 import { Plane, maxSliceFor } from "./plane";
-import ControlsPane, { PANE_WIDTH } from "../ControlsPane";
+import ControlsPane from "../ControlsPane";
 import TomographyPlots from "./TomographyPlots";
 import { useSharedState } from "../../hooks/useSharedState";
-import ScanStatusLine from "../ScanStatusLine";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -24,7 +23,8 @@ interface Volume {
 function TomographyView() {
   const [volume, setVolume] = useState<Volume | null>(null);
   // const [revolve, setRevolve] = useState(false);
-  const [paneOpen, setPaneOpen] = useState(true);
+  // one choice for every experiment page, kept across reloads and tabs
+  const [paneOpen, setPaneOpen] = useSharedState("controls:open", true);
 
   // Shared across all open tabs (and restored on reload)
   const [slice, setSlice] = useSharedState("tomography:slice", 0);
@@ -87,7 +87,7 @@ function TomographyView() {
         flexGrow: 1,
         // as tall as the page area and no taller, so only the plots scroll
         minHeight: 0,
-        minWidth: paneOpen ? PANE_WIDTH + 400 : 400,
+        minWidth: 400,
         height: "100%",
       }}
     >
@@ -118,7 +118,6 @@ function TomographyView() {
       <ControlsPane
         open={paneOpen}
         onToggle={() => setPaneOpen(prev => !prev)}
-        status={<ScanStatusLine compact={!paneOpen} />}
         tabs={[
           { label: "Scan", content: <TomographyForm /> },
           {

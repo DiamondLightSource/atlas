@@ -1,17 +1,17 @@
 import { Box } from "@mui/material";
 import SpectroscopyPlots from "./SpectroscopyPlots";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useScanEvents } from "../../hooks/scanEvents";
 import { useSubmitWorkflow } from "../../hooks/useSubmitWorkflow";
 import { visitTextToVisit } from "../../utils/common";
-import ControlsPane, { PANE_WIDTH } from "../ControlsPane";
+import ControlsPane from "../ControlsPane";
 import { SpectroscopyForm } from "./SpectroscopyForm";
 import SpectroscopyControls from "./SpectroscopyControls";
 import { useInstrumentSession } from "@atlas/app-shell";
 import { DataSource } from "./dataSource";
 import { plotKindFor, type Positions, type Shape } from "./plotKinds";
 import { useSharedState } from "../../hooks/useSharedState";
-import ScanStatusLine, { type LastPointsStatus } from "../ScanStatusLine";
+import { useReportLastPoints } from "../../hooks/useLastPoints";
 
 export type SpectroscopyFormData = {
   total_number_of_scan_points: number;
@@ -28,8 +28,9 @@ export type SpectroscopyFormData = {
 const PLOT_ASPECT_RATIO = "equal";
 
 function SpectroscopyView() {
-  const [paneOpen, setPaneOpen] = useState(true);
-  const [lastPoints, setLastPoints] = useState<LastPointsStatus | null>(null);
+  // one choice for every experiment page, kept across reloads and tabs
+  const [paneOpen, setPaneOpen] = useSharedState("controls:open", true);
+  const reportLastPoints = useReportLastPoints();
 
   // Shared across all open tabs (and restored on reload)
   const [dataSource, setDataSource] = useSharedState<DataSource>(
@@ -81,7 +82,7 @@ function SpectroscopyView() {
         flexGrow: 1,
         // as tall as the page area and no taller, so only the plots scroll
         minHeight: 0,
-        minWidth: paneOpen ? PANE_WIDTH + 400 : 400,
+        minWidth: 400,
         height: "100%",
       }}
     >
@@ -104,13 +105,12 @@ function SpectroscopyView() {
           plotKind={plotKindFor(positions, shape)}
           paneOpen={paneOpen}
           plotAspectRatio={PLOT_ASPECT_RATIO}
-          onLastPointsChange={setLastPoints}
+          onLastPointsChange={reportLastPoints}
         />
       </Box>
       <ControlsPane
         open={paneOpen}
         onToggle={() => setPaneOpen(prev => !prev)}
-        status={<ScanStatusLine lastPoints={lastPoints} compact={!paneOpen} />}
         tabs={[
           { label: "Scan", content: <SpectroscopyForm /> },
           {

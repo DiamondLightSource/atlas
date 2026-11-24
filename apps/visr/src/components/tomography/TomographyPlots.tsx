@@ -13,9 +13,7 @@ import {
   gridHeightFor,
   minimumRowHeightFor,
   rowHeightFor,
-  settlingSx,
 } from "../plotGrid";
-import { useSettling } from "../../hooks/useSettling";
 import { useElementSize } from "../../hooks/useElementSize";
 
 const OVERVIEW_SRC =
@@ -59,8 +57,6 @@ function TomographyPlots({
   const mounted = size !== null;
   const width = size?.width ?? 0;
   const containerHeight = size?.height ?? 0;
-  // hidden while the plots resize after the pane opens or closes, or the window is resized
-  const settling = useSettling(paneOpen, containerRef);
 
   // -------------------------------------------------------------------------
   // Grid sizing
@@ -195,7 +191,6 @@ function TomographyPlots({
           // container. Without this they're placed against something
           // further up the page, outside the scrolling plot column
           position: "relative",
-          ...settlingSx(settling),
         }}
       >
         {mounted && (

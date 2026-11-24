@@ -15,6 +15,7 @@ import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
 import Workflows from "./components/workflows/Workflows.tsx";
 import CrystallographyView from "./components/crystallography/CrystallographyView.tsx";
 import HomePage from "./components/HomePage.tsx";
+import { LastPointsProvider, StatusBar } from "./components/StatusBar.tsx";
 import GeneralPage from "./components/information/GeneralPage.tsx";
 import ExperimentsPage from "./components/information/ExperimentsPage.tsx";
 import VerticalSlicePage from "./components/information/VerticalSlicePage.tsx";
@@ -79,6 +80,7 @@ const navigation: SectionGroup[] = [
 const router = createRouter({
   title: "ViSR",
   navigation,
+  statusBar: <StatusBar />,
 });
 
 const api = createApi("/api/blueapi", authProvider.login);
@@ -93,7 +95,9 @@ enableMocking().then(() => {
         queryClient={queryClient}
         theme={DiamondDSTheme}
       >
-        <RouterProvider router={router} />
+        <LastPointsProvider>
+          <RouterProvider router={router} />
+        </LastPointsProvider>
       </AppProviders>
     </StrictMode>,
   );

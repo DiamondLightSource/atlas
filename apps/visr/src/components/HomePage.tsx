@@ -1,83 +1,59 @@
-import { Box, Typography } from "@mui/material";
-import { green, pink } from "@mui/material/colors";
-import { alpha } from "@mui/material/styles";
+import { Box, Card, CardActionArea, Typography } from "@mui/material";
 import { Lambda, Slice, type LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { HEADER_HEIGHT } from "./ControlsPane";
 import { PLOT_GAP } from "./plotGrid";
 
 const EXPERIMENTS: {
   name: string;
   icon: LucideIcon;
-  colour: string;
   to: string;
 }[] = [
-  {
-    name: "Spectroscopy",
-    icon: Lambda,
-    colour: pink[300],
-    to: "/acquisition/spectroscopy",
-  },
-  {
-    name: "Tomography",
-    icon: Slice,
-    colour: green[400],
-    to: "/acquisition/tomography",
-  },
+  { name: "Spectroscopy", icon: Lambda, to: "/acquisition/spectroscopy" },
+  { name: "Tomography", icon: Slice, to: "/acquisition/tomography" },
 ];
 
-function ExperimentCard({
-  name,
-  icon: Icon,
-  colour,
-  to,
-}: (typeof EXPERIMENTS)[0]) {
+function ExperimentCard({ name, icon: Icon, to }: (typeof EXPERIMENTS)[0]) {
   return (
-    <Box
-      component={Link}
-      to={to}
+    <Card
+      elevation={0}
+      square
       sx={theme => ({
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 2,
-        minHeight: 240,
-        p: 3,
-        color: "text.primary",
-        textDecoration: "none",
-        bgcolor: "action.hover",
-        transition: theme.transitions.create(
-          ["background-color", "box-shadow", "transform"],
-          { duration: theme.transitions.duration.shorter },
-        ),
-        "& svg": {
-          color: colour,
-          transition: theme.transitions.create("transform", {
-            duration: theme.transitions.duration.shorter,
-          }),
+        bgcolor: "primary.container",
+        color: "primary.onContainer",
+        transition: theme.transitions.create("box-shadow", {
+          duration: theme.transitions.duration.shorter,
+        }),
+        "&:hover, &:has(.Mui-focusVisible)": {
+          boxShadow: "inset 0 0 0 9999px var(--ds-overlay-hover)",
         },
-        "&:hover, &:focus-visible": {
-          bgcolor: alpha(colour, 0.1),
-          boxShadow: `inset 0 0 0 2px ${colour}, ${theme.shadows[6]}`,
-          transform: "translateY(-4px)",
-          "& svg": { transform: "scale(1.08)" },
+        // on the card, not the action area: the card's overflow would clip it
+        "&:has(.Mui-focusVisible)": {
+          outline: "var(--ds-focus-ring-width) solid var(--ds-focus-ring)",
+          outlineOffset: "var(--ds-focus-ring-offset)",
         },
-        "&:active": { transform: "translateY(-1px)" },
-        "&:focus-visible": { outline: "none" },
-        "@media (prefers-reduced-motion: reduce)": {
-          transition: "none",
-          "&:hover, &:focus-visible, &:active": { transform: "none" },
-          "& svg": { transition: "none" },
-          "&:hover svg, &:focus-visible svg": { transform: "none" },
-        },
+        "@media (prefers-reduced-motion: reduce)": { transition: "none" },
       })}
     >
-      <Icon size={96} strokeWidth={1.5} aria-hidden />
-      <Typography variant="h4" component="span">
-        {name}
-      </Typography>
-    </Box>
+      <CardActionArea
+        component={Link}
+        to={to}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          minHeight: 240,
+          p: 3,
+          "& .MuiCardActionArea-focusHighlight": { display: "none" },
+        }}
+      >
+        <Icon size={96} strokeWidth={1.5} aria-hidden />
+        <Typography variant="h4" component="span">
+          {name}
+        </Typography>
+      </CardActionArea>
+    </Card>
   );
 }
 
@@ -86,26 +62,18 @@ function HomePage() {
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: `${PLOT_GAP}px` }}
     >
-      {/* its top lines up with the controls pane's header on the experiment pages */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          minHeight: HEADER_HEIGHT,
           px: 3,
           py: 2,
           flexShrink: 0,
-          bgcolor: "action.selected",
           borderBottom: 1,
           borderColor: "divider",
         }}
       >
-        <Typography
-          variant="h2"
-          component="h1"
-          fontWeight="var(--ds-font-weight-bold)"
-          noWrap
-        >
+        <Typography variant="h2Display" component="h1" noWrap>
           ViSR
         </Typography>
       </Box>

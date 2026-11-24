@@ -18,7 +18,7 @@ const AXIS_MARGIN_DIFFERENCE = 80 - 24;
 // top y tick label, which sits half above the axis
 const AXIS_TOP_SPARE = 10;
 
-/** A plot on a shaded card, titled inside it */
+/** A plot on a card, titled inside it */
 export function PlotCell({
   title,
   children,
@@ -35,7 +35,7 @@ export function PlotCell({
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        bgcolor: "action.hover",
+        bgcolor: "background.paper",
       }}
     >
       <Typography

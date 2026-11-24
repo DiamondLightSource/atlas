@@ -30,9 +30,7 @@ import {
   gridHeightFor,
   minimumRowHeightFor,
   rowHeightFor,
-  settlingSx,
 } from "../plotGrid";
-import { useSettling } from "../../hooks/useSettling";
 import { useElementSize } from "../../hooks/useElementSize";
 
 const OVERVIEW_SRC =
@@ -197,9 +195,7 @@ function SpectroscopyPlots({
   const mounted = size !== null;
   const width = size?.width ?? 0;
   const containerHeight = size?.height ?? 0;
-  // hidden while the plots resize after the pane opens or closes, or the window is resized
-  const settling = useSettling(paneOpen, containerRef);
-  // the stripes match the cells' shading, so are read from inside one
+  // the stripes match the cells' background, so are read from inside one
   const cellContent = useRef<HTMLDivElement>(null);
   const stripes = useStripesBehind(cellContent, mounted);
   const { data, lastPoints } = useSpectroscopyData(plotKind, stripes);
@@ -326,7 +322,6 @@ function SpectroscopyPlots({
           // container. Without this they're placed against something
           // further up the page, outside the scrolling plot column
           position: "relative",
-          ...settlingSx(settling),
         }}
       >
         {mounted && (

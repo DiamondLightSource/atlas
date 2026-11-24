@@ -27,7 +27,7 @@ function CamPva({ src, alt = "Camera view" }: CamPvaProps) {
             justifyContent: "center",
           }}
         >
-          <VideocamOffIcon sx={{ fontSize: 64, color: "grey.500" }} />
+          <VideocamOffIcon sx={{ fontSize: 64, color: "text.tertiary" }} />
         </Box>
       )}
       <Box

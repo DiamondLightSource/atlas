@@ -39,12 +39,7 @@ export default function Controls({
         p: 3,
       }}
     >
-      <Typography
-        variant="subtitle1"
-        fontWeight="var(--ds-font-weight-semibold)"
-      >
-        General
-      </Typography>
+      <Typography variant="subtitle1">General</Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="body2" color="text.secondary">
@@ -62,12 +57,7 @@ export default function Controls({
         />
       </Box>
 
-      <Typography
-        variant="subtitle1"
-        fontWeight="var(--ds-font-weight-semibold)"
-      >
-        Cross-section
-      </Typography>
+      <Typography variant="subtitle1">Cross-section</Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="body2" color="text.secondary">

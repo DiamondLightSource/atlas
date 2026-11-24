@@ -1,11 +1,11 @@
-import { Button } from "@mui/material";
+import { Button, type ButtonProps } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { useScanEvents } from "../hooks/scanEvents";
 import type { WorkerStateRequest } from "@atlas/blueapi";
 import { useSetWorkerState } from "@atlas/blueapi-query";
 
-const AbortButton = () => {
+const AbortButton = ({ size }: { size?: ButtonProps["size"] }) => {
   const [disabled, setDisabled] = useState<boolean>(true);
   const scanEvent = useScanEvents();
   const workerState = useSetWorkerState();
@@ -22,8 +22,8 @@ const AbortButton = () => {
     <Button
       variant="contained"
       color="error"
+      size={size}
       disabled={disabled}
-      sx={{ width: "150px" }}
       onClick={async () => {
         const workerRequest: WorkerStateRequest = {
           new_state: "ABORTING",
