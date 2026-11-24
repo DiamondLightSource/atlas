@@ -22,7 +22,7 @@ const colours = [
 ];
 
 const defaultScan: MappingScan = {
-  region: { fastStart: 25, fastStop: 75, slowStart: 25, slowStop: 75 },
+  region: { fastStart: 0, fastStop: 0.005, slowStart: 0, slowStop: 0.005 },
   path: { xPoints: 10, yPoints: 10 },
   exposure: 0.1,
 };

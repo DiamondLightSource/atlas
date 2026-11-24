@@ -11,8 +11,8 @@ type Props = {
   selectionHandler: SelectionHandler;
 };
 export function Map({ selections, selectionHandler }: Props) {
-  const values = ndarray(new Float32Array([0, 0, 0]), [1, 1, 3]);
-  const initialAxis = ndarray(new Float32Array([0, 100]));
+  const values = ndarray(new Float32Array([0.2, 0.2, 0.2]), [1, 1, 3]);
+  const initialAxis = ndarray(new Float32Array([-0.02, 0.02]));
 
   return (
     <ImagePlot
