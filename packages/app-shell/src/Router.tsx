@@ -20,6 +20,9 @@ export interface RouterProps {
 
   /** Add a footer to the bottom of the navigation panel */
   footer?: (props: { open: boolean }) => React.ReactNode;
+
+  /** A narrow strip along the bottom of every page, for app-wide status */
+  statusBar?: React.ReactNode;
 }
 
 /** A group within the main navigation tree */

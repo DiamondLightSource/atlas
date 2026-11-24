@@ -8,6 +8,7 @@ import { usePersistentDrawerState } from "./usePersistentDrawerState";
 import { topBarHeight } from "./layoutConstants";
 import { useAuth } from "@atlas/auth";
 import type { ReactNode } from "react";
+import { PageSlotsProvider } from "./context/pageSlots";
 
 export function toNavItemGroups(
   routerProps: RouterProps,
@@ -64,7 +65,10 @@ export function Layout(props: RouterProps) {
         }}
       >
         <Box sx={{ height: topBarHeight, flexShrink: 0 }} />
-        <Outlet />
+        <PageSlotsProvider>
+          <Outlet />
+        </PageSlotsProvider>
+        {props.statusBar}
       </Box>
     </Box>
   );
