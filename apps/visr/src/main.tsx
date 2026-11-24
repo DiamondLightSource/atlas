@@ -8,11 +8,16 @@ import { QueryClient } from "@tanstack/react-query";
 import { createApi } from "@atlas/blueapi";
 import { createRouter, type SectionGroup } from "@atlas/app-shell";
 import { PlanBrowser } from "@atlas/blueapi-ui";
-import { ChartNoAxesCombined, ScanQrCode } from "lucide-react";
+import { ChartNoAxesCombined, House, Info, ScanQrCode } from "lucide-react";
 import { AppProviders } from "./AppProviders.tsx";
 import TomographyView from "./components/tomography/TomographyView.tsx";
 import SpectroscopyView from "./components/spectroscopy/SpectroscopyView.tsx";
 import Workflows from "./components/workflows/Workflows.tsx";
+import CrystallographyView from "./components/crystallography/CrystallographyView.tsx";
+import HomePage from "./components/HomePage.tsx";
+import GeneralPage from "./components/information/GeneralPage.tsx";
+import ExperimentsPage from "./components/information/ExperimentsPage.tsx";
+import VerticalSlicePage from "./components/information/VerticalSlicePage.tsx";
 import { authProvider } from "./auth.ts";
 
 async function enableMocking() {
@@ -22,7 +27,19 @@ async function enableMocking() {
   }
 }
 
+// / goes to the first section; the sidebar puts a divider between groups
 const navigation: SectionGroup[] = [
+  {
+    sections: [
+      {
+        name: "Home",
+        icon: <House />,
+        // needed: / goes to the first section's path, without falling back to its name
+        path: "home",
+        pages: [{ name: "Home", element: <HomePage /> }],
+      },
+    ],
+  },
   {
     sections: [
       {
@@ -32,6 +49,7 @@ const navigation: SectionGroup[] = [
         pages: [
           { name: "Spectroscopy", element: <SpectroscopyView /> },
           { name: "Tomography", element: <TomographyView /> },
+          { name: "Crystallography", element: <CrystallographyView /> },
           { name: "Plans", element: <PlanBrowser /> },
         ],
       },
@@ -40,6 +58,19 @@ const navigation: SectionGroup[] = [
         icon: <ChartNoAxesCombined />,
         path: "analysis",
         pages: [{ name: "Workflows", element: <Workflows /> }],
+      },
+    ],
+  },
+  {
+    sections: [
+      {
+        name: "Information",
+        icon: <Info />,
+        pages: [
+          { name: "General", element: <GeneralPage /> },
+          { name: "Experiments", element: <ExperimentsPage /> },
+          { name: "Vertical Slice", element: <VerticalSlicePage /> },
+        ],
       },
     ],
   },

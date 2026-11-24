@@ -6,7 +6,7 @@ import { layoutTransition } from "./plotGrid";
 
 export const PANE_WIDTH = 600;
 const COLLAPSED_WIDTH = 56;
-const HEADER_HEIGHT = 56;
+export const HEADER_HEIGHT = 56;
 
 export interface PaneTab {
   label: string;

@@ -34,7 +34,7 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@tanstack/react-query": "^5.90.21",
-    "lucide-react": "^1.33.0",
+    "lucide-react": "^1.68.0",
     "ndarray": "^1.0.19",
     "ndarray-ops": "^1.2.2",
     "react-error-boundary": "^6.0.0",
