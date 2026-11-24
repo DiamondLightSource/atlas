@@ -17,7 +17,7 @@ import Pucks from "./routes/Pucks";
 import { QueueView } from "./routes/QueueView";
 import { DataVisRedirect } from "./routes/DataVisRedirect";
 import { StopAllButton } from "./components/StopAllButton";
-import { PlanBrowser } from "@atlas/blueapi-ui";
+import Plans from "./routes/Plans";
 
 const INSTRUMENT: string = "i15-1";
 
@@ -47,7 +47,7 @@ const navigation: SectionGroup[] = [
           },
           {
             name: "Plans",
-            element: <PlanBrowser />,
+            element: <Plans />,
           },
         ],
       },
