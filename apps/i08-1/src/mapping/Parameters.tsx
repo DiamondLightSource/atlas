@@ -3,7 +3,7 @@ import { ROIs } from "./roi/ROIs";
 import { RasterPath } from "./path/RasterPath";
 import { Detector } from "./Detector";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import { toPandaScanParameters, useDefinitionManager } from "./definitions";
 
 export function Parameters() {
