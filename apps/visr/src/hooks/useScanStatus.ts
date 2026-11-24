@@ -7,8 +7,8 @@ import { useScanEvents } from "./scanEvents";
 // Types
 // ---------------------------------------------------------------------------
 
-// "ending": over, waiting on blueapi for how. "finished": over, but blueapi
-// never said how
+// "ending": over, waiting on blueapi for how
+// "finished": over, but blueapi never said how
 export type ScanPhase =
   | "running"
   | "ending"
@@ -25,13 +25,10 @@ export interface ScanStatus {
   id: string;
   planName?: string;
   scanType?: string;
-  // unknown if this tab joined partway
   startedAt?: number;
   endedAt?: number;
-  // when this tab first saw it, for telling which came last
   seenAt: number;
   error?: string;
-  // when not plain RUNNING
   workerState?: WorkerState;
 }
 
@@ -292,8 +289,8 @@ function choose(
   return scan;
 }
 
-// While the worker is busy, the running scan, else the plan; once idle,
-// whichever ended last
+// While the worker is busy, the running scan, else the plan
+// Once idle, whichever ended last
 export function useScanStatus(): {
   status: ScanStatus | null;
   worker: WorkerReach;
