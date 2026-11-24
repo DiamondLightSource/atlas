@@ -154,8 +154,12 @@ export function QueueView({
   const handleClearHistory = () => {
     clearHistory();
     setNotifyClearHistory(true);
-  }
+  };
   const [notifyClearAll, setNotifyClearAll] = useState<boolean>(false);
+  const handleClearAll = () => {
+    clearAllTasks();
+    setNotifyClearAll(true);
+  };
 
   const table = useMaterialReactTable({
     columns: columns,
@@ -198,26 +202,14 @@ export function QueueView({
           >
             Clear History
           </Button>
-          <FeedbackSnackbar
-            open={notifyClearHistory}
-            setOpen={setNotifyClearHistory}
-            message="History deleted"
-            severity="success"
-          />
           <Button
             variant="outlined"
             color="error"
             disabled={displayMode === "future"}
-            onClick={() => clearAllTasks()}
+            onClick={() => handleClearAll()}
           >
             Clear All
           </Button>
-          {/* <FeedbackSnackbar
-            open={notifyClearAll}
-            setOpen={setNotifyClearAll}
-            message="Queue deleted"
-            severity="success"
-          /> */}
         </Stack>
         <Stack direction="row" alignItems="center" spacing={2}>
           <QueueEstimatedRuntime />
@@ -255,6 +247,18 @@ export function QueueView({
       >
         <MaterialReactTable table={table} />
       </Stack>
+      <FeedbackSnackbar
+        open={notifyClearHistory}
+        setOpen={setNotifyClearHistory}
+        message="History deleted"
+        severity="success"
+      />
+      <FeedbackSnackbar
+        open={notifyClearAll}
+        setOpen={setNotifyClearAll}
+        message="Queue deleted"
+        severity="success"
+      />
     </Box>
   );
 }
