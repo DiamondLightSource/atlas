@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Stack } from "@mui/material";
+import { Box, Button, Chip, Divider, Stack, Tooltip } from "@mui/material";
 import { useMemo } from "react";
 import {
   MaterialReactTable,
@@ -8,6 +8,8 @@ import {
 import {
   cancelTasks,
   clearHistory,
+  holdTasks,
+  releaseTasks,
   useGetTasks,
   useMoveTask,
   useQueueEvents,
@@ -22,6 +24,7 @@ import { JsonView } from "../components/JsonView";
 import { diamondFillParentTableProps } from "../components/diamondTableProps";
 import { useRowReorder } from "../components/rowReorder/useRowReorder";
 import { QueueEstimatedRuntime } from "../queue/QueueEstimatedRuntime";
+import { Divide } from "lucide-react";
 
 interface QueueViewProps {
   displayMode?: "future" | "historic" | "all";
@@ -40,6 +43,17 @@ export function QueueView({
   const isLoading = tasks.isPending;
   const isFetching = tasks.isFetching;
   const error = tasks.error;
+
+  const getHoldTooltip = (task: QueueTableData) => {
+    const isOnHold = task.status == "On hold";
+    const reason = task.task?.hold_reason;
+    return {
+      title: isOnHold
+        ? `On hold due to ${reason?.toLowerCase() ?? "unknown"}.`
+        : "",
+      disabled: !isOnHold || !reason,
+    };
+  };
 
   const tableData = useMemo<QueueTableData[]>(() => {
     return getTableData(tasks.data ?? []);
@@ -92,36 +106,71 @@ export function QueueView({
         accessorKey: "status",
         header: "Status",
         size: 150,
-        Cell: ({ cell }) => (
-          <Chip
-            size="small"
-            label={cell.getValue<string>()}
-            variant="outlined"
-            color={CHIP_COLOR_MAP[cell.getValue<Status>()]}
-          />
-        ),
+        Cell: ({ row }) => {
+          const task = row.original;
+          const { title, disabled } = getHoldTooltip(task);
+
+          return (
+            <Tooltip title={title} disableHoverListener={disabled}>
+              <Chip
+                size="small"
+                label={task.status}
+                variant="outlined"
+                color={CHIP_COLOR_MAP[task.status]}
+              />
+            </Tooltip>
+          );
+        },
       },
       ...(displayMode !== "historic"
         ? [
             {
-              accessorKey: "cancel",
+              accessorKey: "put on hold",
               header: "",
               size: 150,
               enableColumnActions: false,
               Cell: ({ row }) => {
                 const task = row.original;
-                const isDisabled = task.status !== "Queued";
+                console.log("hold debug", task);
+                const isDisabled =
+                  task.status != "Queued" && task.status != "On hold";
+                const { title, disabled } = getHoldTooltip(task);
 
                 return (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    disabled={isDisabled}
-                    onClick={() => cancelTasks([task.id])}
-                  >
-                    Cancel
-                  </Button>
+                  <Stack direction="row" spacing={1}>
+                    <Tooltip title={title} disableHoverListener={disabled}>
+                      <span>
+                        <Button
+                          variant="contained"
+                          color={task.status == "On hold" ? "info" : "warning"}
+                          size="small"
+                          sx={{ minWidth: 70 }}
+                          disabled={
+                            isDisabled ||
+                            (task.status == "On hold" &&
+                              task.task.hold_reason !== "Requested via API")
+                          }
+                          onClick={() =>
+                            task.status == "On hold"
+                              ? releaseTasks([task.id])
+                              : holdTasks([task.id])
+                          }
+                        >
+                          {task.status == "On hold" ? "Release" : "Hold"}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                    <Divider orientation="vertical" flexItem></Divider>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      disabled={isDisabled}
+                      onClick={() => cancelTasks([task.id])}
+                    >
+                      Cancel
+                    </Button>
+                  </Stack>
                 );
               },
             } as MRT_ColumnDef<QueueTableData>,
