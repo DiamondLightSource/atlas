@@ -399,7 +399,7 @@ export function useSpectroscopyData(
 
   /** Cached interval id */
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  /** The scan whose last points have been reported; later polls of it are view switches */
+  // later polls of a scan already reported on are view switches
   const reportedFor = useRef<string | null>(null);
 
   // React to scan updates
@@ -438,10 +438,8 @@ export function useSpectroscopyData(
       return "done";
     }
 
-    /**
-     * The last poll after a scan ends: no later poll will follow a 503, so
-     * retry. Only the first, at the scan's end, reports on its last points.
-     */
+    // no later poll will follow a 503, so retry. Only the first, at the
+    // scan's end, reports on its last points
     async function finalPoll() {
       const report = (next: LastPointsStatus | null) => {
         if (reportedFor.current === uuid) return;

@@ -150,7 +150,6 @@ interface SpectroscopyPlotsProps {
   plotKind: PlotKind;
   expanded: boolean;
   plotAspectRatio: number | "auto" | "equal";
-  /** Told whether the last points are in, for the scan status */
   onLastPointsChange?: (lastPoints: LastPointsStatus | null) => void;
 }
 

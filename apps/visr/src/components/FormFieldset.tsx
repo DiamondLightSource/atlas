@@ -1,10 +1,7 @@
 import { Box } from "@mui/material";
 import type { ReactNode } from "react";
 
-/**
- * Form fields disabled as one, by the browser through the fieldset (sci-react-ui's
- * NumberInput has no `disabled` prop), and dimmed to look it.
- */
+// A fieldset, because sci-react-ui's NumberInput has no `disabled` prop
 export function FormFieldset({
   disabled,
   children,

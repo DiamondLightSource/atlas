@@ -8,7 +8,7 @@ import instrumentSessionResponse from "./instrumentSessions-response.json";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
 
-/** Busy for the fake scan, and a little after it, as if tidying up */
+// busy for the fake scan, and a little after it, as if tidying up
 let mockWorkerState: WorkerState = "IDLE";
 const WORKER_TIDY_UP_MS = 1500;
 

@@ -7,7 +7,7 @@ interface ControlsDrawerProps {
   open: boolean;
   onToggle: () => void;
   controls: ReactNode | ReactNode[];
-  /** Shown in the header, so it stays visible when the drawer is closed */
+  // in the header, so it stays visible when the drawer is closed
   status?: ReactNode;
 }
 

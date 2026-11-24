@@ -13,18 +13,18 @@ import {
   type WorkerReach,
 } from "../hooks/useScanStatus";
 
-/** After a scan: the plots' last points aren't ready yet, or couldn't be fetched */
+// after a scan: the plots' last points aren't ready yet, or couldn't be fetched
 export type LastPointsStatus = "loading" | "missing";
 
 // ---------------------------------------------------------------------------
 // Timing
 // ---------------------------------------------------------------------------
 
-/** "Complete" goes idle after this; problems stay until the next scan */
+// problems stay until the next scan
 const IDLE_AFTER_MS = 5000;
 const FADE_MS = 1000;
 
-/** 0:07, 1:42, 1:02:03 */
+// 0:07, 1:42, 1:02:03
 function formatDuration(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
   const hours = Math.floor(total / 3600);
@@ -35,7 +35,6 @@ function formatDuration(ms: number): string {
     : `${minutes}:${seconds}`;
 }
 
-/** The current time, ticking each second while `active` */
 function useNow(active: boolean): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -49,7 +48,7 @@ function useNow(active: boolean): number {
 
 type Pauses = { id?: string; total: number; since?: number };
 
-/** Time spent paused during the run `id`: finished pauses, and any going on */
+// time paused during the run `id`, including any pause going on
 function usePauses(id: string | undefined, paused: boolean): Pauses {
   const [pauses, setPauses] = useState<Pauses>({ total: 0 });
   useEffect(() => {
@@ -70,7 +69,6 @@ function usePauses(id: string | undefined, paused: boolean): Pauses {
   return pauses;
 }
 
-/** Whether the line under `key` has had its time and gone idle */
 function useGoneIdle(key: string, goesIdle: boolean): boolean {
   const [idleKey, setIdleKey] = useState<string | null>(null);
   useEffect(() => {
@@ -87,16 +85,13 @@ function useGoneIdle(key: string, goesIdle: boolean): boolean {
 
 type Line = {
   text: string;
-  /** Duration after the text */
   time?: string;
   colour: string;
-  /** Changes on its own: shown with a spinner */
+  // changes on its own: shown with a spinner
   busy?: boolean;
-  /** Goes idle after a while */
   goesIdle?: boolean;
-  /** Fades in */
   fadeIn?: boolean;
-  /** Full text on hover, for text cut short */
+  // on hover, for text cut short
   detail?: string;
 };
 
@@ -106,12 +101,11 @@ const UNREACHABLE_LINE: Line = {
   colour: "warning.main",
 };
 
-/** Plans with no scan type, by name */
+// plans with no scan type
 const PLAN_LABELS: Record<string, string> = {
   darks_flats: "Darks/flats",
 };
 
-/** The worker's states other than plain running */
 const WORKER_STATES: Partial<Record<WorkerState, Omit<Line, "time">>> = {
   PAUSING: { text: "pausing…", colour: "warning.main", busy: true },
   PAUSED: { text: "paused", colour: "warning.main" },
@@ -122,7 +116,7 @@ const WORKER_STATES: Partial<Record<WorkerState, Omit<Line, "time">>> = {
   PANICKED: { text: "panicked", colour: "error.main" },
 };
 
-/** "Fly scan", "Darks/flats", or plain "Scan" */
+// "Fly scan", "Darks/flats", or plain "Scan"
 function label({ scanType, planName }: ScanStatus): string {
   if (scanType) {
     return `${scanType.charAt(0).toUpperCase()}${scanType.slice(1)} scan`;
@@ -134,7 +128,7 @@ function label({ scanType, planName }: ScanStatus): string {
 function describe(
   status: ScanStatus,
   lastPoints: LastPointsStatus | null,
-  /** Time running so far, less pauses */
+  // less pauses
   elapsed: number | undefined,
 ): Line {
   const name = label(status);
@@ -195,7 +189,6 @@ function describe(
   }
 }
 
-/** The line to show, and what it is showing; null for nothing */
 function chooseLine(
   status: ScanStatus | null,
   worker: WorkerReach,
@@ -223,10 +216,8 @@ function chooseLine(
 
 const fixedSx = { flexShrink: 0 };
 
-/**
- * One line; remounted when it changes, so a fade starts afresh. The spinner
- * goes after the text: the line is right-aligned, so it stays put.
- */
+// Remounted when the line changes, so a fade starts afresh. The spinner goes
+// after the text: the line is right-aligned, so it stays put
 function StatusText({ line }: { line: Line }) {
   return (
     <Fade in appear={line.fadeIn ?? false} timeout={FADE_MS}>
@@ -267,11 +258,9 @@ function StatusText({ line }: { line: Line }) {
 }
 
 interface ScanStatusLineProps {
-  /** The plots' last points, for a view that polls for them after the scan */
   lastPoints?: LastPointsStatus | null;
 }
 
-/** The latest scan or plan in one line, "Idle", or "Worker unreachable" */
 export function ScanStatusLine({ lastPoints = null }: ScanStatusLineProps) {
   const { status, worker } = useScanStatus();
   const running = status?.phase === "running";

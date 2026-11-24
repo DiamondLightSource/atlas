@@ -7,10 +7,8 @@ import { useScanEvents } from "./scanEvents";
 // Types
 // ---------------------------------------------------------------------------
 
-/**
- * "ending": over, waiting on blueapi for how. "finished": over, but blueapi
- * never said how.
- */
+// "ending": over, waiting on blueapi for how. "finished": over, but blueapi
+// never said how
 export type ScanPhase =
   | "running"
   | "ending"
@@ -19,36 +17,30 @@ export type ScanPhase =
   | "failed"
   | "aborted";
 
-/**
- * The latest scan (from the scan events), or the plan the worker is running
- * outside a scan: before, between or after scans, or with none at all.
- */
+// The latest scan (from the scan events), or the plan the worker is running
+// outside a scan: before, between or after scans, or with none at all
 export interface ScanStatus {
-  /** From the scan events, or from blueapi's worker */
   source: "scan" | "plan";
   phase: ScanPhase;
-  /** Tells one scan or plan run from the next */
   id: string;
   planName?: string;
-  /** The plan's `scan_type` parameter, if it has one */
   scanType?: string;
-  /** When this tab saw it start; unknown if it joined partway */
+  // unknown if this tab joined partway
   startedAt?: number;
   endedAt?: number;
-  /** When this tab first saw it, for telling which came last */
+  // when this tab first saw it, for telling which came last
   seenAt: number;
   error?: string;
-  /** The worker's state, when not plain RUNNING */
+  // when not plain RUNNING
   workerState?: WorkerState;
 }
 
-/** Whether blueapi's worker state is known: not yet, yes, or not reachable */
 export type WorkerReach = "loading" | "ok" | "unreachable";
 
 type TaskInfo = Pick<ScanStatus, "planName" | "scanType">;
 type TaskResult = TaskInfo & Pick<ScanStatus, "phase" | "error">;
 
-/** Whether the worker is doing anything; unknown counts as not */
+// unknown counts as not busy
 export const isBusy = (state: WorkerState | undefined) =>
   state !== undefined && state !== "IDLE" && state !== "UNKNOWN";
 
@@ -56,11 +48,11 @@ export const isBusy = (state: WorkerState | undefined) =>
 // Blueapi tasks
 // ---------------------------------------------------------------------------
 
-/** Tries for blueapi to mark a task complete once it ends */
+// tries for blueapi to mark a task complete once it ends
 const TASK_SETTLE_ATTEMPTS = 10;
 const TASK_SETTLE_DELAY_MS = 500;
 
-/** The UI aborts with the reason "UI Intervention" */
+// the UI aborts with the reason "UI Intervention"
 const ABORT_PATTERN = /abort|UI Intervention/i;
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -82,7 +74,6 @@ function taskError(task: TrackableTask): string | undefined {
   return undefined;
 }
 
-/** The worker's current task */
 async function fetchActiveTask(
   blueapi: Api,
 ): Promise<{ taskId: string; info: TaskInfo } | null> {
@@ -99,7 +90,7 @@ async function fetchActiveTask(
   }
 }
 
-/** How a task ended, once blueapi has finished it; null if it never does */
+// null if blueapi never finishes it
 async function settleTask(
   blueapi: Api,
   taskId: string,
@@ -217,7 +208,7 @@ function useLatestPlan(workerState: WorkerState | undefined) {
   const runId = useRef<string | null>(null);
   const task = useRef<Promise<string | null> | null>(null);
   const sawAbort = useRef(false);
-  /** Unknown before: the tab joined a busy worker, rather than saw it start */
+  // unknown before: the tab joined a busy worker, rather than saw it start
   const previous = useRef<WorkerState | undefined>(undefined);
 
   useEffect(() => {
@@ -281,7 +272,7 @@ function useLatestPlan(workerState: WorkerState | undefined) {
 // Status
 // ---------------------------------------------------------------------------
 
-/** The scan or the plan, whichever says more */
+// the scan or the plan, whichever says more
 function choose(
   scan: ScanStatus | null,
   plan: ScanStatus | null,
@@ -301,10 +292,8 @@ function choose(
   return scan;
 }
 
-/**
- * The status line's status: while the worker is busy, the running scan, else
- * the plan; once idle, whichever ended last. Null before anything has happened.
- */
+// While the worker is busy, the running scan, else the plan; once idle,
+// whichever ended last
 export function useScanStatus(): {
   status: ScanStatus | null;
   worker: WorkerReach;
