@@ -74,6 +74,19 @@ describe("PlanBrowser", () => {
       expect(planDetails).toHaveTextContent("Plan 2");
     });
 
+    it("passes the queue callback to the selected plan parameters", async () => {
+      const onQueuePlan = vi.fn().mockResolvedValue(undefined);
+      render(<PlanBrowser onQueuePlan={onQueuePlan} />);
+
+      await userEvent
+        .setup()
+        .click(screen.getByRole("button", { name: "Plan 2" }));
+
+      expect(paramsComponentMock.mock.calls.at(-1)?.[0].onQueuePlan).toBe(
+        onQueuePlan,
+      );
+    });
+
     it("renders plan details with every selection", async () => {
       renderBrowser();
 
@@ -127,7 +140,7 @@ describe("PlanBrowser", () => {
       const user = userEvent.setup();
       const button = screen.getByRole("button", { name: "View plans" });
       await user.click(button);
-      plansResponse.plans.forEach(plan =>
+      plansResponse.plans.forEach((plan) =>
         expect(screen.getByText(plan.name)).toBeVisible(),
       );
     });
