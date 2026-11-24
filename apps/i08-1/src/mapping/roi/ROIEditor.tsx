@@ -1,22 +1,19 @@
-import {
-  RectangularSelection,
-  type SelectionBase,
-} from "@diamondlightsource/davidia";
 import { Box, ListItemButton, Typography } from "@mui/material";
 import { Circle } from "lucide-react";
+import type { MappingDefinition } from "../definitions";
 
 type Props = {
-  roi: SelectionBase;
-  shape: "rect" | "line" | "point";
+  definition: MappingDefinition;
+  selected: boolean;
+  onSelect: () => void;
 };
 
-export function RoiItem({ roi }: Props) {
-  if (!(roi instanceof RectangularSelection)) {
-    return <Typography>Unsupported shape</Typography>;
-  }
-
+export function RoiItem({ definition, selected, onSelect }: Props) {
+  const { fastStart, fastStop, slowStart, slowStop } = definition.scan.region;
   return (
     <ListItemButton
+      selected={selected}
+      onClick={onSelect}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -26,6 +23,7 @@ export function RoiItem({ roi }: Props) {
         alignSelf: "stretch",
         borderRadius: "4px",
         border: "1px solid",
+        borderStyle: selected ? "solid" : "dashed",
       }}
     >
       <Box
@@ -36,8 +34,12 @@ export function RoiItem({ roi }: Props) {
           alignSelf: "stretch",
         }}
       >
-        <Circle size={"8px"} color={roi.colour} fill={roi.colour} />
-        <Typography>{roi.id}</Typography>
+        <Circle
+          size={"8px"}
+          color={definition.colour}
+          fill={definition.colour}
+        />
+        <Typography>{definition.name}</Typography>
       </Box>
       <Box
         sx={{
@@ -47,21 +49,8 @@ export function RoiItem({ roi }: Props) {
           alignSelf: "stretch",
         }}
       >
-        <Typography color="text.tertiary">{`${roi.lengths[0].toFixed(1)} x ${roi.lengths[1].toFixed(1)} mm at ${roi.start[0].toFixed(1)}, ${roi.start[1].toFixed(1)}`}</Typography>
+        <Typography color="text.tertiary">{`${(fastStop - fastStart).toFixed(1)} x ${(slowStop - slowStart).toFixed(1)} mm at ${fastStart.toFixed(1)}, ${slowStart.toFixed(1)}`}</Typography>
       </Box>
     </ListItemButton>
-  );
-}
-
-export function ROIEditor({ roi, shape }: Props) {
-  if (!(roi instanceof RectangularSelection)) {
-    return <Typography>Unsupported shape</Typography>;
-  }
-  const summary = `${roi.id} - ${roi.start} : ${roi.lengths}`;
-  return (
-    <Box>
-      {/* <TextField id="roi-name" label="Name" defaultValue={props.roi.id} /> */}
-      <Typography>{summary}</Typography>
-    </Box>
   );
 }

@@ -1,31 +1,27 @@
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
 import { Box } from "@mui/material";
+import type { MappingScan } from "../types";
 
-export type Raster = {
-  xStep: number;
-  yStep: number;
-};
+export type Raster = MappingScan["path"];
 
 type Props = {
   path: Raster;
-  setPath: React.Dispatch<React.SetStateAction<Raster>>;
+  setPath: (path: Raster) => void;
 };
 
-export function RasterPath(props: Props) {
-  const updateX = (x: number) => props.setPath(prev => ({ ...prev, xStep: x }));
-  const updateY = (y: number) => props.setPath(prev => ({ ...prev, yStep: y }));
+export function RasterPath({ path, setPath }: Props) {
   return (
     <Box sx={{ display: "flex", flexDirection: "row", gap: 1, p: 2 }}>
       <NumberInput
-        label="X step (mm)"
-        defaultValue={props.path.xStep}
-        onCommit={updateX}
+        label="X points"
+        defaultValue={path.xPoints}
+        onCommit={xPoints => setPath({ ...path, xPoints })}
         helperText={false}
       />
       <NumberInput
-        label="Y step (mm)"
-        defaultValue={props.path.yStep}
-        onCommit={updateY}
+        label="Y points"
+        defaultValue={path.yPoints}
+        onCommit={yPoints => setPath({ ...path, yPoints })}
         helperText={false}
       />
     </Box>

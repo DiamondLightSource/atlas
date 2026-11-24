@@ -3,18 +3,28 @@ import { http, HttpResponse } from "msw";
 import plansResponse from "./getPlans.json";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
-const task_response = { task_id: fakeTaskId };
+const taskResponse = { task_id: fakeTaskId };
+const trackableTask = {
+  task_id: fakeTaskId,
+  task: { name: "fake-task", params: {}, metadata: {} },
+  request_id: "00",
+  is_complete: true,
+  is_pending: false,
+  errors: [],
+  outcome: { outcome: "success", type: "str", result: null },
+};
 
 export const blueapi = {
   get: {
     plans: plansResponse,
     state: "IDLE",
+    task: trackableTask,
   },
   post: {
-    task: task_response,
+    task: taskResponse,
   },
   put: {
-    task: { ...task_response, status: 201 },
+    task: { ...taskResponse, status: 201 },
   },
 };
 
@@ -33,5 +43,9 @@ export const blueapiHandlers = [
 
   http.get("/api/blueapi/worker/state", () => {
     return HttpResponse.json(blueapi.get.state);
+  }),
+
+  http.get(`/api/blueapi/tasks/${fakeTaskId}`, () => {
+    return HttpResponse.json(blueapi.get.task);
   }),
 ];

@@ -1,34 +1,15 @@
-import type { SelectionBase } from "@diamondlightsource/davidia";
 import { Box, Divider, Typography } from "@mui/material";
 import { ROIs } from "./roi/ROIs";
-import { RasterPath, type Raster } from "./path/RasterPath";
-import { useState } from "react";
+import { RasterPath } from "./path/RasterPath";
 import { Detector } from "./Detector";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import { useInstrumentSession } from "@atlas/app-shell";
+import { toPandaScanParameters, useDefinitionManager } from "./definitions";
 
-type Props = {
-  selections: SelectionBase[];
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[]>>;
-};
-
-type PandaScanParameters = {
-  start: number;
-  start_slow: number;
-  stop: number;
-  stop_slow: number;
-  num: number;
-  duration: number;
-};
-
-export function Parameters(props: Props) {
-  const [path, setPath] = useState<Raster>({ xStep: 0.5, yStep: 0.5 });
-  const [exposure, setExposure] = useState<number>(0.1);
-  const [selectedRoi, setSelectedRoi] = useState<SelectionBase | undefined>(
-    undefined,
-  );
-
+export function Parameters() {
+  const { selected, updateScan } = useDefinitionManager();
   const { instrumentSession } = useInstrumentSession();
+
   return (
     <Box
       sx={theme => ({
@@ -40,16 +21,35 @@ export function Parameters(props: Props) {
         gap: 1,
       })}
     >
-      <ROIs {...props} selectedRoi={selectedRoi} setSelected={setSelectedRoi} />
+      <ROIs />
       <Divider orientation="horizontal" flexItem />
       <Typography variant="h6">Scan details</Typography>
-      <RasterPath path={path} setPath={setPath} />
-      <Detector exposure={exposure} setExposure={setExposure} />
-      <RunPlanButton
-        name="panda_scan"
-        instrumentSession={instrumentSession}
-        params={{}}
-      />
+      {selected ? (
+        // keyed so the uncommitted inputs reset when switching scans
+        <Box key={selected.id}>
+          <RasterPath
+            path={selected.scan.path}
+            setPath={path =>
+              updateScan(selected.id, scan => ({ ...scan, path }))
+            }
+          />
+          <Detector
+            exposure={selected.scan.exposure}
+            setExposure={exposure =>
+              updateScan(selected.id, scan => ({ ...scan, exposure }))
+            }
+          />
+          <RunPlanButton
+            name="panda_scan"
+            instrumentSession={instrumentSession}
+            params={toPandaScanParameters(selected.scan)}
+          />
+        </Box>
+      ) : (
+        <Typography color="text.secondary">
+          Add or select a region to edit its scan
+        </Typography>
+      )}
     </Box>
   );
 }

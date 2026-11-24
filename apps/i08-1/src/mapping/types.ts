@@ -1,8 +1,3 @@
-type MappingStage = {
-  fastAxis: string;
-  slowAxis: string;
-};
-
 /** for now just a rectangle */
 type Region = {
   fastStart: number;
@@ -13,17 +8,25 @@ type Region = {
 
 /** for now just a raster */
 type Path = {
-  xStep: number;
-  yStep: number;
+  xPoints: number;
+  yPoints: number;
 };
 
 export type MappingScan = {
-  /** what devices we are scanning */
-  stage: MappingStage;
   /** extent of the scan */
   region: Region;
   /** trajectory along the region */
   path: Path;
-  /** detector name(s), as Blueapi knows it, to exposure time(s) in seconds */
-  detectors: Record<string, number>;
+  /** for now just an exposure */
+  exposure: number;
+};
+
+/** params of the panda_scan plan in blueapi */
+export type PandaScanParameters = {
+  start: number;
+  start_slow: number;
+  stop: number;
+  stop_slow: number;
+  num: number;
+  duration: number;
 };

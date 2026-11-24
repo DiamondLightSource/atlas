@@ -1,28 +1,51 @@
 import { Box, Grid } from "@mui/material";
 import { Map } from "./Map";
-import { ROIs } from "./roi/ROIs";
 import {
   RectangularSelection,
-  type SelectionBase,
   type SelectionHandler,
 } from "@diamondlightsource/davidia";
-import { useState } from "react";
+import { useMemo } from "react";
 import { Parameters } from "./Parameters";
+import { DefinitionManagerProvider } from "./DefinitionManager";
+import {
+  regionFromSelection,
+  toSelection,
+  useDefinitionManager,
+} from "./definitions";
+
+const plotContainerSx = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  "& > div": {
+    display: "flex",
+    flex: 1,
+    minHeight: 0,
+  },
+};
 
 export function Mapping() {
-  const [selections, setSelections] = useState<SelectionBase[]>([]);
-  const selectionHandler: SelectionHandler = (
-    updatedSelection,
-    dragging,
-    clear,
-  ) => {
+  return (
+    <DefinitionManagerProvider>
+      <MappingLayout />
+    </DefinitionManagerProvider>
+  );
+}
+
+function MappingLayout() {
+  const { definitions, selected, select, updateScan } = useDefinitionManager();
+
+  const selections = useMemo(
+    () => definitions.map(def => toSelection(def, def.id === selected?.id)),
+    [definitions, selected?.id],
+  );
+
+  const selectionHandler: SelectionHandler = updatedSelection => {
     if (!updatedSelection) return "";
     if (RectangularSelection.isShape(updatedSelection)) {
-      setSelections(prev =>
-        prev.map(sel =>
-          sel.id === updatedSelection.id ? updatedSelection : sel,
-        ),
-      );
+      const region = regionFromSelection(updatedSelection);
+      updateScan(updatedSelection.id, scan => ({ ...scan, region }));
+      select(updatedSelection.id);
     }
     return updatedSelection.id;
   };
@@ -52,41 +75,19 @@ export function Mapping() {
               gap: 2,
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                "& > div": {
-                  display: "flex",
-                  flex: 1,
-                  minHeight: 0,
-                },
-              }}
-            >
+            <Box sx={plotContainerSx}>
               <Map
                 selections={selections}
                 selectionHandler={selectionHandler}
               />
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                "& > div": {
-                  display: "flex",
-                  flex: 1,
-                  minHeight: 0,
-                },
-              }}
-            >
+            <Box sx={plotContainerSx}>
               <Map selections={[]} selectionHandler={() => null} />
             </Box>
           </Box>
         </Grid>
         <Grid size={3}>
-          <Parameters selections={selections} setSelections={setSelections} />
+          <Parameters />
         </Grid>
       </Grid>
     </Box>
