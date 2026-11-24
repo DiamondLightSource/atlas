@@ -8,6 +8,10 @@ type Props = {
   onSelect: () => void;
 };
 
+function mmToPrettyMicrons(mm: number) {
+  return (1000 * mm).toFixed(0);
+}
+
 export function RoiItem({ definition, selected, onSelect }: Props) {
   const { fastStart, fastStop, slowStart, slowStop } = definition.scan.region;
   return (
@@ -49,7 +53,10 @@ export function RoiItem({ definition, selected, onSelect }: Props) {
           alignSelf: "stretch",
         }}
       >
-        <Typography color="text.tertiary">{`${(fastStop - fastStart).toFixed(1)} x ${(slowStop - slowStart).toFixed(1)} mm at ${fastStart.toFixed(1)}, ${slowStart.toFixed(1)}`}</Typography>
+        <Typography
+          color="text.tertiary"
+          variant="mono1"
+        >{`${mmToPrettyMicrons(fastStop - fastStart)}x${mmToPrettyMicrons(slowStop - slowStart)} μm at [${mmToPrettyMicrons(fastStart)},${mmToPrettyMicrons(slowStart)}]`}</Typography>
       </Box>
     </ListItemButton>
   );
