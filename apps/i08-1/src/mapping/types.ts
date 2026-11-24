@@ -27,6 +27,7 @@ export type PandaScanParameters = {
   start_slow: number;
   stop: number;
   stop_slow: number;
-  num: number;
-  duration: number;
+  num_fast: number;
+  num_slow: number;
+  exposure: number;
 };

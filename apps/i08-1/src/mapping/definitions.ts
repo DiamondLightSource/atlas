@@ -68,9 +68,8 @@ export function toPandaScanParameters(scan: MappingScan): PandaScanParameters {
     stop: scan.region.fastStop,
     start_slow: scan.region.slowStart,
     stop_slow: scan.region.slowStop,
-    // TODO: panda_scan currently uses a single `num` for both axes, so yPoints
-    // is ignored until the plan takes separate fast/slow point counts
-    num: scan.path.xPoints,
-    duration: scan.exposure,
+    num_fast: scan.path.xPoints,
+    num_slow: scan.path.yPoints,
+    exposure: scan.exposure,
   };
 }
