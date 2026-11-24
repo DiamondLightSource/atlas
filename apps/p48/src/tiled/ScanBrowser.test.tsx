@@ -64,14 +64,18 @@ function mockScans(scans: (query: ScanQuery) => TiledNode[]) {
 }
 
 /** `opened` is a scan, and its fields, picked from elsewhere such as the Dashboard */
-function renderBrowser(opened?: Selection) {
-  return render(
+function browser(opened?: Selection) {
+  return (
     <MemoryRouter initialEntries={[{ state: opened }]}>
       <ThemeProvider theme={DiamondDSTheme}>
         <ScanBrowser session="cm44196-1" />
       </ThemeProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
+}
+
+function renderBrowser(opened?: Selection) {
+  return render(browser(opened));
 }
 
 function workspace() {
@@ -286,5 +290,39 @@ describe("ScanBrowser", () => {
     renderBrowser();
 
     expect(panel().getByText("1–50 of 120")).toBeVisible();
+  });
+
+  it("shows a picked scan finishing, even after a newer one starts", async () => {
+    const user = userEvent.setup();
+    const running = makeRun(3);
+    mockLatestRun(running);
+    mockScans(() => [running, SCAN_2]);
+    const { rerender } = renderBrowser();
+    await user.click(panel().getByText("Scan 3"));
+
+    // Scan 3 finishes and scan 4 starts
+    const next = makeRun(4);
+    mockLatestRun(next);
+    mockScans(() => [next, makeRun(3, { exit_status: "success" }), SCAN_2]);
+    rerender(browser());
+
+    expect(workspace().getByText("Scan 3 · count")).toBeVisible();
+    expect(workspace().getByText("Success")).toBeVisible();
+  });
+
+  it("keeps showing a picked scan that the filters hide", async () => {
+    const user = userEvent.setup();
+    vi.mocked(useGetPlanNames).mockReturnValue({
+      data: ["count", "scan"],
+    } as ReturnType<typeof useGetPlanNames>);
+    mockScans(({ plan }) => (plan ? [SCAN_2] : [SCAN_2, SCAN_1]));
+    renderBrowser();
+    await user.click(panel().getByText("Scan 1"));
+
+    await user.click(screen.getByRole("combobox", { name: "Plan" }));
+    await user.click(screen.getByRole("option", { name: "scan" }));
+
+    expect(panel().queryByText("Scan 1")).not.toBeInTheDocument();
+    expect(workspace().getByText("Scan 1 · count")).toBeVisible();
   });
 });

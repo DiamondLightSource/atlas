@@ -87,9 +87,13 @@ export function ScanBrowser({ session }: { session: string }) {
   useRefreshOnRunChange(session);
 
   // Follow the newest scan until another is picked; the newest is polled, so
-  // use that copy of it to see it finish
+  // use that copy of it to see it finish. Show a picked scan as last listed,
+  // so it still updates after a newer scan starts.
+  const listed = scans.data?.nodes.find((node) => node.path === openRun?.path);
   const run =
-    !openRun || openRun.path === latest.data?.path ? latest.data : openRun;
+    !openRun || openRun.path === latest.data?.path
+      ? latest.data
+      : (listed ?? openRun);
 
   // A search for one scan, usually by its ID, opens it straight away
   const onlyMatch =
