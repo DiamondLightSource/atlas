@@ -1,12 +1,12 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import AbortButton from "../AbortButton";
 import FormFieldset from "../FormFieldset";
 import { useWorkerBusy } from "../../hooks/useWorkerBusy";
 import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
-import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Box } from "@mui/material";
+import ScanTypeField from "../ScanTypeField";
 
 export type SpectroscopyFormData = {
   scan_type: ScanType;
@@ -45,13 +45,12 @@ export function SpectroscopyForm() {
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        p: 3,
+        p: 2,
         "& .MuiButton-root": {
           width: "100%",
           height: 56,
           whiteSpace: "nowrap",
         },
-        "& .MuiToggleButtonGroup-root": { height: 56 },
       }}
     >
       {/* Parameters */}
@@ -59,16 +58,22 @@ export function SpectroscopyForm() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gridTemplateColumns: "1fr",
             gap: 2,
             alignItems: "start",
           }}
         >
-          {/* x and y share one cell */}
+          <ScanTypeField
+            value={formData.scan_type}
+            onChange={v => setField("scan_type", v)}
+            disabled={busy}
+          />
+          {/* x and y share one cell, too narrow for the limits hint */}
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
             <NumberInput
               label="Grid Origin x"
               numberMode="scientific"
+              helperText={false}
               defaultValue={formData.grid_origin_x}
               onCommit={v => setField("grid_origin_x", v)}
               minValue={minValue}
@@ -77,6 +82,7 @@ export function SpectroscopyForm() {
             <NumberInput
               label="Grid Origin y"
               numberMode="scientific"
+              helperText={false}
               defaultValue={formData.grid_origin_y}
               onCommit={v => setField("grid_origin_y", v)}
               minValue={minValue}
@@ -108,33 +114,14 @@ export function SpectroscopyForm() {
         </Box>
       </FormFieldset>
 
-      {/* Scan controls */}
-      <Box
-        sx={{
-          ...sectionSx,
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-          gap: 1.5,
-        }}
-      >
-        <ToggleButtonGroup
-          exclusive
-          fullWidth
-          aria-label="Scan type"
-          disabled={busy}
-          value={formData.scan_type}
-          onChange={(_, v) => v && setField("scan_type", v)}
-        >
-          <ToggleButton value={ScanType.STEP}>Step</ToggleButton>
-          <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
-        </ToggleButtonGroup>
+      {/* The scan's one action, after everything it runs with */}
+      <Box sx={sectionSx}>
         <RunPlanButton
           name="demo_spectroscopy"
           params={formData}
           instrumentSession={instrumentSession}
           buttonText="Run"
         />
-        <AbortButton />
       </Box>
     </Box>
   );

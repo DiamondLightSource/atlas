@@ -36,7 +36,7 @@ export default function Controls({
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        p: 3,
+        p: 2,
       }}
     >
       <Typography variant="subtitle1">General</Typography>
@@ -69,7 +69,6 @@ export default function Controls({
           min={0}
           max={volumeShape ? maxSliceFor(volumeShape, plane) : 0}
           disabled={loading}
-          marks
           valueLabelDisplay="auto"
           onChange={onSlide}
           value={slice}

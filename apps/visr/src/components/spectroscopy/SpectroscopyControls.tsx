@@ -41,7 +41,7 @@ export default function Controls({
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        p: 3,
+        p: 2,
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -87,7 +87,6 @@ export default function Controls({
           Plot Type
         </Typography>
         <RadioGroup
-          row
           // the setpoint grid's cells are rectangles
           value={onGrid ? "rectangles" : shape}
           onChange={event => onSetShape(event.target.value as Shape)}

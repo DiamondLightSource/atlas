@@ -14,7 +14,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { PageSidePanel, TabBarActions } from "@atlas/app-shell";
 import { layoutTransition } from "./plotGrid";
 
-const PANE_WIDTH = 600;
+const PANE_WIDTH = 320;
 const DRAWER_ID = "controls-drawer";
 
 export interface PaneTab {

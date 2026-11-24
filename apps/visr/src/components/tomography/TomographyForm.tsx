@@ -1,12 +1,12 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
-import AbortButton from "../AbortButton";
 import FormFieldset from "../FormFieldset";
 import { useWorkerBusy } from "../../hooks/useWorkerBusy";
 import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
-import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Box } from "@mui/material";
+import ScanTypeField from "../ScanTypeField";
 
 export type TomographyFormData = {
   scan_type: ScanType;
@@ -39,13 +39,12 @@ export function TomographyForm() {
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        p: 3,
+        p: 2,
         "& .MuiButton-root": {
           width: "100%",
           height: 56,
           whiteSpace: "nowrap",
         },
-        "& .MuiToggleButtonGroup-root": { height: 56 },
       }}
     >
       {/* Parameters */}
@@ -53,17 +52,16 @@ export function TomographyForm() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "1fr 1fr",
-              md: "repeat(3, 1fr)",
-            },
-            columnGap: 2,
-            rowGap: 4,
+            gridTemplateColumns: "1fr",
+            gap: 2,
             alignItems: "start",
-            pt: 2,
           }}
         >
+          <ScanTypeField
+            value={formData.scan_type}
+            onChange={v => setField("scan_type", v)}
+            disabled={busy}
+          />
           <NumberInput
             label="Number of Projections"
             numberMode="natural"
@@ -82,33 +80,14 @@ export function TomographyForm() {
         </Box>
       </FormFieldset>
 
-      {/* Scan controls */}
-      <Box
-        sx={{
-          ...sectionSx,
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-          gap: 1.5,
-        }}
-      >
-        <ToggleButtonGroup
-          exclusive
-          fullWidth
-          aria-label="Scan type"
-          disabled={busy}
-          value={formData.scan_type}
-          onChange={(_, v) => v && setField("scan_type", v)}
-        >
-          <ToggleButton value={ScanType.STEP}>Step</ToggleButton>
-          <ToggleButton value={ScanType.FLY}>Fly</ToggleButton>
-        </ToggleButtonGroup>
+      {/* The scan's one action, after everything it runs with */}
+      <Box sx={sectionSx}>
         <RunPlanButton
           name="demo_tomography"
           params={formData}
           instrumentSession={instrumentSession}
           buttonText="Run"
         />
-        <AbortButton />
       </Box>
     </Box>
   );
