@@ -1057,4 +1057,12 @@ export const handlers = [
   http.post("/api/daq-queue/queue", () => {
     return HttpResponse.json(fakeExperiments);
   }),
+
+  http.delete("/api/daq-queue/history", () => {
+    return HttpResponse.json(200);
+  }),
+
+  http.delete("/api/daq-queue/queue", () => {
+    return HttpResponse.json(200);
+  }),
 ];
