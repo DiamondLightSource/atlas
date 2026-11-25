@@ -23,6 +23,9 @@ export function toNavItemGroups(
         linkProps: {
           to: routePath(section),
           component: NavLink,
+          ...(section.openInNewTab
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {}),
         },
       })),
   }));

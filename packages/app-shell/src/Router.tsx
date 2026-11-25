@@ -50,6 +50,9 @@ export interface Section extends LabelledRoute {
 
   /** First one is default */
   pages: Page[];
+
+  /** Open this section in a new browser tab from the side navigation */
+  openInNewTab?: boolean;
 }
 
 export interface Page extends LabelledRoute {
