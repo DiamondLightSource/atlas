@@ -13,6 +13,24 @@ interface ConnectedTabProps {
   baseUrl: string;
 }
 
+export function ARPESViewer() {
+  const [uuid] = useState(() => crypto.randomUUID().slice(-8));
+
+  const baseUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/api/davidia`;
+
+  useEffect(() => {
+    console.info("ARPES Viewer mounted", {
+      uuid,
+      baseUrl,
+    });
+
+    return () => {
+      console.info("ARPES Viewer unmounted", { uuid });
+    };
+  }, [uuid, baseUrl]);
+
+  return <ConnectedARPESTab uuid={uuid} baseUrl={baseUrl} />;
+}
 export function ConnectedARPESTab({ uuid, baseUrl }: ConnectedTabProps) {
   const plots = [
     "plot_0",
