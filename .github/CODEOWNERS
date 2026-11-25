@@ -19,6 +19,8 @@
 # Repo infrastructure
 # -----------------------------------------------------------------------------
 /.github/                           @diamondlightsource/atlas-core
+/.gitignore                         @diamondlightsource/atlas-core
+/.npmrc                             @diamondlightsource/atlas-core
 /docker/                            @diamondlightsource/atlas-core
 /helm/                              @diamondlightsource/atlas-core
 /scripts/                           @diamondlightsource/atlas-core
@@ -26,6 +28,7 @@
 # Deliberately unowned: meaningful review happens on the package.json that caused the change.
 /pnpm-lock.yaml
 /pnpm-workspace.yaml                @diamondlightsource/atlas-core
+/turbo/                             @diamondlightsource/atlas-core
 /turbo.json                         @diamondlightsource/atlas-core
 /tsconfig.json                      @diamondlightsource/atlas-core
 
