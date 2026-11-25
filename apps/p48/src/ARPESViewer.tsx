@@ -8,12 +8,7 @@ import {
   type SourceConfig,
 } from "@diamondlightsource/davidia";
 
-interface ConnectedTabProps {
-  uuid: string;
-  baseUrl: string;
-}
-
-export function ARPESViewer() {
+function ARPESViewer() {
   const [uuid] = useState(() => crypto.randomUUID().slice(-8));
 
   const baseUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/api/davidia`;
@@ -31,7 +26,13 @@ export function ARPESViewer() {
 
   return <ConnectedARPESTab uuid={uuid} baseUrl={baseUrl} />;
 }
-export function ConnectedARPESTab({ uuid, baseUrl }: ConnectedTabProps) {
+
+interface ConnectedTabProps {
+  uuid: string;
+  baseUrl: string;
+}
+
+function ConnectedARPESTab({ uuid, baseUrl }: ConnectedTabProps) {
   const plots = [
     "plot_0",
     "plot_1",
@@ -261,3 +262,5 @@ export function ConnectedARPESTab({ uuid, baseUrl }: ConnectedTabProps) {
     </>
   );
 }
+
+export { ARPESViewer };
