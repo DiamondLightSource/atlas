@@ -20,6 +20,12 @@ export default defineConfig({
           );
         },
       },
+      "/api/davidia": {
+        target: "http://localhost:8000",
+        ws: true,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/davidia/, ""),
+      },
     },
   },
 });
