@@ -28,6 +28,17 @@ packages/      # Shared libraries/utilities (if applicable)
 
 Each application under `apps/<name>` is independently buildable and releasable, but follows shared conventions for layout, auth, and deployment.
 
+## Adding an application
+
+To create a new instance of the Science UI for a new instrument, use
+
+```
+turbo gen
+```
+
+Select `Science UI: Create a new Science UI instance`, follow the prompts, then run
+`pnpm install` to install the newly created app.
+
 ## Testing
 
 Frontend testing across the monorepo is standardised via [packages/vitest-conf](packages/vitest-conf/README.md). This package centralises shared test setup, including, Vitest configuration, jsdom test environment, Testing Library matchers and common setup.
