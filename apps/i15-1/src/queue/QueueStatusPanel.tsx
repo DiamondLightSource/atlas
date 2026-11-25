@@ -50,12 +50,24 @@ export function QueueControlButton() {
   );
 }
 
+const syncQueueTooltip = (
+  <>
+    <strong>Sync queue</strong>
+    <br />
+    Syncing happens automatically whenever the queue changes, but you may want
+    to do this manually if something external has changed, like a config file,
+    to see the result immediately. The queue always syncs before running each
+    task, so this button won't change what runs, only how soon you see the
+    update here.
+  </>
+);
+
 export function SyncQueueButton() {
   const { connected } = useConnected();
   const { mutate, isPending } = useSyncQueue();
 
   return (
-    <Tooltip title="Sync queue">
+    <Tooltip title={syncQueueTooltip}>
       {/* span wrapper so the tooltip still works when the button is disabled */}
       <span>
         <IconButton
