@@ -1,8 +1,7 @@
 import { type SectionGroup, createRouter } from "@atlas/app-shell";
 import { LucideLayoutDashboard } from "lucide-react";
 import { Dashboard } from "./Dashboard";
-import { ConnectedARPESTab,ARPESViewer } from "./ConnectedARPESTab";
-import { useEffect, useState } from "react";
+import { ARPESViewer } from "./ConnectedARPESTab";
 
 const navigation: SectionGroup[] = [
   {
@@ -26,7 +25,6 @@ const navigation: SectionGroup[] = [
     ],
   },
 ];
-
 
 export const router = createRouter({
   title: "P48",
