@@ -22,7 +22,6 @@ const navigation: SectionGroup[] = [
         icon: <LucideScanLine />,
         path: "scans",
         isProtected: true,
-        openInNewTab: true,
         pages: [
           {
             name: "Scans",
