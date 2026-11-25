@@ -3,6 +3,9 @@ import { defineConfig } from "vite";
 const target = "https://p48-pollux-proto-jeg.diamond.ac.uk";
 
 export default defineConfig({
+  define: {
+    global: {},
+  },
   server: {
     proxy: {
       "/api/scripting": {
