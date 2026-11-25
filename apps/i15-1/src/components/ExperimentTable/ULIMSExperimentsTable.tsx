@@ -61,10 +61,10 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 export function ExperimentList() {
   const location = useLocation();
   const { instrumentSession } = useInstrumentSession();
-  const { mutateAsync: submitTasksAsync } = useSumbitQueueTasks();
+  const submitTasksMutation = useSumbitQueueTasks();
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
-    await submitTasksAsync({
+    await submitTasksMutation.mutateAsync({
       experiments: selected.map((exp) => ({
         name: exp.experiment.name,
         experiment_definition: exp.experiment
@@ -286,6 +286,9 @@ export function ExperimentList() {
               variant="contained"
               color="primary"
               startIcon={<QueueIcon />}
+              disabled={
+                flatExperiments.length === 0 || submitTasksMutation.isPending
+              }
               onClick={async () => handleClick(selectedCount)}
             >
               Add selected {selectedCount} to queue
@@ -294,7 +297,9 @@ export function ExperimentList() {
             <Button
               variant="contained"
               startIcon={<QueueIcon />}
-              disabled={flatExperiments.length === 0}
+              disabled={
+                flatExperiments.length === 0 || submitTasksMutation.isPending
+              }
               onClick={async () => handleClick(selectedCount)}
             >
               Add all to queue
