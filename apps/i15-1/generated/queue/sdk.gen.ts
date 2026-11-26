@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelAllTasksQueueDeleteData, CancelAllTasksQueueDeleteResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
+import type { AddTasksToQueueQueuePostData, AddTasksToQueueQueuePostErrors, AddTasksToQueueQueuePostResponses, CancelAllTasksQueueDeleteData, CancelAllTasksQueueDeleteResponses, CancelTasksQueueTasksDeleteData, CancelTasksQueueTasksDeleteErrors, CancelTasksQueueTasksDeleteResponses, ClearHistoryHistoryDeleteData, ClearHistoryHistoryDeleteResponses, GetAllTasksTasksGetData, GetAllTasksTasksGetErrors, GetAllTasksTasksGetResponses, GetCallHistoryCallHistoryGetData, GetCallHistoryCallHistoryGetResponses, GetCallQueueCallQueueGetData, GetCallQueueCallQueueGetResponses, GetCompletedTasksHistoryGetData, GetCompletedTasksHistoryGetErrors, GetCompletedTasksHistoryGetResponses, GetConfigConfigGetData, GetConfigConfigGetResponses, GetQueuedTasksQueueGetData, GetQueuedTasksQueueGetErrors, GetQueuedTasksQueueGetResponses, GetQueueStateQueueStateGetData, GetQueueStateQueueStateGetResponses, GetTaskByIdTasksTaskIdGetData, GetTaskByIdTasksTaskIdGetErrors, GetTaskByIdTasksTaskIdGetResponses, GetTaskByPositionQueuePositionGetData, GetTaskByPositionQueuePositionGetErrors, GetTaskByPositionQueuePositionGetResponses, HealthzHealthzGetData, HealthzHealthzGetResponses, MoveTaskQueueMovePostData, MoveTaskQueueMovePostErrors, MoveTaskQueueMovePostResponses, ReadRootGetData, ReadRootGetResponses, StreamEventsEventsGetData, StreamEventsEventsGetResponses, SyncQueueSyncPostData, SyncQueueSyncPostResponses, UpdateQueueStateQueueStatePatchData, UpdateQueueStateQueueStatePatchErrors, UpdateQueueStateQueueStatePatchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
   /**
@@ -49,6 +49,11 @@ export const updateQueueStateQueueStatePatch = <ThrowOnError extends boolean = f
  * Get Config
  */
 export const getConfigConfigGet = <ThrowOnError extends boolean = false>(options?: Options<GetConfigConfigGetData, ThrowOnError>): RequestResult<GetConfigConfigGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetConfigConfigGetResponses, unknown, ThrowOnError>({ url: '/config', ...options });
+
+/**
+ * Sync Queue
+ */
+export const syncQueueSyncPost = <ThrowOnError extends boolean = false>(options?: Options<SyncQueueSyncPostData, ThrowOnError>): RequestResult<SyncQueueSyncPostResponses, unknown, ThrowOnError> => (options?.client ?? client).post<SyncQueueSyncPostResponses, unknown, ThrowOnError>({ url: '/sync', ...options });
 
 /**
  * Cancel All Tasks

@@ -81,6 +81,10 @@ describe("QueueView row reordering", () => {
     vi.spyOn(queueService, "useMoveTask").mockReturnValue({
       mutate,
     } as unknown as ReturnType<typeof queueService.useMoveTask>);
+    vi.spyOn(queueService, "useCancelTasks").mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof queueService.useCancelTasks>);
   });
 
   it("shows the reorder toggle except for historic tasks", () => {
