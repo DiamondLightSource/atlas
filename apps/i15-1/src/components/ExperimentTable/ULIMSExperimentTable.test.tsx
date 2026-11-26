@@ -44,6 +44,7 @@ afterEach(() => {
 beforeEach(() => {
   mockedUseSubmitTask.mockReturnValue({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
+    isPending: false,
   });
   mockedUseInstrumentSession.mockReturnValue({
     instrumentSession: "cm44163-3",
@@ -127,21 +128,131 @@ const mockExperiments = {
         },
       },
     ],
+    pageInfo: { hasNextPage: false, endCursor: "cursor-3" },
   },
 };
 
 const testTheme = createTheme();
 
 const renderComponent = () =>
-  render(
-    <ThemeProvider theme={testTheme}>
-      <MemoryRouter>
-        <ExperimentList />
-      </MemoryRouter>
-    </ThemeProvider>,
-  );
+  render(<ExperimentList />, {
+    wrapper: ({ children }) => (
+      <ThemeProvider theme={testTheme}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </ThemeProvider>
+    ),
+  });
 
 describe("ExperimentList", () => {
+  it("fetches and appends successive pages until there are no more experiments", async () => {
+    const fetchMore = vi.fn().mockResolvedValue({});
+    const firstPage = {
+      experiments: {
+        ...mockExperiments.experiments,
+        pageInfo: { hasNextPage: true, endCursor: "cursor-3" },
+      },
+    };
+    mockedUseQuery.mockReturnValue({
+      data: firstPage,
+      loading: false,
+      fetchMore,
+    });
+
+    const { rerender } = renderComponent();
+
+    await waitFor(() => expect(fetchMore).toHaveBeenCalledTimes(1));
+    expect(fetchMore.mock.calls[0][0].variables).toEqual({ after: "cursor-3" });
+
+    const nextPage = {
+      experiments: {
+        edges: [
+          {
+            node: {
+              ...mockExperiments.experiments.edges[1].node,
+              name: "Exp 4",
+            },
+          },
+        ],
+        pageInfo: { hasNextPage: true, endCursor: "cursor-4" },
+      },
+    };
+    const merged = fetchMore.mock.calls[0][0].updateQuery(firstPage, {
+      fetchMoreResult: nextPage,
+    });
+    expect(merged.experiments.edges).toEqual([
+      ...firstPage.experiments.edges,
+      ...nextPage.experiments.edges,
+    ]);
+    expect(merged.experiments.pageInfo).toEqual(nextPage.experiments.pageInfo);
+
+    mockedUseQuery.mockReturnValue({ data: merged, loading: false, fetchMore });
+    rerender(<ExperimentList />);
+
+    await waitFor(() => expect(fetchMore).toHaveBeenCalledTimes(2));
+    expect(fetchMore.mock.calls[1][0].variables).toEqual({ after: "cursor-4" });
+    expect(screen.getByText("Exp 1")).toBeInTheDocument();
+    expect(screen.getByText("Exp 4")).toBeInTheDocument();
+
+    const finalPage = {
+      experiments: {
+        edges: [
+          {
+            node: {
+              ...mockExperiments.experiments.edges[1].node,
+              name: "Exp 5",
+            },
+          },
+        ],
+        pageInfo: { hasNextPage: false, endCursor: "cursor-5" },
+      },
+    };
+    const allPages = fetchMore.mock.calls[1][0].updateQuery(merged, {
+      fetchMoreResult: finalPage,
+    });
+    mockedUseQuery.mockReturnValue({ data: allPages, loading: false, fetchMore });
+    rerender(<ExperimentList />);
+
+    expect(screen.getByText("Exp 5")).toBeInTheDocument();
+    expect(fetchMore).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    { loading: true, hasNextPage: true, endCursor: "cursor-3" },
+    { loading: false, hasNextPage: false, endCursor: "cursor-3" },
+    { loading: false, hasNextPage: true, endCursor: null },
+  ])("does not fetch another page for %j", ({ loading, ...pageInfo }) => {
+    const fetchMore = vi.fn();
+    mockedUseQuery.mockReturnValue({
+      data: { experiments: { ...mockExperiments.experiments, pageInfo } },
+      loading,
+      fetchMore,
+    });
+
+    renderComponent();
+
+    expect(fetchMore).not.toHaveBeenCalled();
+  });
+
+  it("shows pagination errors without discarding loaded experiments or retrying", async () => {
+    const fetchMore = vi.fn().mockRejectedValue(new Error("Next page failed"));
+    mockedUseQuery.mockReturnValue({
+      data: {
+        experiments: {
+          ...mockExperiments.experiments,
+          pageInfo: { hasNextPage: true, endCursor: "cursor-3" },
+        },
+      },
+      loading: false,
+      fetchMore,
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText(/Next page failed/)).toBeInTheDocument();
+    expect(screen.getByText("Exp 1")).toBeInTheDocument();
+    expect(fetchMore).toHaveBeenCalledTimes(1);
+  });
+
   it("renders experiment data in table", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
@@ -212,6 +323,28 @@ describe("ExperimentList", () => {
     ).toBeInTheDocument();
   });
 
+  it("disables queue submission while an add request is pending", () => {
+    const mutateAsync = vi.fn();
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync,
+      isPending: true,
+    });
+
+    renderComponent();
+
+    const addButton = screen.getByRole("button", {
+      name: /add all to queue/i,
+    });
+    expect(addButton).toBeDisabled();
+    fireEvent.click(addButton);
+    expect(mutateAsync).not.toHaveBeenCalled();
+  });
+
   it("changes button text when a row is selected", () => {
     mockedUseQuery.mockReturnValue({
       data: mockExperiments,
@@ -241,9 +374,7 @@ describe("ExperimentList", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    mockedUseSubmitTask.mockReturnValue({
-      mutateAsync,
-    });
+    mockedUseSubmitTask.mockReturnValue({ mutateAsync, isPending: false });
 
     renderComponent();
 
@@ -295,9 +426,7 @@ describe("ExperimentList", () => {
       error: undefined,
     } as unknown as ReturnType<typeof apollo.useQuery>);
 
-    mockedUseSubmitTask.mockReturnValue({
-      mutateAsync,
-    });
+    mockedUseSubmitTask.mockReturnValue({ mutateAsync, isPending: false });
 
     renderComponent();
 
@@ -344,7 +473,15 @@ describe("ExperimentList", () => {
   });
 
   it("shows alert with error message when submission to queue fails", async () => {
-    mockedUseSubmitTask.mockResolvedValue(null);
+    mockedUseQuery.mockReturnValue({
+      data: mockExperiments,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+    mockedUseSubmitTask.mockReturnValue({
+      mutateAsync: vi.fn().mockRejectedValue(new Error("request failed")),
+      isPending: false,
+    });
 
     renderComponent();
 

@@ -228,6 +228,24 @@ export function useCancelTasks() {
   });
 }
 
+export const syncQueue = async (): Promise<number> => {
+  const response = await queueClient.post<number>("/sync", {});
+  return response.data;
+};
+
+export function useSyncQueue() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: syncQueue,
+    onSuccess: async () => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["queue"] }),
+        client.invalidateQueries({ queryKey: ["tasks"] }),
+      ]);
+    },
+  });
+}
+
 export const moveTask = async ({
   taskId,
   newPosition,

@@ -7,7 +7,7 @@ import {
 import type { TypedDocumentNode } from "@apollo/client";
 import { columns, type ExperimentTableData } from "./columns";
 import { useLocation } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import QueueIcon from "@mui/icons-material/Queue";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useSumbitQueueTasks } from "../../queue/queueService";
@@ -61,10 +61,10 @@ const GET_EXPERIMENTS: TypedDocumentNode<
 export function ExperimentList() {
   const location = useLocation();
   const { instrumentSession } = useInstrumentSession();
-  const { mutateAsync: submitTasksAsync } = useSumbitQueueTasks();
+  const submitTasksMutation = useSumbitQueueTasks();
 
   async function submitQueueTasks(selected: ExperimentTableData[]) {
-    await submitTasksAsync({
+    await submitTasksMutation.mutateAsync({
       experiments: selected.map((exp) => ({
         name: exp.experiment.name,
         experiment_definition: exp.experiment
@@ -78,8 +78,15 @@ export function ExperimentList() {
   }
 
   const visit = visitTextToVisit(instrumentSession ?? "cm0-0");
+  const hasVisit = !!visit;
 
-  const { data, loading, error } = useQuery(GET_EXPERIMENTS, {
+  const [paginationError, setPaginationError] = useState<Error>();
+  const {
+    data,
+    loading,
+    error: queryError,
+    fetchMore,
+  } = useQuery(GET_EXPERIMENTS, {
     skip: !visit,
     variables: {
       proposal: visit?.proposalNumber ?? 0,
@@ -87,9 +94,61 @@ export function ExperimentList() {
       first: 50,
     },
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
     context: { pathname: location.pathname },
   });
 
+  useEffect(() => {
+    setPaginationError(undefined);
+  }, [visit?.proposalNumber, visit?.number]);
+
+  const hasNextPage = data?.experiments?.pageInfo?.hasNextPage;
+  const endCursor = data?.experiments?.pageInfo?.endCursor;
+
+  useEffect(() => {
+    if (
+      !hasVisit ||
+      loading ||
+      queryError ||
+      paginationError ||
+      !hasNextPage ||
+      !endCursor
+    ) {
+      return;
+    }
+
+    void fetchMore({
+      variables: { after: endCursor },
+      updateQuery: (previous, { fetchMoreResult }) => {
+        if (!previous.experiments || !fetchMoreResult.experiments) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          experiments: {
+            ...fetchMoreResult.experiments,
+            edges: [
+              ...previous.experiments.edges,
+              ...fetchMoreResult.experiments.edges,
+            ],
+          },
+        };
+      },
+    }).catch((error: Error) => setPaginationError(error));
+  }, [
+    hasVisit,
+    visit?.proposalNumber,
+    visit?.number,
+    loading,
+    queryError,
+    paginationError,
+    hasNextPage,
+    endCursor,
+    fetchMore,
+  ]);
+
+  const error = queryError ?? paginationError;
   const experiments = data?.experiments?.edges || [];
 
   const typedExperiments = experiments as {
@@ -137,6 +196,9 @@ export function ExperimentList() {
     columns,
     data: flatExperiments,
     ...diamondFillParentTableProps,
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: 25 },
+    },
     enableColumnResizing: true,
     layoutMode: "grid", // Because enabling column resizing automatically makes this default to "grid-no-grow"
     enableRowOrdering: false,
@@ -224,6 +286,9 @@ export function ExperimentList() {
               variant="contained"
               color="primary"
               startIcon={<QueueIcon />}
+              disabled={
+                flatExperiments.length === 0 || submitTasksMutation.isPending
+              }
               onClick={async () => handleClick(selectedCount)}
             >
               Add selected {selectedCount} to queue
@@ -232,7 +297,9 @@ export function ExperimentList() {
             <Button
               variant="contained"
               startIcon={<QueueIcon />}
-              disabled={flatExperiments.length === 0}
+              disabled={
+                flatExperiments.length === 0 || submitTasksMutation.isPending
+              }
               onClick={async () => handleClick(selectedCount)}
             >
               Add all to queue
