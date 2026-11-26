@@ -36,6 +36,5 @@ ui-base:
       passHostHeader: false
       ws: true
       target:
-        service:
-          name: enterprise-gateway
-          port: 8888
+        external:
+          uri: https://p48-pollux-proto-jeg.diamond.ac.uk
