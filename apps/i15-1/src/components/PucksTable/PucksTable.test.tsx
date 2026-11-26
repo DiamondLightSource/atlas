@@ -436,6 +436,32 @@ describe("PucksTable", () => {
     expect(assignOption).toHaveAttribute("aria-disabled", "true");
   });
 
+  it("shows positions in use as disabled options in the position dropdown", async () => {
+    mockedUseQuery.mockReturnValue({
+      data: mockContainersData,
+      loading: false,
+      error: undefined,
+    } as unknown as ReturnType<typeof apollo.useQuery>);
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    // Open the position dropdown for the puck with no position (puck 56789)
+    // The select showing "Assign" belongs to that puck
+    const comboboxes = await screen.findAllByRole("combobox");
+    const assignCombobox = comboboxes.find((el) =>
+      el.textContent?.includes("Assign"),
+    );
+    expect(assignCombobox).toBeDefined();
+
+    await user.click(assignCombobox!);
+
+    // The option for position 1, which is already taken by i15-1 Puck 1234, must be
+    // present but disabled so it cannot be chosen
+    const fullPositionOption = screen.getByRole("option", { name: "1" });
+    expect(fullPositionOption).toHaveAttribute("aria-disabled", "true");
+  });
+
   it("disables the position dropdown for a mounted puck", async () => {
     mockedUseQuery.mockReturnValue({
       data: mockContainersData,
