@@ -86,9 +86,19 @@ Each section:
 
 - Has a display name
 - Has an icon
-- Contains one or more pages
+- Contains one or more pages, or a single `element` with no tabs
 
 The first page is treated as the default page.
+
+A section with an `element` renders it directly, with no tab bar:
+
+```tsx
+{
+  name: "Overview",
+  icon: <OverviewIcon />,
+  element: <OverviewPage />,
+}
+```
 
 ### Pages
 

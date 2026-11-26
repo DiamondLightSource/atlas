@@ -8,6 +8,7 @@ import {
 import { Layout } from "./Layout";
 import React from "react";
 import { TabbedPanel } from "./TabbedRoute";
+import { ContentPanel } from "./ContentPanel";
 import { AuthGuard } from "./AuthGuard";
 
 describe("createRouter", () => {
@@ -40,6 +41,19 @@ describe("createRouter", () => {
             name: "Route 3",
             icon: <div />,
             pages: [{ name: "3A", element: <div test-data="3a" /> }],
+          },
+          {
+            name: "Single",
+            path: "single",
+            icon: <div />,
+            element: <div test-data="single" />,
+          },
+          {
+            name: "Protected single",
+            path: "protected_single",
+            isProtected: true,
+            icon: <div />,
+            element: <div test-data="protected-single" />,
           },
         ],
       },
@@ -94,6 +108,11 @@ describe("createRouter", () => {
     return section?.isProtected;
   };
 
+  const isSingle = (route: RouteObject) =>
+    props.navigation
+      .flatMap((group) => group.sections)
+      .find((section) => section.path === route.path)?.element !== undefined;
+
   it("creates child routes with TabbedPanel element, wrapped in AuthGuard if protected", () => {
     const children: RouteObject[] = router.routes[0].children!.filter(
       (child) => !child.index,
@@ -103,6 +122,8 @@ describe("createRouter", () => {
       const element = getReactElement(child.element);
       if (isProtected(child)) {
         expect(element.type).toBe(AuthGuard);
+      } else if (isSingle(child)) {
+        expect(element.type).not.toBe(TabbedPanel);
       } else {
         expect(element.type).toBe(TabbedPanel);
       }
@@ -111,8 +132,24 @@ describe("createRouter", () => {
     });
   });
 
-  it("adds an index route to each non-index child, redirecting to first panel", () => {
-    const children = router.routes[0].children!.filter((child) => !child.index);
+  it("renders a section with an element directly, with no tabs or redirect", () => {
+    const children = router.routes[0].children!;
+    const single = children.find((child) => child.path === "single")!;
+    expect(getReactElement(single.element).type).toBe(ContentPanel);
+    expect(single.children).toBeUndefined();
+
+    const guardedSingle = children.find(
+      (child) => child.path === "protected_single",
+    )!;
+    const guard = getReactElement(guardedSingle.element);
+    expect(guard.type).toBe(AuthGuard);
+    expect(getReactElement(guard.props.element).type).toBe(ContentPanel);
+  });
+
+  it("adds an index route to each tabbed child, redirecting to first panel", () => {
+    const children = router.routes[0].children!.filter(
+      (child) => !child.index && child.children,
+    );
     children.forEach((child) => {
       const indexRoutes: RouteObject[] = child.children?.filter(
         (child) => child.index,
@@ -125,7 +162,7 @@ describe("createRouter", () => {
         (r) => child.path === (r.path ?? sanitisePath(r.name)),
       )!;
 
-      const firstPanel = route.pages[0];
+      const firstPanel = route.pages![0];
       const expectedPath = firstPanel.path ?? sanitisePath(firstPanel.name);
       expect(indexElement.props).toEqual({
         to: expectedPath,
