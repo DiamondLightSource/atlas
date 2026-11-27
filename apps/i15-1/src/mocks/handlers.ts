@@ -86,10 +86,7 @@ const fakeExperiments = {
               id: "b645e887-85b4-40d6-a8f0-500a436bc395",
               data: {
                 q_max: 40,
-                frames: 100,
-                beam_energy: 40,
                 time_per_pdf: 2,
-                focused_beam_size: 3,
               },
             },
           },
@@ -129,7 +126,7 @@ const fakeExperiments = {
               name: "run_full_collection",
               id: "b645e887-85b4-40d6-a8f0-500a436bc395",
               data: {
-                q_max: 67,
+                q_max: 40, //67,
                 frames: 100,
                 beam_energy: 40,
                 time_per_pdf: 2,
@@ -1062,5 +1059,13 @@ export const handlers = [
 
   http.post("/api/daq-queue/queue", () => {
     return HttpResponse.json(fakeExperiments);
+  }),
+
+  http.delete("/api/daq-queue/history", () => {
+    return HttpResponse.json(200);
+  }),
+
+  http.delete("/api/daq-queue/queue", () => {
+    return HttpResponse.json(200);
   }),
 ];
