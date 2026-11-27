@@ -204,12 +204,10 @@ export function ExperimentList() {
     columns,
     data: flatExperiments,
     ...diamondFillParentTableProps,
-    initialState: {
-      pagination: { pageIndex: 0, pageSize: 25 },
-    },
     enableColumnResizing: true,
     layoutMode: "grid", // Because enabling column resizing automatically makes this default to "grid-no-grow"
     initialState: {
+      pagination: { pageIndex: 0, pageSize: 25 },
       columnVisibility: {
         capillary: false,
         frames: false,
