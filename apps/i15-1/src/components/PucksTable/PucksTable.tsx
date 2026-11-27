@@ -185,7 +185,7 @@ export function PucksTable() {
                     <em>Assign</em>
                   </MenuItem>
                   {positionOptions.map((position) => (
-                    <MenuItem key={position} value={position}>
+                    <MenuItem key={position} value={position} disabled={Object.values(selectedPositions).includes(position)}>
                       {position}
                     </MenuItem>
                   ))}
