@@ -1,41 +1,41 @@
-import type { Api } from "@atlas/blueapi";
 import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
-import { InstrumentSessionProvider } from "@atlas/app-shell";
-import { Provider as ReduxProvider } from "react-redux";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthContextProvider } from "@atlas/auth";
+import { authProvider } from "./auth";
+import type { Api } from "@atlas/blueapi";
 import { BlueapiProvider } from "@atlas/blueapi-query";
-import { store } from "@diamondlightsource/cs-web-lib";
-import { useLoadPvwsConfig } from "@atlas/pvws-config";
-import { ApolloProvider } from "@apollo/client/react";
-import { client } from "./context/experimentDefinitions/apolloClient";
-import { AuthContextProvider, type AuthProvider } from "@atlas/auth";
+import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
+import { VisitsProvider } from "./VisitsProvider";
+import { RelayEnvironmentProvider } from "react-relay/hooks";
+import { relayEnvironment } from "./relay";
 
 type Props = {
-  authProvider: AuthProvider;
-  api: Api;
+  beamline: string;
   theme: Theme;
+  blueapi: Api;
+  queryClient: QueryClient;
   children: ReactNode;
 };
 
-export function AppProviders({ authProvider, api, theme, children }: Props) {
-  const config = useLoadPvwsConfig();
+export function AppProviders({
+  beamline,
+  theme,
+  blueapi,
+  queryClient,
+  children,
+}: Props) {
   return (
-    <ThemeProvider theme={theme}>
-      <AuthContextProvider provider={authProvider}>
-        <ReduxProvider store={store(config)}>
-          <QueryClientProvider client={new QueryClient()}>
-            <BlueapiProvider api={api}>
-              <ApolloProvider client={client}>
-                <InstrumentSessionProvider>
-                  {children}
-                </InstrumentSessionProvider>
-              </ApolloProvider>
-            </BlueapiProvider>
-          </QueryClientProvider>
-        </ReduxProvider>
-      </AuthContextProvider>
-    </ThemeProvider>
+    <AuthContextProvider provider={authProvider}>
+      <ThemeProvider theme={theme}>
+        <RelayEnvironmentProvider environment={relayEnvironment}>
+          <BlueapiProvider api={blueapi}>
+            <QueryClientProvider client={queryClient}>
+              <VisitsProvider beamline={beamline}>{children}</VisitsProvider>
+            </QueryClientProvider>
+          </BlueapiProvider>
+        </RelayEnvironmentProvider>
+      </ThemeProvider>
+    </AuthContextProvider>
   );
 }

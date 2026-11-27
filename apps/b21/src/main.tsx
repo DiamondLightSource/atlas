@@ -4,11 +4,15 @@ import { RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 
-import { router } from "./router.tsx";
+import { router } from "./router";
 
+import { AppProviders } from "./AppProviders";
 import { createApi } from "@atlas/blueapi";
-import { AppProviders } from "./AppProviders.tsx";
-import { authProvider } from "./auth.ts";
+import { authProvider } from "./auth";
+import { QueryClient } from "@tanstack/react-query";
+
+export const blueapi = createApi("/api/blueapi", authProvider.login);
+const queryClient = new QueryClient();
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -17,15 +21,14 @@ async function enableMocking() {
   }
 }
 
-const api = createApi("/api/blueapi", authProvider.login);
-
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <AppProviders
-        authProvider={authProvider}
-        api={api}
+        beamline="b21"
         theme={DiamondDSTheme}
+        blueapi={blueapi}
+        queryClient={queryClient}
       >
         <RouterProvider router={router} />
       </AppProviders>
