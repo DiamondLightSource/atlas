@@ -5,5 +5,6 @@ export const renderSubmittedMessageFragment = graphql`
     status {
       __typename
     }
+    id
   }
 `;
