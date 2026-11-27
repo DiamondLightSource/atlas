@@ -45,6 +45,7 @@ const RenderSubmittedMessage = ({
               Successfully submitted{" "}
               <Link
                 to={`https://workflows.diamond.ac.uk/workflows/${result.link}`}
+                target="_blank"
               >
                 {result.message}
               </Link>
