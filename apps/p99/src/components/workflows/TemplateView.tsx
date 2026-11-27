@@ -48,6 +48,7 @@ const TemplateView = ({
               submissionResult: {
                 type: "success",
                 message: `${visitToText(visit)}/${submittedName}`,
+                link: `${visitToText(visit)}/${response.submitWorkflowTemplate.id}`,
               },
               visit,
               workflowName: submittedName,

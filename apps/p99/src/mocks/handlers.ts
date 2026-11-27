@@ -2,6 +2,7 @@ import { http, HttpResponse, graphql } from "msw";
 import plansResponse from "./plans-response.json";
 import devicesResponse from "./devices-response.json";
 import templateResponse from "./template-response.json";
+import { visitToText } from "@diamondlightsource/sci-react-ui";
 
 const fakeTaskId = "46709394";
 let workerState = "IDLE";
@@ -42,38 +43,43 @@ export const handlers = [
     return HttpResponse.json({ preferredUsername: "abc123456" });
   }),
 
-  graphql.query("templateViewQuery", async () => {
-    return HttpResponse.json(templateResponse);
+  graphql.query("templateViewQuery", async ({ variables }) => {
+    if (variables.templateName === "ptypy-p99-nexus") {
+      return HttpResponse.json(templateResponse);
+    } else {
+      return HttpResponse.json({
+        data: null,
+        errors: [
+          {
+            message: "Failed to fetch from Subgraph 'workflows'.",
+            extensions: {
+              errors: [
+                {
+                  message:
+                    'clusterworkflowtemplates.argoproj.io "ptypy-p99-from-config" not found',
+                  path: ["workflowTemplate"],
+                  extensions: {
+                    code: "DOWNSTREAM_SERVICE_ERROR",
+                  },
+                },
+              ],
+              serviceName: "workflows",
+              statusCode: 200,
+            },
+          },
+        ],
+      });
+    }
   }),
 
   graphql.mutation("submitWorkflowTemplateMutation", async ({ variables }) => {
-    if (
-      variables.visit.proposalCode === "ne" &&
-      variables.visit.proposalNumber === 11111 &&
-      variables.visit.number === 1
-    ) {
-      return HttpResponse.error();
-    } else if (
-      variables.visit.proposalCode === "ge" &&
-      variables.visit.proposalNumber === 22222 &&
-      variables.visit.number === 1
-    ) {
-      return HttpResponse.json({
-        data: {
-          submitWorkflowTemplate: {
-            name: variables.templateName,
-          },
+    return HttpResponse.json({
+      data: {
+        submitWorkflowTemplate: {
+          name: variables.templateName,
+          id: `${visitToText(variables.visit)}:${variables.templateName}:asdf123`,
         },
-        errors: [{ message: "GraphQL Error" }],
-      });
-    } else {
-      return HttpResponse.json({
-        data: {
-          submitWorkflowTemplate: {
-            name: variables.templateName,
-          },
-        },
-      });
-    }
+      },
+    });
   }),
 ];
