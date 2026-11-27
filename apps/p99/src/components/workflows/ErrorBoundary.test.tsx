@@ -13,7 +13,7 @@ const AsynchronousError = () => {
 
   useEffect(() => {
     setError(new Error("returned error"));
-  });
+  }, []);
 
   return null;
 };
