@@ -107,7 +107,11 @@ describe("RenderSubmittedMessage", () => {
 
   it("renders a success with the succeeded status icon once the fragment resolves", async () => {
     renderHarness(environment, {
-      result: { type: "success", message: "ab12345-1/mock-workflow" },
+      result: {
+        type: "success",
+        message: "ab12345-1/mock-workflow",
+        link: "ab12345-1/ab12345-1:mock-workflow:asdf123",
+      },
       index: 0,
       useResolvedFragment: true,
     });
@@ -117,14 +121,18 @@ describe("RenderSubmittedMessage", () => {
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute(
       "href",
-      "https://workflows.diamond.ac.uk/workflows/ab12345-1/mock-workflow",
+      "https://workflows.diamond.ac.uk/workflows/ab12345-1/ab12345-1:mock-workflow:asdf123",
     );
     expect(screen.getByTestId("status-icon-succeeded")).toBeInTheDocument();
   });
 
   it("falls back to the unknown status icon when there is no fragment data yet", () => {
     renderHarness(environment, {
-      result: { type: "success", message: "ab12345-1/mock-workflow" },
+      result: {
+        type: "success",
+        message: "ab12345-1/mock-workflow",
+        link: "ab12345-1/ab12345-1:mock-workflow:asdf123",
+      },
       index: 0,
       useResolvedFragment: false,
     });

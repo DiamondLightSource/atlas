@@ -15,6 +15,7 @@ describe("SubmittedMessagesList", () => {
         submissionResult: {
           type: "success",
           message: "ab12345-1/mock-workflow",
+          link: "ab12345-1/ab12345-1:mock-workflow:asdf123",
         },
         visit: {
           proposalCode: "ab",
@@ -58,7 +59,7 @@ describe("SubmittedMessagesList", () => {
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute(
       "href",
-      "https://workflows.diamond.ac.uk/workflows/ab12345-1/mock-workflow",
+      "https://workflows.diamond.ac.uk/workflows/ab12345-1/ab12345-1:mock-workflow:asdf123",
     );
     expect(screen.getByTestId("status-icon-unknown")).toBeInTheDocument();
 

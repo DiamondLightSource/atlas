@@ -44,7 +44,8 @@ const RenderSubmittedMessage = ({
             <Typography>
               Successfully submitted{" "}
               <Link
-                to={`https://workflows.diamond.ac.uk/workflows/${result.message}`}
+                to={`https://workflows.diamond.ac.uk/workflows/${result.link}`}
+                target="_blank"
               >
                 {result.message}
               </Link>
@@ -82,7 +83,7 @@ const RenderSubmittedMessage = ({
           <AccordionDetails>
             {result.errors.map((e, j) => {
               return (
-                <Typography key={`errors-msgs=${String(j)}`}>
+                <Typography key={`errors-msgs-${String(j)}`}>
                   Error {j} {e.message}
                 </Typography>
               );
