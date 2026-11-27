@@ -2,10 +2,15 @@ import { http, HttpResponse, graphql } from "msw";
 import workflowsResponse from "./workflows-response.json";
 import plansResponse from "./plans-response.json";
 import { binnedReadback, binnedSetpoint, mapData } from "./mock_data";
+import type { TrackableTask, WorkerState } from "@atlas/blueapi";
 import type { ScanEventMessage } from "../hooks/scanEvents";
 import instrumentSessionResponse from "./instrumentSessions-response.json";
 
 const fakeTaskId = "7304e8e0-81c6-4978-9a9d-9046ab79ce3c";
+
+// busy for the fake scan, and a little after it, as if tidying up
+let mockWorkerState: WorkerState = "IDLE";
+const WORKER_TIDY_UP_MS = 1500;
 
 export const handlers = [
   // Query handler
@@ -43,6 +48,24 @@ export const handlers = [
     });
   }),
 
+  // The fake scan's task, so the scan status line can name it ("Test scan")
+  http.get("/api/blueapi/worker/task", () => {
+    return HttpResponse.json({ task_id: fakeTaskId });
+  }),
+
+  http.get("/api/blueapi/tasks/:taskId", ({ params }) => {
+    const task: TrackableTask = {
+      task_id: String(params.taskId),
+      task: { name: "test_scan", params: { scan_type: "test" }, metadata: {} },
+      request_id: null,
+      is_complete: true,
+      is_pending: false,
+      errors: [],
+      outcome: { outcome: "success" },
+    };
+    return HttpResponse.json(task);
+  }),
+
   http.post("/api/blueapi/tasks", () => {
     return HttpResponse.json({
       task_id: fakeTaskId,
@@ -55,7 +78,7 @@ export const handlers = [
   }),
 
   http.get("/api/blueapi/worker/state", () => {
-    return HttpResponse.json("IDLE");
+    return HttpResponse.json(mockWorkerState);
   }),
 
   http.get("/api/data/binned/:uuid", ({ request }) => {
@@ -93,6 +116,7 @@ export const handlers = [
         };
 
         // scan starts
+        mockWorkerState = "RUNNING";
         send({
           uuid: "fake-scan-uuid",
           filepath: "/mock/path/fake.nxs",
@@ -114,6 +138,7 @@ export const handlers = [
               status: "finished",
               snake: true,
             });
+            setTimeout(() => (mockWorkerState = "IDLE"), WORKER_TIDY_UP_MS);
           }
         }, 200);
       },

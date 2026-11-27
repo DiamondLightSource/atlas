@@ -6,6 +6,7 @@ import { Plane } from "./plane";
 import ControlsDrawer from "../ControlsDrawer";
 import TomographyPlots from "./TomographyPlots";
 import { useSharedState } from "../../hooks/useSharedState";
+import ScanStatusLine from "../ScanStatusLine";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,6 +104,7 @@ function TomographyView() {
       <ControlsDrawer
         open={drawerOpen}
         onToggle={() => setDrawerOpen(prev => !prev)}
+        status={<ScanStatusLine />}
         controls={[
           <TomographyForm key="form" />,
           <TomographyControls

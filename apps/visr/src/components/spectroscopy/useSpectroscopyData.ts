@@ -2,7 +2,7 @@ import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useScanEvents } from "../../hooks/scanEvents/useScanEvents";
-import type { ScanStatus } from "./scanStatus";
+import type { LastPointsStatus } from "../ScanStatusLine";
 
 /** SpectroscopyData wrapped as NDT for ease of Davidia plotting */
 export interface DataChannels {
@@ -377,7 +377,7 @@ export function toChannels(
 
 /**
  * The scan drawn as `kind`, polled while it runs, with empty cells in
- * `stripes`
+ * `stripes`; and once it ends, whether its last points are in yet
  */
 export function useSpectroscopyData(
   kind: PlotKind = "cells",
@@ -385,11 +385,11 @@ export function useSpectroscopyData(
 ): {
   data: DataChannels;
   running: boolean;
-  status: ScanStatus | null;
+  lastPoints: LastPointsStatus | null;
 } {
   const scanEvent = useScanEvents();
   const [running, setRunning] = useState<boolean>(false);
-  const [status, setStatus] = useState<ScanStatus | null>(null);
+  const [lastPoints, setLastPoints] = useState<LastPointsStatus | null>(null);
   const [uuid, setUuid] = useState<string | null>(null);
   // kept as the server answered, so a theme change redraws it without a poll
   const [answer, setAnswer] = useState<SpectroscopyData | RenderData | null>(
@@ -399,6 +399,8 @@ export function useSpectroscopyData(
 
   /** Cached interval id */
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  // later polls of a scan already reported on are view switches
+  const reportedFor = useRef<string | null>(null);
 
   // React to scan updates
   useEffect(() => {
@@ -407,13 +409,12 @@ export function useSpectroscopyData(
     if (scanEvent.status === "running") {
       setRunning(true);
       setUuid(scanEvent.uuid);
-      setStatus("scanning");
+      setLastPoints(null);
     } else if (
       scanEvent.status === "finished" ||
       scanEvent.status === "failed"
     ) {
       setRunning(false); // triggers final poll below
-      if (scanEvent.status === "failed") setStatus("failed");
     }
   }, [scanEvent]);
 
@@ -437,11 +438,14 @@ export function useSpectroscopyData(
       return "done";
     }
 
-    /** The last poll after a scan ends: no later poll will follow a 503, so retry */
+    // no later poll will follow a 503, so retry. Only the first, at the
+    // scan's end, reports on its last points
     async function finalPoll() {
-      // a failed scan stays "failed", whatever its last points do
-      const settle = (next: ScanStatus) =>
-        setStatus(current => (current === "failed" ? current : next));
+      const report = (next: LastPointsStatus | null) => {
+        if (reportedFor.current === uuid) return;
+        setLastPoints(next);
+        if (next !== "loading") reportedFor.current = uuid;
+      };
       for (
         let attempt = 0;
         attempt < FINAL_POLL_ATTEMPTS && !cancelled;
@@ -449,16 +453,17 @@ export function useSpectroscopyData(
       ) {
         const result = await poll();
         if (cancelled) return;
-        if (result === "done") return settle("complete");
-        if (result === "error") return settle("lastPointsMissing");
-        settle("loadingLastPoints");
+        if (result === "done") return report(null);
+        if (result === "error") return report("missing");
+        report("loading");
         await new Promise(resolve => setTimeout(resolve, result.retryAfterMs));
       }
-      if (!cancelled) settle("lastPointsMissing");
+      if (!cancelled) report("missing");
     }
 
     if (running && uuid) {
-      // start polling
+      // start polling, at once so a view switch shows straight away
+      void poll();
       pollInterval.current = setInterval(poll, 500); // 2 Hz
     } else if (!running && uuid) {
       // The scan has ended: poll once more for its last points. (The previous
@@ -476,5 +481,5 @@ export function useSpectroscopyData(
     };
   }, [running, uuid, kind]);
 
-  return { data, running, status };
+  return { data, running, lastPoints };
 }

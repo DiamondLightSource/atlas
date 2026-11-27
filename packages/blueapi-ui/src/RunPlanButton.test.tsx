@@ -140,7 +140,7 @@ describe("RunPlanButton", () => {
     await waitFor(() => {
       const alert = screen.getByRole("alert");
       expect(alert).toHaveTextContent(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        "Failed to run plan test_plan: Plan submission failed!",
       );
     });
   });
@@ -177,7 +177,7 @@ describe("RunPlanButton", () => {
     await waitFor(() => {
       const alert = screen.getByRole("alert");
       expect(alert).toHaveTextContent(
-        "Failed to run plan test_plan, see console and blueapi logs for full error.",
+        "Failed to run plan test_plan: Some error. You should see this text.",
       );
     });
   });

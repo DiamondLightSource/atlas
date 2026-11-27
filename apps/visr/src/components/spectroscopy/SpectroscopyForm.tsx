@@ -1,6 +1,8 @@
 import { useInstrumentSession } from "@atlas/app-shell";
 import { RunPlanButton } from "@atlas/blueapi-ui";
 import AbortButton from "../AbortButton";
+import FormFieldset from "../FormFieldset";
+import { useWorkerBusy } from "../../hooks/useWorkerBusy";
 import { ScanType } from "../scanType";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";
@@ -17,6 +19,8 @@ export type SpectroscopyFormData = {
 
 export function SpectroscopyForm() {
   const { instrumentSession } = useInstrumentSession();
+  // no changes under a running plan
+  const busy = useWorkerBusy();
   const [formData, setFormData] = useState<SpectroscopyFormData>({
     scan_type: ScanType.STEP,
     total_number_of_scan_points: 25,
@@ -51,56 +55,58 @@ export function SpectroscopyForm() {
       }}
     >
       {/* Parameters */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-          gap: 3,
-          alignItems: "start",
-        }}
-      >
-        {/* x and y share one cell */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+      <FormFieldset disabled={busy}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 3,
+            alignItems: "start",
+          }}
+        >
+          {/* x and y share one cell */}
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <NumberInput
+              label="Grid Origin x"
+              numberMode="scientific"
+              defaultValue={formData.grid_origin_x}
+              onCommit={v => setField("grid_origin_x", v)}
+              minValue={minValue}
+              maxValue={maxValue}
+            />
+            <NumberInput
+              label="Grid Origin y"
+              numberMode="scientific"
+              defaultValue={formData.grid_origin_y}
+              onCommit={v => setField("grid_origin_y", v)}
+              minValue={minValue}
+              maxValue={maxValue}
+            />
+          </Box>
           <NumberInput
-            label="Grid Origin x"
+            label="Grid Size"
             numberMode="scientific"
-            defaultValue={formData.grid_origin_x}
-            onCommit={v => setField("grid_origin_x", v)}
-            minValue={minValue}
-            maxValue={maxValue}
+            defaultValue={formData.grid_size}
+            onCommit={v => setField("grid_size", v)}
+            minValue={0.1}
+            maxValue={15}
           />
           <NumberInput
-            label="Grid Origin y"
+            label="Number of Points"
+            numberMode="natural"
+            defaultValue={formData.total_number_of_scan_points}
+            onCommit={v => setField("total_number_of_scan_points", v)}
+            minValue={1}
+          />
+          <NumberInput
+            label="Exposure Time"
             numberMode="scientific"
-            defaultValue={formData.grid_origin_y}
-            onCommit={v => setField("grid_origin_y", v)}
-            minValue={minValue}
-            maxValue={maxValue}
+            defaultValue={formData.exposure_time}
+            onCommit={v => setField("exposure_time", v)}
+            minValue={0.1}
           />
         </Box>
-        <NumberInput
-          label="Grid Size"
-          numberMode="scientific"
-          defaultValue={formData.grid_size}
-          onCommit={v => setField("grid_size", v)}
-          minValue={0.1}
-          maxValue={15}
-        />
-        <NumberInput
-          label="Number of Points"
-          numberMode="natural"
-          defaultValue={formData.total_number_of_scan_points}
-          onCommit={v => setField("total_number_of_scan_points", v)}
-          minValue={1}
-        />
-        <NumberInput
-          label="Exposure Time"
-          numberMode="scientific"
-          defaultValue={formData.exposure_time}
-          onCommit={v => setField("exposure_time", v)}
-          minValue={0.1}
-        />
-      </Box>
+      </FormFieldset>
 
       {/* Scan controls */}
       <Box
@@ -115,6 +121,7 @@ export function SpectroscopyForm() {
           exclusive
           fullWidth
           aria-label="Scan type"
+          disabled={busy}
           value={formData.scan_type}
           onChange={(_, v) => v && setField("scan_type", v)}
         >

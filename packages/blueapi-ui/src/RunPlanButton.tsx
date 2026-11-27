@@ -48,9 +48,8 @@ export function RunPlanButton({
         setMsg(result.message);
       } catch (error) {
         setSeverity("error");
-        setMsg(
-          `Failed to run plan ${name}, see console and blueapi logs for full error.`,
-        );
+        const reason = error instanceof Error ? error.message : String(error);
+        setMsg(`Failed to run plan ${name}: ${reason}`);
         console.log(`Failed to run plan ${name}.\n Reason: ${error}`);
       } finally {
         setLoading(false);
