@@ -25,7 +25,7 @@ vi.mock("../RunPlanButton", () => ({
 const mockUseIS = vi.fn(() => ({
   instrumentSession: "cm12345-1",
 }));
-vi.mock("@atlas/app-shell", () => ({
+vi.mock("@atlas/instrument-session", () => ({
   useInstrumentSession: () => mockUseIS(),
 }));
 

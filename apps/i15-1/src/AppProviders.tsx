@@ -2,7 +2,9 @@ import type { Api } from "@atlas/blueapi";
 import { ThemeProvider } from "@diamondlightsource/sci-react-ui";
 import type { Theme } from "@mui/material";
 import type { ReactNode } from "react";
-import { InstrumentSessionProvider } from "@atlas/app-shell";
+import { InstrumentSessionProvider } from "@atlas/instrument-session";
+import { RelayEnvironmentProvider } from "react-relay";
+import { relayEnvironment } from "./relay";
 import { Provider as ReduxProvider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BlueapiProvider } from "@atlas/blueapi-query";
@@ -28,9 +30,11 @@ export function AppProviders({ authProvider, api, theme, children }: Props) {
           <QueryClientProvider client={new QueryClient()}>
             <BlueapiProvider api={api}>
               <ApolloProvider client={client}>
-                <InstrumentSessionProvider>
-                  {children}
-                </InstrumentSessionProvider>
+                <RelayEnvironmentProvider environment={relayEnvironment}>
+                  <InstrumentSessionProvider instrument="I15-1">
+                    {children}
+                  </InstrumentSessionProvider>
+                </RelayEnvironmentProvider>
               </ApolloProvider>
             </BlueapiProvider>
           </QueryClientProvider>

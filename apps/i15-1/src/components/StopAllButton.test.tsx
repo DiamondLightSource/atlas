@@ -23,12 +23,8 @@ vi.mock("../../../../packages/blueapi-ui/src/useSubmitAndRunTask", () => ({
   useSubmitAndRunTask: () => ({ submitAndRunTask: submitAndRunTaskMock }),
 }));
 
-vi.mock("@atlas/app-shell", () => ({
+vi.mock("@atlas/instrument-session", () => ({
   useInstrumentSession: () => useInstrumentSessionMock(),
-}));
-
-vi.mock("../graphql/getInstrumentSessionsQuery.ts", () => ({
-  getInstrumentSessionsQuery: {},
 }));
 
 describe("StopAllButton", () => {

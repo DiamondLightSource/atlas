@@ -1,132 +1,101 @@
 import { useState } from "react";
-import { useInstrumentSession } from "./InstrumentSessionProvider";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Divider from "@mui/material/Divider";
 import { Science, ExpandMore } from "@mui/icons-material";
 import { ListSubheader, Tooltip } from "@mui/material";
 
 export function InstrumentSessionView() {
-  const { instrumentSession, setInstrumentSession, instrumentSessionList } =
-    useInstrumentSession();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const {
+    instrumentSession,
+    setInstrumentSession,
+    instrumentSessionList,
+    loading,
+    error,
+  } = useInstrumentSession();
 
-  const menuDisabled =
-    !instrumentSessionList || instrumentSessionList.length <= 1;
   const id = "session-input";
   const staticButtonId = `${id}-staticButton`;
   const buttonId = `${id}-button`;
   const menuId = `${id}-menu`;
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleMenuItemClick = (
-    event: React.MouseEvent<HTMLElement>,
-    index: number,
-  ) => {
-    setSelectedIndex(index);
+  const handleMenuItemClick = (session: string) => {
     setAnchorEl(null);
-    setInstrumentSession(event.currentTarget.textContent ?? "");
+    setInstrumentSession(session);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleStaticButtonClick = () => {
-    if (instrumentSessionList) {
-      setInstrumentSession(instrumentSessionList[0]);
-    }
-  };
 
-  if (!instrumentSession && !instrumentSessionList) {
+  if (!instrumentSessionList || instrumentSessionList.length <= 1) {
+    const tooltip = loading
+      ? "Loading sessions..."
+      : error
+        ? `Failed to load sessions: ${error.message}`
+        : !instrumentSessionList
+          ? "Log in to see your sessions."
+          : instrumentSessionList.length === 0
+            ? "You have no sessions in progress on this instrument."
+            : "";
     return (
       <div>
-        <Tooltip title="Use 'Get Sessions' to fetch available sessions.">
+        <Tooltip title={tooltip}>
           <Button
             data-testid={staticButtonId}
             startIcon={<Science />}
             color="secondary"
             variant="outlined"
           >
-            {"No Session Selected"}
+            {instrumentSession ?? "No Session Selected"}
           </Button>
         </Tooltip>
       </div>
     );
-  } else if (
-    instrumentSessionList &&
-    instrumentSessionList.length == 1 &&
-    !instrumentSession
-  ) {
-    return (
-      <div>
-        <Button
-          data-testid={staticButtonId}
-          startIcon={<Science />}
-          color="secondary"
-          variant="outlined"
-          onClick={handleStaticButtonClick}
-        >
-          {"Assign Session"}
-        </Button>
-      </div>
-    );
-  } else if (menuDisabled && instrumentSession) {
-    return (
-      <div>
-        <Button
-          data-testid={staticButtonId}
-          startIcon={<Science />}
-          color="secondary"
-          variant="outlined"
-        >
-          {instrumentSession}
-        </Button>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <Button
-          data-testid={buttonId}
-          aria-controls={open ? menuId : undefined}
-          aria-haspopup="true"
-          aria-expanded={open}
-          startIcon={<Science />}
-          endIcon={<ExpandMore />}
-          onClick={handleClick}
-          color="secondary"
-          variant="outlined"
-        >
-          {instrumentSession ? instrumentSession : "No Session Selected"}
-        </Button>
-        <Menu
-          data-testid={menuId}
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          slotProps={{
-            list: {
-              "aria-labelledby": buttonId,
-            },
-          }}
-        >
-          <Divider />
-          <ListSubheader> Available Sessions </ListSubheader>
-          {instrumentSessionList?.map((option, index) => (
-            <MenuItem
-              key={option}
-              selected={index === selectedIndex}
-              onClick={(event) => handleMenuItemClick(event, index)}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
-      </div>
-    );
   }
+
+  return (
+    <div>
+      <Button
+        data-testid={buttonId}
+        aria-controls={open ? menuId : undefined}
+        aria-haspopup="true"
+        aria-expanded={open}
+        startIcon={<Science />}
+        endIcon={<ExpandMore />}
+        onClick={handleClick}
+        color="secondary"
+        variant="outlined"
+      >
+        {instrumentSession ?? "Select Session"}
+      </Button>
+      <Menu
+        data-testid={menuId}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          list: {
+            "aria-labelledby": buttonId,
+          },
+        }}
+      >
+        <ListSubheader>Available Sessions</ListSubheader>
+        {instrumentSessionList.map((session) => (
+          <MenuItem
+            key={session}
+            selected={session === instrumentSession}
+            onClick={() => handleMenuItemClick(session)}
+          >
+            {session}
+          </MenuItem>
+        ))}
+      </Menu>
+    </div>
+  );
 }

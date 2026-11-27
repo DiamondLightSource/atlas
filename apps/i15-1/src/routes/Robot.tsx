@@ -1,4 +1,4 @@
-import { useInstrumentSession } from "@atlas/app-shell";
+import { useInstrumentSession } from "@atlas/instrument-session";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { useState } from "react";
 import { NumberInput } from "@diamondlightsource/sci-react-ui";

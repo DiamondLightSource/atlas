@@ -20,7 +20,9 @@
     "@atlas/blueapi": "workspace:*",
     "@atlas/blueapi-query": "workspace:*",
     "@atlas/blueapi-ui": "workspace:*",
+    "@atlas/instrument-session": "workspace:*",
     "@atlas/pvws-config": "workspace:*",
+    "@atlas/supergraph": "workspace:*",
     "@diamondlightsource/cs-web-lib": "0.11.3",
     "@diamondlightsource/sci-react-ui": "0.8.0",
     "@mui/icons-material": "^7.0.0",
@@ -33,7 +35,9 @@
     "lucide-react": "^1.46.0",
     "material-react-table": "^3.2.1",
     "react-error-boundary": "^6.0.0",
-    "react-icons": "^5.3.0"
+    "react-icons": "^5.3.0",
+    "react-relay": "^20.1.1",
+    "relay-runtime": "^20.1.1"
   },
   "devDependencies": {
     "@atlas/vitest-conf": "workspace:*",
@@ -43,6 +47,8 @@
     "@hey-api/openapi-ts": "0.0.0-next-20260813201118",
     "@types/humanize-duration": "^3.27.4",
     "@types/react-redux": "7.1.34",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^20.1.1",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",

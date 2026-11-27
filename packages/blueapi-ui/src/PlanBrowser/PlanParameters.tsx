@@ -9,11 +9,11 @@ import {
 import { sanitisePlan, type SchemaNode } from "../utils/schema";
 import type { Plan, TaskRequest } from "@atlas/blueapi";
 import { RunPlanButton } from "../RunPlanButton";
-import { useInstrumentSession } from "@atlas/app-shell";
 import {
   FeedbackSnackbar,
   type SeverityLevel,
 } from "../utils/FeedbackSnackbar";
+import { useInstrumentSession } from "@atlas/instrument-session";
 
 import { ErrorBoundary } from "react-error-boundary";
 
