@@ -14,7 +14,11 @@ const mockedRenderSubmittedMessage = RenderSubmittedMessage as unknown as Mock;
 
 const testVisit = { proposalCode: "ab", proposalNumber: 12345, number: 1 };
 const workflowName = "ptypy-p99-from-config";
-const testResult = { type: "success" as const, message: "test" };
+const testResult = {
+  type: "success" as const,
+  message: "test",
+  link: "testLink",
+};
 
 function renderSubscribeAndRender(
   environment: ReturnType<typeof createMockEnvironment>,

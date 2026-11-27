@@ -2,7 +2,7 @@
   "data": {
     "workflowTemplate": {
       "title": "PtyPy Reconstruction for P99",
-      "name": "ptypy-p99-from-config",
+      "name": "ptypy-p99-nexus",
       "maintainer": "imaging-ptypy-group",
       "description": "Runs a PtyPy reconstruction job inside a container based on data collected at P99.\n",
       "repository": "https://github.com/DiamondLightSource/imaging-workflows",
