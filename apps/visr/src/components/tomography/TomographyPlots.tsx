@@ -1,14 +1,29 @@
-import { Box, Typography } from "@mui/material";
-import { ReactGridLayout, useContainerWidth } from "react-grid-layout";
-import { useLayoutEffect, useState } from "react";
+import { Box } from "@mui/material";
+import { ReactGridLayout } from "react-grid-layout";
 import SliceViewer from "./SliceViewer";
 import VolumeRenderer from "./VolumeRenderer";
 import { Plane } from "./plane";
 import CamPva from "../CamPva";
 import type { Cell } from "../cell";
+import { PlotCell } from "../PlotCell";
+import {
+  ONE_COLUMN_BELOW,
+  PLOT_GRID_SPACING,
+  ROWS_PER_PLOT,
+  gridHeightFor,
+  minimumRowHeightFor,
+  rowHeightFor,
+  settlingSx,
+} from "../plotGrid";
+import { useSettling } from "../../hooks/useSettling";
+import { useElementSize } from "../../hooks/useElementSize";
 
 const OVERVIEW_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-01:PVA:OUTPUT";
+
+/** Pane collapsed, the three plots side by side get no narrower than this: below it, one goes across the top and two below */
+const MIN_ROW_PLOT_WIDTH = 260;
+
 const DETECTOR_SRC =
   "https://visr-pvws.diamond.ac.uk/mjpg/BL01C-DI-DCAM-05:PVA:OUTPUT";
 
@@ -17,9 +32,10 @@ const DETECTOR_SRC =
 // ---------------------------------------------------------------------------
 
 interface Props {
-  volumeData: Uint8Array;
-  volumeShape: [number, number, number];
-  drawerOpen: boolean;
+  /** Not yet loaded: the reconstruction and slice cells are empty */
+  volumeData?: Uint8Array;
+  volumeShape?: [number, number, number];
+  paneOpen: boolean;
   volumeVisible: boolean;
   slice: number;
   plane: Plane;
@@ -36,43 +52,44 @@ function TomographyPlots({
   plane,
   slice,
   threshold,
-  drawerOpen,
+  paneOpen,
 }: Props) {
-  const { width, containerRef, mounted } = useContainerWidth();
+  // measured before the first paint, so the cards never show at a guessed size
+  const { ref: containerRef, size } = useElementSize();
+  const mounted = size !== null;
+  const width = size?.width ?? 0;
+  const containerHeight = size?.height ?? 0;
+  // hidden while the plots resize after the pane opens or closes, or the window is resized
+  const settling = useSettling(paneOpen, containerRef);
 
   // -------------------------------------------------------------------------
   // Grid sizing
   // -------------------------------------------------------------------------
-  const h = 10;
-  const minimumRowHeight = 30;
+  // Pane open: overview + 3 plots in 2x2
+  // Pane collapsed: 3 plots in a row; or, too narrow for that, the first
+  // across the top and the other two side by side below
+  // Narrow: all in one column, scrolling
+  const plotCount = paneOpen ? 4 : 3;
+  const oneColumn = width > 0 && width < ONE_COLUMN_BELOW;
+  const split = !paneOpen && !oneColumn && width < 3 * MIN_ROW_PLOT_WIDTH;
+  const cols = oneColumn ? 1 : paneOpen || split ? 2 : 3;
+  const rowsPerPlot = ROWS_PER_PLOT;
+  const h = Math.ceil(plotCount / cols) * rowsPerPlot;
+  const minimumRowHeight = minimumRowHeightFor(oneColumn);
   const minimumGridHeight = minimumRowHeight * h;
-  const [containerHeight, setContainerHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver(([entry]) => {
-      setContainerHeight(entry.contentRect.height);
-    });
-    resizeObserver.observe(container);
-
-    return () => resizeObserver.disconnect();
-  }, [containerRef]);
 
   const rowHeight =
     containerHeight > 0
-      ? Math.max(containerHeight / h, minimumRowHeight)
-      : drawerOpen
-        ? minimumRowHeight
-        : 50;
-  const gridHeight = rowHeight * h;
-
-  if (!volumeData) return <Box />;
+      ? Math.max(rowHeightFor(containerHeight, h), minimumRowHeight)
+      : minimumRowHeight;
+  const gridHeight = gridHeightFor(rowHeight, h);
 
   // -------------------------------------------------------------------------
   // Cells
   // -------------------------------------------------------------------------
+  const volume =
+    volumeData && volumeShape ? { data: volumeData, shape: volumeShape } : null;
+
   const overviewCell: Cell = {
     key: "overview",
     title: "Overview",
@@ -88,120 +105,116 @@ function TomographyPlots({
     {
       key: "reconstruction",
       title: "Reconstruction",
-      content: (
+      content: volume && (
         <VolumeRenderer
-          volumeData={volumeData}
-          volumeShape={volumeShape}
+          volumeData={volume.data}
+          volumeShape={volume.shape}
           threshold={threshold / 255}
         />
       ),
     },
     {
       key: "slice",
-      title: "Slice View",
-      content: (
+      title: "Cross-section",
+      content: volume && (
         <SliceViewer
-          volumeData={volumeData}
-          volumeShape={volumeShape}
+          volumeData={volume.data}
+          volumeShape={volume.shape}
           slice={slice}
           plane={plane}
           threshold={threshold}
+          colourBar={false}
         />
       ),
     },
   ];
 
-  // Drawer open: overview + 3 plots (4x1)
-  // Drawer closed: 3 plots only (3x1)
-  const cells = drawerOpen ? [overviewCell, ...plotCells] : plotCells;
-  const cols = cells.length;
+  const cells = paneOpen ? [overviewCell, ...plotCells] : plotCells;
 
   // -------------------------------------------------------------------------
   // Layout
   // -------------------------------------------------------------------------
-  const layout = cells.map(({ key }, i) => ({
-    i: key,
-    x: i,
-    y: 0,
-    w: 1,
-    h: h,
-    static: true,
-  }));
+  const layout = cells.map(({ key }, i) => {
+    const size = { i: key, h: rowsPerPlot, static: true };
+    // split: the first takes the whole top row, the rest go below it
+    if (split && i === 0) return { ...size, x: 0, y: 0, w: cols };
+    const j = split ? i + 1 : i;
+    return {
+      ...size,
+      x: j % cols,
+      y: Math.floor(j / cols) * rowsPerPlot,
+      w: 1,
+    };
+  });
 
   // -------------------------------------------------------------------------
   // Plot cells
   // -------------------------------------------------------------------------
   const plots = cells.map(({ key, title, content }) => (
-    <Box
-      key={key}
-      sx={{
-        width: "100%",
-        height: "100%",
-        minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "auto",
-        borderRight: 1,
-        borderColor: "divider",
-      }}
-    >
-      <Typography
-        variant="overline"
-        color="primary"
-        borderBottom={1}
-        borderColor={"divider"}
-        marginLeft={2}
-        flexShrink={0}
-      >
-        {title}
-      </Typography>
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          overflow: "hidden",
-          // davidia wraps every plot in a hardcoded
-          // <div style="display:grid;position:relative"> with no height,
-          // which breaks the size chain. This gives it one.
-          "& > div": { height: "100%" },
-        }}
+    <div key={key}>
+      <PlotCell
+        title={title}
+        largeTitle={!paneOpen}
+        // the cross-section is a davidia plot like spectroscopy's: aligned
+        // the same way
+        balanceAxes={key === "slice"}
       >
         {content}
-      </Box>
-    </Box>
+      </PlotCell>
+    </div>
   ));
 
   // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
+  // The outer box takes the column's height and no more: the grid's minimum
+  // height is on the inner one, so stacked plots overflow and the column
+  // scrolls, rather than the whole page growing
   return (
     <Box
-      ref={containerRef! as React.RefObject<HTMLDivElement>}
       sx={{
         flex: "1 1 0",
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
         minWidth: 0,
-        height: gridHeight,
-        minHeight: minimumGridHeight,
-        overflow: "visible",
+        minHeight: 0,
       }}
     >
-      {mounted && (
-        <ReactGridLayout
-          layout={layout}
-          width={width}
-          style={{ height: gridHeight }}
-          gridConfig={{
-            cols: cols,
-            rowHeight: rowHeight,
-            margin: [0, 0],
-          }}
-          autoSize
-          onLayoutChange={() => {}}
-        >
-          {plots}
-        </ReactGridLayout>
-      )}
+      <Box
+        ref={containerRef! as React.RefObject<HTMLDivElement>}
+        sx={{
+          flex: "1 1 0",
+          width: "100%",
+          minWidth: 0,
+          height: gridHeight,
+          minHeight: minimumGridHeight,
+          overflow: "visible",
+          // react-grid-layout places its cells with position: absolute, and
+          // only its stylesheet (not imported) makes the grid their
+          // container. Without this they're placed against something
+          // further up the page, outside the scrolling plot column
+          position: "relative",
+          ...settlingSx(settling),
+        }}
+      >
+        {mounted && (
+          <ReactGridLayout
+            layout={layout}
+            width={width}
+            style={{ height: gridHeight }}
+            gridConfig={{
+              cols: cols,
+              rowHeight: rowHeight,
+              ...PLOT_GRID_SPACING,
+            }}
+            autoSize
+            onLayoutChange={() => {}}
+          >
+            {plots}
+          </ReactGridLayout>
+        )}
+      </Box>
     </Box>
   );
 }
