@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { statusBarHeight } from "./layoutConstants";
 
 export interface SystemControlsProps {
   open: boolean;
@@ -17,6 +18,11 @@ export function SystemControls({ open, children }: SystemControlsProps) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          /**
+           * Temporary fix!
+           * see https://github.com/DiamondLightSource/sci-react-ui/issues/334
+           */
+          pb: `${statusBarHeight}px`,
         }}
       >
         {children}
