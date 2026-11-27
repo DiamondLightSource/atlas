@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const getContainersForInstrumentQuery = gql`
   query GetContainersForInstrument($instrumentKeys: [String!]) {
-    containers(instrumentKeys: $instrumentKeys) {
+    containers(instrumentKeys: $instrumentKeys, first:50) {
       edges {
         node {
           id
