@@ -321,12 +321,6 @@ export function ExperimentList() {
               Add all to queue
             </Button>
           )}
-          <FeedbackSnackbar
-            open={openSnackbar}
-            setOpen={setOpenSnackbar}
-            message={msg}
-            severity={severity}
-          />
         </Stack>
       );
     },
@@ -344,5 +338,15 @@ export function ExperimentList() {
       : undefined,
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <MaterialReactTable table={table} />
+      <FeedbackSnackbar
+        open={openSnackbar}
+        setOpen={setOpenSnackbar}
+        message={msg}
+        severity={severity}
+      />
+    </>
+  );
 }
